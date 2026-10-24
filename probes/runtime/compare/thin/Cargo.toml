@@ -1,0 +1,18 @@
+# S01 comparison crate: the same streamed tool-call turn through the thin
+# factory-agent OpenAI adapter. Standalone workspace for a clean build measure.
+[package]
+name = "compare-thin"
+version = "0.0.0"
+edition = "2024"
+license = "AGPL-3.0-only"
+publish = false
+
+[workspace]
+
+[dependencies]
+factory-agent = { path = "../../../../crates/agent", default-features = false, features = ["openai"] }
+serde_json = "1"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+
+[profile.release]
+strip = true

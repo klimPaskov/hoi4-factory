@@ -1,0 +1,613 @@
+{
+ "before": "C:/Users/klimp/Documents/Projects/hoi4-factory/.work/exp01/runs-win/fixed/none-1/before.json",
+ "after": "C:/Users/klimp/Documents/Projects/hoi4-factory/.work/exp01/runs-win/fixed/none-1/after.json",
+ "approved_prefixes": [
+  "exp01_setup/managed",
+  "exp01_setup/replace-me.txt",
+  ".hoi4-mod-setup"
+ ],
+ "unapproved": {
+  "changed": [],
+  "mode_changed": [],
+  "added": [],
+  "removed": [],
+  "metadata_only": []
+ },
+ "approved": {
+  "changed": [],
+  "added": [
+   {
+    "path": "exp01_setup/managed",
+    "type": "dir",
+    "size": null,
+    "sha256": null
+   },
+   {
+    "path": "exp01_setup/managed/.hoi4ms-quarantine-5a80c4c211414609a426abc009d4da79-rollback-exp01-create-0080.tmp",
+    "type": "file",
+    "size": 262144,
+    "sha256": "c0c0a13a17c926f1528cb9224f84690766ed6f7d3af82eaab3e1cffef363a42e"
+   },
+   {
+    "path": "exp01_setup/managed/file-0000.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "fe4a443eb6869afe5ee40da3dab9cab007b0188fdec92914cb70358a8aeb8231"
+   },
+   {
+    "path": "exp01_setup/managed/file-0001.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "72565329b5456d562d571823627cd5382e62dcb1d62e40e565d4e7ce8f4a02b2"
+   },
+   {
+    "path": "exp01_setup/managed/file-0002.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "90eed2f5ccc3a76e0bf86b2fe9b53dafe57000e98564978920e7c27fb653088c"
+   },
+   {
+    "path": "exp01_setup/managed/file-0003.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "755d12e31d021d9b6e6ed7a84343f6848ab9dff0b9e8118f2d31faab6af61571"
+   },
+   {
+    "path": "exp01_setup/managed/file-0004.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "591f1059bafd8a56a09f5fa2fba14b5059f72c71f4f11de2f94e20142ea04fe3"
+   },
+   {
+    "path": "exp01_setup/managed/file-0005.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "1eb020c288b82fac190a058b67d60c19afaacbc4ad5463958cb22acb62fe96ff"
+   },
+   {
+    "path": "exp01_setup/managed/file-0006.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "2e80a37ecbc21f1e912992039940b4d5c85a5b5f48b01a441b9eced0b9b4b157"
+   },
+   {
+    "path": "exp01_setup/managed/file-0007.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "28c5ec636cc8ae3a1dff70ae1db10f79aef21c4caa0490f7fd648327ce22d7b7"
+   },
+   {
+    "path": "exp01_setup/managed/file-0008.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "7d66b76618973b3b12784559a921da427eb1ff08ec25547b9ab98c9281efbc0b"
+   },
+   {
+    "path": "exp01_setup/managed/file-0009.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "8fc7afb34a6905a11e16483ddb24acbea6932c9d3bfb53acc7756d5acc2ba34a"
+   },
+   {
+    "path": "exp01_setup/managed/file-0010.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "034443b207050d13d23b7342416c054be72398d32877ac6a402ce7df54682053"
+   },
+   {
+    "path": "exp01_setup/managed/file-0011.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "21468aa7db9f6adc8265e646ac42d3d5222963c201bb20e10451acab48c0a1fa"
+   },
+   {
+    "path": "exp01_setup/managed/file-0012.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "660701bc731866f6d7ef7ee350a13a0fabc79a7819e75d79c7fa92fcb26014aa"
+   },
+   {
+    "path": "exp01_setup/managed/file-0013.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "216b560bbd865c0774d56001fd419dafc5ba394cb29d3462f47ab7e44b4f17fd"
+   },
+   {
+    "path": "exp01_setup/managed/file-0014.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "0c0b75dd424a4399763d740d528ba4229aff002b3e06eb4bca79cfcf011b3470"
+   },
+   {
+    "path": "exp01_setup/managed/file-0015.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "34244ffa9c0299ad3c8b6de5479e2b4848e63556f8621a31ed74b3f9f2d1c757"
+   },
+   {
+    "path": "exp01_setup/managed/file-0016.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "4d5629a707f91b2249e6118d894ccac4356ba7d1551e818d41949f7b835e712e"
+   },
+   {
+    "path": "exp01_setup/managed/file-0017.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "f2aeb62d213687407666df3fb052d7a76bf57dbbfd7c037022ddebbb87df7af0"
+   },
+   {
+    "path": "exp01_setup/managed/file-0018.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "d692432bfdfc203c1e27a3dd75e0b245a557c6798300026e0856d820a540faa9"
+   },
+   {
+    "path": "exp01_setup/managed/file-0019.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "66fe9f5889bd248bf090c01e8e8e7e0b54e94e693ee7c72fada7e21af2182b64"
+   },
+   {
+    "path": "exp01_setup/managed/file-0020.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "846a18cb0ffbab59d86e4adfb31cadc2f37b5d4f54535c5328ee11e9852f6209"
+   },
+   {
+    "path": "exp01_setup/managed/file-0021.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "29c2268b6f06140e60c5d4d361702cc1925a821a86db11f7fb964fdfc2d01745"
+   },
+   {
+    "path": "exp01_setup/managed/file-0022.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "b18421bc3a9e5a786ec51afc1cd28a7c8d51b3da0ae4d166a35469d45479a3b1"
+   },
+   {
+    "path": "exp01_setup/managed/file-0023.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "8d68d3c97eee40534407cfd1d78ace199340fbc19f94b3df57d3c6e597977bbf"
+   },
+   {
+    "path": "exp01_setup/managed/file-0024.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "c20d93af0a2d57ac9356a685378902404780345cbead1c1418a1e973ba48ab25"
+   },
+   {
+    "path": "exp01_setup/managed/file-0025.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "4768a5399a7a10fb33e4607cabec30d1f65116c3626ad90b015333576e87d148"
+   },
+   {
+    "path": "exp01_setup/managed/file-0026.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "0dc914531ee6036094db051b33b134cab431579fd4f1d3023cc48ae462a45e51"
+   },
+   {
+    "path": "exp01_setup/managed/file-0027.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "e077f5b1f78228954a23c4d36c36083561b663d26e2a4ee0a0e4a50924804264"
+   },
+   {
+    "path": "exp01_setup/managed/file-0028.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "2eaf46060ea5a9c2869d6e4892c6fe7cf3d48e33c05b75b3f887b5708c465f70"
+   },
+   {
+    "path": "exp01_setup/managed/file-0029.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "1225948232e4f044ed882e2fa8a7f293e6aabc3741b9f6d472760cd80f4877e5"
+   },
+   {
+    "path": "exp01_setup/managed/file-0030.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "27019aae6122be5d2b765b2bbb4136591de96bc93cf671f3ae294923c1e5af5c"
+   },
+   {
+    "path": "exp01_setup/managed/file-0031.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "62191dec527952e3a8255d4b84bd6a637c7ccdb06c95cdb87ad91b98be70d074"
+   },
+   {
+    "path": "exp01_setup/managed/file-0032.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "4ab37e9f539f5463d4a74cc820598a5de8b532845d589769f8b4acd6799294ca"
+   },
+   {
+    "path": "exp01_setup/managed/file-0033.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "235dc1704c288cc0d68715c1baa8008ee2a239fe40ed98cd5725df07ee4f4124"
+   },
+   {
+    "path": "exp01_setup/managed/file-0034.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "0cf88c0e3dbb0245824405e62baecdff81f581be558ffd0f12fe6cec4ec58859"
+   },
+   {
+    "path": "exp01_setup/managed/file-0035.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "d84dd1ee7c1c397c5ea4e66792e0495ae5cbff30284b07c19de215a3f9eddc95"
+   },
+   {
+    "path": "exp01_setup/managed/file-0036.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "2527dd1b0d1269b1a87a66d3bfd7efd2b07bf24778f6a8e4dc60335dfe6fa2fb"
+   },
+   {
+    "path": "exp01_setup/managed/file-0037.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "476ce8dc0e94811ac11adaa296499a8fc3b3b5252375dd077c784556904f02b4"
+   },
+   {
+    "path": "exp01_setup/managed/file-0038.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "9e757a6429537ac0126ee492542dc01ba4437ad073fb805a06c220f9eb95f20a"
+   },
+   {
+    "path": "exp01_setup/managed/file-0039.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "8dc78d07aeef98de524963f5612c2bc2622c2799c769195662575b095e0ae6a1"
+   },
+   {
+    "path": "exp01_setup/managed/file-0040.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "4bc7f10dac9d94a2439fd0501c3f8c27fd17668e2e8c04fbdfea20bcbb15cd22"
+   },
+   {
+    "path": "exp01_setup/managed/file-0041.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "41007be173140b98d897d29d64fe870e8614c5c7c206f68f877ce239393c4227"
+   },
+   {
+    "path": "exp01_setup/managed/file-0042.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "769f068e5db4526e731636c52fbbb49f1aeff82027e3fceab6561d68bb44f253"
+   },
+   {
+    "path": "exp01_setup/managed/file-0043.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "c4c522ef322205c0ce6bdf135d80a294256722d5ee3c3e61473444fe8b1f95c7"
+   },
+   {
+    "path": "exp01_setup/managed/file-0044.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "fb3dcb5c1cb6f9493dc46efc4d61d2d061e786ffcf36c8b6e4dd377f03de9466"
+   },
+   {
+    "path": "exp01_setup/managed/file-0045.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "8db84e9c3b45278db2fc4569f902a3544a471b570548b239755564e25a4be481"
+   },
+   {
+    "path": "exp01_setup/managed/file-0046.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "8e7de8fa215ed30caaa99016d9cdfda05383b247f58573beccb1d56a003742f3"
+   },
+   {
+    "path": "exp01_setup/managed/file-0047.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "eb408cf3eaf3c8962b2529fdf5db3702a33381362c10e7e338e5e5e02713dd9b"
+   },
+   {
+    "path": "exp01_setup/managed/file-0048.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "9a31c04a14e8355f40677a4b52e785acfc998b720c01617389ad783b681ac961"
+   },
+   {
+    "path": "exp01_setup/managed/file-0049.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "a57ad0a79003db50cabf6abac5fc801b5b439d530e76cfbfa1643173ca3fd114"
+   },
+   {
+    "path": "exp01_setup/managed/file-0050.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "9edbf6be29ca181b0b00a24d2edd1808113f2f8c44de6e9e311c5f98837f3a41"
+   },
+   {
+    "path": "exp01_setup/managed/file-0051.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "47d97e0b7ed54fc1ae11de6d2668ff15792769f0443ca7385b4ce2c4edf07c35"
+   },
+   {
+    "path": "exp01_setup/managed/file-0052.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "b3dc7e90567055483270bdc73a1874416955a48f507657b01f50c4f134651a41"
+   },
+   {
+    "path": "exp01_setup/managed/file-0053.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "eadef05cbd8e8135e2f5246cd33be716ffedfb8dcbae59abada9d5d2542f4f92"
+   },
+   {
+    "path": "exp01_setup/managed/file-0054.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "a080c2ec70229fdf20f2414ba0d8067f9bf0af8406090b98cc71ab52c5899c0c"
+   },
+   {
+    "path": "exp01_setup/managed/file-0055.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "844adb00694568f1e86f1384b5586923f028c004df9e98d1171055a419838450"
+   },
+   {
+    "path": "exp01_setup/managed/file-0056.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "6b541b36b28560904a91db4c8906c51a2fa308a4762a029d05c33466e7aeeee7"
+   },
+   {
+    "path": "exp01_setup/managed/file-0057.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "b63e888c8004e945020007bd39a371f2bed0dce3d533b66fc0b640c7e0c38201"
+   },
+   {
+    "path": "exp01_setup/managed/file-0058.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "8b3607dde79cc2c30092192c557cb4dd346eb770a58be4f4eec0d8035822c81f"
+   },
+   {
+    "path": "exp01_setup/managed/file-0059.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "a1b7a4411085201f71d52bb110da971f7c66c4b32f73a455ebd077d4f296cadd"
+   },
+   {
+    "path": "exp01_setup/managed/file-0060.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "14b8e02465ab9b688a5931bd23fa9c8056ea622381dadbff7a2495053184d243"
+   },
+   {
+    "path": "exp01_setup/managed/file-0061.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "60ac012b870191f5f6b6751187d37aba11548e8c916a330d2ab15521f0973cdf"
+   },
+   {
+    "path": "exp01_setup/managed/file-0062.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "5468a1b37194641fb8438a97e5fad13df53761ce1de3902e34a0868cfab8e42b"
+   },
+   {
+    "path": "exp01_setup/managed/file-0063.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "4c999ecc3f56692f4ec447bef22e85f703fdf8c91acb159bd8bf469e91ee8fe0"
+   },
+   {
+    "path": "exp01_setup/managed/file-0064.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "40ce20c31f45533bcdc24cbe4339c0617baed1aa5d08d4c8a430514a64df93ca"
+   },
+   {
+    "path": "exp01_setup/managed/file-0065.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "0ef2a1b70006eda33417319ac56128cf0dfd96e3153f574882bc60388ec330af"
+   },
+   {
+    "path": "exp01_setup/managed/file-0066.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "a9775d2638c087ada269e81be6eb7a9e449454e9ff6fc001a99b399d5caff575"
+   },
+   {
+    "path": "exp01_setup/managed/file-0067.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "6dd4d3086762289d135622b233eaf2ecde3e5fe6014d5beee14fcc27beeb3010"
+   },
+   {
+    "path": "exp01_setup/managed/file-0068.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "d4919d96982de5ab429a8e35ef6f40e97e7b073381d089d55ada5a78ff8e1ee6"
+   },
+   {
+    "path": "exp01_setup/managed/file-0069.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "923aff463904db7374920b306ae92deb6a11086cc128db8b565ce58cd672d78d"
+   },
+   {
+    "path": "exp01_setup/managed/file-0070.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "50c583082bf1143504844c2fba9cc123ef397c40c4fa2f5c91e21c52e97fc421"
+   },
+   {
+    "path": "exp01_setup/managed/file-0071.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "fb39a230ed69b5c6ad53ac34336f3bdc0761bbcffefecf03f9b85cfe324ca3ee"
+   },
+   {
+    "path": "exp01_setup/managed/file-0072.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "f487e5a341a24c98010094c2b5bc4deaadb22ea0d67a97dd8000dd4b3e7f9adc"
+   },
+   {
+    "path": "exp01_setup/managed/file-0073.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "4a8ecde38144ca0aab9b509773e75a98f45ce69df74b6e70e907bfcc1db1c6f6"
+   },
+   {
+    "path": "exp01_setup/managed/file-0074.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "0c5a82548e2885da5b4f4462550ffe2b9b4542a356afeee3542a517451be9e86"
+   },
+   {
+    "path": "exp01_setup/managed/file-0075.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "1083f2579692a18275b362fb92da4e5851d1641cfbae25ee4123983a2672efc3"
+   },
+   {
+    "path": "exp01_setup/managed/file-0076.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "7d4b5cda57ade2c5d43d3a3a8e0609cfad3690dd3c60c12cac4d452c61bb2c02"
+   },
+   {
+    "path": "exp01_setup/managed/file-0077.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "36a7fe31f1b6f29a67603dc36f328fb075dec27b9bb75fb39667f18d5c93de18"
+   },
+   {
+    "path": "exp01_setup/managed/file-0078.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "497478d82a82db3ff88d35d0798b43c1f7527a2e8ff1b6a60cc08ddfc2809f65"
+   },
+   {
+    "path": "exp01_setup/managed/file-0079.md",
+    "type": "file",
+    "size": 262144,
+    "sha256": "3d584a28fd1d051de01ee3c4e4b441afb51e91d6c8dff6d2b186ac00ef7bea75"
+   }
+  ],
+  "removed": []
+ },
+ "all": {
+  "added_files": [
+   "exp01_setup/managed/.hoi4ms-quarantine-5a80c4c211414609a426abc009d4da79-rollback-exp01-create-0080.tmp",
+   "exp01_setup/managed/file-0000.md",
+   "exp01_setup/managed/file-0001.md",
+   "exp01_setup/managed/file-0002.md",
+   "exp01_setup/managed/file-0003.md",
+   "exp01_setup/managed/file-0004.md",
+   "exp01_setup/managed/file-0005.md",
+   "exp01_setup/managed/file-0006.md",
+   "exp01_setup/managed/file-0007.md",
+   "exp01_setup/managed/file-0008.md",
+   "exp01_setup/managed/file-0009.md",
+   "exp01_setup/managed/file-0010.md",
+   "exp01_setup/managed/file-0011.md",
+   "exp01_setup/managed/file-0012.md",
+   "exp01_setup/managed/file-0013.md",
+   "exp01_setup/managed/file-0014.md",
+   "exp01_setup/managed/file-0015.md",
+   "exp01_setup/managed/file-0016.md",
+   "exp01_setup/managed/file-0017.md",
+   "exp01_setup/managed/file-0018.md",
+   "exp01_setup/managed/file-0019.md",
+   "exp01_setup/managed/file-0020.md",
+   "exp01_setup/managed/file-0021.md",
+   "exp01_setup/managed/file-0022.md",
+   "exp01_setup/managed/file-0023.md",
+   "exp01_setup/managed/file-0024.md",
+   "exp01_setup/managed/file-0025.md",
+   "exp01_setup/managed/file-0026.md",
+   "exp01_setup/managed/file-0027.md",
+   "exp01_setup/managed/file-0028.md",
+   "exp01_setup/managed/file-0029.md",
+   "exp01_setup/managed/file-0030.md",
+   "exp01_setup/managed/file-0031.md",
+   "exp01_setup/managed/file-0032.md",
+   "exp01_setup/managed/file-0033.md",
+   "exp01_setup/managed/file-0034.md",
+   "exp01_setup/managed/file-0035.md",
+   "exp01_setup/managed/file-0036.md",
+   "exp01_setup/managed/file-0037.md",
+   "exp01_setup/managed/file-0038.md",
+   "exp01_setup/managed/file-0039.md",
+   "exp01_setup/managed/file-0040.md",
+   "exp01_setup/managed/file-0041.md",
+   "exp01_setup/managed/file-0042.md",
+   "exp01_setup/managed/file-0043.md",
+   "exp01_setup/managed/file-0044.md",
+   "exp01_setup/managed/file-0045.md",
+   "exp01_setup/managed/file-0046.md",
+   "exp01_setup/managed/file-0047.md",
+   "exp01_setup/managed/file-0048.md",
+   "exp01_setup/managed/file-0049.md",
+   "exp01_setup/managed/file-0050.md",
+   "exp01_setup/managed/file-0051.md",
+   "exp01_setup/managed/file-0052.md",
+   "exp01_setup/managed/file-0053.md",
+   "exp01_setup/managed/file-0054.md",
+   "exp01_setup/managed/file-0055.md",
+   "exp01_setup/managed/file-0056.md",
+   "exp01_setup/managed/file-0057.md",
+   "exp01_setup/managed/file-0058.md",
+   "exp01_setup/managed/file-0059.md",
+   "exp01_setup/managed/file-0060.md",
+   "exp01_setup/managed/file-0061.md",
+   "exp01_setup/managed/file-0062.md",
+   "exp01_setup/managed/file-0063.md",
+   "exp01_setup/managed/file-0064.md",
+   "exp01_setup/managed/file-0065.md",
+   "exp01_setup/managed/file-0066.md",
+   "exp01_setup/managed/file-0067.md",
+   "exp01_setup/managed/file-0068.md",
+   "exp01_setup/managed/file-0069.md",
+   "exp01_setup/managed/file-0070.md",
+   "exp01_setup/managed/file-0071.md",
+   "exp01_setup/managed/file-0072.md",
+   "exp01_setup/managed/file-0073.md",
+   "exp01_setup/managed/file-0074.md",
+   "exp01_setup/managed/file-0075.md",
+   "exp01_setup/managed/file-0076.md",
+   "exp01_setup/managed/file-0077.md",
+   "exp01_setup/managed/file-0078.md",
+   "exp01_setup/managed/file-0079.md"
+  ],
+  "added_dirs": [
+   "exp01_setup/managed"
+  ],
+  "removed": [],
+  "content_changed": []
+ },
+ "unapproved_bytes_untouched": true,
+ "exact_files": false,
+ "exact_files_and_dirs": false,
+ "git_index_sha256": {
+  "before": "3d98fa4c5e05e5080b05e326325b9d79aa850c6c0d69d124fea5a2db9789952e",
+  "after": "3d98fa4c5e05e5080b05e326325b9d79aa850c6c0d69d124fea5a2db9789952e"
+ },
+ "git_status_identical": false,
+ "git_ls_files_identical": true
+}

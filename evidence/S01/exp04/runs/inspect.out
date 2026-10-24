@@ -1,0 +1,57 @@
+[
+    {
+        "Id": "sha256:d31ea492a4418930952b7d68b54e2328d9ba9ff12c57d253d2940c05172b4e27",
+        "RepoTags": [
+            "hoi4-factory-agent-probe:s01"
+        ],
+        "RepoDigests": [
+            "hoi4-factory-agent-probe@sha256:d31ea492a4418930952b7d68b54e2328d9ba9ff12c57d253d2940c05172b4e27"
+        ],
+        "Parent": "",
+        "Comment": "buildkit.dockerfile.v0",
+        "Created": "2026-10-24T11:26:51.049427922Z",
+        "DockerVersion": "",
+        "Author": "",
+        "Architecture": "amd64",
+        "Os": "linux",
+        "Size": 37817617,
+        "GraphDriver": {
+            "Data": null,
+            "Name": "overlayfs"
+        },
+        "RootFS": {
+            "Type": "layers",
+            "Layers": [
+                "sha256:9b35de7893378218e365c34c2c735fb0032a859112fb7345ca8ea73f9aa1db70",
+                "sha256:8d165152ccf45085e1ae7cee05c1ad81772b8169d8a5c34ad7f1cce78ad0d098",
+                "sha256:504c4b852353021de2a537e957de7b823d3632b5f546ba4232afb3b7d7224068",
+                "sha256:e4cc961ffc187feae17e2652121400f6c701971c0f556d11c7e70232834f9bfc"
+            ]
+        },
+        "Metadata": {
+            "LastTagTime": "2026-10-24T11:26:51.876934457Z"
+        },
+        "Descriptor": {
+            "mediaType": "application/vnd.oci.image.index.v1+json",
+            "digest": "sha256:d31ea492a4418930952b7d68b54e2328d9ba9ff12c57d253d2940c05172b4e27",
+            "size": 856
+        },
+        "Config": {
+            "ArgsEscaped": true,
+            "Cmd": [
+                "live-once"
+            ],
+            "Entrypoint": [
+                "/usr/local/bin/runtime-probe"
+            ],
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+            ],
+            "Labels": null,
+            "OnBuild": null,
+            "User": "factory",
+            "Volumes": null,
+            "WorkingDir": ""
+        }
+    }
+]

@@ -19,6 +19,8 @@ Implementation remains deferred. The maintainer stated that the application will
 | ADR-019 | Claude and OpenAI adapters, monthly allowance on any model, Stripe for credits | Unchosen providers and payments |
 | ADR-020 | gVisor runtime for per-task tool containers | Unchosen sandbox runtime |
 | ADR-021 | Verified email, 30-day deletion grace, private or public projects, license-respecting copies, English with translatable strings | Unchosen account policies |
+| ADR-022 | Automatic personal, project and global memory with verified lessons and no authority | Review-every-lesson runtime learning |
+| ADR-023 | Automatic engineering learning gated by regression tests | Review-every-lesson engineering learning |
 
 ADR-001 and ADR-003 through ADR-010 remain in force, with the scope changes noted below. ADR-002 is superseded by ADR-011 and ADR-012.
 
@@ -141,6 +143,49 @@ The maintainer answered the remaining product questions later on 2026-10-24.
 | Project visibility | Projects are private by default. An owner may make one public, giving a read-only view of its source, previews and evidence |
 | Copying public projects | Another user may copy a public project into their account only when the project declares a license that permits it. Attribution is kept |
 | Interface language | English at launch, with all interface text in translatable strings so languages can be added later |
+
+### ADR-022: automatic memory, feedback and self-improvement
+
+**Decision.** The agent learns automatically from feedback and outcomes so it becomes personal to each user and stops repeating mistakes. Three memory scopes exist. Learning runs in four lanes decided by fixed Rust rules, never by the model. Memory carries no authority.
+
+| Scope | Holds | Visible to |
+|---|---|---|
+| Personal | Portable preferences and habits of one user, such as verbosity, explanation depth, review style and visual or hybrid mode. Never project names, paths, tags or lore | That user only |
+| Project | Conventions, mistake-avoidance lessons and project facts, shared by all members | Project members by role. Not part of a public project view or a public copy |
+| Global | General HOI4 scripting and tool lessons that help every user | Every task, as product knowledge |
+
+| Lane | What | How it activates |
+|---|---|---|
+| A | Personal preferences stated by the user, or repeated in the same direction at least twice | Immediately. A single inferred signal is applied on probation and dropped on contradiction or a thumbs-down |
+| B | Project conventions, mistake-avoidance lessons and facts | Automatically after verification: a convention must be observable in the accepted source, and a lesson must pass the replay gate below |
+| C | A lesson that conflicts with another member's active item, or one member's preference that would bind the whole project | Owner review. Until then it applies only to its author's tasks if portable |
+| D | Canon or lore changes, grants, permissions, tools, endpoints, budgets, statements about another user, secrets | Never stored as memory. Canon changes become design proposals. Permission changes appear at most as a settings suggestion the user applies |
+
+**Verification gate.** A lesson from a failed validation followed by a working fix first tries a deterministic check: if it can be compiled into a validator rule or source query, that rule must flag the original failure and pass the fix. Otherwise the original case is replayed with and without the lesson (at least three samples each), the lesson-free run must still reproduce the failure, and the lesson must improve the outcome. A do-no-harm sample of recent successful tasks must not regress. After activation every use is attributed, and repeated harm pauses the lesson automatically. Thresholds are starting values that EXP-05 calibrates.
+
+**Global lessons.** Learned automatically, with strict checks and no human review. Only de-identified signals of the form "validator rule R failed, then fix pattern F passed" are used, never raw user text, and a candidate needs the same signal from at least five unrelated projects. It must pass the verification gate across those projects' frozen cases plus a do-no-harm sample before it ships as versioned product knowledge. The maintainer can pause or remove any global lesson. A user's contribution of de-identified signals follows their learning switch.
+
+**Feedback signals.** Thumbs up or down, "remember this", "don't do that again" and "forget that", user edits to an agent proposal before accepting it, rejected proposals with a reason, reverted commits, closed agent pull requests and requested changes, failed validations followed by fixes, user-reported game errors, repeated corrections and stopped runs.
+
+**Writer and safety.** A background reflection job with a budget and a single tool that proposes memory. It never copies text from imported mods, game files, the web, uploads or GitHub content by non-members, and refers to those by ID. Memory reaches the model as a labelled, attributed data block that states it grants nothing, and the host still checks every action against grants. Writes and loads are scanned for injection patterns. Every write has a ledger row. Owners can pause or delete everything one contributor added.
+
+**User control.** Personal learning is on by default with an off switch. Users can delete memories ("forget that", the Undo on each "memory updated" notice, or delete all) and switch learning off. There is no page to browse or edit memories, by maintainer choice. The research recommended one, so this is a reconsideration point if users ask what the agent remembers. Project owners can delete project memory and pause a contributor's items. Deletion removes the item, its index entries, cached payloads and anything derived only from it.
+
+**Defaults chosen in this record.** Lane B activates project-wide by default. Verification replays and the background reflection job are paid by the operator, outside user budgets and allowances, under a daily cap. The off switch stops new learning and signal sharing and hides existing personal items until it is turned back on. Deleting is what forget, Undo and delete all do. Active project memory takes precedence over a global lesson, and such a conflict counts as feedback against the global lesson. Lessons from a member who leaves stay with the project, still credited to them, and the owner may delete them. No modeling of user traits beyond stated or repeated preferences, and sensitive personal traits are never stored. Exporting project memory into the mod repository is off unless the owner turns it on.
+
+**Staleness and conflict.** An item goes stale when the files, identifiers, game build, DLC set or tool versions it refers to change, and is re-verified on its next matching task. Newer statements supersede older ones without erasing history. Conflicts between members are never resolved automatically. Unused items become stale after 60 days and are archived 60 days later.
+
+**Isolation.** Every memory and feedback row carries its account and project. PostgreSQL row-level security and a scoped data-access layer mean no query can run without a scope. A task never sees another user's personal memory or another project's memory.
+
+**Build or reuse.** Build natively in Rust on PostgreSQL with full-text search first. Borrow designs, not code, from Hermes Agent (background review, do-not-capture list, write ledger, frozen snapshots, character caps), Letta (commit per reflection), mem0 (supersede and merge), Graphiti (validity time), Honcho (evidence for each conclusion) and Agent Beacon (review state machine). Research: [Hermes memory](https://github.com/NousResearch/hermes-agent/blob/f7fb481502bd3ef32be19e7034ba566801d7bf85/website/docs/user-guide/features/memory.md), [Hermes background review](https://github.com/NousResearch/hermes-agent/blob/f7fb481502bd3ef32be19e7034ba566801d7bf85/agent/background_review.py), [Letta reflection](https://github.com/letta-ai/letta-code/blob/75d7921f1666b92b4a82acca64e5ef09001c1eb3/src/agent/subagents/builtin/reflection-v2.md), [mem0 supersede](https://github.com/mem0ai/mem0/blob/2c81af3bbe27d9bccb09c772d583df9e9be72ee5/docs/platform/features/dream.mdx), [Graphiti invalidation](https://github.com/getzep/graphiti/blob/8ce6d633bdcd3d178b3a47bc25b105dce106a754/graphiti_core/utils/maintenance/edge_operations.py), [Honcho deletion](https://github.com/plastic-labs/honcho/blob/5bf3b3489db4295d249c0fbe11797fee82e108ba/docs/v3/documentation/features/advanced/deleting-data.mdx), [Beacon memory](https://github.com/Asymptote-Labs/agent-beacon/blob/473c18434d7336cccb34ef9ca3694339088bbbc8/docs/concepts/cross-harness-memory.mdx) and the [MINJA memory poisoning paper](https://arxiv.org/abs/2503.03704). None of the systems checked verifies that a lesson prevents its original failure before activation, which is the gap the verification gate closes.
+
+**Supersedes.** The review-every-lesson rule in REQ-020 and SPEC-004.
+
+### ADR-023: automatic engineering learning with tests as the gate
+
+**Decision.** The factory's own development process improves itself automatically. At each stage handoff the agent runs the validation and lesson-capture workflows itself. A lesson that is backed by a passing regression test, and that changes no authority, access root, external data transfer, paid operation, approved product scope or game design canon, is promoted into guidance automatically and recorded in the knowledge changelog. Anything outside that bound still needs owner review. No agent may widen its own permissions through a guidance or skill edit.
+
+**Effect on skills.** `validate-stage` and `capture-engineering-lessons` become callable by the agent. `start-implementation-stage` stays invocable only by the maintainer, because starting a stage is an authorization step. `audit-hoi4-integrations` stays maintainer-invoked.
 
 ## Effects on existing decisions
 

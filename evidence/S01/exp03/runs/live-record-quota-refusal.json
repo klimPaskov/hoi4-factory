@@ -1,0 +1,64 @@
+{
+  "auth_refusal": {
+    "auto_retry_allowed": false,
+    "class": "http_refusal",
+    "elapsed_ms": 532.0685000000001,
+    "error": {
+      "class": "auth",
+      "message": "Incorrect API key provided: [REDACTED] You can find your API key at https://platform.openai.com/account/api-keys.",
+      "provider_code": "invalid_api_key",
+      "provider_type": "invalid_request_error",
+      "status": 401
+    },
+    "evidence_kind": "live",
+    "spend": {
+      "basis": "request refused at authentication",
+      "usd": 0.0
+    }
+  },
+  "cancelled_turn": {
+    "auto_retry_allowed": true,
+    "class": "http_refusal",
+    "error": {
+      "class": "rate_limited",
+      "message": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
+      "provider_code": "credit_balance_exhausted",
+      "provider_type": "insufficient_quota",
+      "status": 429
+    },
+    "name": "openai-cancelled-turn"
+  },
+  "evidence_kind": "live",
+  "followup_turn": null,
+  "host_tool_execution": null,
+  "model": "gpt-5.4-nano-2026-03-17",
+  "spend": [
+    null,
+    null,
+    null
+  ],
+  "text_turn": {
+    "auto_retry_allowed": true,
+    "class": "http_refusal",
+    "error": {
+      "class": "rate_limited",
+      "message": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
+      "provider_code": "credit_balance_exhausted",
+      "provider_type": "insufficient_quota",
+      "status": 429
+    },
+    "name": "openai-text-turn"
+  },
+  "tool_turn": {
+    "auto_retry_allowed": true,
+    "class": "http_refusal",
+    "error": {
+      "class": "rate_limited",
+      "message": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
+      "provider_code": "credit_balance_exhausted",
+      "provider_type": "insufficient_quota",
+      "status": 429
+    },
+    "name": "openai-tool-turn"
+  }
+}

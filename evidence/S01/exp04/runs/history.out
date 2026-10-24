@@ -1,0 +1,7 @@
+CMD ["live-once"]
+ENTRYPOINT ["/usr/local/bin/runtime-probe"]
+USER factory
+COPY /src/target/release/runtime-probe /usr/local/bin/runtime-probe # buildkit
+RUN /bin/sh -c useradd --system --uid 10001 --no-create-home factory # buildkit
+RUN /bin/sh -c apt-get update  && apt-get install -y --no-install-recommends ca-certificates  && rm -rf /var/lib/apt/lists/* # buildkit
+# debian.sh --arch 'amd64' out/ 'bookworm' '@1792531975'

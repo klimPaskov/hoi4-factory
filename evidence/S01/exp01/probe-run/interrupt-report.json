@@ -1,0 +1,19 @@
+{
+  "elapsed_ms": 16088,
+  "hoi4ms_leftovers_after_kill": [],
+  "hoi4ms_leftovers_after_recovery": [],
+  "kill": "apply",
+  "killed_at": "not_killed",
+  "observed_managed": 0,
+  "observed_staged": 0,
+  "ops": 200,
+  "plan_id": "fdda9e57-2f0b-4d29-a056-96900ed55595",
+  "recovery": {
+    "found": false,
+    "skipped": true
+  },
+  "size": 262144,
+  "worker_exit_code": 0,
+  "worker_exit_success": true,
+  "worker_result": "EXP01_WORKER_RESULT err transaction error: Permission denied (os error 13)"
+}

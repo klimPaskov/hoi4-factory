@@ -1,0 +1,22 @@
+rustc 1.88.0 (6b00bc388 2025-06-23)
+debconf: delaying package configuration, since apt-utils is not installed
+apt_exit=0
+rev=4488a418cad56a158273cb66c4ce7794696b7ed1
+ src-tauri/src/safe_fs.rs     | 39 +++++++++++++++++++++++++-
+ src-tauri/src/transaction.rs | 65 +++++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 99 insertions(+), 5 deletions(-)
+build_exit=0
+   Compiling tokio-rustls v0.26.4
+   Compiling hoi4-setup-core v0.1.0 (/build/crates/hoi4-setup-core)
+   Compiling hyper-rustls v0.27.9
+   Compiling reqwest v0.12.28
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 48s
+bin=/target/debug/deps/hoi4_mod_setup-b5b13ec949d466c9
+25cc1b2e7d2bac110bd4cdcc1b5b50b5e5434f57ba807d13729a351afd307190  /target/debug/deps/hoi4_mod_setup-b5b13ec949d466c9
+{"trial": "none-1", "harness_exit": 0, "killed_at": "not_killed", "worker_result": "EXP01_WORKER_RESULT ok state=completed", "worker_exit_code": 0, "recommended_action": null, "state_before": null, "recovery_outcome": null, "leftovers_after_kill": [], "leftovers_after_recovery": [], "unapproved_bytes_untouched": true, "exact_files": false, "added_files": [".hoi4-mod-setup/install.lock.json", "exp0
+{"trial": "apply-1", "harness_exit": 0, "killed_at": "apply managed_files_seen=1", "worker_result": "EXP01_WORKER_RESULT none", "worker_exit_code": null, "recommended_action": "rollback", "state_before": "applying", "recovery_outcome": {"ok": "rolled_back"}, "leftovers_after_kill": ["exp01_setup/managed/.hoi4ms-placing-3ba9ce0573024bcb92854499814f9ca4-exp01-create-0000.tmp"], "leftovers_after_reco
+{"trial": "apply-2", "harness_exit": 0, "killed_at": "apply managed_files_seen=1", "worker_result": "EXP01_WORKER_RESULT none", "worker_exit_code": null, "recommended_action": "rollback", "state_before": "applying", "recovery_outcome": {"ok": "rolled_back"}, "leftovers_after_kill": ["exp01_setup/managed/.hoi4ms-placing-03a5e69b962e44909713fc06a989d0cf-exp01-create-0000.tmp"], "leftovers_after_reco
+{"trial": "apply-3", "harness_exit": 0, "killed_at": "apply managed_files_seen=1", "worker_result": "EXP01_WORKER_RESULT none", "worker_exit_code": null, "recommended_action": "rollback", "state_before": "applying", "recovery_outcome": {"ok": "rolled_back"}, "leftovers_after_kill": ["exp01_setup/managed/.hoi4ms-placing-ec1de079861b488c9390f388e17b2fbd-exp01-create-0000.tmp"], "leftovers_after_reco
+trials_exit=0
+copied_out
+docker_exit=0

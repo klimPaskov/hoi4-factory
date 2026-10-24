@@ -1,0 +1,10 @@
+{
+  "fixture": "F-SETUP-NEW",
+  "display_name": "EXP01 Synthetic New Mod",
+  "project_id": "exp01_synthetic_new",
+  "script_prefix": "EXP01N",
+  "primary_namespace": "exp01n",
+  "descriptor_tags": ["Alternative History"],
+  "supported_version": "1.17.*",
+  "note": "Original synthetic identity. The workspace directory starts empty and owned."
+}

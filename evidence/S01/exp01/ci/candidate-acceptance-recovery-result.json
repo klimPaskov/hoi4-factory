@@ -1,0 +1,133 @@
+{
+  "scenario": "recovery",
+  "applicationKind": "candidate",
+  "applicationVersion": "0.6.3",
+  "releaseSourceCommitFromPin": "4488a418cad56a158273cb66c4ce7794696b7ed1",
+  "runner": "Windows",
+  "ai": "deterministic loopback HTTP fixture; real provider authentication and semantic quality are not tested",
+  "nativeIpc": "unmodified candidate binary; no IPC mocks or application test hooks",
+  "stages": [
+    {
+      "name": "welcome",
+      "at": "2026-10-19T16:07:59.998Z",
+      "heading": "Start a mod project"
+    },
+    {
+      "name": "confirmed-read-only-scan",
+      "at": "2026-10-19T16:08:40.221Z",
+      "heading": "Confirm scan findings"
+    },
+    {
+      "name": "coding-environments",
+      "at": "2026-10-19T16:08:40.471Z",
+      "heading": "Coding environments"
+    },
+    {
+      "name": "image-provider",
+      "at": "2026-10-19T16:08:40.724Z",
+      "heading": "Image generation"
+    },
+    {
+      "name": "selected-components",
+      "at": "2026-10-19T16:08:40.916Z",
+      "heading": "Choose what to install"
+    },
+    {
+      "name": "dry-run",
+      "at": "2026-10-19T16:09:07.121Z",
+      "heading": "Review changes"
+    },
+    {
+      "name": "recovery-without-provider",
+      "at": "2026-10-19T16:10:17.470Z",
+      "heading": "Installation was interrupted"
+    },
+    {
+      "name": "failure",
+      "at": "2026-10-19T16:11:13.497Z",
+      "heading": "Start a mod project"
+    }
+  ],
+  "screenshots": [
+    "01-welcome.png",
+    "02-confirmed-read-only-scan.png",
+    "03-coding-environments.png",
+    "04-image-provider.png",
+    "05-selected-components.png",
+    "06-dry-run.png",
+    "07-recovery-without-provider.png",
+    "08-failure.png"
+  ],
+  "success": false,
+  "latestSourceAtStart": "856940f2a629e0e2f3e03fc484cb0c0309c96734",
+  "installer": {
+    "origin": "same-workflow native build",
+    "sha256": "ade8bcab4d6fac79b91e58b5d60458f450c31500255c77e4f9f695b5e455b55e",
+    "size": 7109158,
+    "sourceRevision": "4488a418cad56a158273cb66c4ce7794696b7ed1"
+  },
+  "signing": "Candidate artifact; not signed release evidence.",
+  "executableSha256": "7ffacb8025f8dffebdc61a0b829feb02a3461e9cf0af26c4182ed316bb6508c1",
+  "mod": {
+    "version": "1.6.4",
+    "commit": "41f71dda33c363c57dd5cbc4ac80eeb95320e0d4",
+    "archive": {
+      "url": "https://codeload.github.com/Kaiserreich/Kaiserreich-HOI4/zip/41f71dda33c363c57dd5cbc4ac80eeb95320e0d4",
+      "size": 675687382,
+      "sha256": "71c8e202b66918a4ef93f490b1db020cbd066b3e22475fa8df06e3612bff12d2"
+    },
+    "inventory": {
+      "files": 35198,
+      "bytes": 1118418543,
+      "git_tree_sha": "6f9856dc5eb12624b4592b6529b7f66ed8897b92",
+      "verified_crlf_files": 5981
+    }
+  },
+  "originalDigest": "1641aef28b4d224389dfba187268389ab1321103890601be20f0fe6fa4a6d5ac",
+  "projectProfile": {
+    "filesIndexed": 35196,
+    "samplesRead": 235,
+    "categories": [
+      "common/national_focus",
+      "events/root",
+      "documentation/root",
+      "common/decisions",
+      "common/on_actions",
+      "common/ideas",
+      "history/countries",
+      "history/states",
+      "localisation/braz_por",
+      "localisation/english",
+      "localisation/french",
+      "localisation/german",
+      "localisation/japanese",
+      "localisation/korean",
+      "localisation/polish",
+      "localisation/russian",
+      "localisation/simp_chinese",
+      "localisation/spanish",
+      "localisation/unknown",
+      "common/scripted_effects",
+      "common/scripted_triggers",
+      "common/abilities",
+      "common/achievements",
+      "common/ai_areas",
+      "common/ai_equipment",
+      "common/ai_faction_theaters",
+      "common/ai_focuses",
+      "common/ai_navy",
+      "common/ai_strategy",
+      "common/ai_strategy_plans",
+      "common/ai_templates",
+      "common/autonomous_states"
+    ],
+    "namespaceCount": 5,
+    "languageCount": 10,
+    "documentationCount": 2
+  },
+  "interruption": {
+    "transactionId": "1c7d0297-6a01-4a0a-bffc-d95bf1d8edad",
+    "observedState": "applying"
+  },
+  "error": "The project was not restored exactly.\n+ actual - expected\n\n+ '7a0535daf583fb7c841da4743f393571fd193ea72558308d1f958c40cb099e65'\n- '1641aef28b4d224389dfba187268389ab1321103890601be20f0fe6fa4a6d5ac'\n"
+}

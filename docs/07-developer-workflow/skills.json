@@ -8,11 +8,11 @@
     },
     {
       "name": "validate-stage",
-      "description": "Use on explicit invocation to review one HOI4 Factory stage against its acceptance rows, changed artifacts and actual evidence. Distinguish pass, fail, unavailable and not applicable. Do not claim game behavior from source checks or authorize the next stage."
+      "description": "Use automatically before every stage handoff, or on request, to review one HOI4 Factory stage against its acceptance rows, changed artifacts and actual evidence. Distinguish pass, fail, unavailable and not applicable. Do not claim game behavior from source checks or authorize the next stage."
     },
     {
       "name": "capture-engineering-lessons",
-      "description": "Use on explicit invocation at a substantive engineering handoff or after a repeatable tooling failure to capture, test and propose reusable guidance. Keep candidates separate from accepted policy, product runtime memory and game design canon."
+      "description": "Use automatically at every substantive engineering handoff or after a repeatable tooling failure to capture and test reusable guidance, promoting test-backed lessons that change no authority under ADR-023. Keep candidates separate from accepted policy, product runtime memory and game design canon."
     },
     {
       "name": "audit-hoi4-integrations",

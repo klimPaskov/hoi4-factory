@@ -1,0 +1,63 @@
+rustc 1.88.0 (6b00bc388 2025-06-23)
+cargo 1.88.0 (873a06493 2025-05-10)
+debconf: delaying package configuration, since apt-utils is not installed
+apt_exit=0
+libdbus-1-dev 1.14.10-1~deb12u1
+pkg-config 1.8.1-1
+== build probe crate with git dependencies pinned to 4488a418
+probe_build_exit=0
+   Compiling hoi4-setup-core v0.1.0 (https://github.com/klimPaskov/HOI4-Mod-Setup?rev=4488a418cad56a158273cb66c4ce7794696b7ed1#4488a418)
+   Compiling exp01-setup-probe v0.0.0 (/work/probe)
+    Finished `release` profile [optimized] target(s) in 5m 39s
+3b5e83c0aac77a36f298e980527926b5b1fbb283abcd784dfe3e49d2bf3ba972  Cargo.lock
+normal_tauri_crates=0
+normal_webkit_gtk=0
+build_tauri_build=0
+│   │   │   │   └── libdbus-sys v0.2.7
+│   │   ├── dbus-secret-service v4.1.0
+│   ├── keyring v3.6.3
+3ceb0ac76d38192f6906baae24e18090634c25ee2f9d4b6004655330e63e4270  /target/release/exp01-setup-probe
+	linux-vdso.so.1 (0x00007ffd20195000)
+	libdbus-1.so.3 => /lib/x86_64-linux-gnu/libdbus-1.so.3 (0x000076c25f03f000)
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x000076c25e7e0000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x000076c25e700000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000076c25e51f000)
+	/lib64/ld-linux-x86-64.so.2 (0x000076c25f09d000)
+	libsystemd.so.0 => /lib/x86_64-linux-gnu/libsystemd.so.0 (0x000076c25e44f000)
+	libcap.so.2 => /lib/x86_64-linux-gnu/libcap.so.2 (0x000076c25e443000)
+	libgcrypt.so.20 => /lib/x86_64-linux-gnu/libgcrypt.so.20 (0x000076c25e2fc000)
+	liblzma.so.5 => /lib/x86_64-linux-gnu/liblzma.so.5 (0x000076c25e2cd000)
+	libzstd.so.1 => /lib/x86_64-linux-gnu/libzstd.so.1 (0x000076c25e211000)
+	liblz4.so.1 => /lib/x86_64-linux-gnu/liblz4.so.1 (0x000076c25e1eb000)
+	libgpg-error.so.0 => /lib/x86_64-linux-gnu/libgpg-error.so.0 (0x000076c25e1c3000)
+== build harness from the Setup clone (upstream plus test harness only)
+setup_rev=4488a418cad56a158273cb66c4ce7794696b7ed1
+ src-tauri/src/transaction.rs | 1 +
+ 1 file changed, 1 insertion(+)
+harness_build_exit=0
+5f318ca03a36c5b1bf78043dc7e920b47bfbf4685741b14b2cd2a91636861cc5  /target/debug/deps/hoi4_mod_setup-b5b13ec949d466c9
+== server workspace layout
+== inventories before
+{"out": "/out/probe/project-before.json", "entries": 100, "files": 55, "content_digest": "b78112480629f537e0921c01c13d417a75fb350d0463b257a3284881173d01de"}
+{"out": "/out/probe/project2-before.json", "entries": 100, "files": 55, "content_digest": "70318c2a6e2247c8527023f3f60420aac018af070ac522257a0319607fd4518a"}
+{"out": "/out/probe/new-empty-before.json", "entries": 0, "files": 0, "content_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"}
+{"out": "/out/probe/outside-before.json", "entries": 1, "files": 1, "content_digest": "888adf1c10403b84018b310720d5de104594b590b451f5550b3962d2b8d569a5"}
+== probe run 1: confinement, scan, plan gate, apply gate, fresh recovery (as uid 10001)
+probe_run1_exit=0
+{"out": "/out/probe/project-after-run1.json", "entries": 100, "files": 55, "content_digest": "b78112480629f537e0921c01c13d417a75fb350d0463b257a3284881173d01de"}
+{"unapproved_bytes_untouched": true, "exact_files": true, "exact_files_and_dirs": true, "added_files": [], "git_status_identical": true, "metadata_only_unapproved": 0}
+== probe run 2: new-empty root, scan and gate
+probe_run_new_exit=0
+{"out": "/out/probe/new-empty-after.json", "entries": 0, "files": 0, "content_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"}
+{"unapproved_bytes_untouched": true, "exact_files": true, "exact_files_and_dirs": true, "added_files": [], "git_status_identical": true, "metadata_only_unapproved": 0}
+== interrupt a real apply on project2 with the harness, recovery left to the probe
+interrupt_exit=0
+{"out": "/out/probe/project2-after-kill.json", "entries": 100, "files": 55, "content_digest": "70318c2a6e2247c8527023f3f60420aac018af070ac522257a0319607fd4518a"}
+== probe run 3: embedded recovery with no provider configured
+probe_run_recover_exit=0
+{"out": "/out/probe/project2-after-recover.json", "entries": 100, "files": 55, "content_digest": "70318c2a6e2247c8527023f3f60420aac018af070ac522257a0319607fd4518a"}
+{"unapproved_bytes_untouched": true, "exact_files": true, "exact_files_and_dirs": true, "added_files": [], "git_status_identical": true, "metadata_only_unapproved": 0}
+{"out": "/out/probe/outside-after.json", "entries": 1, "files": 1, "content_digest": "888adf1c10403b84018b310720d5de104594b590b451f5550b3962d2b8d569a5"}
+{"unapproved_bytes_untouched": true, "exact_files": true, "exact_files_and_dirs": true, "added_files": [], "git_status_identical": true, "metadata_only_unapproved": 0}
+done
+docker_exit=0

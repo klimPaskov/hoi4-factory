@@ -1,0 +1,1388 @@
+{
+  "cases": [
+    {
+      "id": "basic_lf_nobom__inspect",
+      "fixture": "basic_lf_nobom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "inspect_only"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "basic_lf_nobom__noop",
+      "fixture": "basic_lf_nobom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "noop"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "basic_lf_nobom__cost",
+      "fixture": "basic_lf_nobom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_left",
+        "value": 9
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "basic_lf_nobom__cost_commented_line",
+      "fixture": "basic_lf_nobom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_root",
+        "value": 12
+      },
+      "expect": "edit",
+      "note": "cost line carries a trailing comment"
+    },
+    {
+      "id": "basic_lf_nobom__move",
+      "fixture": "basic_lf_nobom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "move",
+        "focusId": "exp_join",
+        "x": 5,
+        "y": 3
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "basic_lf_nobom__link",
+      "fixture": "basic_lf_nobom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "link",
+        "focusId": "exp_join",
+        "prerequisites": [
+          "exp_root"
+        ]
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "basic_lf_nobom__create",
+      "fixture": "basic_lf_nobom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "create",
+        "focus": {
+          "id": "exp_new",
+          "x": 4,
+          "y": 3,
+          "cost": 5,
+          "prerequisites": [
+            [
+              "exp_join"
+            ]
+          ]
+        }
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "basic_lf_bom__inspect",
+      "fixture": "basic_lf_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "inspect_only"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "basic_lf_bom__noop",
+      "fixture": "basic_lf_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "noop"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "basic_lf_bom__cost",
+      "fixture": "basic_lf_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_left",
+        "value": 9
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "basic_lf_bom__cost_commented_line",
+      "fixture": "basic_lf_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_root",
+        "value": 12
+      },
+      "expect": "edit",
+      "note": "cost line carries a trailing comment"
+    },
+    {
+      "id": "basic_lf_bom__move",
+      "fixture": "basic_lf_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "move",
+        "focusId": "exp_join",
+        "x": 5,
+        "y": 3
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "basic_lf_bom__link",
+      "fixture": "basic_lf_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "link",
+        "focusId": "exp_join",
+        "prerequisites": [
+          "exp_root"
+        ]
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "basic_lf_bom__create",
+      "fixture": "basic_lf_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "create",
+        "focus": {
+          "id": "exp_new",
+          "x": 4,
+          "y": 3,
+          "cost": 5,
+          "prerequisites": [
+            [
+              "exp_join"
+            ]
+          ]
+        }
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "basic_crlf_nobom__inspect",
+      "fixture": "basic_crlf_nobom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "inspect_only"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "basic_crlf_nobom__noop",
+      "fixture": "basic_crlf_nobom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "noop"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "basic_crlf_nobom__cost",
+      "fixture": "basic_crlf_nobom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_left",
+        "value": 9
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "basic_crlf_nobom__cost_commented_line",
+      "fixture": "basic_crlf_nobom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_root",
+        "value": 12
+      },
+      "expect": "edit",
+      "note": "cost line carries a trailing comment"
+    },
+    {
+      "id": "basic_crlf_nobom__move",
+      "fixture": "basic_crlf_nobom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "move",
+        "focusId": "exp_join",
+        "x": 5,
+        "y": 3
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "basic_crlf_nobom__link",
+      "fixture": "basic_crlf_nobom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "link",
+        "focusId": "exp_join",
+        "prerequisites": [
+          "exp_root"
+        ]
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "basic_crlf_nobom__create",
+      "fixture": "basic_crlf_nobom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "create",
+        "focus": {
+          "id": "exp_new",
+          "x": 4,
+          "y": 3,
+          "cost": 5,
+          "prerequisites": [
+            [
+              "exp_join"
+            ]
+          ]
+        }
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "basic_crlf_bom__inspect",
+      "fixture": "basic_crlf_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "inspect_only"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "basic_crlf_bom__noop",
+      "fixture": "basic_crlf_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "noop"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "basic_crlf_bom__cost",
+      "fixture": "basic_crlf_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_left",
+        "value": 9
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "basic_crlf_bom__cost_commented_line",
+      "fixture": "basic_crlf_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_root",
+        "value": 12
+      },
+      "expect": "edit",
+      "note": "cost line carries a trailing comment"
+    },
+    {
+      "id": "basic_crlf_bom__move",
+      "fixture": "basic_crlf_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "move",
+        "focusId": "exp_join",
+        "x": 5,
+        "y": 3
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "basic_crlf_bom__link",
+      "fixture": "basic_crlf_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "link",
+        "focusId": "exp_join",
+        "prerequisites": [
+          "exp_root"
+        ]
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "basic_crlf_bom__create",
+      "fixture": "basic_crlf_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "create",
+        "focus": {
+          "id": "exp_new",
+          "x": 4,
+          "y": 3,
+          "cost": 5,
+          "prerequisites": [
+            [
+              "exp_join"
+            ]
+          ]
+        }
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "basic_mixed_bom__inspect",
+      "fixture": "basic_mixed_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "inspect_only"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "basic_mixed_bom__noop",
+      "fixture": "basic_mixed_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "noop"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "basic_mixed_bom__cost",
+      "fixture": "basic_mixed_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_left",
+        "value": 9
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "basic_mixed_bom__cost_commented_line",
+      "fixture": "basic_mixed_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_root",
+        "value": 12
+      },
+      "expect": "edit",
+      "note": "cost line carries a trailing comment"
+    },
+    {
+      "id": "basic_mixed_bom__move",
+      "fixture": "basic_mixed_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "move",
+        "focusId": "exp_join",
+        "x": 5,
+        "y": 3
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "basic_mixed_bom__link",
+      "fixture": "basic_mixed_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "link",
+        "focusId": "exp_join",
+        "prerequisites": [
+          "exp_root"
+        ]
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "basic_mixed_bom__create",
+      "fixture": "basic_mixed_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "create",
+        "focus": {
+          "id": "exp_new",
+          "x": 4,
+          "y": 3,
+          "cost": 5,
+          "prerequisites": [
+            [
+              "exp_join"
+            ]
+          ]
+        }
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "nonascii_crlf_bom__inspect",
+      "fixture": "nonascii_crlf_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "inspect_only"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "nonascii_crlf_bom__noop",
+      "fixture": "nonascii_crlf_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "noop"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "nonascii_crlf_bom__cost",
+      "fixture": "nonascii_crlf_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_left",
+        "value": 9
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "nonascii_crlf_bom__cost_commented_line",
+      "fixture": "nonascii_crlf_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_root",
+        "value": 12
+      },
+      "expect": "edit",
+      "note": "cost line carries a trailing comment"
+    },
+    {
+      "id": "nonascii_crlf_bom__move",
+      "fixture": "nonascii_crlf_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "move",
+        "focusId": "exp_join",
+        "x": 5,
+        "y": 3
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "nonascii_crlf_bom__link",
+      "fixture": "nonascii_crlf_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "link",
+        "focusId": "exp_join",
+        "prerequisites": [
+          "exp_root"
+        ]
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "nonascii_crlf_bom__create",
+      "fixture": "nonascii_crlf_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "create",
+        "focus": {
+          "id": "exp_new",
+          "x": 4,
+          "y": 3,
+          "cost": 5,
+          "prerequisites": [
+            [
+              "exp_join"
+            ]
+          ]
+        }
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "invalid_utf8_lf__inspect",
+      "fixture": "invalid_utf8_lf.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "inspect_only"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "invalid_utf8_lf__noop",
+      "fixture": "invalid_utf8_lf.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "noop"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "invalid_utf8_lf__cost",
+      "fixture": "invalid_utf8_lf.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_left",
+        "value": 9
+      },
+      "expect": "refuse",
+      "note": "file is not valid UTF-8; the only safe outcomes are an exact edit or a refusal",
+      "acceptEdit": true
+    },
+    {
+      "id": "invalid_utf8_lf__cost_commented_line",
+      "fixture": "invalid_utf8_lf.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_root",
+        "value": 12
+      },
+      "expect": "refuse",
+      "note": "file is not valid UTF-8; the only safe outcomes are an exact edit or a refusal",
+      "acceptEdit": true
+    },
+    {
+      "id": "invalid_utf8_lf__move",
+      "fixture": "invalid_utf8_lf.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "move",
+        "focusId": "exp_join",
+        "x": 5,
+        "y": 3
+      },
+      "expect": "refuse",
+      "note": "file is not valid UTF-8; the only safe outcomes are an exact edit or a refusal",
+      "acceptEdit": true
+    },
+    {
+      "id": "invalid_utf8_lf__link",
+      "fixture": "invalid_utf8_lf.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "link",
+        "focusId": "exp_join",
+        "prerequisites": [
+          "exp_root"
+        ]
+      },
+      "expect": "refuse",
+      "note": "file is not valid UTF-8; the only safe outcomes are an exact edit or a refusal",
+      "acceptEdit": true
+    },
+    {
+      "id": "invalid_utf8_lf__create",
+      "fixture": "invalid_utf8_lf.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "create",
+        "focus": {
+          "id": "exp_new",
+          "x": 4,
+          "y": 3,
+          "cost": 5,
+          "prerequisites": [
+            [
+              "exp_join"
+            ]
+          ]
+        }
+      },
+      "expect": "refuse",
+      "note": "file is not valid UTF-8; the only safe outcomes are an exact edit or a refusal",
+      "acceptEdit": true
+    },
+    {
+      "id": "windows1252_lf__inspect",
+      "fixture": "windows1252_lf.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "inspect_only"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "windows1252_lf__noop",
+      "fixture": "windows1252_lf.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "noop"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "windows1252_lf__cost",
+      "fixture": "windows1252_lf.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_left",
+        "value": 9
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "windows1252_lf__cost_commented_line",
+      "fixture": "windows1252_lf.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_root",
+        "value": 12
+      },
+      "expect": "edit",
+      "note": "cost line carries a trailing comment"
+    },
+    {
+      "id": "windows1252_lf__move",
+      "fixture": "windows1252_lf.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "move",
+        "focusId": "exp_join",
+        "x": 5,
+        "y": 3
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "windows1252_lf__link",
+      "fixture": "windows1252_lf.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "link",
+        "focusId": "exp_join",
+        "prerequisites": [
+          "exp_root"
+        ]
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "windows1252_lf__create",
+      "fixture": "windows1252_lf.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "create",
+        "focus": {
+          "id": "exp_new",
+          "x": 4,
+          "y": 3,
+          "cost": 5,
+          "prerequisites": [
+            [
+              "exp_join"
+            ]
+          ]
+        }
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "unknown__inspect",
+      "fixture": "unknown_crlf_bom.txt",
+      "tree": "exp_unknown_tree",
+      "op": {
+        "type": "inspect_only"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "unknown__noop",
+      "fixture": "unknown_crlf_bom.txt",
+      "tree": "exp_unknown_tree",
+      "op": {
+        "type": "noop"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "unknown__cost_beside_unknown_key",
+      "fixture": "unknown_crlf_bom.txt",
+      "tree": "exp_unknown_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_u_root",
+        "value": 11
+      },
+      "expect": "edit",
+      "note": "focus has an unmodelled block and an unmodelled scalar key"
+    },
+    {
+      "id": "unknown__cost_scripted_constant",
+      "fixture": "unknown_crlf_bom.txt",
+      "tree": "exp_unknown_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_u_const",
+        "value": 9
+      },
+      "expect": "edit",
+      "note": "cost is a scripted constant reference @exp_cost"
+    },
+    {
+      "id": "unknown__move",
+      "fixture": "unknown_crlf_bom.txt",
+      "tree": "exp_unknown_tree",
+      "op": {
+        "type": "move",
+        "focusId": "exp_u_plain",
+        "x": 6,
+        "y": 3
+      },
+      "expect": "edit",
+      "note": "focus has an available block with a comparison operator"
+    },
+    {
+      "id": "unknown__link",
+      "fixture": "unknown_crlf_bom.txt",
+      "tree": "exp_unknown_tree",
+      "op": {
+        "type": "link",
+        "focusId": "exp_u_plain",
+        "prerequisites": [
+          "exp_u_const"
+        ]
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "unknown__create",
+      "fixture": "unknown_crlf_bom.txt",
+      "tree": "exp_unknown_tree",
+      "op": {
+        "type": "create",
+        "focus": {
+          "id": "exp_u_new",
+          "x": 3,
+          "y": 2,
+          "cost": 5,
+          "prerequisites": [
+            [
+              "exp_u_const"
+            ]
+          ]
+        }
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "unknown__raw_edit",
+      "fixture": "unknown_crlf_bom.txt",
+      "tree": "exp_unknown_tree",
+      "op": {
+        "type": "raw_edit",
+        "focusId": "exp_u_root",
+        "key": "exp_custom_block",
+        "text": "exp_custom_block = { foo = baz }"
+      },
+      "expect": "refuse",
+      "note": "editing an unmodelled entry through the plan"
+    },
+    {
+      "id": "duplicate__inspect",
+      "fixture": "duplicate_lf.txt",
+      "tree": "exp_dup_tree",
+      "op": {
+        "type": "inspect_only"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "duplicate__noop",
+      "fixture": "duplicate_lf.txt",
+      "tree": "exp_dup_tree",
+      "op": {
+        "type": "noop"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "duplicate__cost_first",
+      "fixture": "duplicate_lf.txt",
+      "tree": "exp_dup_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_d_twin",
+        "occurrence": 0,
+        "value": 4
+      },
+      "expect": "refuse",
+      "note": "ambiguous target: two focus blocks share the id"
+    },
+    {
+      "id": "duplicate__cost_second",
+      "fixture": "duplicate_lf.txt",
+      "tree": "exp_dup_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_d_twin",
+        "occurrence": 1,
+        "value": 9
+      },
+      "expect": "refuse",
+      "note": "ambiguous target: two focus blocks share the id"
+    },
+    {
+      "id": "duplicate__move_first",
+      "fixture": "duplicate_lf.txt",
+      "tree": "exp_dup_tree",
+      "op": {
+        "type": "move",
+        "focusId": "exp_d_twin",
+        "occurrence": 0,
+        "x": 0,
+        "y": 2
+      },
+      "expect": "refuse",
+      "note": ""
+    },
+    {
+      "id": "duplicate__cost_unique",
+      "fixture": "duplicate_lf.txt",
+      "tree": "exp_dup_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_d_root",
+        "value": 12
+      },
+      "expect": "edit",
+      "note": "edit of a unique focus in a file that also has duplicates"
+    },
+    {
+      "id": "shared__inspect",
+      "fixture": "shared_lf.txt",
+      "tree": "exp_shared_tree",
+      "op": {
+        "type": "inspect_only"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "shared__noop",
+      "fixture": "shared_lf.txt",
+      "tree": "exp_shared_tree",
+      "op": {
+        "type": "noop"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "shared__cost_tree_focus",
+      "fixture": "shared_lf.txt",
+      "tree": "exp_shared_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_s_after",
+        "value": 8
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "shared__move_tree_focus",
+      "fixture": "shared_lf.txt",
+      "tree": "exp_shared_tree",
+      "op": {
+        "type": "move",
+        "focusId": "exp_s_after",
+        "x": 3,
+        "y": 2
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "shared__link_to_shared",
+      "fixture": "shared_lf.txt",
+      "tree": "exp_shared_tree",
+      "op": {
+        "type": "link",
+        "focusId": "exp_s_root",
+        "prerequisites": [
+          "exp_s_shared_a"
+        ]
+      },
+      "expect": "edit",
+      "note": "prerequisite pointing to a shared focus defined outside the tree"
+    },
+    {
+      "id": "shared__create_after_shared",
+      "fixture": "shared_lf.txt",
+      "tree": "exp_shared_tree",
+      "op": {
+        "type": "create",
+        "focus": {
+          "id": "exp_s_new",
+          "x": 2,
+          "y": 2,
+          "cost": 5,
+          "prerequisites": [
+            [
+              "exp_s_after"
+            ]
+          ]
+        }
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "shared__cost_shared_focus",
+      "fixture": "shared_lf.txt",
+      "tree": "exp_shared_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_s_shared_a",
+        "value": 9
+      },
+      "expect": "refuse",
+      "note": "the shared focus lives outside focus_tree; expect no structured edit"
+    },
+    {
+      "id": "relative__inspect",
+      "fixture": "relative_crlf.txt",
+      "tree": "exp_rel_tree",
+      "op": {
+        "type": "inspect_only"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "relative__noop",
+      "fixture": "relative_crlf.txt",
+      "tree": "exp_rel_tree",
+      "op": {
+        "type": "noop"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "relative__move_offset",
+      "fixture": "relative_crlf.txt",
+      "tree": "exp_rel_tree",
+      "op": {
+        "type": "move",
+        "focusId": "exp_r_child",
+        "x": 0,
+        "y": 1
+      },
+      "expect": "edit",
+      "note": "changes the relative offset, keeps the anchor"
+    },
+    {
+      "id": "relative__move_to_fixed",
+      "fixture": "relative_crlf.txt",
+      "tree": "exp_rel_tree",
+      "op": {
+        "type": "move",
+        "focusId": "exp_r_child",
+        "x": 6,
+        "y": 2,
+        "toFixed": true
+      },
+      "expect": "edit",
+      "note": "explicit conversion from relative to absolute"
+    },
+    {
+      "id": "relative__cost_child",
+      "fixture": "relative_crlf.txt",
+      "tree": "exp_rel_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_r_child",
+        "value": 4
+      },
+      "expect": "edit",
+      "note": "scalar edit on a relatively positioned focus"
+    },
+    {
+      "id": "relative__link",
+      "fixture": "relative_crlf.txt",
+      "tree": "exp_rel_tree",
+      "op": {
+        "type": "link",
+        "focusId": "exp_r_grandchild",
+        "prerequisites": [
+          "exp_r_anchor"
+        ]
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "relative__create_relative",
+      "fixture": "relative_crlf.txt",
+      "tree": "exp_rel_tree",
+      "op": {
+        "type": "create",
+        "focus": {
+          "id": "exp_r_new",
+          "x": 0,
+          "y": 1,
+          "cost": 5,
+          "relative_position_id": "exp_r_grandchild",
+          "prerequisites": [
+            [
+              "exp_r_grandchild"
+            ]
+          ]
+        }
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "orphan__noop",
+      "fixture": "relative_orphan_lf.txt",
+      "tree": "exp_orphan_tree",
+      "op": {
+        "type": "noop"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "orphan__cost_root",
+      "fixture": "relative_orphan_lf.txt",
+      "tree": "exp_orphan_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_o_root",
+        "value": 8
+      },
+      "expect": "edit",
+      "note": "edit of a valid focus in a tree that also holds a missing relative anchor"
+    },
+    {
+      "id": "orphan__cost_orphan",
+      "fixture": "relative_orphan_lf.txt",
+      "tree": "exp_orphan_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_o_orphan",
+        "value": 4
+      },
+      "expect": "edit",
+      "note": "edit of the focus whose relative anchor is missing"
+    },
+    {
+      "id": "sharedalone__noop",
+      "fixture": "shared_standalone_crlf_bom.txt",
+      "tree": "exp_ss_tree",
+      "op": {
+        "type": "noop"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "sharedalone__cost",
+      "fixture": "shared_standalone_crlf_bom.txt",
+      "tree": "exp_ss_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_ss_next",
+        "value": 8
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "sharedalone__move",
+      "fixture": "shared_standalone_crlf_bom.txt",
+      "tree": "exp_ss_tree",
+      "op": {
+        "type": "move",
+        "focusId": "exp_ss_next",
+        "x": 3,
+        "y": 1
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "sharedalone__link",
+      "fixture": "shared_standalone_crlf_bom.txt",
+      "tree": "exp_ss_tree",
+      "op": {
+        "type": "link",
+        "focusId": "exp_ss_next",
+        "prerequisites": [
+          "exp_ss_shared"
+        ]
+      },
+      "expect": "edit",
+      "note": "new prerequisite on a shared focus defined outside the tree"
+    },
+    {
+      "id": "sharedalone__create",
+      "fixture": "shared_standalone_crlf_bom.txt",
+      "tree": "exp_ss_tree",
+      "op": {
+        "type": "create",
+        "focus": {
+          "id": "exp_ss_new",
+          "x": 2,
+          "y": 2,
+          "cost": 5,
+          "prerequisites": [
+            [
+              "exp_ss_next"
+            ]
+          ]
+        }
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "stale__comment_then_cost",
+      "fixture": "basic_crlf_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_left",
+        "value": 9,
+        "external": {
+          "find": "# leading comment before the root focus",
+          "replace": "# leading comment edited externally"
+        }
+      },
+      "expect": "edit",
+      "note": "external formatting-only change after inspect; preserve it or refuse"
+    },
+    {
+      "id": "stale__semantic_then_cost",
+      "fixture": "basic_crlf_bom.txt",
+      "tree": "exp_basic_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_left",
+        "value": 9,
+        "external": {
+          "find": "cost = 7",
+          "replace": "cost = 3"
+        }
+      },
+      "expect": "edit",
+      "note": "external semantic change to another focus after inspect; preserve it or refuse"
+    },
+    {
+      "id": "commented__noop",
+      "fixture": "commented_prereq_lf.txt",
+      "tree": "exp_cmt_tree",
+      "op": {
+        "type": "noop"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "commented__link",
+      "fixture": "commented_prereq_lf.txt",
+      "tree": "exp_cmt_tree",
+      "op": {
+        "type": "link",
+        "focusId": "exp_c_next",
+        "prerequisites": [
+          "exp_c_side"
+        ]
+      },
+      "expect": "edit",
+      "note": "the existing prerequisite block holds a comment; refusal is also acceptable",
+      "acceptRefusal": true
+    },
+    {
+      "id": "commented__cost",
+      "fixture": "commented_prereq_lf.txt",
+      "tree": "exp_cmt_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_c_next",
+        "value": 6
+      },
+      "expect": "edit",
+      "note": ""
+    },
+    {
+      "id": "malformed_unclosed_lf__inspect",
+      "fixture": "malformed_unclosed_lf.txt",
+      "tree": "exp_bad_tree",
+      "op": {
+        "type": "inspect_only"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "malformed_unclosed_lf__noop",
+      "fixture": "malformed_unclosed_lf.txt",
+      "tree": "exp_bad_tree",
+      "op": {
+        "type": "noop"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "malformed_unclosed_lf__cost",
+      "fixture": "malformed_unclosed_lf.txt",
+      "tree": "exp_bad_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_b_root",
+        "value": 7
+      },
+      "expect": "refuse",
+      "note": ""
+    },
+    {
+      "id": "malformed_unclosed_lf__create",
+      "fixture": "malformed_unclosed_lf.txt",
+      "tree": "exp_bad_tree",
+      "op": {
+        "type": "create",
+        "focus": {
+          "id": "exp_bad_new",
+          "x": 1,
+          "y": 2,
+          "cost": 5,
+          "prerequisites": [
+            [
+              "exp_b_root"
+            ]
+          ]
+        }
+      },
+      "expect": "refuse",
+      "note": ""
+    },
+    {
+      "id": "malformed_stray_crlf__inspect",
+      "fixture": "malformed_stray_crlf.txt",
+      "tree": "exp_stray_tree",
+      "op": {
+        "type": "inspect_only"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "malformed_stray_crlf__noop",
+      "fixture": "malformed_stray_crlf.txt",
+      "tree": "exp_stray_tree",
+      "op": {
+        "type": "noop"
+      },
+      "expect": "identical",
+      "note": ""
+    },
+    {
+      "id": "malformed_stray_crlf__cost",
+      "fixture": "malformed_stray_crlf.txt",
+      "tree": "exp_stray_tree",
+      "op": {
+        "type": "cost",
+        "focusId": "exp_t_root",
+        "value": 7
+      },
+      "expect": "refuse",
+      "note": ""
+    },
+    {
+      "id": "malformed_stray_crlf__create",
+      "fixture": "malformed_stray_crlf.txt",
+      "tree": "exp_stray_tree",
+      "op": {
+        "type": "create",
+        "focus": {
+          "id": "exp_bad_new",
+          "x": 1,
+          "y": 2,
+          "cost": 5,
+          "prerequisites": [
+            [
+              "exp_t_root"
+            ]
+          ]
+        }
+      },
+      "expect": "refuse",
+      "note": ""
+    }
+  ]
+}

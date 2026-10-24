@@ -1,0 +1,345 @@
+rustc 1.88.0 (6b00bc388 2025-06-23)
+cargo 1.88.0 (873a06493 2025-05-10)
+Linux 3b741804d630 6.6.87.2-microsoft-standard-WSL2 #1 SMP PREEMPT_DYNAMIC Thu Jun  5 18:30:46 UTC 2025 x86_64 GNU/Linux
+debconf: delaying package configuration, since apt-utils is not installed
+apt_exit=0
+libdbus-1-dev 1.14.10-1~deb12u1
+pkg-config 1.8.1-1
+4488a418cad56a158273cb66c4ce7794696b7ed1
+info: syncing channel updates for '1.88.0-x86_64-unknown-linux-gnu'
+info: latest update on 2025-06-26, rust version 1.88.0 (6b00bc388 2025-06-23)
+info: downloading component 'clippy'
+info: downloading component 'rustfmt'
+info: installing component 'clippy'
+info: installing component 'rustfmt'
+   Compiling zerovec-derive v0.11.3
+   Compiling zerofrom-derive v0.1.7
+   Compiling yoke-derive v0.8.2
+   Compiling phf_macros v0.13.1
+   Compiling zeroize_derive v1.5.0
+   Compiling darling_macro v0.23.0
+   Compiling cssparser-macros v0.6.1
+   Compiling derive_more-impl v2.1.1
+   Compiling thiserror v1.0.69
+   Compiling getrandom v0.4.3
+   Compiling thiserror v2.0.19
+   Compiling indexmap v1.9.3
+   Compiling thiserror-impl v1.0.69
+   Compiling ring v0.17.14
+   Compiling schemars_derive v0.8.22
+   Compiling darling v0.23.0
+   Compiling rustls v0.23.46
+   Compiling cargo_metadata v0.19.2
+   Compiling libdbus-sys v0.2.7
+   Compiling rand_core v0.9.5
+   Compiling serde_with_macros v3.21.0
+   Compiling phf v0.13.1
+   Compiling zeroize v1.9.0
+   Compiling parking_lot_core v0.9.12
+   Compiling web_atoms v0.2.5
+   Compiling derive_more v2.1.1
+   Compiling rustls-pki-types v1.15.1
+   Compiling cssparser v0.36.0
+   Compiling tracing-core v0.1.36
+   Compiling adler2 v2.0.1
+   Compiling unicode-general-category v1.1.0
+   Compiling atomic-waker v1.1.2
+   Compiling lazy_static v1.5.0
+   Compiling zerofrom v0.1.8
+   Compiling glob v0.3.4
+   Compiling yoke v0.8.3
+   Compiling markup5ever v0.38.0
+   Compiling selectors v0.36.1
+   Compiling zerovec v0.11.6
+   Compiling zerotrie v0.2.4
+   Compiling html5ever v0.38.0
+   Compiling rustls-webpki v0.103.15
+   Compiling json-patch v3.0.1
+   Compiling serde_with v3.21.0
+   Compiling borrow-or-share v0.2.4
+   Compiling tracing v0.1.44
+   Compiling fluent-uri v0.4.1
+   Compiling fraction v0.15.4
+   Compiling tinystr v0.8.3
+   Compiling potential_utf v0.1.5
+   Compiling icu_collections v2.2.0
+   Compiling icu_locale_core v2.2.0
+   Compiling dom_query v0.27.0
+   Compiling hyper v1.11.0
+   Compiling miniz_oxide v0.8.9
+   Compiling parking_lot v0.12.5
+   Compiling tauri-winres v0.3.6
+   Compiling crc32fast v1.5.0
+   Compiling icu_provider v2.2.0
+   Compiling cargo_toml v0.22.3
+   Compiling dirs v6.0.0
+   Compiling icu_normalizer v2.2.0
+   Compiling icu_properties v2.2.0
+   Compiling sha2 v0.10.9
+   Compiling indexmap v2.14.0
+   Compiling strum_macros v0.28.0
+   Compiling hmac v0.12.1
+   Compiling sync_wrapper v1.0.2
+   Compiling serde_spanned v0.6.9
+   Compiling toml_datetime v0.6.3
+   Compiling outref v0.5.2
+   Compiling tower-layer v0.3.3
+   Compiling winnow v0.5.40
+   Compiling ipnet v2.12.0
+   Compiling micromap v0.3.0
+   Compiling bytecount v0.6.9
+   Compiling tinyvec_macros v0.1.1
+   Compiling alloc-no-stdlib v2.0.4
+   Compiling num-cmp v0.1.0
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling vsimd v0.8.0
+   Compiling alloc-stdlib v0.2.4
+   Compiling jsonschema-value v0.49.2
+   Compiling referencing v0.49.2
+   Compiling tinyvec v1.12.0
+   Compiling hyper-util v0.1.20
+   Compiling tower v0.5.3
+   Compiling url v2.5.8
+   Compiling uuid-simd v0.8.0
+   Compiling hkdf v0.12.4
+   Compiling flate2 v1.1.9
+   Compiling toml_edit v0.20.2
+   Compiling tokio-rustls v0.26.4
+   Compiling dbus v0.9.12
+   Compiling schemars v0.8.22
+   Compiling urlpattern v0.3.0
+   Compiling strum v0.28.0
+   Compiling webpki-roots v1.0.9
+   Compiling regex v1.13.1
+   Compiling fancy-regex v0.18.0
+   Compiling cbc v0.1.2
+   Compiling aes v0.8.4
+   Compiling fdeflate v0.3.7
+   Compiling tempfile v3.27.0
+   Compiling ppv-lite86 v0.2.21
+   Compiling email_address v0.2.9
+   Compiling jsonschema-regex v0.49.2
+   Compiling wait-timeout v0.2.1
+   Compiling tauri-utils v2.9.3
+   Compiling quick-error v1.2.3
+   Compiling bitflags v1.3.2
+   Compiling data-encoding v2.11.0
+   Compiling ryu v1.0.23
+   Compiling rusty-fork v0.3.1
+   Compiling png v0.17.16
+   Compiling serde_urlencoded v0.7.1
+   Compiling toml v0.8.2
+   Compiling rand_chacha v0.9.0
+   Compiling hyper-rustls v0.27.9
+   Compiling jsonschema v0.49.2
+   Compiling tower-http v0.6.11
+   Compiling unicode-normalization v0.1.25
+   Compiling brotli-decompressor v5.0.3
+   Compiling dbus-secret-service v4.1.0
+   Compiling rand v0.9.5
+   Compiling rand_xorshift v0.4.0
+   Compiling uuid v1.24.0
+   Compiling xattr v1.6.1
+   Compiling http-body-util v0.1.4
+   Compiling filetime v0.2.29
+   Compiling hex v0.4.3
+   Compiling iana-time-zone v0.1.65
+   Compiling unarray v0.1.4
+   Compiling keyring v3.6.3
+   Compiling tar v0.4.46
+   Compiling proptest v1.11.0
+   Compiling reqwest v0.12.28
+   Compiling brotli v8.0.4
+   Compiling md-5 v0.10.6
+   Compiling chrono v0.4.45
+   Compiling hoi4-setup-core v0.1.0 (/build/crates/hoi4-setup-core)
+   Compiling tauri-build v2.6.3
+   Compiling hoi4-mod-setup v0.6.3 (/build/src-tauri)
+warning: function `session_generation` is never used
+   --> src-tauri/src/account_cli.rs:177:15
+    |
+177 | pub(crate) fn session_generation() -> u64 {
+    |               ^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` on by default
+
+warning: `hoi4-mod-setup` (lib test) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3m 57s
+     Running unittests src/lib.rs (/target/debug/deps/hoi4_mod_setup-b5b13ec949d466c9)
+
+running 144 tests
+test transaction::tests::a_deselected_clients_modified_file_is_kept_on_disk_and_released_from_the_lock ... ok
+test transaction::tests::a_route_removal_operation_is_bound_to_an_unchanged_merged_mcp_file ... ok
+test transaction::tests::a_missing_bound_parent_is_absent_only_for_operations_that_changed_nothing ... ok
+test transaction::tests::actual_project_state_path_enforces_reasoning_effort_schema ... ok
+test transaction::tests::an_update_keeps_the_content_of_replaced_generated_files_for_repair ... ok
+test transaction::tests::an_update_that_keeps_a_file_records_it_at_the_new_revision ... ok
+test transaction::tests::absent_project_root_is_created_only_at_apply_and_removed_by_rollback ... ok
+test transaction::tests::application_data_root_replaced_before_recovery_is_refused ... ok
+test transaction::tests::all_skip_removal_writes_an_empty_managed_lock_and_clears_workflow_refs ... ok
+test transaction::tests::absent_root_create_remove_and_inverse_boundaries_are_recoverable has been running for over 60 seconds
+test transaction::tests::backup_directory_replaced_before_rollback_is_refused ... ok
+test transaction::tests::apply_then_rollback_restores_original_hashes ... ok
+test transaction::tests::batched_operation_intents_replay_before_compaction ... ok
+test transaction::tests::checkpoint_replay_orders_records_by_sequence_not_wall_clock ... ok
+test transaction::tests::backup_directory_replaced_by_a_link_before_rollback_is_refused ... ok
+test transaction::tests::blocked_readiness_never_writes_a_success_lock ... ok
+test transaction::tests::configured_git_remote_requires_explicit_plan_approval ... ok
+test transaction::tests::concurrent_edit_after_precondition_is_preserved_as_a_conflict ... ok
+test transaction::tests::child_rollback_storage_replaced_before_a_retry_is_refused ... ok
+test transaction::tests::crash_before_moving_changed_bytes_back_keeps_them_for_rollback ... ok
+test transaction::tests::crash_before_lock_quarantine_release_is_finished_by_resume ... ok
+test transaction::tests::create_leaf_binding_rejects_replacement_of_the_reviewed_parent ... ok
+test transaction::tests::crash_at_each_quarantine_boundary_rolls_back_to_the_original_bytes has been running for over 60 seconds
+test transaction::tests::absent_root_create_remove_and_inverse_boundaries_are_recoverable ... ok
+test transaction::tests::crash_inside_lock_commit_restores_the_predecessor_for_rollback has been running for over 60 seconds
+test transaction::tests::crash_at_each_quarantine_boundary_rolls_back_to_the_original_bytes ... ok
+test transaction::tests::deselected_client_mcp_file_loses_the_recorded_image_and_live_routes_too ... ok
+test transaction::tests::cross_process_finalization_and_rollback_boundaries_are_recoverable has been running for over 60 seconds
+test transaction::tests::cross_process_inverse_rollback_boundary_is_recoverable ... ok
+test transaction::tests::direct_journal_reads_reject_a_linked_transaction_directory ... ok
+test transaction::tests::discard_staging_preserves_journal_and_removes_only_staging ... ok
+test transaction::tests::crash_inside_lock_commit_restores_the_predecessor_for_rollback ... ok
+test transaction::tests::discard_staging_rejects_a_different_project_root ... ok
+test transaction::tests::deselected_client_mcp_route_removal_applies_and_rolls_back_the_original_bytes has been running for over 60 seconds
+test transaction::tests::edit_after_placement_is_kept_as_a_conflict_and_never_treated_as_installed ... ok
+test transaction::tests::deselected_client_mcp_route_removal_applies_and_rolls_back_the_original_bytes ... ok
+test transaction::tests::cross_process_finalization_and_rollback_boundaries_are_recoverable ... ok
+test transaction::tests::errors_after_the_quarantine_rename_move_the_bytes_back ... ok
+test transaction::tests::each_reviewed_post_install_action_has_its_own_fault_checkpoint has been running for over 60 seconds
+test transaction::tests::external_parent_replaced_after_backup_blocks_resume_until_the_bound_directory_returns ... ok
+test transaction::tests::external_parent_replaced_by_a_directory_after_apply_is_refused ... ok
+test transaction::tests::each_reviewed_post_install_action_has_its_own_fault_checkpoint ... ok
+test transaction::tests::external_parent_replaced_by_a_link_after_apply_is_refused ... ok
+test transaction::tests::external_parent_swap_during_apply_cannot_redirect_the_launcher ... ok
+test transaction::tests::external_parent_swapped_after_plan_review_is_refused_before_transaction_storage ... ok
+test transaction::tests::failed_post_install_action_never_writes_a_success_lock_and_requires_rollback ... ok
+test transaction::tests::failure_before_final_rollback_checkpoint_does_not_write_lock ... ok
+test transaction::tests::file_created_after_quarantine_keeps_both_user_files ... ok
+test transaction::tests::file_created_in_the_apply_window_is_never_clobbered ... ok
+test transaction::tests::finalization_rejects_a_substituted_success_lock ... ok
+test transaction::tests::finalizing_journal_can_be_reconciled_after_lock_commit ... ok
+test transaction::tests::first_install_rejects_launcher_descriptor_for_a_different_complete_root ... ok
+test transaction::tests::first_install_preserved_modification_stays_non_removable ... ok
+test transaction::tests::first_install_resumes_after_validation_with_user_facing_launcher_path_and_keeps_user_thumbnail has been running for over 60 seconds
+test transaction::tests::forward_quarantine_beside_restored_bytes_is_settled_by_hash has been running for over 60 seconds
+test transaction::tests::first_install_resumes_after_validation_with_user_facing_launcher_path_and_keeps_user_thumbnail ... ok
+test transaction::tests::identityless_legacy_journal_is_inspect_only ... ok
+test transaction::tests::forward_replace_interrupted_after_placement_rolls_back_through_its_quarantine has been running for over 60 seconds
+test transaction::tests::forward_replace_interrupted_after_placement_rolls_back_through_its_quarantine ... ok
+test transaction::tests::incomplete_transaction_is_discovered_before_a_new_mutation ... ok
+test transaction::tests::independently_planned_removal_batches_have_stable_unique_ids ... ok
+test transaction::tests::git_boundary_faults_leave_no_success_lock_and_remain_recoverable has been running for over 60 seconds
+test transaction::tests::git_boundary_faults_leave_no_success_lock_and_remain_recoverable ... ok
+test transaction::tests::injected_failure_does_not_write_success_lock ... ok
+test transaction::tests::forward_quarantine_beside_restored_bytes_is_settled_by_hash ... ok
+test transaction::tests::incomplete_live_runtime_persists_a_warning_without_claiming_gameplay_verification ... ok
+test transaction::tests::interrupted_after_apply_refuses_resume ... ok
+test transaction::tests::invalid_kept_workshop_descriptor_blocks_success_and_remains_rollback_only ... ok
+test transaction::tests::interrupted_pre_apply_transaction_can_resume_from_verified_staging ... ok
+test transaction::tests::inverse_rollback_checks_the_recorded_lock_before_file_apply ... ok
+test transaction::tests::journal_error_messages_are_redacted_bounded_and_sanitized_on_read ... ok
+test transaction::tests::journaled_quarantine_names_are_bound_to_their_operation ... ok
+test transaction::tests::journal_binds_the_application_data_directories_it_creates ... ok
+test transaction::tests::inverse_rollback_recreates_an_absent_reviewed_root_before_restore ... ok
+test transaction::tests::lock_reconciliation_drops_a_future_environment_component_after_its_files_are_removed ... ok
+test transaction::tests::lock_records_installer_creation_only_without_merged_local_content ... ok
+test transaction::tests::inverse_rollback_refuses_a_user_modified_file ... ok
+test transaction::tests::live_tools_failure_is_journaled_without_a_success_lock_and_rolls_back ... ok
+test transaction::tests::managed_removal_has_a_nonblocking_completion_report ... ok
+test transaction::tests::lock_commit_interrupted_before_its_rename_rolls_back_to_the_predecessor has been running for over 60 seconds
+test transaction::tests::managed_delete_preserves_a_concurrent_edit has been running for over 60 seconds
+test transaction::tests::managed_removal_does_not_rerun_post_install_actions_for_kept_components has been running for over 60 seconds
+test transaction::tests::managed_removal_prunes_emptied_folders_and_rollback_restores_them has been running for over 60 seconds
+test transaction::tests::lock_commit_interrupted_before_its_rename_rolls_back_to_the_predecessor ... ok
+test transaction::tests::managed_removal_does_not_rerun_post_install_actions_for_kept_components ... ok
+test transaction::tests::managed_removal_validation_does_not_require_codex_semantics ... ok
+test transaction::tests::managed_delete_preserves_a_concurrent_edit ... ok
+test transaction::tests::merged_files_require_reverse_merge_review_on_removal ... ok
+test transaction::tests::managed_removal_prunes_emptied_folders_and_rollback_restores_them ... ok
+test transaction::tests::managed_removal_runs_only_the_reviewed_gptimage_dependency_cleanup ... ok
+test transaction::tests::new_project_readiness_still_requires_launcher_thumbnail_and_generated_picture ... ok
+test transaction::tests::offline_wiki_validation_accepts_declared_text_and_binary_media ... ok
+test transaction::tests::offline_wiki_validation_rejects_malformed_or_unknown_media ... ok
+test transaction::tests::operation_checkpoint_replay_ignores_only_a_torn_final_record ... ok
+test transaction::tests::operation_checkpoint_replays_and_compacts_into_the_full_journal ... ok
+test transaction::tests::operation_checkpoint_size_does_not_grow_with_the_full_plan ... ok
+test transaction::tests::ordinary_active_checkpoints_derive_the_safe_recovery_action ... ok
+test transaction::tests::merged_ownership_survives_a_replace_and_stays_non_removable ... ok
+test transaction::tests::plan_binding_records_the_reviewed_launcher_parent_through_one_handle ... ok
+test transaction::tests::plan_bound_parent_missing_at_apply_time_is_refused ... ok
+test transaction::tests::plans_without_ownership_evidence_are_rejected_before_mutation ... ok
+test transaction::tests::ordinary_rollback_refuses_a_later_lock_edit_before_file_restore ... ok
+test transaction::tests::mcp_route_removal_faults_never_commit_and_recover_the_original_bytes has been running for over 60 seconds
+test transaction::tests::post_install_result_must_match_the_requested_component ... ok
+test transaction::tests::pre_apply_failure_leaves_new_root_absent_and_staging_discardable ... ok
+test transaction::tests::profile_directories_are_created_without_markers_and_rollback_removes_only_empty_ones ... ok
+test transaction::tests::project_root_identity_binding_rejects_replacement_at_the_reviewed_path ... ok
+test transaction::tests::missing_maintenance_files_rollback_across_unicode_paths_and_apply_faults has been running for over 60 seconds
+test transaction::tests::project_root_swap_during_post_install_checks_cannot_redirect_the_reads ... ok
+test transaction::tests::removal_and_update_reverse_only_the_shared_route_in_every_mcp_format ... ok
+test transaction::tests::repair_and_removal_preserve_modified_files ... ok
+test transaction::tests::pre_apply_resume_refuses_a_missing_predecessor_lock ... ok
+test transaction::tests::repair_does_not_replace_a_healthy_file ... ok
+test transaction::tests::reviewed_post_install_action_fault_boundaries_require_rollback ... ok
+test transaction::tests::reviewed_post_install_action_updates_readiness_and_persisted_workflow_state ... ok
+test transaction::tests::rollback_keeps_quarantines_it_cannot_vouch_for has been running for over 60 seconds
+test transaction::tests::rollback_lock_removal_after_a_first_install_is_settled_on_retry has been running for over 60 seconds
+test transaction::tests::rollback_keeps_quarantines_it_cannot_vouch_for ... ok
+test transaction::tests::rollback_lock_restore_interruptions_are_settled_on_retry has been running for over 60 seconds
+test transaction::tests::rollback_lock_removal_after_a_first_install_is_settled_on_retry ... ok
+test transaction::tests::rollback_lock_restore_interruptions_are_settled_on_retry ... ok
+test transaction::tests::rollback_never_removes_an_explicitly_skipped_file ... ok
+test transaction::tests::rollback_of_a_created_launcher_stops_while_its_bound_parent_is_missing ... ok
+test transaction::tests::rollback_lock_restore_remaining_boundaries_are_settled_on_retry ... ok
+test transaction::tests::rollback_of_a_kept_launcher_needs_nothing_from_a_missing_bound_parent ... ok
+test transaction::tests::rollback_preserves_a_created_root_when_unexpected_user_content_appears ... ok
+test transaction::tests::rollback_of_a_replaced_launcher_stops_while_its_bound_parent_is_missing ... ok
+test transaction::tests::rollback_probes_the_derived_quarantine_name_when_the_journal_lacks_it ... ok
+test transaction::tests::rollback_quarantine_interruptions_are_settled_on_retry has been running for over 60 seconds
+test transaction::tests::rollback_rejects_a_different_project_root ... ok
+test transaction::tests::rollback_removing_a_created_file_settles_each_boundary_on_retry has been running for over 60 seconds
+test transaction::tests::rollback_quarantine_interruptions_are_settled_on_retry ... ok
+test transaction::tests::rollback_removing_a_created_file_settles_each_boundary_on_retry ... ok
+test transaction::tests::rollback_restores_predecessor_lock_after_a_successful_maintenance_transaction ... ok
+test transaction::tests::rollback_resumes_an_operation_checkpoint_after_restore ... ok
+test transaction::tests::rollback_restoring_a_forward_quarantine_settles_each_boundary_on_retry has been running for over 60 seconds
+test transaction::tests::rollback_sweep_restores_the_quarantine_of_an_operation_left_pending ... ok
+test transaction::tests::setup_provider_does_not_restrict_development_client_components ... ok
+test transaction::tests::stage_and_operation_fault_matrix_never_writes_success_lock has been running for over 60 seconds
+test transaction::tests::rollback_restoring_a_forward_quarantine_settles_each_boundary_on_retry ... ok
+test transaction::tests::staging_directory_replaced_before_resume_is_refused has been running for over 60 seconds
+test transaction::tests::staging_directory_replaced_before_resume_is_refused ... ok
+test transaction::tests::staging_directory_replaced_by_a_link_before_resume_is_refused has been running for over 60 seconds
+test transaction::tests::staging_directory_replaced_by_a_link_before_resume_is_refused ... ok
+test transaction::tests::staging_discard_never_removes_a_swapped_in_staging_directory has been running for over 60 seconds
+test transaction::tests::staging_discard_never_removes_a_swapped_in_staging_directory ... ok
+test transaction::tests::the_journal_starts_from_the_plan_bound_parent_before_backup ... ok
+test transaction::tests::transaction_absent_root_process_fault_worker ... ok
+test transaction::tests::transaction_applies_and_rolls_back_executable_metadata has been running for over 60 seconds
+test transaction::tests::transaction_applies_and_rolls_back_executable_metadata ... ok
+test transaction::tests::transaction_directory_replaced_before_resume_is_refused ... ok
+test transaction::tests::transaction_directory_replaced_before_rollback_is_refused has been running for over 60 seconds
+test transaction::tests::transaction_directory_replaced_before_rollback_is_refused ... ok
+test transaction::tests::stage_and_operation_fault_matrix_never_writes_success_lock ... ok
+test transaction::tests::transaction_directory_replaced_by_a_link_before_resume_is_refused ... ok
+test transaction::tests::transaction_directory_replaced_by_a_link_before_rollback_is_refused ... ok
+test transaction::tests::transaction_inverse_process_fault_worker ... ok
+test transaction::tests::transaction_mutations_do_not_use_ambient_filesystem_apis ... ok
+test transaction::tests::transaction_process_fault_worker ... ok
+test transaction::tests::transaction_rejects_a_root_replaced_after_plan_review ... ok
+test transaction::tests::transaction_rejects_download_evidence_that_differs_from_the_reviewed_operation ... ok
+test transaction::tests::transaction_rejects_plans_without_reviewed_root_identity ... ok
+test transaction::tests::transaction_requires_revision_bound_download_evidence_before_backup ... ok
+test transaction::tests::transaction_directory_swap_during_apply_cannot_redirect_the_journal has been running for over 60 seconds
+test transaction::tests::transaction_revalidates_prepared_bytes_before_backup ... ok
+test transaction::tests::update_removes_an_unchanged_legacy_super_events_filename ... ok
+test transaction::tests::update_retires_components_the_newer_manifest_dropped_and_their_legacy_check ... ok
+test transaction::tests::updated_lock_records_the_reviewed_mcp_version_not_the_predecessor ... ok
+test transaction::tests::workshop_import_stage_faults_never_write_success_or_change_kept_descriptor has been running for over 60 seconds
+test transaction::tests::transaction_directory_swap_during_apply_cannot_redirect_the_journal ... ok
+test transaction::tests::workshop_import_without_launcher_keeps_descriptor_and_survives_recheck_and_rollback has been running for over 60 seconds
+test transaction::tests::workshop_import_without_launcher_keeps_descriptor_and_survives_recheck_and_rollback ... ok
+test transaction::tests::workshop_import_stage_faults_never_write_success_or_change_kept_descriptor ... ok
+test transaction::tests::missing_maintenance_files_rollback_across_unicode_paths_and_apply_faults ... ok

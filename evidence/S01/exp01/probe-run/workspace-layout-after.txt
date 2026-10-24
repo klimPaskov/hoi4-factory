@@ -1,0 +1,8 @@
+total 24
+drwx--x--x  5 root  root  4096 Oct 24 10:00 .
+drwxr-xr-x  3 root  root  4096 Oct 24 09:59 ..
+lrwxrwxrwx  1 root  root     4 Oct 24 10:00 escape-link -> /etc
+drwxr-xr-x  2 exp01 exp01 4096 Oct 24 10:00 new-empty
+drwxr-xr-x 10 exp01 exp01 4096 Oct 24 09:59 project
+-rw-------  1 root  root    31 Oct 24 10:00 project.mod
+drwxr-xr-x 10 exp01 exp01 4096 Oct 24 10:00 project2

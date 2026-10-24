@@ -1,0 +1,12 @@
+diff --git a/src-tauri/src/transaction.rs b/src-tauri/src/transaction.rs
+index 51bd4b9..99abe05 100644
+--- a/src-tauri/src/transaction.rs
++++ b/src-tauri/src/transaction.rs
+@@ -9174,6 +9174,7 @@ mod tests {
+ 
+     use super::*;
+     use crate::paths::transaction_root;
++    mod exp01_repro;
+     use crate::readiness::manifest_wiki_pages;
+     use crate::security::atomic_write_json;
+     use std::process::Command;

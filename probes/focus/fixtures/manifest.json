@@ -1,0 +1,204 @@
+{
+  "basic_crlf_bom.txt": {
+    "bom": true,
+    "bytes": 1286,
+    "conditions": [
+      "bom",
+      "crlf",
+      "comments"
+    ],
+    "newline": "crlf",
+    "sha256": "5c0812cb4e6aa34c7f5eb448cde8bb1c369abc77e018936de5f1efa1ae2256b9",
+    "tree": "exp_basic_tree"
+  },
+  "basic_crlf_nobom.txt": {
+    "bom": false,
+    "bytes": 1283,
+    "conditions": [
+      "no_bom",
+      "crlf",
+      "comments"
+    ],
+    "newline": "crlf",
+    "sha256": "2aecc0a7873bca82b2f8848215c49aaaafda60613387a20135a9d8254360a9ce",
+    "tree": "exp_basic_tree"
+  },
+  "basic_lf_bom.txt": {
+    "bom": true,
+    "bytes": 1228,
+    "conditions": [
+      "bom",
+      "lf",
+      "comments"
+    ],
+    "newline": "lf",
+    "sha256": "45fb9fd2aa551862624158fb5df0cded38a50c62853e2cb5da64ed8ef4f4fcb7",
+    "tree": "exp_basic_tree"
+  },
+  "basic_lf_nobom.txt": {
+    "bom": false,
+    "bytes": 1225,
+    "conditions": [
+      "no_bom",
+      "lf",
+      "comments"
+    ],
+    "newline": "lf",
+    "sha256": "68bd406d428bcc8add0a35b616904611bded565fe9e987d7bb0287fdfd15fcf9",
+    "tree": "exp_basic_tree"
+  },
+  "basic_mixed_bom.txt": {
+    "bom": true,
+    "bytes": 1267,
+    "conditions": [
+      "bom",
+      "mixed_newlines",
+      "comments"
+    ],
+    "newline": "mixed",
+    "sha256": "9fcded02c23969373e4d00bcdf05c92bea27745c454c50d9bca09fb021a1c940",
+    "tree": "exp_basic_tree"
+  },
+  "commented_prereq_lf.txt": {
+    "bom": false,
+    "bytes": 684,
+    "conditions": [
+      "comment_in_edited_block",
+      "lf"
+    ],
+    "newline": "lf",
+    "sha256": "10ff6a0cb14390389223ed963acde0657f90f69143b0d00d6d938ae13f42aa1d",
+    "tree": "exp_cmt_tree"
+  },
+  "duplicate_lf.txt": {
+    "bom": false,
+    "bytes": 687,
+    "conditions": [
+      "duplicate_ids",
+      "lf"
+    ],
+    "newline": "lf",
+    "sha256": "7fa77ba311b4c7bfc49fe438a5217886e3b4f40ad0b160634a9557666212b2f4",
+    "tree": "exp_dup_tree"
+  },
+  "invalid_utf8_lf.txt": {
+    "bom": false,
+    "bytes": 1238,
+    "conditions": [
+      "invalid_utf8",
+      "lf",
+      "comments"
+    ],
+    "newline": "lf",
+    "sha256": "0030b557e4233b2921145ced579a8462494be37ec971988f1baaab42fbb4e363",
+    "tree": "exp_basic_tree"
+  },
+  "malformed_stray_crlf.txt": {
+    "bom": false,
+    "bytes": 414,
+    "conditions": [
+      "malformed_stray_brace",
+      "unterminated_string"
+    ],
+    "newline": "crlf",
+    "sha256": "580620dee33540e5e1a02acd1696aaf1b4022ff8e10e710b680711afa65714f5",
+    "tree": "exp_stray_tree"
+  },
+  "malformed_unclosed_lf.txt": {
+    "bom": false,
+    "bytes": 289,
+    "conditions": [
+      "malformed_unclosed"
+    ],
+    "newline": "lf",
+    "sha256": "db961b8e3adfe1ec2173014864e89b956aa4be7c270bf74e14c461f4e62b2c9a",
+    "tree": "exp_bad_tree"
+  },
+  "nonascii_crlf_bom.txt": {
+    "bom": true,
+    "bytes": 1337,
+    "conditions": [
+      "bom",
+      "crlf",
+      "comments",
+      "non_ascii_utf8"
+    ],
+    "newline": "crlf",
+    "sha256": "821cecc6f8a5db938e0690a095a8e033e37bb8bc174d931f85a2f370c7e13da7",
+    "tree": "exp_basic_tree"
+  },
+  "relative_crlf.txt": {
+    "bom": false,
+    "bytes": 818,
+    "conditions": [
+      "relative_position",
+      "crlf"
+    ],
+    "newline": "crlf",
+    "sha256": "28c6fa14e5ca4c0f78d059d093a560e99b781f36c2d70684a5e4b3931250f039",
+    "tree": "exp_rel_tree"
+  },
+  "relative_orphan_lf.txt": {
+    "bom": false,
+    "bytes": 511,
+    "conditions": [
+      "relative_position",
+      "missing_anchor",
+      "lf"
+    ],
+    "newline": "lf",
+    "sha256": "899693bfe1a1d13296cd84b4e90fa34cfe87517bdfe703564446eac8ae751a55",
+    "tree": "exp_orphan_tree"
+  },
+  "shared_lf.txt": {
+    "bom": false,
+    "bytes": 976,
+    "conditions": [
+      "shared_focus",
+      "relative_position",
+      "comments",
+      "lf"
+    ],
+    "newline": "lf",
+    "sha256": "1670985317acd897db5dec0696643c9761efd5a52d14e0e430d4092e3e3620f7",
+    "tree": "exp_shared_tree"
+  },
+  "shared_standalone_crlf_bom.txt": {
+    "bom": true,
+    "bytes": 735,
+    "conditions": [
+      "shared_focus",
+      "bom",
+      "crlf"
+    ],
+    "newline": "crlf",
+    "sha256": "f88f461c6394001f364b9c02d25380155dee2486290c05624c279d3224038c8b",
+    "tree": "exp_ss_tree"
+  },
+  "unknown_crlf_bom.txt": {
+    "bom": true,
+    "bytes": 975,
+    "conditions": [
+      "bom",
+      "crlf",
+      "comments",
+      "unknown_syntax",
+      "scripted_constant"
+    ],
+    "newline": "crlf",
+    "sha256": "1203d4ac42c3b43393dd098c6ab0d3b8439f81db0f2558612792868c88c712ae",
+    "tree": "exp_unknown_tree"
+  },
+  "windows1252_lf.txt": {
+    "bom": false,
+    "bytes": 1230,
+    "conditions": [
+      "windows_1252",
+      "lf",
+      "comments"
+    ],
+    "newline": "lf",
+    "sha256": "358365c3b5ad32f80f0c6b27e9a9d4ebbd3ff17675f39bc6b8be9891052ba394",
+    "tree": "exp_basic_tree"
+  }
+}

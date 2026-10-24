@@ -4,3 +4,12 @@
 
 # The config field map was authored with CRLF and is kept byte-identical.
 *.csv -text
+
+# S01 evidence records sha256 hashes of these files, so their bytes are kept exactly as
+# recorded, CRLF included. Cargo.toml and the two agent sources were written with CRLF on
+# Windows during EXP-03. Normalize them when S02 re-records the affected evidence.
+evidence/** -text
+probes/** -text
+Cargo.toml -text
+crates/agent/src/cost.rs -text
+crates/agent/src/types.rs -text

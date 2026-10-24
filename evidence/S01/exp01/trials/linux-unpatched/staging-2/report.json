@@ -1,0 +1,29 @@
+{
+  "elapsed_ms": 26349,
+  "hoi4ms_leftovers_after_kill": [],
+  "hoi4ms_leftovers_after_recovery": [],
+  "kill": "staging",
+  "killed_at": "staging staged_files=1",
+  "observed_managed": 0,
+  "observed_staged": 1,
+  "ops": 200,
+  "plan_id": "d75f318e-1d3b-4e03-b34e-16c6150eb489",
+  "recovery": {
+    "discard_staging_allowed": true,
+    "found": true,
+    "last_checkpoint": "staging",
+    "outcome": {
+      "ok": "staging_discarded"
+    },
+    "project_apply_started": false,
+    "recommended_action": "discard_staging",
+    "resume_allowed": false,
+    "rollback_allowed": false,
+    "state_before": "staging",
+    "transaction_id": "d75f318e-1d3b-4e03-b34e-16c6150eb489"
+  },
+  "size": 262144,
+  "worker_exit_code": null,
+  "worker_exit_success": false,
+  "worker_result": "EXP01_WORKER_RESULT none"
+}

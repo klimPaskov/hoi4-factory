@@ -1,0 +1,21 @@
+rustc 1.88.0 (6b00bc388 2025-06-23)
+debconf: delaying package configuration, since apt-utils is not installed
+apt_exit=0
+rev=4488a418cad56a158273cb66c4ce7794696b7ed1
+ src-tauri/src/safe_fs.rs     | 39 +++++++++++++++++++++++++-
+ src-tauri/src/transaction.rs | 65 +++++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 99 insertions(+), 5 deletions(-)
+build_exit=0
+info: downloading component 'clippy'
+info: downloading component 'rustfmt'
+info: installing component 'clippy'
+info: installing component 'rustfmt'
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.52s
+bin=/target/debug/deps/hoi4_mod_setup-b5b13ec949d466c9
+25cc1b2e7d2bac110bd4cdcc1b5b50b5e5434f57ba807d13729a351afd307190  /target/debug/deps/hoi4_mod_setup-b5b13ec949d466c9
+{"trial": "finalization-1", "harness_exit": 0, "killed_at": "not_killed", "worker_result": "EXP01_WORKER_RESULT none", "worker_exit_code": null, "recommended_action": "resume", "state_before": "finalizing", "recovery_outcome": {"ok": "completed"}, "leftovers_after_kill": [], "leftovers_after_recovery": [], "unapproved_bytes_untouched": true, "exact_files": false, "added_files": [".hoi4-mod-setup/i
+{"trial": "finalization-2", "harness_exit": 0, "killed_at": "not_killed", "worker_result": "EXP01_WORKER_RESULT none", "worker_exit_code": null, "recommended_action": "resume", "state_before": "finalizing", "recovery_outcome": {"ok": "completed"}, "leftovers_after_kill": [], "leftovers_after_recovery": [], "unapproved_bytes_untouched": true, "exact_files": false, "added_files": [".hoi4-mod-setup/i
+{"trial": "finalization-3", "harness_exit": 0, "killed_at": "not_killed", "worker_result": "EXP01_WORKER_RESULT none", "worker_exit_code": null, "recommended_action": "resume", "state_before": "finalizing", "recovery_outcome": {"ok": "completed"}, "leftovers_after_kill": [], "leftovers_after_recovery": [], "unapproved_bytes_untouched": true, "exact_files": false, "added_files": [".hoi4-mod-setup/i
+trials_exit=0
+copied_out
+docker_exit=0

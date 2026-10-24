@@ -1,0 +1,16 @@
+{
+  "model": "gpt-5.4-nano-2026-03-17",
+  "messages": [
+    {"role": "system", "content": "You are the HOI4 Factory S01 runtime probe. When asked to create a file, call the write_file tool exactly once. Keep output minimal."},
+    {"role": "user", "content": "Create the file notes/probe.txt whose content is one line: S01 runtime probe ok"}
+  ],
+  "stream": true,
+  "stream_options": {"include_usage": true},
+  "max_completion_tokens": 200,
+  "reasoning_effort": "none",
+  "parallel_tool_calls": false,
+  "tool_choice": {"type": "function", "function": {"name": "write_file"}},
+  "tools": [{"type": "function", "function": {"name": "write_file", "description": "Create or replace one file inside the task workspace.", "strict": true,
+    "parameters": {"type": "object", "additionalProperties": false, "required": ["path", "content"],
+      "properties": {"path": {"type": "string", "description": "Workspace-relative file path using forward slashes"}, "content": {"type": "string", "description": "Complete file content"}}}}}]
+}

@@ -1,0 +1,19 @@
+{
+  "elapsed_ms": 60346,
+  "hoi4ms_leftovers_after_kill": [],
+  "hoi4ms_leftovers_after_recovery": [],
+  "kill": "none",
+  "killed_at": "not_killed",
+  "observed_managed": 0,
+  "observed_staged": 0,
+  "ops": 200,
+  "plan_id": "a427675f-02c8-48ee-92f0-1bcb42b2a573",
+  "recovery": {
+    "found": false,
+    "skipped": false
+  },
+  "size": 262144,
+  "worker_exit_code": 0,
+  "worker_exit_success": true,
+  "worker_result": "EXP01_WORKER_RESULT ok state=completed"
+}

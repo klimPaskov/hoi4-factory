@@ -1,0 +1,21 @@
+rustc 1.88.0 (6b00bc388 2025-06-23)
+debconf: delaying package configuration, since apt-utils is not installed
+apt_exit=0
+rev=4488a418cad56a158273cb66c4ce7794696b7ed1
+ src-tauri/src/transaction.rs | 1 +
+ 1 file changed, 1 insertion(+)
+build_exit=0
+info: downloading component 'rustfmt'
+info: installing component 'clippy'
+info: installing component 'rustfmt'
+   Compiling hoi4-mod-setup v0.6.3 (/build/src-tauri)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 38.06s
+bin=/target/debug/deps/hoi4_mod_setup-b5b13ec949d466c9
+9dbeeac1f349251c6ed8c09844988f08d7b07edbfcccf7c3516ed8674c75b761  /target/debug/deps/hoi4_mod_setup-b5b13ec949d466c9
+{"trial": "none-1", "harness_exit": 0, "killed_at": "not_killed", "worker_result": "EXP01_WORKER_RESULT ok state=completed", "worker_exit_code": 0, "recommended_action": null, "state_before": null, "recovery_outcome": null, "leftovers_after_kill": [], "leftovers_after_recovery": [], "unapproved_bytes_untouched": true, "exact_files": false, "added_files": [".hoi4-mod-setup/install.lock.json", "exp0
+{"trial": "apply-1", "harness_exit": 0, "killed_at": "apply managed_files_seen=1", "worker_result": "EXP01_WORKER_RESULT none", "worker_exit_code": null, "recommended_action": "rollback", "state_before": "applying", "recovery_outcome": {"ok": "rolled_back"}, "leftovers_after_kill": ["exp01_setup/managed/.hoi4ms-662605c7-f640-4bb2-824f-7c54dff1132a.tmp"], "leftovers_after_recovery": ["exp01_setup/m
+{"trial": "apply-2", "harness_exit": 0, "killed_at": "apply managed_files_seen=1", "worker_result": "EXP01_WORKER_RESULT none", "worker_exit_code": null, "recommended_action": "rollback", "state_before": "applying", "recovery_outcome": {"ok": "rolled_back"}, "leftovers_after_kill": ["exp01_setup/managed/.hoi4ms-ef50ce74-de3d-4f57-acdf-a83b58364bff.tmp"], "leftovers_after_recovery": ["exp01_setup/m
+{"trial": "apply-3", "harness_exit": 0, "killed_at": "apply managed_files_seen=1", "worker_result": "EXP01_WORKER_RESULT none", "worker_exit_code": null, "recommended_action": "rollback", "state_before": "applying", "recovery_outcome": {"ok": "rolled_back"}, "leftovers_after_kill": ["exp01_setup/managed/.hoi4ms-644e96a4-9594-4f60-98de-580b104671d1.tmp"], "leftovers_after_recovery": ["exp01_setup/m
+trials_exit=0
+copied_out
+docker_exit=0

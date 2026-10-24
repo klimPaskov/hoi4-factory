@@ -1,0 +1,2969 @@
+{
+ "byte_total": 105937866,
+ "content_digest": "7c952ed864330859bc254e172152b44fb1f8590cbf49378ded7771ba02aea211",
+ "entries": {
+  ".agents": {
+   "gid": 0,
+   "ino": 464868,
+   "mode": "0o755",
+   "mtime_ns": 1792842435626234073,
+   "type": "dir",
+   "uid": 0
+  },
+  ".agents/skills": {
+   "gid": 0,
+   "ino": 464869,
+   "mode": "0o755",
+   "mtime_ns": 1792842435630076829,
+   "type": "dir",
+   "uid": 0
+  },
+  ".agents/skills/exp01-custom": {
+   "gid": 0,
+   "ino": 464870,
+   "mode": "0o755",
+   "mtime_ns": 1792842435637762341,
+   "type": "dir",
+   "uid": 0
+  },
+  ".agents/skills/exp01-custom/SKILL.md": {
+   "gid": 0,
+   "ino": 464871,
+   "mode": "0o644",
+   "mtime_ns": 1792842435637762341,
+   "sha256": "d62d8591aeb21ee05cac4f1d90d7f26d0950a9e8cc7dd7d3b58b8b2b686a8f62",
+   "size": 223,
+   "type": "file",
+   "uid": 0
+  },
+  ".git": {
+   "gid": 0,
+   "ino": 464878,
+   "mode": "0o755",
+   "mtime_ns": 1792842435729988477,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/COMMIT_EDITMSG": {
+   "gid": 0,
+   "ino": 464905,
+   "mode": "0o644",
+   "mtime_ns": 1792842435722302965,
+   "sha256": "c24e14f2398e5f080ef70781fa6b49249826497891db244016f81f940ca7daad",
+   "size": 25,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/HEAD": {
+   "gid": 0,
+   "ino": 464900,
+   "mode": "0o644",
+   "mtime_ns": 1792842435706931944,
+   "sha256": "28d25bf82af4c0e2b72f50959b2beb859e3e60b9630a5e8c603dad4ddb2b6e80",
+   "size": 21,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/branches": {
+   "gid": 0,
+   "ino": 464879,
+   "mode": "0o755",
+   "mtime_ns": 1792842435703089188,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/config": {
+   "gid": 0,
+   "ino": 464902,
+   "mode": "0o644",
+   "mtime_ns": 1792842435706931944,
+   "sha256": "cfe7ba1238c9a78be7535d7c63bcaf5a4d5011d46b07c9b45d3bbf7d6c312dfe",
+   "size": 92,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/description": {
+   "gid": 0,
+   "ino": 464896,
+   "mode": "0o644",
+   "mtime_ns": 1792842435706931944,
+   "sha256": "85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee",
+   "size": 73,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/hooks": {
+   "gid": 0,
+   "ino": 464882,
+   "mode": "0o755",
+   "mtime_ns": 1792842435706931944,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/hooks/applypatch-msg.sample": {
+   "gid": 0,
+   "ino": 464885,
+   "mode": "0o755",
+   "mtime_ns": 1792842435706931944,
+   "sha256": "0223497a0b8b033aa58a3a521b8629869386cf7ab0e2f101963d328aa62193f7",
+   "size": 478,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/hooks/commit-msg.sample": {
+   "gid": 0,
+   "ino": 464889,
+   "mode": "0o755",
+   "mtime_ns": 1792842435706931944,
+   "sha256": "1f74d5e9292979b573ebd59741d46cb93ff391acdd083d340b94370753d92437",
+   "size": 896,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/hooks/fsmonitor-watchman.sample": {
+   "gid": 0,
+   "ino": 464891,
+   "mode": "0o755",
+   "mtime_ns": 1792842435706931944,
+   "sha256": "e0549964e93897b519bd8e333c037e51fff0f88ba13e086a331592bf801fa1d0",
+   "size": 4726,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/hooks/post-update.sample": {
+   "gid": 0,
+   "ino": 464887,
+   "mode": "0o755",
+   "mtime_ns": 1792842435706931944,
+   "sha256": "81765af2daef323061dcbc5e61fc16481cb74b3bac9ad8a174b186523586f6c5",
+   "size": 189,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/hooks/pre-applypatch.sample": {
+   "gid": 0,
+   "ino": 464890,
+   "mode": "0o755",
+   "mtime_ns": 1792842435706931944,
+   "sha256": "e15c5b469ea3e0a695bea6f2c82bcf8e62821074939ddd85b77e0007ff165475",
+   "size": 424,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/hooks/pre-commit.sample": {
+   "gid": 0,
+   "ino": 464888,
+   "mode": "0o755",
+   "mtime_ns": 1792842435706931944,
+   "sha256": "f9af7d95eb1231ecf2eba9770fedfa8d4797a12b02d7240e98d568201251244a",
+   "size": 1643,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/hooks/pre-merge-commit.sample": {
+   "gid": 0,
+   "ino": 464893,
+   "mode": "0o755",
+   "mtime_ns": 1792842435706931944,
+   "sha256": "d3825a70337940ebbd0a5c072984e13245920cdf8898bd225c8d27a6dfc9cb53",
+   "size": 416,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/hooks/pre-push.sample": {
+   "gid": 0,
+   "ino": 464884,
+   "mode": "0o755",
+   "mtime_ns": 1792842435706931944,
+   "sha256": "ecce9c7e04d3f5dd9d8ada81753dd1d549a9634b26770042b58dda00217d086a",
+   "size": 1374,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/hooks/pre-rebase.sample": {
+   "gid": 0,
+   "ino": 464892,
+   "mode": "0o755",
+   "mtime_ns": 1792842435706931944,
+   "sha256": "4febce867790052338076f4e66cc47efb14879d18097d1d61c8261859eaaa7b3",
+   "size": 4898,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/hooks/pre-receive.sample": {
+   "gid": 0,
+   "ino": 464895,
+   "mode": "0o755",
+   "mtime_ns": 1792842435706931944,
+   "sha256": "a4c3d2b9c7bb3fd8d1441c31bd4ee71a595d66b44fcf49ddb310252320169989",
+   "size": 544,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/hooks/prepare-commit-msg.sample": {
+   "gid": 0,
+   "ino": 464883,
+   "mode": "0o755",
+   "mtime_ns": 1792842435706931944,
+   "sha256": "e9ddcaa4189fddd25ed97fc8c789eca7b6ca16390b2392ae3276f0c8e1aa4619",
+   "size": 1492,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/hooks/push-to-checkout.sample": {
+   "gid": 0,
+   "ino": 464886,
+   "mode": "0o755",
+   "mtime_ns": 1792842435706931944,
+   "sha256": "a53d0741798b287c6dd7afa64aee473f305e65d3f49463bb9d7408ec3b12bf5f",
+   "size": 2783,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/hooks/update.sample": {
+   "gid": 0,
+   "ino": 464894,
+   "mode": "0o755",
+   "mtime_ns": 1792842435706931944,
+   "sha256": "8d5f2fa83e103cf08b57eaa67521df9194f45cbdbcb37da52ad586097a14d106",
+   "size": 3650,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/index": {
+   "gid": 0,
+   "ino": 464949,
+   "mode": "0o644",
+   "mtime_ns": 1792842435729988477,
+   "sha256": "4ba91e9d7568c0474df5e0a990dd1e6484bb987f6f0d9d26523e38da64e79fab",
+   "size": 1181,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/info": {
+   "gid": 0,
+   "ino": 464880,
+   "mode": "0o755",
+   "mtime_ns": 1792842435706931944,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/info/exclude": {
+   "gid": 0,
+   "ino": 464881,
+   "mode": "0o644",
+   "mtime_ns": 1792842435706931944,
+   "sha256": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+   "size": 240,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/logs": {
+   "gid": 0,
+   "ino": 464951,
+   "mode": "0o755",
+   "mtime_ns": 1792842435726145721,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/logs/HEAD": {
+   "gid": 0,
+   "ino": 464952,
+   "mode": "0o644",
+   "mtime_ns": 1792842435722302965,
+   "sha256": "876a0fc48cd97aee02087843bee10bdcc5d79b01d3b76259388d05a8e88bfca2",
+   "size": 172,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/logs/refs": {
+   "gid": 0,
+   "ino": 464953,
+   "mode": "0o755",
+   "mtime_ns": 1792842435726145721,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/logs/refs/heads": {
+   "gid": 0,
+   "ino": 464954,
+   "mode": "0o755",
+   "mtime_ns": 1792842435726145721,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/logs/refs/heads/main": {
+   "gid": 0,
+   "ino": 464955,
+   "mode": "0o644",
+   "mtime_ns": 1792842435726145721,
+   "sha256": "876a0fc48cd97aee02087843bee10bdcc5d79b01d3b76259388d05a8e88bfca2",
+   "size": 172,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/objects": {
+   "gid": 0,
+   "ino": 464901,
+   "mode": "0o755",
+   "mtime_ns": 1792842435729988477,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/objects/03": {
+   "gid": 0,
+   "ino": 464935,
+   "mode": "0o755",
+   "mtime_ns": 1792842435722302965,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/objects/03/c4495f97318d91668c6956c41816cfe19b6cd9": {
+   "gid": 0,
+   "ino": 464936,
+   "mode": "0o444",
+   "mtime_ns": 1792842435722302965,
+   "sha256": "c2940bd8774680b2539cb70f5afa49a3370dc321d2d33b19180e191eca7fbe55",
+   "size": 59,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/objects/0a": {
+   "gid": 0,
+   "ino": 464912,
+   "mode": "0o755",
+   "mtime_ns": 1792842435714617453,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/objects/0a/c67f35b10b5e1e16b1a82edeadeba30b1d8f99": {
+   "gid": 0,
+   "ino": 464913,
+   "mode": "0o444",
+   "mtime_ns": 1792842435714617453,
+   "sha256": "be9fe02a45242d12783d7434f0e18f89e74f31b90ba59f832d962d33b6aeed6c",
+   "size": 327,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/objects/13": {
+   "gid": 0,
+   "ino": 464920,
+   "mode": "0o755",
+   "mtime_ns": 1792842435714617453,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/objects/13/9958890cdbee81d76b2625f0bb66cb30be2196": {
+   "gid": 0,
+   "ino": 464921,
+   "mode": "0o444",
+   "mtime_ns": 1792842435714617453,
+   "sha256": "8c81056a5ef8225f42c2a1ccd2ee106c5d06885222f245bef1255229a4aba569",
+   "size": 157,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/objects/18": {
+   "gid": 0,
+   "ino": 464956,
+   "mode": "0o755",
+   "mtime_ns": 1792842435729988477,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/objects/18/d69e828bc2c112c112a4b320d827c4fd20fbee": {
+   "gid": 0,
+   "ino": 464957,
+   "mode": "0o444",
+   "mtime_ns": 1792842435729988477,
+   "sha256": "91506c15f744e1ff13f54ac38f3b1c29948d78e9055275a9f48daabe9dca799c",
+   "size": 183,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/objects/35": {
+   "gid": 0,
+   "ino": 464939,
+   "mode": "0o755",
+   "mtime_ns": 1792842435722302965,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/objects/35/13b7acea80d4e0c799b846b9a1c3c86952e376": {
+   "gid": 0,
+   "ino": 464940,
+   "mode": "0o444",
+   "mtime_ns": 1792842435722302965,
+   "sha256": "480831cf2bc5da3210882c2375afa03836d21262d00b494d8b01c3c28a4355a0",
+   "size": 74,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/objects/3a": {
+   "gid": 0,
+   "ino": 464906,
+   "mode": "0o755",
+   "mtime_ns": 1792842435710774700,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/objects/3a/5113c476b5dfde5205bc0043c94fa365399c7d": {
+   "gid": 0,
+   "ino": 464907,
+   "mode": "0o444",
+   "mtime_ns": 1792842435710774700,
+   "sha256": "66c46cdaaa299526fe5c4121262468c048563194f1e2559e030e205379b2daf5",
+   "size": 174,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/objects/3e": {
+   "gid": 0,
+   "ino": 464925,
+   "mode": "0o755",
+   "mtime_ns": 1792842435718460209,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/objects/3e/7c91bc8c2051f75aa273d03551107144ddb8cc": {
+   "gid": 0,
+   "ino": 464926,
+   "mode": "0o444",
+   "mtime_ns": 1792842435718460209,
+   "sha256": "fd5be3d8cd345bb9c67367e6d5ed41a89168276691f0cfd9c783654aff95db52",
+   "size": 53,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/objects/44": {
+   "gid": 0,
+   "ino": 464910,
+   "mode": "0o755",
+   "mtime_ns": 1792842435714617453,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/objects/44/06f25d6079db59aa75274148435e362844b6b6": {
+   "gid": 0,
+   "ino": 464911,
+   "mode": "0o444",
+   "mtime_ns": 1792842435714617453,
+   "sha256": "31a2222711059688bbfcc3468943699ee38b24f7b4e116a6c991f79fd343240f",
+   "size": 117,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/objects/4a": {
+   "gid": 0,
+   "ino": 464943,
+   "mode": "0o755",
+   "mtime_ns": 1792842435722302965,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/objects/4a/5d6e44730ad31d0fbc7d846d774e6752010bcb": {
+   "gid": 0,
+   "ino": 464944,
+   "mode": "0o444",
+   "mtime_ns": 1792842435722302965,
+   "sha256": "2940e9353afa996e8f6a340ce229e92497ffe31cfb8eb5d1d1819ade800525e3",
+   "size": 59,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/objects/52": {
+   "gid": 0,
+   "ino": 464916,
+   "mode": "0o755",
+   "mtime_ns": 1792842435714617453,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/objects/52/3b1b14b673b866a9d853fa7ce27775f69a9c68": {
+   "gid": 0,
+   "ino": 464917,
+   "mode": "0o444",
+   "mtime_ns": 1792842435714617453,
+   "sha256": "da65736b213d11ff6673fc1d601d681966de489f1a89878eadb1e704af981800",
+   "size": 69,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/objects/5e": {
+   "gid": 0,
+   "ino": 464947,
+   "mode": "0o755",
+   "mtime_ns": 1792842435722302965,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/objects/5e/a60f0b46e9bf0548ab43ef0048b0a0c46c77a4": {
+   "gid": 0,
+   "ino": 464948,
+   "mode": "0o444",
+   "mtime_ns": 1792842435722302965,
+   "sha256": "af8a8b793956da2950fb50d4e0dc66be31612dfd9ab34611f57fe9bb96a86324",
+   "size": 136,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/objects/6e": {
+   "gid": 0,
+   "ino": 464933,
+   "mode": "0o755",
+   "mtime_ns": 1792842435722302965,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/objects/6e/4e54088ec733fdcc9762a8db4c546f8ce2a577": {
+   "gid": 0,
+   "ino": 464934,
+   "mode": "0o444",
+   "mtime_ns": 1792842435722302965,
+   "sha256": "0bd22b28be98616641036d020d08ef9a8b73ecc92cb7c3030d93bc7f19903452",
+   "size": 56,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/objects/72": {
+   "gid": 0,
+   "ino": 464922,
+   "mode": "0o755",
+   "mtime_ns": 1792842435714617453,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/objects/72/021abdf85b41f318f04646717101a46497942e": {
+   "gid": 0,
+   "ino": 464923,
+   "mode": "0o444",
+   "mtime_ns": 1792842435714617453,
+   "sha256": "d2162e73c97a9ff6c9dca84adda4650da5f915e5986d04fed79e642d05107472",
+   "size": 109,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/objects/8c": {
+   "gid": 0,
+   "ino": 464945,
+   "mode": "0o755",
+   "mtime_ns": 1792842435722302965,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/objects/8c/3611e20a48ee189014a2fd2fdbe0c394129598": {
+   "gid": 0,
+   "ino": 464946,
+   "mode": "0o444",
+   "mtime_ns": 1792842435722302965,
+   "sha256": "f52841899f5d8972d298673e97e18897e2a8c7481e4c9102a6feb96fa4747b5f",
+   "size": 314,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/objects/92": {
+   "gid": 0,
+   "ino": 464931,
+   "mode": "0o755",
+   "mtime_ns": 1792842435718460209,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/objects/92/e0400d1984c236a83f050cb19b9bdc7d2a8b10": {
+   "gid": 0,
+   "ino": 464932,
+   "mode": "0o444",
+   "mtime_ns": 1792842435718460209,
+   "sha256": "e996c880a76a7e28263ad5afea643ec7e157d3c2de94a56f3d876fa144e3c8e7",
+   "size": 70,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/objects/ad": {
+   "gid": 0,
+   "ino": 464929,
+   "mode": "0o755",
+   "mtime_ns": 1792842435718460209,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/objects/ad/c96bd2ee63cffe82a85ca52098cfcda1ffba68": {
+   "gid": 0,
+   "ino": 464930,
+   "mode": "0o444",
+   "mtime_ns": 1792842435718460209,
+   "sha256": "9317cf634f68c60b420a2bcd1c683b04b832e2398212de994c98cdbc9ac87cd1",
+   "size": 48,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/objects/b0": {
+   "gid": 0,
+   "ino": 464914,
+   "mode": "0o755",
+   "mtime_ns": 1792842435714617453,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/objects/b0/deddd2981cd4d568357a78e4b78f7a7245a4cd": {
+   "gid": 0,
+   "ino": 464915,
+   "mode": "0o444",
+   "mtime_ns": 1792842435714617453,
+   "sha256": "4a40db43388ae599ce278e42bb3790eea8223b155425e3e34e5b5d49739fd50c",
+   "size": 146,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/objects/c7": {
+   "gid": 0,
+   "ino": 464918,
+   "mode": "0o755",
+   "mtime_ns": 1792842435714617453,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/objects/c7/5c47375519928c5d6b45317e01b424b90292ea": {
+   "gid": 0,
+   "ino": 464919,
+   "mode": "0o444",
+   "mtime_ns": 1792842435714617453,
+   "sha256": "f08163ab6d6dd7fd7a8e0593894f69675c385fa56f3cf6bfe325a6bae065c886",
+   "size": 4117,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/objects/d7": {
+   "gid": 0,
+   "ino": 464937,
+   "mode": "0o755",
+   "mtime_ns": 1792842435722302965,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/objects/d7/3c0565e205e69c6771fd050c116b9fd8240232": {
+   "gid": 0,
+   "ino": 464938,
+   "mode": "0o444",
+   "mtime_ns": 1792842435722302965,
+   "sha256": "721490917fcba4740603bb547888800e5f21a3728fd5f68c6f96f622e765ae59",
+   "size": 66,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/objects/e2": {
+   "gid": 0,
+   "ino": 464927,
+   "mode": "0o755",
+   "mtime_ns": 1792842435718460209,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/objects/e2/0a201e8037073df8ebe5defe0777bc7828e60e": {
+   "gid": 0,
+   "ino": 464928,
+   "mode": "0o444",
+   "mtime_ns": 1792842435718460209,
+   "sha256": "4915d9431399dd58539b16d5c0a5db52c60ed55a702a0cb411d1f0439e74443c",
+   "size": 54,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/objects/e4": {
+   "gid": 0,
+   "ino": 464941,
+   "mode": "0o755",
+   "mtime_ns": 1792842435722302965,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/objects/e4/2d0d257e15068d1d0dd2f39d51e59178772dab": {
+   "gid": 0,
+   "ino": 464942,
+   "mode": "0o444",
+   "mtime_ns": 1792842435722302965,
+   "sha256": "ee1c0dc22d99d227047916f97779b4fc2082be33d5073ddd0423537b2cd8a6ea",
+   "size": 50,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/objects/fe": {
+   "gid": 0,
+   "ino": 464908,
+   "mode": "0o755",
+   "mtime_ns": 1792842435714617453,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/objects/fe/15b2337f215e46b8bed9022bca8024aa2d4bc0": {
+   "gid": 0,
+   "ino": 464909,
+   "mode": "0o444",
+   "mtime_ns": 1792842435714617453,
+   "sha256": "718b97037e8a745c1a4215394c4ec127a431ec2192db0d7e38f63971ecf935d2",
+   "size": 177,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/objects/info": {
+   "gid": 0,
+   "ino": 464904,
+   "mode": "0o755",
+   "mtime_ns": 1792842435710774700,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/objects/pack": {
+   "gid": 0,
+   "ino": 464903,
+   "mode": "0o755",
+   "mtime_ns": 1792842435710774700,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/refs": {
+   "gid": 0,
+   "ino": 464897,
+   "mode": "0o755",
+   "mtime_ns": 1792842435706931944,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/refs/heads": {
+   "gid": 0,
+   "ino": 464898,
+   "mode": "0o755",
+   "mtime_ns": 1792842435726145721,
+   "type": "dir",
+   "uid": 0
+  },
+  ".git/refs/heads/main": {
+   "gid": 0,
+   "ino": 464950,
+   "mode": "0o644",
+   "mtime_ns": 1792842435722302965,
+   "sha256": "c726351f69964c19d79c252107d82dd60a23e3c46db355bc4ff75c5e3e27e679",
+   "size": 41,
+   "type": "file",
+   "uid": 0
+  },
+  ".git/refs/tags": {
+   "gid": 0,
+   "ino": 464899,
+   "mode": "0o755",
+   "mtime_ns": 1792842435706931944,
+   "type": "dir",
+   "uid": 0
+  },
+  ".hoi4-mod-setup": {
+   "gid": 0,
+   "ino": 464975,
+   "mode": "0o700",
+   "mtime_ns": 1792842489582064057,
+   "type": "dir",
+   "uid": 0
+  },
+  ".hoi4-mod-setup/install.lock.json": {
+   "gid": 0,
+   "ino": 465379,
+   "mode": "0o600",
+   "mtime_ns": 1792842489486057787,
+   "sha256": "a53358c9e5fa91841a0f5525257a3b712429bc91de202de9d3948b984e83a89e",
+   "size": 53471056,
+   "type": "file",
+   "uid": 0
+  },
+  "AGENTS.md": {
+   "gid": 0,
+   "ino": 464859,
+   "mode": "0o644",
+   "mtime_ns": 1792842435572435492,
+   "sha256": "8d7ebb832176b24bc97b44f05e4b644d83620388bf6dfa77612336663bda4c62",
+   "size": 210,
+   "type": "file",
+   "uid": 0
+  },
+  "README.md": {
+   "gid": 0,
+   "ino": 464860,
+   "mode": "0o644",
+   "mtime_ns": 1792842435729988477,
+   "sha256": "6f64d280e75c6107b6d6d55eb705002a25880b1f145d32a4457d1c537d621065",
+   "size": 154,
+   "type": "file",
+   "uid": 0
+  },
+  "common": {
+   "gid": 0,
+   "ino": 458709,
+   "mode": "0o755",
+   "mtime_ns": 1792842435595492028,
+   "type": "dir",
+   "uid": 0
+  },
+  "common/national_focus": {
+   "gid": 0,
+   "ino": 459113,
+   "mode": "0o755",
+   "mtime_ns": 1792842435603177540,
+   "type": "dir",
+   "uid": 0
+  },
+  "common/national_focus/exp01_synthetic_focus.txt": {
+   "gid": 0,
+   "ino": 464850,
+   "mode": "0o644",
+   "mtime_ns": 1792842435668504386,
+   "sha256": "59cf7fe6903edd5d8ed7d05fff5f17097d4e9deb046db69f930aaf200ff9ceb4",
+   "size": 573,
+   "type": "file",
+   "uid": 0
+  },
+  "descriptor.mod": {
+   "gid": 0,
+   "ino": 464858,
+   "mode": "0o644",
+   "mtime_ns": 1792842435680032652,
+   "sha256": "c6a757e6ddda4bfb7e4c76b8d9c0c0f58bbfc5b2d88c0591a6e02a6c1dc9f824",
+   "size": 149,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup": {
+   "gid": 0,
+   "ino": 464861,
+   "mode": "0o755",
+   "mtime_ns": 1792842479735369821,
+   "type": "dir",
+   "uid": 0
+  },
+  "exp01_setup/managed": {
+   "gid": 0,
+   "ino": 465176,
+   "mode": "0o700",
+   "mtime_ns": 1792842479700779576,
+   "type": "dir",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0000.md": {
+   "gid": 0,
+   "ino": 465177,
+   "mode": "0o600",
+   "mtime_ns": 1792842472652270472,
+   "sha256": "fe4a443eb6869afe5ee40da3dab9cab007b0188fdec92914cb70358a8aeb8231",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0001.md": {
+   "gid": 0,
+   "ino": 465178,
+   "mode": "0o600",
+   "mtime_ns": 1792842472752192732,
+   "sha256": "72565329b5456d562d571823627cd5382e62dcb1d62e40e565d4e7ce8f4a02b2",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0002.md": {
+   "gid": 0,
+   "ino": 465179,
+   "mode": "0o600",
+   "mtime_ns": 1792842472832899172,
+   "sha256": "90eed2f5ccc3a76e0bf86b2fe9b53dafe57000e98564978920e7c27fb653088c",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0003.md": {
+   "gid": 0,
+   "ino": 465180,
+   "mode": "0o600",
+   "mtime_ns": 1792842472902076122,
+   "sha256": "755d12e31d021d9b6e6ed7a84343f6848ab9dff0b9e8118f2d31faab6af61571",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0004.md": {
+   "gid": 0,
+   "ino": 465181,
+   "mode": "0o600",
+   "mtime_ns": 1792842472928978266,
+   "sha256": "591f1059bafd8a56a09f5fa2fba14b5059f72c71f4f11de2f94e20142ea04fe3",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0005.md": {
+   "gid": 0,
+   "ino": 465182,
+   "mode": "0o600",
+   "mtime_ns": 1792842473017371034,
+   "sha256": "1eb020c288b82fac190a058b67d60c19afaacbc4ad5463958cb22acb62fe96ff",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0006.md": {
+   "gid": 0,
+   "ino": 465183,
+   "mode": "0o600",
+   "mtime_ns": 1792842473098077475,
+   "sha256": "2e80a37ecbc21f1e912992039940b4d5c85a5b5f48b01a441b9eced0b9b4b157",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0007.md": {
+   "gid": 0,
+   "ino": 465184,
+   "mode": "0o600",
+   "mtime_ns": 1792842473224901879,
+   "sha256": "28c5ec636cc8ae3a1dff70ae1db10f79aef21c4caa0490f7fd648327ce22d7b7",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0008.md": {
+   "gid": 0,
+   "ino": 465185,
+   "mode": "0o600",
+   "mtime_ns": 1792842473282549338,
+   "sha256": "7d66b76618973b3b12784559a921da427eb1ff08ec25547b9ab98c9281efbc0b",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0009.md": {
+   "gid": 0,
+   "ino": 465186,
+   "mode": "0o600",
+   "mtime_ns": 1792842473347883120,
+   "sha256": "8fc7afb34a6905a11e16483ddb24acbea6932c9d3bfb53acc7756d5acc2ba34a",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0010.md": {
+   "gid": 0,
+   "ino": 465187,
+   "mode": "0o600",
+   "mtime_ns": 1792842473436275889,
+   "sha256": "034443b207050d13d23b7342416c054be72398d32877ac6a402ce7df54682053",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0011.md": {
+   "gid": 0,
+   "ino": 465188,
+   "mode": "0o600",
+   "mtime_ns": 1792842473509296003,
+   "sha256": "21468aa7db9f6adc8265e646ac42d3d5222963c201bb20e10451acab48c0a1fa",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0012.md": {
+   "gid": 0,
+   "ino": 465189,
+   "mode": "0o600",
+   "mtime_ns": 1792842473597688768,
+   "sha256": "660701bc731866f6d7ef7ee350a13a0fabc79a7819e75d79c7fa92fcb26014aa",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0013.md": {
+   "gid": 0,
+   "ino": 465190,
+   "mode": "0o600",
+   "mtime_ns": 1792842473686081538,
+   "sha256": "216b560bbd865c0774d56001fd419dafc5ba394cb29d3462f47ab7e44b4f17fd",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0014.md": {
+   "gid": 0,
+   "ino": 465191,
+   "mode": "0o600",
+   "mtime_ns": 1792842473751415319,
+   "sha256": "0c0b75dd424a4399763d740d528ba4229aff002b3e06eb4bca79cfcf011b3470",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0015.md": {
+   "gid": 0,
+   "ino": 465192,
+   "mode": "0o600",
+   "mtime_ns": 1792842473774474302,
+   "sha256": "34244ffa9c0299ad3c8b6de5479e2b4848e63556f8621a31ed74b3f9f2d1c757",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0016.md": {
+   "gid": 0,
+   "ino": 465193,
+   "mode": "0o600",
+   "mtime_ns": 1792842473809062776,
+   "sha256": "4d5629a707f91b2249e6118d894ccac4356ba7d1551e818d41949f7b835e712e",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0017.md": {
+   "gid": 0,
+   "ino": 465194,
+   "mode": "0o600",
+   "mtime_ns": 1792842473828278595,
+   "sha256": "f2aeb62d213687407666df3fb052d7a76bf57dbbfd7c037022ddebbb87df7af0",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0018.md": {
+   "gid": 0,
+   "ino": 465195,
+   "mode": "0o600",
+   "mtime_ns": 1792842473862867069,
+   "sha256": "d692432bfdfc203c1e27a3dd75e0b245a557c6798300026e0856d820a540faa9",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0019.md": {
+   "gid": 0,
+   "ino": 465196,
+   "mode": "0o600",
+   "mtime_ns": 1792842473943573508,
+   "sha256": "66fe9f5889bd248bf090c01e8e8e7e0b54e94e693ee7c72fada7e21af2182b64",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0020.md": {
+   "gid": 0,
+   "ino": 465197,
+   "mode": "0o600",
+   "mtime_ns": 1792842474031966276,
+   "sha256": "846a18cb0ffbab59d86e4adfb31cadc2f37b5d4f54535c5328ee11e9852f6209",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0021.md": {
+   "gid": 0,
+   "ino": 465198,
+   "mode": "0o600",
+   "mtime_ns": 1792842474066554752,
+   "sha256": "29c2268b6f06140e60c5d4d361702cc1925a821a86db11f7fb964fdfc2d01745",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0022.md": {
+   "gid": 0,
+   "ino": 465199,
+   "mode": "0o600",
+   "mtime_ns": 1792842474143418025,
+   "sha256": "b18421bc3a9e5a786ec51afc1cd28a7c8d51b3da0ae4d166a35469d45479a3b1",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0023.md": {
+   "gid": 0,
+   "ino": 465200,
+   "mode": "0o600",
+   "mtime_ns": 1792842474243340284,
+   "sha256": "8d68d3c97eee40534407cfd1d78ace199340fbc19f94b3df57d3c6e597977bbf",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0024.md": {
+   "gid": 0,
+   "ino": 465201,
+   "mode": "0o600",
+   "mtime_ns": 1792842474327889887,
+   "sha256": "c20d93af0a2d57ac9356a685378902404780345cbead1c1418a1e973ba48ab25",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0025.md": {
+   "gid": 0,
+   "ino": 465202,
+   "mode": "0o600",
+   "mtime_ns": 1792842474423968982,
+   "sha256": "4768a5399a7a10fb33e4607cabec30d1f65116c3626ad90b015333576e87d148",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0026.md": {
+   "gid": 0,
+   "ino": 465203,
+   "mode": "0o600",
+   "mtime_ns": 1792842474450871128,
+   "sha256": "0dc914531ee6036094db051b33b134cab431579fd4f1d3023cc48ae462a45e51",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0027.md": {
+   "gid": 0,
+   "ino": 465204,
+   "mode": "0o600",
+   "mtime_ns": 1792842474527734406,
+   "sha256": "e077f5b1f78228954a23c4d36c36083561b663d26e2a4ee0a0e4a50924804264",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0028.md": {
+   "gid": 0,
+   "ino": 465205,
+   "mode": "0o600",
+   "mtime_ns": 1792842474546950224,
+   "sha256": "2eaf46060ea5a9c2869d6e4892c6fe7cf3d48e33c05b75b3f887b5708c465f70",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0029.md": {
+   "gid": 0,
+   "ino": 465206,
+   "mode": "0o600",
+   "mtime_ns": 1792842474631499828,
+   "sha256": "1225948232e4f044ed882e2fa8a7f293e6aabc3741b9f6d472760cd80f4877e5",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0030.md": {
+   "gid": 0,
+   "ino": 465207,
+   "mode": "0o600",
+   "mtime_ns": 1792842474731422087,
+   "sha256": "27019aae6122be5d2b765b2bbb4136591de96bc93cf671f3ae294923c1e5af5c",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0031.md": {
+   "gid": 0,
+   "ino": 465208,
+   "mode": "0o600",
+   "mtime_ns": 1792842474839030674,
+   "sha256": "62191dec527952e3a8255d4b84bd6a637c7ccdb06c95cdb87ad91b98be70d074",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0032.md": {
+   "gid": 0,
+   "ino": 465209,
+   "mode": "0o600",
+   "mtime_ns": 1792842474904364460,
+   "sha256": "4ab37e9f539f5463d4a74cc820598a5de8b532845d589769f8b4acd6799294ca",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0033.md": {
+   "gid": 0,
+   "ino": 465210,
+   "mode": "0o600",
+   "mtime_ns": 1792842474927423441,
+   "sha256": "235dc1704c288cc0d68715c1baa8008ee2a239fe40ed98cd5725df07ee4f4124",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0034.md": {
+   "gid": 0,
+   "ino": 465211,
+   "mode": "0o600",
+   "mtime_ns": 1792842475008129884,
+   "sha256": "0cf88c0e3dbb0245824405e62baecdff81f581be558ffd0f12fe6cec4ec58859",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0035.md": {
+   "gid": 0,
+   "ino": 465212,
+   "mode": "0o600",
+   "mtime_ns": 1792842475108052140,
+   "sha256": "d84dd1ee7c1c397c5ea4e66792e0495ae5cbff30284b07c19de215a3f9eddc95",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0036.md": {
+   "gid": 0,
+   "ino": 465213,
+   "mode": "0o600",
+   "mtime_ns": 1792842475200288073,
+   "sha256": "2527dd1b0d1269b1a87a66d3bfd7efd2b07bf24778f6a8e4dc60335dfe6fa2fb",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0037.md": {
+   "gid": 0,
+   "ino": 465214,
+   "mode": "0o600",
+   "mtime_ns": 1792842475288680840,
+   "sha256": "476ce8dc0e94811ac11adaa296499a8fc3b3b5252375dd077c784556904f02b4",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0038.md": {
+   "gid": 0,
+   "ino": 465215,
+   "mode": "0o600",
+   "mtime_ns": 1792842475380916773,
+   "sha256": "9e757a6429537ac0126ee492542dc01ba4437ad073fb805a06c220f9eb95f20a",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0039.md": {
+   "gid": 0,
+   "ino": 465216,
+   "mode": "0o600",
+   "mtime_ns": 1792842475473152703,
+   "sha256": "8dc78d07aeef98de524963f5612c2bc2622c2799c769195662575b095e0ae6a1",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0040.md": {
+   "gid": 0,
+   "ino": 465217,
+   "mode": "0o600",
+   "mtime_ns": 1792842475557702306,
+   "sha256": "4bc7f10dac9d94a2439fd0501c3f8c27fd17668e2e8c04fbdfea20bcbb15cd22",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0041.md": {
+   "gid": 0,
+   "ino": 465218,
+   "mode": "0o600",
+   "mtime_ns": 1792842475653781401,
+   "sha256": "41007be173140b98d897d29d64fe870e8614c5c7c206f68f877ce239393c4227",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0042.md": {
+   "gid": 0,
+   "ino": 465219,
+   "mode": "0o600",
+   "mtime_ns": 1792842475776762643,
+   "sha256": "769f068e5db4526e731636c52fbbb49f1aeff82027e3fceab6561d68bb44f253",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0043.md": {
+   "gid": 0,
+   "ino": 465220,
+   "mode": "0o600",
+   "mtime_ns": 1792842475803664791,
+   "sha256": "c4c522ef322205c0ce6bdf135d80a294256722d5ee3c3e61473444fe8b1f95c7",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0044.md": {
+   "gid": 0,
+   "ino": 465221,
+   "mode": "0o600",
+   "mtime_ns": 1792842475822880609,
+   "sha256": "fb3dcb5c1cb6f9493dc46efc4d61d2d061e786ffcf36c8b6e4dd377f03de9466",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0045.md": {
+   "gid": 0,
+   "ino": 465222,
+   "mode": "0o600",
+   "mtime_ns": 1792842475849782755,
+   "sha256": "8db84e9c3b45278db2fc4569f902a3544a471b570548b239755564e25a4be481",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0046.md": {
+   "gid": 0,
+   "ino": 465223,
+   "mode": "0o600",
+   "mtime_ns": 1792842475876684902,
+   "sha256": "8e7de8fa215ed30caaa99016d9cdfda05383b247f58573beccb1d56a003742f3",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0047.md": {
+   "gid": 0,
+   "ino": 465224,
+   "mode": "0o600",
+   "mtime_ns": 1792842475903587048,
+   "sha256": "eb408cf3eaf3c8962b2529fdf5db3702a33381362c10e7e338e5e5e02713dd9b",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0048.md": {
+   "gid": 0,
+   "ino": 465225,
+   "mode": "0o600",
+   "mtime_ns": 1792842475926646031,
+   "sha256": "9a31c04a14e8355f40677a4b52e785acfc998b720c01617389ad783b681ac961",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0049.md": {
+   "gid": 0,
+   "ino": 465226,
+   "mode": "0o600",
+   "mtime_ns": 1792842475949705014,
+   "sha256": "a57ad0a79003db50cabf6abac5fc801b5b439d530e76cfbfa1643173ca3fd114",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0050.md": {
+   "gid": 0,
+   "ino": 465227,
+   "mode": "0o600",
+   "mtime_ns": 1792842475980450324,
+   "sha256": "9edbf6be29ca181b0b00a24d2edd1808113f2f8c44de6e9e311c5f98837f3a41",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0051.md": {
+   "gid": 0,
+   "ino": 465228,
+   "mode": "0o600",
+   "mtime_ns": 1792842476007352472,
+   "sha256": "47d97e0b7ed54fc1ae11de6d2668ff15792769f0443ca7385b4ce2c4edf07c35",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0052.md": {
+   "gid": 0,
+   "ino": 465229,
+   "mode": "0o600",
+   "mtime_ns": 1792842476038097783,
+   "sha256": "b3dc7e90567055483270bdc73a1874416955a48f507657b01f50c4f134651a41",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0053.md": {
+   "gid": 0,
+   "ino": 465230,
+   "mode": "0o600",
+   "mtime_ns": 1792842476072686256,
+   "sha256": "eadef05cbd8e8135e2f5246cd33be716ffedfb8dcbae59abada9d5d2542f4f92",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0054.md": {
+   "gid": 0,
+   "ino": 465231,
+   "mode": "0o600",
+   "mtime_ns": 1792842476099588404,
+   "sha256": "a080c2ec70229fdf20f2414ba0d8067f9bf0af8406090b98cc71ab52c5899c0c",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0055.md": {
+   "gid": 0,
+   "ino": 465232,
+   "mode": "0o600",
+   "mtime_ns": 1792842476122647388,
+   "sha256": "844adb00694568f1e86f1384b5586923f028c004df9e98d1171055a419838450",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0056.md": {
+   "gid": 0,
+   "ino": 465233,
+   "mode": "0o600",
+   "mtime_ns": 1792842476145706371,
+   "sha256": "6b541b36b28560904a91db4c8906c51a2fa308a4762a029d05c33466e7aeeee7",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0057.md": {
+   "gid": 0,
+   "ino": 465234,
+   "mode": "0o600",
+   "mtime_ns": 1792842476172608517,
+   "sha256": "b63e888c8004e945020007bd39a371f2bed0dce3d533b66fc0b640c7e0c38201",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0058.md": {
+   "gid": 0,
+   "ino": 465235,
+   "mode": "0o600",
+   "mtime_ns": 1792842476195667501,
+   "sha256": "8b3607dde79cc2c30092192c557cb4dd346eb770a58be4f4eec0d8035822c81f",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0059.md": {
+   "gid": 0,
+   "ino": 465236,
+   "mode": "0o600",
+   "mtime_ns": 1792842476218726484,
+   "sha256": "a1b7a4411085201f71d52bb110da971f7c66c4b32f73a455ebd077d4f296cadd",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0060.md": {
+   "gid": 0,
+   "ino": 465237,
+   "mode": "0o600",
+   "mtime_ns": 1792842476257158120,
+   "sha256": "14b8e02465ab9b688a5931bd23fa9c8056ea622381dadbff7a2495053184d243",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0061.md": {
+   "gid": 0,
+   "ino": 465238,
+   "mode": "0o600",
+   "mtime_ns": 1792842476299432922,
+   "sha256": "60ac012b870191f5f6b6751187d37aba11548e8c916a330d2ab15521f0973cdf",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0062.md": {
+   "gid": 0,
+   "ino": 465239,
+   "mode": "0o600",
+   "mtime_ns": 1792842476330178232,
+   "sha256": "5468a1b37194641fb8438a97e5fad13df53761ce1de3902e34a0868cfab8e42b",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0063.md": {
+   "gid": 0,
+   "ino": 465240,
+   "mode": "0o600",
+   "mtime_ns": 1792842476360923542,
+   "sha256": "4c999ecc3f56692f4ec447bef22e85f703fdf8c91acb159bd8bf469e91ee8fe0",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0064.md": {
+   "gid": 0,
+   "ino": 465241,
+   "mode": "0o600",
+   "mtime_ns": 1792842476399355182,
+   "sha256": "40ce20c31f45533bcdc24cbe4339c0617baed1aa5d08d4c8a430514a64df93ca",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0065.md": {
+   "gid": 0,
+   "ino": 465242,
+   "mode": "0o600",
+   "mtime_ns": 1792842476430100493,
+   "sha256": "0ef2a1b70006eda33417319ac56128cf0dfd96e3153f574882bc60388ec330af",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0066.md": {
+   "gid": 0,
+   "ino": 465243,
+   "mode": "0o600",
+   "mtime_ns": 1792842476460845803,
+   "sha256": "a9775d2638c087ada269e81be6eb7a9e449454e9ff6fc001a99b399d5caff575",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0067.md": {
+   "gid": 0,
+   "ino": 465244,
+   "mode": "0o600",
+   "mtime_ns": 1792842476483904787,
+   "sha256": "6dd4d3086762289d135622b233eaf2ecde3e5fe6014d5beee14fcc27beeb3010",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0068.md": {
+   "gid": 0,
+   "ino": 465245,
+   "mode": "0o600",
+   "mtime_ns": 1792842476503120606,
+   "sha256": "d4919d96982de5ab429a8e35ef6f40e97e7b073381d089d55ada5a78ff8e1ee6",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0069.md": {
+   "gid": 0,
+   "ino": 465246,
+   "mode": "0o600",
+   "mtime_ns": 1792842476526179589,
+   "sha256": "923aff463904db7374920b306ae92deb6a11086cc128db8b565ce58cd672d78d",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0070.md": {
+   "gid": 0,
+   "ino": 465247,
+   "mode": "0o600",
+   "mtime_ns": 1792842476556924900,
+   "sha256": "50c583082bf1143504844c2fba9cc123ef397c40c4fa2f5c91e21c52e97fc421",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0071.md": {
+   "gid": 0,
+   "ino": 465248,
+   "mode": "0o600",
+   "mtime_ns": 1792842476587670211,
+   "sha256": "fb39a230ed69b5c6ad53ac34336f3bdc0761bbcffefecf03f9b85cfe324ca3ee",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0072.md": {
+   "gid": 0,
+   "ino": 465249,
+   "mode": "0o600",
+   "mtime_ns": 1792842476610729194,
+   "sha256": "f487e5a341a24c98010094c2b5bc4deaadb22ea0d67a97dd8000dd4b3e7f9adc",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0073.md": {
+   "gid": 0,
+   "ino": 465250,
+   "mode": "0o600",
+   "mtime_ns": 1792842476649160830,
+   "sha256": "4a8ecde38144ca0aab9b509773e75a98f45ce69df74b6e70e907bfcc1db1c6f6",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0074.md": {
+   "gid": 0,
+   "ino": 465251,
+   "mode": "0o600",
+   "mtime_ns": 1792842476668376649,
+   "sha256": "0c5a82548e2885da5b4f4462550ffe2b9b4542a356afeee3542a517451be9e86",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0075.md": {
+   "gid": 0,
+   "ino": 465252,
+   "mode": "0o600",
+   "mtime_ns": 1792842476691435632,
+   "sha256": "1083f2579692a18275b362fb92da4e5851d1641cfbae25ee4123983a2672efc3",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0076.md": {
+   "gid": 0,
+   "ino": 465253,
+   "mode": "0o600",
+   "mtime_ns": 1792842476714494616,
+   "sha256": "7d4b5cda57ade2c5d43d3a3a8e0609cfad3690dd3c60c12cac4d452c61bb2c02",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0077.md": {
+   "gid": 0,
+   "ino": 465254,
+   "mode": "0o600",
+   "mtime_ns": 1792842476745239925,
+   "sha256": "36a7fe31f1b6f29a67603dc36f328fb075dec27b9bb75fb39667f18d5c93de18",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0078.md": {
+   "gid": 0,
+   "ino": 465255,
+   "mode": "0o600",
+   "mtime_ns": 1792842476775985235,
+   "sha256": "497478d82a82db3ff88d35d0798b43c1f7527a2e8ff1b6a60cc08ddfc2809f65",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0079.md": {
+   "gid": 0,
+   "ino": 465256,
+   "mode": "0o600",
+   "mtime_ns": 1792842476799044218,
+   "sha256": "3d584a28fd1d051de01ee3c4e4b441afb51e91d6c8dff6d2b186ac00ef7bea75",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0080.md": {
+   "gid": 0,
+   "ino": 465257,
+   "mode": "0o600",
+   "mtime_ns": 1792842476822103202,
+   "sha256": "c0c0a13a17c926f1528cb9224f84690766ed6f7d3af82eaab3e1cffef363a42e",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0081.md": {
+   "gid": 0,
+   "ino": 465258,
+   "mode": "0o600",
+   "mtime_ns": 1792842476856692833,
+   "sha256": "7d06755d142e53f4f782c6acb7407b2bc3607f9659e96808f6f0ef84585c2c93",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0082.md": {
+   "gid": 0,
+   "ino": 465259,
+   "mode": "0o600",
+   "mtime_ns": 1792842476895126436,
+   "sha256": "d541c30843cb60ca6204e162768e1c59ebbf1fe0f18eab303183719b6a9061a1",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0083.md": {
+   "gid": 0,
+   "ino": 465260,
+   "mode": "0o600",
+   "mtime_ns": 1792842476918186600,
+   "sha256": "0e514362dec79e8215db40dcd3ccb771e132d9daeda3d941c99d971a07ea6159",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0084.md": {
+   "gid": 0,
+   "ino": 465261,
+   "mode": "0o600",
+   "mtime_ns": 1792842476971993645,
+   "sha256": "85df8c3e7876feab2a735ba6ab73a76be2e3aacb089c6166c0655a69d2094163",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0085.md": {
+   "gid": 0,
+   "ino": 465262,
+   "mode": "0o600",
+   "mtime_ns": 1792842477002740530,
+   "sha256": "5eb81f22be5c09366977243bc5bd0ac73c02ccbe1c943e34382bc8e02c9c62ad",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0086.md": {
+   "gid": 0,
+   "ino": 465263,
+   "mode": "0o600",
+   "mtime_ns": 1792842477025800693,
+   "sha256": "37c8c424292512071d57e61f87bbb9eb12736ac3038636308fa535c922a433d4",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0087.md": {
+   "gid": 0,
+   "ino": 465264,
+   "mode": "0o600",
+   "mtime_ns": 1792842477060390938,
+   "sha256": "491851e1c48793a5599a01f0c12a3cc623f00e130045559d5a1db90f6007dd02",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0088.md": {
+   "gid": 0,
+   "ino": 465265,
+   "mode": "0o600",
+   "mtime_ns": 1792842477079607738,
+   "sha256": "a975783ce34585f8830006031482460b74e9b5b2244d55c883affe558552d87e",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0089.md": {
+   "gid": 0,
+   "ino": 465266,
+   "mode": "0o600",
+   "mtime_ns": 1792842477102667902,
+   "sha256": "e0bb40ba1d3b969a89c4a1665f7f31c009b378a65a521933a9d2bd654bf03736",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0090.md": {
+   "gid": 0,
+   "ino": 465267,
+   "mode": "0o600",
+   "mtime_ns": 1792842477125728066,
+   "sha256": "289886d2c8f9b3fcebaa6b95e92d55ed104f172a447feca3b6f40977871d8d34",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0091.md": {
+   "gid": 0,
+   "ino": 465268,
+   "mode": "0o600",
+   "mtime_ns": 1792842477160318310,
+   "sha256": "8048a21db76be0e8f67c19ca9a2988fb914a03b32dbbc1450144c55d98a34824",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0092.md": {
+   "gid": 0,
+   "ino": 465269,
+   "mode": "0o600",
+   "mtime_ns": 1792842477179535111,
+   "sha256": "f2408322d903f36556c009a653d29f3c587c40025e12efaa18388199262827bc",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0093.md": {
+   "gid": 0,
+   "ino": 465270,
+   "mode": "0o600",
+   "mtime_ns": 1792842477198751915,
+   "sha256": "08c7420af0a4cbc5f5388d2038a592c58a186602c934c3225dfd7a267c87f74a",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0094.md": {
+   "gid": 0,
+   "ino": 465271,
+   "mode": "0o600",
+   "mtime_ns": 1792842477217968718,
+   "sha256": "8cba2a83c2a45903bba4a412c3da87eacaabd9beba95aebf0355e3a7522dcfe8",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0095.md": {
+   "gid": 0,
+   "ino": 465272,
+   "mode": "0o600",
+   "mtime_ns": 1792842477244872240,
+   "sha256": "9b42f774e2caf24872c9ab9ba6973815a4e71c2525741e9a36db283c9a9f9c20",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0096.md": {
+   "gid": 0,
+   "ino": 465273,
+   "mode": "0o600",
+   "mtime_ns": 1792842477267932403,
+   "sha256": "23d8ac893b9e514dcb2dd93e7f64164bca956ba70c08a46729ca538df7cd65d5",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0097.md": {
+   "gid": 0,
+   "ino": 465274,
+   "mode": "0o600",
+   "mtime_ns": 1792842477290992566,
+   "sha256": "c471cc8a64b19467919497f8d63c6d6aaf1bf8cf4eefa28a7e95418f6dc04ed4",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0098.md": {
+   "gid": 0,
+   "ino": 465275,
+   "mode": "0o600",
+   "mtime_ns": 1792842477310209366,
+   "sha256": "e25db5d5391b8ab208220f521e5f56ac644d5745096783e53607bd30077243cf",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0099.md": {
+   "gid": 0,
+   "ino": 465276,
+   "mode": "0o600",
+   "mtime_ns": 1792842477337112890,
+   "sha256": "f2bb46f972559906ed12454a9a36e2e30c615cdf75d45a5df66cb7677e5078b0",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0100.md": {
+   "gid": 0,
+   "ino": 465277,
+   "mode": "0o600",
+   "mtime_ns": 1792842477356329692,
+   "sha256": "bcb54360e05b779e3efa0ce5179f756a1631446a8f73334e278e1d9a7bea3c69",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0101.md": {
+   "gid": 0,
+   "ino": 465278,
+   "mode": "0o600",
+   "mtime_ns": 1792842477383233214,
+   "sha256": "a04a4a4aa41bc2c4c29997bdfe45f56f18ab7637088428a541c0b9d72829ba2e",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0102.md": {
+   "gid": 0,
+   "ino": 465279,
+   "mode": "0o600",
+   "mtime_ns": 1792842477402450018,
+   "sha256": "8616de54c471865616511af25a3a4c584389245ea070123dc300bfe718995ccf",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0103.md": {
+   "gid": 0,
+   "ino": 465280,
+   "mode": "0o600",
+   "mtime_ns": 1792842477429353541,
+   "sha256": "26663c0e5025c94c6507f5192145e7b5ac1fa22b041c2c256bc485bfb81d5f79",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0104.md": {
+   "gid": 0,
+   "ino": 465281,
+   "mode": "0o600",
+   "mtime_ns": 1792842477448570342,
+   "sha256": "73da6fd86dca98000235dd93438fb4e3d8fcdfa0157985b41670c2872b1fcea5",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0105.md": {
+   "gid": 0,
+   "ino": 465282,
+   "mode": "0o600",
+   "mtime_ns": 1792842477471630506,
+   "sha256": "6ca378b0a638849fc595c147d03bf7e31c74a301ef132fe6bb65c3febb2a649e",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0106.md": {
+   "gid": 0,
+   "ino": 465283,
+   "mode": "0o600",
+   "mtime_ns": 1792842477494690666,
+   "sha256": "7d80ea2610f67d7d75fa65772076427a94ad6380c02ae45c344f3f1549aaaf50",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0107.md": {
+   "gid": 0,
+   "ino": 465284,
+   "mode": "0o600",
+   "mtime_ns": 1792842477517750828,
+   "sha256": "53bd0bf137fc5851cf4cec227a908c2efbda3d4997da74ae638504d4a9b61c95",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0108.md": {
+   "gid": 0,
+   "ino": 465285,
+   "mode": "0o600",
+   "mtime_ns": 1792842477544654355,
+   "sha256": "9733e2f55834820218f3d7d3a90e0cb2aa3458e1c01d4acce9e7c02f458cdf91",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0109.md": {
+   "gid": 0,
+   "ino": 465286,
+   "mode": "0o600",
+   "mtime_ns": 1792842477563871156,
+   "sha256": "11f29e89ef946b9828d84af29c4d5ae40241e158c91fa9b900374421975de152",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0110.md": {
+   "gid": 0,
+   "ino": 465287,
+   "mode": "0o600",
+   "mtime_ns": 1792842477583087960,
+   "sha256": "1d4a6cd714a3a8b1eedc7d5a77fc87e600f1c48842ebbadf49e39c764a724b1d",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0111.md": {
+   "gid": 0,
+   "ino": 465288,
+   "mode": "0o600",
+   "mtime_ns": 1792842477602304760,
+   "sha256": "edc848e1ed224cd2481260d54ebd19c844f83c155d2cb9034c3e5e8c307da612",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0112.md": {
+   "gid": 0,
+   "ino": 465289,
+   "mode": "0o600",
+   "mtime_ns": 1792842477629208286,
+   "sha256": "02e8604d980bf7d7c9e5c6b13b89b7f655fabcc5167091d1d307bc9f60a3546f",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0113.md": {
+   "gid": 0,
+   "ino": 465290,
+   "mode": "0o600",
+   "mtime_ns": 1792842477652268447,
+   "sha256": "b3e8ac4f5b74cff4040cb498cb237f10a56840bbbef1d994964bda69e095203d",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0114.md": {
+   "gid": 0,
+   "ino": 465291,
+   "mode": "0o600",
+   "mtime_ns": 1792842477671485251,
+   "sha256": "a3a7e8d298becc423d18d2439ee11f11680584628d34289a34dfe1ea640b972c",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0115.md": {
+   "gid": 0,
+   "ino": 465292,
+   "mode": "0o600",
+   "mtime_ns": 1792842477694545414,
+   "sha256": "dc0f69c36b4d29f0fd93b8e1e8be32498650bc458f54d5219cdf2a3b1a708ffc",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0116.md": {
+   "gid": 0,
+   "ino": 465293,
+   "mode": "0o600",
+   "mtime_ns": 1792842477717605577,
+   "sha256": "bd2518e044db200ee0c6edbc72872db98eaddc04b55f7c94f3836b999793e0ce",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0117.md": {
+   "gid": 0,
+   "ino": 465294,
+   "mode": "0o600",
+   "mtime_ns": 1792842477740665740,
+   "sha256": "2b87afefc97f23c430306f0c96fb422aef812198a0c61e2b7bca9c1692748edb",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0118.md": {
+   "gid": 0,
+   "ino": 465295,
+   "mode": "0o600",
+   "mtime_ns": 1792842477759882541,
+   "sha256": "4c82db81aa13dbc82a8d3b2ef08f425e560493405fa11463b964c8a4d8938f20",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0119.md": {
+   "gid": 0,
+   "ino": 465296,
+   "mode": "0o600",
+   "mtime_ns": 1792842477782942703,
+   "sha256": "11fad3b5fb70703628eafa5d6448658ca766209dfe9c4225675ca8a906015753",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0120.md": {
+   "gid": 0,
+   "ino": 465297,
+   "mode": "0o600",
+   "mtime_ns": 1792842477806002868,
+   "sha256": "ed74a86f041ba48221499daa71a3678e3676a765cfe53d1d15e208784cdac3af",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0121.md": {
+   "gid": 0,
+   "ino": 465298,
+   "mode": "0o600",
+   "mtime_ns": 1792842477829063031,
+   "sha256": "a478343bd6b10a633cfd2ee0adbd33e47c4a1da1ae61a6b101e071c22407a52f",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0122.md": {
+   "gid": 0,
+   "ino": 465299,
+   "mode": "0o600",
+   "mtime_ns": 1792842477848279834,
+   "sha256": "1e8ab2c749ab081ea3ce525649c103aa441dde97b5bb488fd70f88bb251a1ac7",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0123.md": {
+   "gid": 0,
+   "ino": 465300,
+   "mode": "0o600",
+   "mtime_ns": 1792842477871339994,
+   "sha256": "b04728105b3df0f2256e901280e41d9b4b23a0348908adfb8f1d9e9f613f2b15",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0124.md": {
+   "gid": 0,
+   "ino": 465301,
+   "mode": "0o600",
+   "mtime_ns": 1792842477894400157,
+   "sha256": "0aca9ed033b60af943b6fd16655da2907ee9f6c1c46bfee231f7d8c0d19070be",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0125.md": {
+   "gid": 0,
+   "ino": 465302,
+   "mode": "0o600",
+   "mtime_ns": 1792842477925147043,
+   "sha256": "46e99d3539aaefd5cf5153630b55428686437f6226dfc02169be5cae59fc5fe8",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0126.md": {
+   "gid": 0,
+   "ino": 465303,
+   "mode": "0o600",
+   "mtime_ns": 1792842477948207207,
+   "sha256": "153f343dc0a11bf0146199642b39ef02f77580c1c9e39460aeba4c366364ddaf",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0127.md": {
+   "gid": 0,
+   "ino": 465304,
+   "mode": "0o600",
+   "mtime_ns": 1792842477975110730,
+   "sha256": "9c7abd8763fb3ff30bbbad03fe86c59f673dccfbba48217b80707909a4810859",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0128.md": {
+   "gid": 0,
+   "ino": 465305,
+   "mode": "0o600",
+   "mtime_ns": 1792842478005857614,
+   "sha256": "bbbca1f4ed2e5f6e8b5be53876459b8e7ca7e474d8123ab126872a9d466e2386",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0129.md": {
+   "gid": 0,
+   "ino": 465306,
+   "mode": "0o600",
+   "mtime_ns": 1792842478032761138,
+   "sha256": "4da322a60f197f4e966bba0db718f548bbf841efbdf7873c429580859b2d6040",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0130.md": {
+   "gid": 0,
+   "ino": 465307,
+   "mode": "0o600",
+   "mtime_ns": 1792842478063508020,
+   "sha256": "3290d92c03eeee7b941bfa9a14213cd890e6d36f7d1329c27bb4e665a48cb8c7",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0131.md": {
+   "gid": 0,
+   "ino": 465308,
+   "mode": "0o600",
+   "mtime_ns": 1792842478086568182,
+   "sha256": "7e02e1d86c72e941fd9e914f09e6cf2c60a8b701b54c315b950f7ef71ba92290",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0132.md": {
+   "gid": 0,
+   "ino": 465309,
+   "mode": "0o600",
+   "mtime_ns": 1792842478105784987,
+   "sha256": "05dd71c318a79277a3ce07765a8cc9c20aab47895083580b298f0cc43545c333",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0133.md": {
+   "gid": 0,
+   "ino": 465310,
+   "mode": "0o600",
+   "mtime_ns": 1792842478132688510,
+   "sha256": "e576b825a5ddc914263bad1cec97601e6ff220b0c4b291f04ef0d13761495a1b",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0134.md": {
+   "gid": 0,
+   "ino": 465311,
+   "mode": "0o600",
+   "mtime_ns": 1792842478159592032,
+   "sha256": "b44bea705e3e370ba4a07bbeaa1c5bfddf8a47a6faaadb0b9c211f66ab96a3c6",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0135.md": {
+   "gid": 0,
+   "ino": 465312,
+   "mode": "0o600",
+   "mtime_ns": 1792842478174965476,
+   "sha256": "267e759169794e3ab3c46c8c952da43a51b7f9e7c7908960fc0fae473f05a1c6",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0136.md": {
+   "gid": 0,
+   "ino": 465313,
+   "mode": "0o600",
+   "mtime_ns": 1792842478194182278,
+   "sha256": "ed624af0e5819ea9ded68a8c18feeb53df9c3f9337c40e3648c6de3b1a4d7d0a",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0137.md": {
+   "gid": 0,
+   "ino": 465314,
+   "mode": "0o600",
+   "mtime_ns": 1792842478217242441,
+   "sha256": "01b3983959a998accb8292b9681de425795798de0b75d7f0cec3fb272e4c2d09",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0138.md": {
+   "gid": 0,
+   "ino": 465315,
+   "mode": "0o600",
+   "mtime_ns": 1792842478236459244,
+   "sha256": "5cae583a7c71005a14f80610f71ea2e01510591babe6fa377a2fcddc6cbdcad5",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0139.md": {
+   "gid": 0,
+   "ino": 465316,
+   "mode": "0o600",
+   "mtime_ns": 1792842478255676045,
+   "sha256": "66ce45fc296bd2fa2b3b347e66075b7d6e6df3a4d7c159feff28565abbcd2251",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0140.md": {
+   "gid": 0,
+   "ino": 465317,
+   "mode": "0o600",
+   "mtime_ns": 1792842478274892849,
+   "sha256": "7032483d12fda8d686ae9762bb650f219451dc5fa28fa516931f67165d5b5a64",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0141.md": {
+   "gid": 0,
+   "ino": 465318,
+   "mode": "0o600",
+   "mtime_ns": 1792842478294109649,
+   "sha256": "58e73408ceafb5378f8f4cd7d0bcd2767e35f6e8005b879d52fa2ceca7a8d581",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0142.md": {
+   "gid": 0,
+   "ino": 465319,
+   "mode": "0o600",
+   "mtime_ns": 1792842478317169813,
+   "sha256": "9abd79c24d7bd03127546bd2f32a2683297e9aff448572529dd38235d12f7c6f",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0143.md": {
+   "gid": 0,
+   "ino": 465320,
+   "mode": "0o600",
+   "mtime_ns": 1792842478336386615,
+   "sha256": "81d4b65efe2e105fbe46d02c8679632ad64b870cbe724742e85911149d3549a9",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0144.md": {
+   "gid": 0,
+   "ino": 465321,
+   "mode": "0o600",
+   "mtime_ns": 1792842478355603415,
+   "sha256": "4b6988febaf6c0130a22d7eb70834b5e63326cfbf548affee6a38ba19b19f8e9",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0145.md": {
+   "gid": 0,
+   "ino": 465322,
+   "mode": "0o600",
+   "mtime_ns": 1792842478374820219,
+   "sha256": "08edbce2482ff7fc3dd1117294b7bfd44f7f0201d13600f10c84f6891996a7db",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0146.md": {
+   "gid": 0,
+   "ino": 465323,
+   "mode": "0o600",
+   "mtime_ns": 1792842478394037023,
+   "sha256": "f3e7c76ad457007b2861dffd3c71e3113a788e5e23d6169029a0525c2da24bc8",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0147.md": {
+   "gid": 0,
+   "ino": 465324,
+   "mode": "0o600",
+   "mtime_ns": 1792842478424783904,
+   "sha256": "58de24e33a96f749559203d2ded974ddd13bcba59ab975837dc487f650bdcdc0",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0148.md": {
+   "gid": 0,
+   "ino": 465325,
+   "mode": "0o600",
+   "mtime_ns": 1792842478444000707,
+   "sha256": "4155ce56886fc2c0bcadd07f5d03ae0b1420477d1af05af362ddad67ef155323",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0149.md": {
+   "gid": 0,
+   "ino": 465326,
+   "mode": "0o600",
+   "mtime_ns": 1792842478463217507,
+   "sha256": "ed1f97d202719d1f1425645bea13de552940cd0e9bdbc0ac736ec893502dcd2b",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0150.md": {
+   "gid": 0,
+   "ino": 465327,
+   "mode": "0o600",
+   "mtime_ns": 1792842478482434312,
+   "sha256": "fb245be5431a5bc3eb2dcf1548bfd5dc037f62ba6895d09dfcec55e8c32a44ad",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0151.md": {
+   "gid": 0,
+   "ino": 465328,
+   "mode": "0o600",
+   "mtime_ns": 1792842478501651111,
+   "sha256": "2ab1524a43c640f7048f2fbe05c08ee8afc75668acf95d5831dbe051e0645c36",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0152.md": {
+   "gid": 0,
+   "ino": 465329,
+   "mode": "0o600",
+   "mtime_ns": 1792842478528554636,
+   "sha256": "aba1c3fe68797530501f3d8ca3da97645a41b857fe8208f938ba6c8c603513d7",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0153.md": {
+   "gid": 0,
+   "ino": 465330,
+   "mode": "0o600",
+   "mtime_ns": 1792842478547771437,
+   "sha256": "86976be3695f4840f156358c0cf8a3b7210b473d12d1667cff5dce3202439507",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0154.md": {
+   "gid": 0,
+   "ino": 465331,
+   "mode": "0o600",
+   "mtime_ns": 1792842478566988241,
+   "sha256": "0a5b303c86d4935231b3d9374f160aef3678250ded252503d0401d651a768d1c",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0155.md": {
+   "gid": 0,
+   "ino": 465332,
+   "mode": "0o600",
+   "mtime_ns": 1792842478586205041,
+   "sha256": "e23da4cb04bb32dcbb33b19150657911c24264099e809866e24f69fe81b541f2",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0156.md": {
+   "gid": 0,
+   "ino": 465333,
+   "mode": "0o600",
+   "mtime_ns": 1792842478613108565,
+   "sha256": "514649fafcff00618275089a733d59035ec9edf286b2536676ea99c2c6133fcb",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0157.md": {
+   "gid": 0,
+   "ino": 465334,
+   "mode": "0o600",
+   "mtime_ns": 1792842478628482007,
+   "sha256": "8afee6c115899b9d76821737716016dac429fa357313a7b673e6520fae160022",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0158.md": {
+   "gid": 0,
+   "ino": 465335,
+   "mode": "0o600",
+   "mtime_ns": 1792842478651542170,
+   "sha256": "fafcac3ad722eb3abb144abae35d4ad3bf92769b4ad4be837628f936eb545c3d",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0159.md": {
+   "gid": 0,
+   "ino": 465336,
+   "mode": "0o600",
+   "mtime_ns": 1792842478666915611,
+   "sha256": "c13d9a3e76f3eacbc5249be8c035e1b9820ab6433574674fd5019ac496783808",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0160.md": {
+   "gid": 0,
+   "ino": 465337,
+   "mode": "0o600",
+   "mtime_ns": 1792842478689975775,
+   "sha256": "229c7a345e558f7dd5f2d9b42c6476308bd4e2ca2431886b3e61ccebe4a734ae",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0161.md": {
+   "gid": 0,
+   "ino": 465338,
+   "mode": "0o600",
+   "mtime_ns": 1792842478713035938,
+   "sha256": "097caccbb887986961b72765feeb3c3ac4fa9fe3877a5a29eaa8103e50073975",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0162.md": {
+   "gid": 0,
+   "ino": 465339,
+   "mode": "0o600",
+   "mtime_ns": 1792842478732252739,
+   "sha256": "a75d5b9118026e75a26337301ec4008aa5dc0d3a5fa01212f5d8cb03972bdf80",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0163.md": {
+   "gid": 0,
+   "ino": 465340,
+   "mode": "0o600",
+   "mtime_ns": 1792842478755312901,
+   "sha256": "721d1a7caa0cc7304fff9985da6548c8cd2851ee77419836501390a0b3187205",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0164.md": {
+   "gid": 0,
+   "ino": 465341,
+   "mode": "0o600",
+   "mtime_ns": 1792842478774529706,
+   "sha256": "ab887bf6eb651c4e9351fa9ba0e9c2d04cfad4916faae54f745d95272c8e558a",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0165.md": {
+   "gid": 0,
+   "ino": 465342,
+   "mode": "0o600",
+   "mtime_ns": 1792842478793746509,
+   "sha256": "c239fb15061800d97bffd23a67bc972a02f132f9a10c921c632eb0d8e8b243d6",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0166.md": {
+   "gid": 0,
+   "ino": 465343,
+   "mode": "0o600",
+   "mtime_ns": 1792842478816806670,
+   "sha256": "55f7bcd9ee790d04e66bd0656541a132afb275e4a0bbd2b6aae96a0f0780799e",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0167.md": {
+   "gid": 0,
+   "ino": 465344,
+   "mode": "0o600",
+   "mtime_ns": 1792842478836023473,
+   "sha256": "a538bb6a91694e24c50a333954c9148ea6977ea9f18ea2b0102f6ba27d5216ef",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0168.md": {
+   "gid": 0,
+   "ino": 465345,
+   "mode": "0o600",
+   "mtime_ns": 1792842478855240277,
+   "sha256": "58ed602d67eb44fbb9e55f91f9eab93139dd84010643920f45abba5f086e5503",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0169.md": {
+   "gid": 0,
+   "ino": 465346,
+   "mode": "0o600",
+   "mtime_ns": 1792842478878300440,
+   "sha256": "6641a49c3a5f61675be18ff44813f3d5dd87bc62e8b1e6531076a6fadf86aec9",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0170.md": {
+   "gid": 0,
+   "ino": 465347,
+   "mode": "0o600",
+   "mtime_ns": 1792842478905203963,
+   "sha256": "2fd7ea02ba10782ae5c8c0b80bf072356139043ef9ee974d9efc804ed2d1b9d9",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0171.md": {
+   "gid": 0,
+   "ino": 465348,
+   "mode": "0o600",
+   "mtime_ns": 1792842478924420764,
+   "sha256": "f652f3751afade9d3bc44466bcf29f7a7ec8702251ca7915452a303d1dbe3aec",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0172.md": {
+   "gid": 0,
+   "ino": 465349,
+   "mode": "0o600",
+   "mtime_ns": 1792842478947480926,
+   "sha256": "3c77968c572854f5b7aac18424578e3d0b33d2f117f04a053356736e6a4ca0e2",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0173.md": {
+   "gid": 0,
+   "ino": 465350,
+   "mode": "0o600",
+   "mtime_ns": 1792842478974384449,
+   "sha256": "56d7ed389818b65b5d7861500dd658ba71eb820d63f6416ab47ede42de40cd04",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0174.md": {
+   "gid": 0,
+   "ino": 465351,
+   "mode": "0o600",
+   "mtime_ns": 1792842479001287973,
+   "sha256": "4ce1b4222614bedf4c492d419d907a677adb6b6c5ac485bec4b090bb5e4c0243",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0175.md": {
+   "gid": 0,
+   "ino": 465352,
+   "mode": "0o600",
+   "mtime_ns": 1792842479024348138,
+   "sha256": "9ff77f1d0a5a4bfd36c9c07d6c84063d3ef26f55357b146a8ccd6be5f3917605",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0176.md": {
+   "gid": 0,
+   "ino": 465353,
+   "mode": "0o600",
+   "mtime_ns": 1792842479051251662,
+   "sha256": "14e9069639d91ac97372511811899f095ab2b84cefb6ba671827fb659aeb4eca",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0177.md": {
+   "gid": 0,
+   "ino": 465354,
+   "mode": "0o600",
+   "mtime_ns": 1792842479081998543,
+   "sha256": "63d9cf6f5a98fdd30ae867d14c8453bc04dea4c2e93f6687f91d17b8b4243da9",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0178.md": {
+   "gid": 0,
+   "ino": 465355,
+   "mode": "0o600",
+   "mtime_ns": 1792842479108902069,
+   "sha256": "7a476f1872e8b241ea4fc0b39de925f623d9c1db28fa3d5b108d4cb96ebcab8d",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0179.md": {
+   "gid": 0,
+   "ino": 465356,
+   "mode": "0o600",
+   "mtime_ns": 1792842479131962230,
+   "sha256": "123625de845388420166da83536cb137e9ee98b61b6baca57a892db6772a1f97",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0180.md": {
+   "gid": 0,
+   "ino": 465357,
+   "mode": "0o600",
+   "mtime_ns": 1792842479155022393,
+   "sha256": "1264f74c2866d3f7fec37ace3bccf5a7e8734283e81423db76e6e3b304ad938e",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0181.md": {
+   "gid": 0,
+   "ino": 465358,
+   "mode": "0o600",
+   "mtime_ns": 1792842479178082556,
+   "sha256": "81a5f7dceb0e12d7ea7954e099155b3227a55035d716baf0734131d499c7e3c0",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0182.md": {
+   "gid": 0,
+   "ino": 465359,
+   "mode": "0o600",
+   "mtime_ns": 1792842479201142720,
+   "sha256": "721634e897ff26ae5642213766a54119043590bbf6fb7e68d6f5ab4997ef1fe9",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0183.md": {
+   "gid": 0,
+   "ino": 465360,
+   "mode": "0o600",
+   "mtime_ns": 1792842479231889603,
+   "sha256": "7122b09c42fb230735ce06c871299ab6a8b70fc391a02ae475bc02a9a016836a",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0184.md": {
+   "gid": 0,
+   "ino": 465361,
+   "mode": "0o600",
+   "mtime_ns": 1792842479278009926,
+   "sha256": "444753133213266aac28d37e309ddbcec32bbcfcc7668507f6fcaacd99727afc",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0185.md": {
+   "gid": 0,
+   "ino": 465362,
+   "mode": "0o600",
+   "mtime_ns": 1792842479301070091,
+   "sha256": "7bf91843d2cc561d85ea23c67595993a9b3b6b395f66e09243d882dec82e6b49",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0186.md": {
+   "gid": 0,
+   "ino": 465363,
+   "mode": "0o600",
+   "mtime_ns": 1792842479320286894,
+   "sha256": "f0ea3561d9263ee55cb7f2a59e00999585a03edce5c3948f967b85f246e50732",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0187.md": {
+   "gid": 0,
+   "ino": 465364,
+   "mode": "0o600",
+   "mtime_ns": 1792842479339503697,
+   "sha256": "b908713dba442818d0d8fd876691a689d9dfd8bb7f444d1c8a99cc914658e61e",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0188.md": {
+   "gid": 0,
+   "ino": 465365,
+   "mode": "0o600",
+   "mtime_ns": 1792842479362563857,
+   "sha256": "df6c73287a6730c3c7c71dabd5c2d952f7d8453b98ee2c20a9a41bac9daccbcc",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0189.md": {
+   "gid": 0,
+   "ino": 465366,
+   "mode": "0o600",
+   "mtime_ns": 1792842479381780662,
+   "sha256": "0feb2ce0459bf034babb5630892b5666d4a3d2606984bd39c4665d9d5ed5c186",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0190.md": {
+   "gid": 0,
+   "ino": 465367,
+   "mode": "0o600",
+   "mtime_ns": 1792842479404840823,
+   "sha256": "a4afd709ff273fe8525e64a2f2fb7dd616924786bf839fcc86041f6b9f3fb964",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0191.md": {
+   "gid": 0,
+   "ino": 465368,
+   "mode": "0o600",
+   "mtime_ns": 1792842479424057626,
+   "sha256": "896398d6770402525b467275cda06a9314ba9553153374f442f0487369b54eeb",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0192.md": {
+   "gid": 0,
+   "ino": 465369,
+   "mode": "0o600",
+   "mtime_ns": 1792842479450961149,
+   "sha256": "439f2e67dab55fc8a5cffdb8d5f8641ba3b44c8ab43bfc48eaf0f1019a10d59d",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0193.md": {
+   "gid": 0,
+   "ino": 465370,
+   "mode": "0o600",
+   "mtime_ns": 1792842479481708031,
+   "sha256": "4b605b5315d4e463e7ea2980ada47ae0dcc5731a69e8c629c1b8a85fad75250a",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0194.md": {
+   "gid": 0,
+   "ino": 465371,
+   "mode": "0o600",
+   "mtime_ns": 1792842479508611556,
+   "sha256": "c0bd7a68ff79f9429de7b29714633bac93c6a6649879c53a6a6a6eb2b5c19c40",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0195.md": {
+   "gid": 0,
+   "ino": 465372,
+   "mode": "0o600",
+   "mtime_ns": 1792842479547045160,
+   "sha256": "97ad59183861244e487f957daab71477fabf9c46198f2aaa1b03777d1ab0adcb",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0196.md": {
+   "gid": 0,
+   "ino": 465373,
+   "mode": "0o600",
+   "mtime_ns": 1792842479597008846,
+   "sha256": "316c9f83e9a7068d62a8e6cc9eb3dc0d6ee45d2362e50cade8ff6e91d9de9f88",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0197.md": {
+   "gid": 0,
+   "ino": 465374,
+   "mode": "0o600",
+   "mtime_ns": 1792842479639285810,
+   "sha256": "a7c383f2cfb9e40b4f51ca81d9a670c6af358e87a718def3c6870eb9c3cfd459",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0198.md": {
+   "gid": 0,
+   "ino": 465375,
+   "mode": "0o600",
+   "mtime_ns": 1792842479666189336,
+   "sha256": "343e84c00c851ef15c2e671a3ab5afb37a39729c99b3c3e29a0f280d290c10ca",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/managed/file-0199.md": {
+   "gid": 0,
+   "ino": 465376,
+   "mode": "0o600",
+   "mtime_ns": 1792842479696936217,
+   "sha256": "baecc5e8499ece3cc70051f7f7c179e63799affa984ec7981728486330d83063",
+   "size": 262144,
+   "type": "file",
+   "uid": 0
+  },
+  "exp01_setup/replace-me.txt": {
+   "gid": 0,
+   "ino": 465377,
+   "mode": "0o600",
+   "mtime_ns": 1792842479723839739,
+   "sha256": "4aef9cdd97a26948d50df2b648b6e077ec627ca26053ee73f875b135ed3098dd",
+   "size": 33,
+   "type": "file",
+   "uid": 0
+  },
+  "gfx": {
+   "gid": 0,
+   "ino": 464876,
+   "mode": "0o755",
+   "mtime_ns": 1792842435729988477,
+   "type": "dir",
+   "uid": 0
+  },
+  "gfx/exp01_custom_asset.bin": {
+   "gid": 0,
+   "ino": 464877,
+   "mode": "0o644",
+   "mtime_ns": 1792842435695403676,
+   "sha256": "36683e7e7f053b1fd71e0705431a6a9fe66d9cfea33e7af795678c94b2867198",
+   "size": 4096,
+   "type": "file",
+   "uid": 0
+  },
+  "gfx/exp01_scratch.tmp": {
+   "gid": 0,
+   "ino": 464924,
+   "mode": "0o644",
+   "mtime_ns": 1792842435729988477,
+   "sha256": "57f21ea0f4ffde511211240a89a46ab14a678f4eb9b9b06e58a7453f175de923",
+   "size": 14,
+   "type": "file",
+   "uid": 0
+  },
+  "localisation": {
+   "gid": 0,
+   "ino": 464851,
+   "mode": "0o755",
+   "mtime_ns": 1792842435610863049,
+   "type": "dir",
+   "uid": 0
+  },
+  "localisation/english": {
+   "gid": 0,
+   "ino": 464866,
+   "mode": "0o755",
+   "mtime_ns": 1792842435618548561,
+   "type": "dir",
+   "uid": 0
+  },
+  "localisation/english/exp01_synthetic_l_english.yml": {
+   "gid": 0,
+   "ino": 464867,
+   "mode": "0o644",
+   "mtime_ns": 1792842435726145721,
+   "sha256": "1165cde97bdfdb5b290243d66f3080418cc615fa6905fa28cc5d2e545e0b9ef9",
+   "size": 232,
+   "type": "file",
+   "uid": 0
+  },
+  "notes": {
+   "gid": 0,
+   "ino": 464874,
+   "mode": "0o755",
+   "mtime_ns": 1792842435656976119,
+   "type": "dir",
+   "uid": 0
+  },
+  "notes/untracked-idea.txt": {
+   "gid": 0,
+   "ino": 464875,
+   "mode": "0o644",
+   "mtime_ns": 1792842435656976119,
+   "sha256": "6154623546a517d6b2494bd395238f9dc51d2252e420dc982e3a5c948f07991c",
+   "size": 75,
+   "type": "file",
+   "uid": 0
+  },
+  "tools": {
+   "gid": 0,
+   "ino": 464872,
+   "mode": "0o755",
+   "mtime_ns": 1792842435649290607,
+   "type": "dir",
+   "uid": 0
+  },
+  "tools/exp01_check.sh": {
+   "gid": 0,
+   "ino": 464873,
+   "mode": "0o755",
+   "mtime_ns": 1792842435649290607,
+   "sha256": "f4150d93671607a05a5ca4aa06e32bc88fa77dce412ea6e1c62beea98782043e",
+   "size": 106,
+   "type": "file",
+   "uid": 0
+  }
+ },
+ "entry_count": 304,
+ "file_count": 256,
+ "git": {
+  "head": {
+   "exit": 0,
+   "stdout": "5ea60f0b46e9bf0548ab43ef0048b0a0c46c77a4\n"
+  },
+  "index_sha256": "4ba91e9d7568c0474df5e0a990dd1e6484bb987f6f0d9d26523e38da64e79fab",
+  "ls_files_stage": {
+   "exit": 0,
+   "stdout": "100644 3a5113c476b5dfde5205bc0043c94fa365399c7d 0\t.agents/skills/exp01-custom/SKILL.md\n100644 fe15b2337f215e46b8bed9022bca8024aa2d4bc0 0\tAGENTS.md\n100644 4406f25d6079db59aa75274148435e362844b6b6 0\tREADME.md\n100644 0ac67f35b10b5e1e16b1a82edeadeba30b1d8f99 0\tcommon/national_focus/exp01_synthetic_focus.txt\n100644 b0deddd2981cd4d568357a78e4b78f7a7245a4cd 0\tdescriptor.mod\n100644 523b1b14b673b866a9d853fa7ce27775f69a9c68 0\texp01_setup/replace-me.txt\n100644 c75c47375519928c5d6b45317e01b424b90292ea 0\tgfx/exp01_custom_asset.bin\n100644 18d69e828bc2c112c112a4b320d827c4fd20fbee 0\tlocalisation/english/exp01_synthetic_l_english.yml\n100755 72021abdf85b41f318f04646717101a46497942e 0\ttools/exp01_check.sh\n"
+  },
+  "status_porcelain_v2": {
+   "exit": 0,
+   "stdout": "1 .M N... 100644 100644 100644 4406f25d6079db59aa75274148435e362844b6b6 4406f25d6079db59aa75274148435e362844b6b6 README.md\n1 .M N... 100644 100644 100644 523b1b14b673b866a9d853fa7ce27775f69a9c68 523b1b14b673b866a9d853fa7ce27775f69a9c68 exp01_setup/replace-me.txt\n1 M. N... 100644 100644 100644 139958890cdbee81d76b2625f0bb66cb30be2196 18d69e828bc2c112c112a4b320d827c4fd20fbee localisation/english/exp01_synthetic_l_english.yml\n? .hoi4-mod-setup/install.lock.json\n? exp01_setup/managed/file-0000.md\n? exp01_setup/managed/file-0001.md\n? exp01_setup/managed/file-0002.md\n? exp01_setup/managed/file-0003.md\n? exp01_setup/managed/file-0004.md\n? exp01_setup/managed/file-0005.md\n? exp01_setup/managed/file-0006.md\n? exp01_setup/managed/file-0007.md\n? exp01_setup/managed/file-0008.md\n? exp01_setup/managed/file-0009.md\n? exp01_setup/managed/file-0010.md\n? exp01_setup/managed/file-0011.md\n? exp01_setup/managed/file-0012.md\n? exp01_setup/managed/file-0013.md\n? exp01_setup/managed/file-0014.md\n? exp01_setup/managed/file-0015.md\n? exp01_setup/managed/file-0016.md\n? exp01_setup/managed/file-0017.md\n? exp01_setup/managed/file-0018.md\n? exp01_setup/managed/file-0019.md\n? exp01_setup/managed/file-0020.md\n? exp01_setup/managed/file-0021.md\n? exp01_setup/managed/file-0022.md\n? exp01_setup/managed/file-0023.md\n? exp01_setup/managed/file-0024.md\n? exp01_setup/managed/file-0025.md\n? exp01_setup/managed/file-0026.md\n? exp01_setup/managed/file-0027.md\n? exp01_setup/managed/file-0028.md\n? exp01_setup/managed/file-0029.md\n? exp01_setup/managed/file-0030.md\n? exp01_setup/managed/file-0031.md\n? exp01_setup/managed/file-0032.md\n? exp01_setup/managed/file-0033.md\n? exp01_setup/managed/file-0034.md\n? exp01_setup/managed/file-0035.md\n? exp01_setup/managed/file-0036.md\n? exp01_setup/managed/file-0037.md\n? exp01_setup/managed/file-0038.md\n? exp01_setup/managed/file-0039.md\n? exp01_setup/managed/file-0040.md\n? exp01_setup/managed/file-0041.md\n? exp01_setup/managed/file-0042.md\n? exp01_setup/managed/file-0043.md\n? exp01_setup/managed/file-0044.md\n? exp01_setup/managed/file-0045.md\n? exp01_setup/managed/file-0046.md\n? exp01_setup/managed/file-0047.md\n? exp01_setup/managed/file-0048.md\n? exp01_setup/managed/file-0049.md\n? exp01_setup/managed/file-0050.md\n? exp01_setup/managed/file-0051.md\n? exp01_setup/managed/file-0052.md\n? exp01_setup/managed/file-0053.md\n? exp01_setup/managed/file-0054.md\n? exp01_setup/managed/file-0055.md\n? exp01_setup/managed/file-0056.md\n? exp01_setup/managed/file-0057.md\n? exp01_setup/managed/file-0058.md\n? exp01_setup/managed/file-0059.md\n? exp01_setup/managed/file-0060.md\n? exp01_setup/managed/file-0061.md\n? exp01_setup/managed/file-0062.md\n? exp01_setup/managed/file-0063.md\n? exp01_setup/managed/file-0064.md\n? exp01_setup/managed/file-0065.md\n? exp01_setup/managed/file-0066.md\n? exp01_setup/managed/file-0067.md\n? exp01_setup/managed/file-0068.md\n? exp01_setup/managed/file-0069.md\n? exp01_setup/managed/file-0070.md\n? exp01_setup/managed/file-0071.md\n? exp01_setup/managed/file-0072.md\n? exp01_setup/managed/file-0073.md\n? exp01_setup/managed/file-0074.md\n? exp01_setup/managed/file-0075.md\n? exp01_setup/managed/file-0076.md\n? exp01_setup/managed/file-0077.md\n? exp01_setup/managed/file-0078.md\n? exp01_setup/managed/file-0079.md\n? exp01_setup/managed/file-0080.md\n? exp01_setup/managed/file-0081.md\n? exp01_setup/managed/file-0082.md\n? exp01_setup/managed/file-0083.md\n? exp01_setup/managed/file-0084.md\n? exp01_setup/managed/file-0085.md\n? exp01_setup/managed/file-0086.md\n? exp01_setup/managed/file-0087.md\n? exp01_setup/managed/file-0088.md\n? exp01_setup/managed/file-0089.md\n? exp01_setup/managed/file-0090.md\n? exp01_setup/managed/file-0091.md\n? exp01_setup/managed/file-0092.md\n? exp01_setup/managed/file-0093.md\n? exp01_setup/managed/file-0094.md\n? exp01_setup/managed/file-0095.md\n? exp01_setup/managed/file-0096.md\n? exp01_setup/managed/file-0097.md\n? exp01_setup/managed/file-0098.md\n? exp01_setup/managed/file-0099.md\n? exp01_setup/managed/file-0100.md\n? exp01_setup/managed/file-0101.md\n? exp01_setup/managed/file-0102.md\n? exp01_setup/managed/file-0103.md\n? exp01_setup/managed/file-0104.md\n? exp01_setup/managed/file-0105.md\n? exp01_setup/managed/file-0106.md\n? exp01_setup/managed/file-0107.md\n? exp01_setup/managed/file-0108.md\n? exp01_setup/managed/file-0109.md\n? exp01_setup/managed/file-0110.md\n? exp01_setup/managed/file-0111.md\n? exp01_setup/managed/file-0112.md\n? exp01_setup/managed/file-0113.md\n? exp01_setup/managed/file-0114.md\n? exp01_setup/managed/file-0115.md\n? exp01_setup/managed/file-0116.md\n? exp01_setup/managed/file-0117.md\n? exp01_setup/managed/file-0118.md\n? exp01_setup/managed/file-0119.md\n? exp01_setup/managed/file-0120.md\n? exp01_setup/managed/file-0121.md\n? exp01_setup/managed/file-0122.md\n? exp01_setup/managed/file-0123.md\n? exp01_setup/managed/file-0124.md\n? exp01_setup/managed/file-0125.md\n? exp01_setup/managed/file-0126.md\n? exp01_setup/managed/file-0127.md\n? exp01_setup/managed/file-0128.md\n? exp01_setup/managed/file-0129.md\n? exp01_setup/managed/file-0130.md\n? exp01_setup/managed/file-0131.md\n? exp01_setup/managed/file-0132.md\n? exp01_setup/managed/file-0133.md\n? exp01_setup/managed/file-0134.md\n? exp01_setup/managed/file-0135.md\n? exp01_setup/managed/file-0136.md\n? exp01_setup/managed/file-0137.md\n? exp01_setup/managed/file-0138.md\n? exp01_setup/managed/file-0139.md\n? exp01_setup/managed/file-0140.md\n? exp01_setup/managed/file-0141.md\n? exp01_setup/managed/file-0142.md\n? exp01_setup/managed/file-0143.md\n? exp01_setup/managed/file-0144.md\n? exp01_setup/managed/file-0145.md\n? exp01_setup/managed/file-0146.md\n? exp01_setup/managed/file-0147.md\n? exp01_setup/managed/file-0148.md\n? exp01_setup/managed/file-0149.md\n? exp01_setup/managed/file-0150.md\n? exp01_setup/managed/file-0151.md\n? exp01_setup/managed/file-0152.md\n? exp01_setup/managed/file-0153.md\n? exp01_setup/managed/file-0154.md\n? exp01_setup/managed/file-0155.md\n? exp01_setup/managed/file-0156.md\n? exp01_setup/managed/file-0157.md\n? exp01_setup/managed/file-0158.md\n? exp01_setup/managed/file-0159.md\n? exp01_setup/managed/file-0160.md\n? exp01_setup/managed/file-0161.md\n? exp01_setup/managed/file-0162.md\n? exp01_setup/managed/file-0163.md\n? exp01_setup/managed/file-0164.md\n? exp01_setup/managed/file-0165.md\n? exp01_setup/managed/file-0166.md\n? exp01_setup/managed/file-0167.md\n? exp01_setup/managed/file-0168.md\n? exp01_setup/managed/file-0169.md\n? exp01_setup/managed/file-0170.md\n? exp01_setup/managed/file-0171.md\n? exp01_setup/managed/file-0172.md\n? exp01_setup/managed/file-0173.md\n? exp01_setup/managed/file-0174.md\n? exp01_setup/managed/file-0175.md\n? exp01_setup/managed/file-0176.md\n? exp01_setup/managed/file-0177.md\n? exp01_setup/managed/file-0178.md\n? exp01_setup/managed/file-0179.md\n? exp01_setup/managed/file-0180.md\n? exp01_setup/managed/file-0181.md\n? exp01_setup/managed/file-0182.md\n? exp01_setup/managed/file-0183.md\n? exp01_setup/managed/file-0184.md\n? exp01_setup/managed/file-0185.md\n? exp01_setup/managed/file-0186.md\n? exp01_setup/managed/file-0187.md\n? exp01_setup/managed/file-0188.md\n? exp01_setup/managed/file-0189.md\n? exp01_setup/managed/file-0190.md\n? exp01_setup/managed/file-0191.md\n? exp01_setup/managed/file-0192.md\n? exp01_setup/managed/file-0193.md\n? exp01_setup/managed/file-0194.md\n? exp01_setup/managed/file-0195.md\n? exp01_setup/managed/file-0196.md\n? exp01_setup/managed/file-0197.md\n? exp01_setup/managed/file-0198.md\n? exp01_setup/managed/file-0199.md\n? gfx/exp01_scratch.tmp\n? notes/untracked-idea.txt\n"
+  }
+ },
+ "root": "/runs/control-ready-fixed/none-1/workspaces/acct-a/project",
+ "tool": "probes/setup/inventory.py"
+}

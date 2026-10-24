@@ -1,0 +1,53 @@
+{
+ "before": "C:/Users/klimp/Documents/Projects/hoi4-factory/.work/exp01/runs-win/unpatched/apply-14/before.json",
+ "after": "C:/Users/klimp/Documents/Projects/hoi4-factory/.work/exp01/runs-win/unpatched/apply-14/after.json",
+ "approved_prefixes": [
+  "exp01_setup/managed",
+  "exp01_setup/replace-me.txt",
+  ".hoi4-mod-setup"
+ ],
+ "unapproved": {
+  "changed": [],
+  "mode_changed": [],
+  "added": [],
+  "removed": [],
+  "metadata_only": []
+ },
+ "approved": {
+  "changed": [],
+  "added": [
+   {
+    "path": "exp01_setup/managed",
+    "type": "dir",
+    "size": null,
+    "sha256": null
+   },
+   {
+    "path": "exp01_setup/managed/.hoi4ms-2ef36462-dd4f-4aa4-8021-0bcaeabd15c7.tmp",
+    "type": "file",
+    "size": 106496,
+    "sha256": "23eb0e91bfef18b7a7317d6b86188303ea1e695c7247d572002de07dd86437a1"
+   }
+  ],
+  "removed": []
+ },
+ "all": {
+  "added_files": [
+   "exp01_setup/managed/.hoi4ms-2ef36462-dd4f-4aa4-8021-0bcaeabd15c7.tmp"
+  ],
+  "added_dirs": [
+   "exp01_setup/managed"
+  ],
+  "removed": [],
+  "content_changed": []
+ },
+ "unapproved_bytes_untouched": true,
+ "exact_files": false,
+ "exact_files_and_dirs": false,
+ "git_index_sha256": {
+  "before": "425f3bb795680414b0224ef94a584d765f33ad2b9354dcb146f6e5754bbeceb9",
+  "after": "425f3bb795680414b0224ef94a584d765f33ad2b9354dcb146f6e5754bbeceb9"
+ },
+ "git_status_identical": false,
+ "git_ls_files_identical": true
+}

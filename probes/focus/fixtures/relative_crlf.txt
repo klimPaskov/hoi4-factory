@@ -1,0 +1,39 @@
+# EXP-02 synthetic fixture: relative positions
+focus_tree = {
+	id = exp_rel_tree
+	default = no
+
+	focus = {
+		id = exp_r_anchor
+		icon = GFX_exp_icon_r_anchor
+		x = 5
+		y = 0
+		cost = 10
+		ai_will_do = { factor = 1 }
+		completion_reward = { add_political_power = 10 }
+	}
+
+	focus = {
+		id = exp_r_child
+		icon = GFX_exp_icon_r_child
+		prerequisite = { focus = exp_r_anchor }
+		relative_position_id = exp_r_anchor
+		x = -1
+		y = 1
+		cost = 5
+		ai_will_do = { factor = 1 }
+		completion_reward = { add_stability = 0.01 }
+	}
+
+	focus = {
+		id = exp_r_grandchild
+		icon = GFX_exp_icon_r_grandchild
+		prerequisite = { focus = exp_r_child }
+		relative_position_id = exp_r_child
+		x = 0
+		y = 1
+		cost = 5
+		ai_will_do = { factor = 1 }
+		completion_reward = { add_war_support = 0.01 }
+	}
+}

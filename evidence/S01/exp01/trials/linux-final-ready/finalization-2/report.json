@@ -1,0 +1,29 @@
+{
+  "elapsed_ms": 80183,
+  "hoi4ms_leftovers_after_kill": [],
+  "hoi4ms_leftovers_after_recovery": [],
+  "kill": "finalization",
+  "killed_at": "not_killed",
+  "observed_managed": 0,
+  "observed_staged": 0,
+  "ops": 200,
+  "plan_id": "76415e42-1320-414d-808d-4b3308be9e36",
+  "recovery": {
+    "discard_staging_allowed": false,
+    "found": true,
+    "last_checkpoint": "rollback record",
+    "outcome": {
+      "ok": "completed"
+    },
+    "project_apply_started": true,
+    "recommended_action": "resume",
+    "resume_allowed": true,
+    "rollback_allowed": true,
+    "state_before": "finalizing",
+    "transaction_id": "76415e42-1320-414d-808d-4b3308be9e36"
+  },
+  "size": 262144,
+  "worker_exit_code": null,
+  "worker_exit_success": false,
+  "worker_result": "EXP01_WORKER_RESULT none"
+}

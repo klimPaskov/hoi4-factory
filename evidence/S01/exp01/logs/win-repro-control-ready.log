@@ -1,0 +1,2 @@
+{"trial": "none-1", "harness_exit": 0, "killed_at": "not_killed", "worker_result": "EXP01_WORKER_RESULT ok state=completed", "worker_exit_code": 0, "recommended_action": null, "state_before": null, "recovery_outcome": null, "leftovers_after_kill": [], "leftovers_after_recovery": [], "unapproved_bytes_untouched": true, "exact_files": false, "added_files": [".hoi4-mod-setup/install.lock.json", "exp0
+exit=0

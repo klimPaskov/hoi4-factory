@@ -24,6 +24,8 @@ EXPECTED_NAMES = {
     "audit-hoi4-integrations",
 }
 CLIENTS = (".claude", ".codex", ".agents")
+# ADR-023: these workflows stay invocable only by the maintainer. The others run automatically.
+MANUAL_ONLY = {"start-implementation-stage", "audit-hoi4-integrations"}
 
 
 def digest(data: bytes) -> str:
@@ -89,7 +91,7 @@ def expected_files() -> tuple[dict[Path, bytes], dict]:
         generated = []
         for client in CLIENTS:
             header = "---\n" + f"name: {name}\n" + f"description: {json.dumps(description, ensure_ascii=False)}\n"
-            if client == ".claude":
+            if client == ".claude" and name in MANUAL_ONLY:
                 header += "disable-model-invocation: true\n"
             header += "---\n\n"
             path = ROOT / client / "skills" / name / "SKILL.md"
@@ -100,7 +102,8 @@ def expected_files() -> tuple[dict[Path, bytes], dict]:
             if client in (".codex", ".agents"):
                 sidecar = path.parent / "agents" / "openai.yaml"
                 assert_owned(sidecar)
-                sidecar_content = b"policy:\n  allow_implicit_invocation: false\n"
+                implicit = "false" if name in MANUAL_ONLY else "true"
+                sidecar_content = f"policy:\n  allow_implicit_invocation: {implicit}\n".encode()
                 outputs[sidecar] = sidecar_content
                 generated.append({"path": sidecar.relative_to(ROOT).as_posix(), "sha256": digest(sidecar_content)})
         records.append({

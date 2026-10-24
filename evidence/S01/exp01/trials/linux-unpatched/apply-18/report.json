@@ -1,0 +1,33 @@
+{
+  "elapsed_ms": 78770,
+  "hoi4ms_leftovers_after_kill": [
+    "exp01_setup/managed/.hoi4ms-493e26d1-c287-46c9-9fea-6480ef104abb.tmp"
+  ],
+  "hoi4ms_leftovers_after_recovery": [
+    "exp01_setup/managed/.hoi4ms-493e26d1-c287-46c9-9fea-6480ef104abb.tmp"
+  ],
+  "kill": "apply",
+  "killed_at": "apply managed_files_seen=1",
+  "observed_managed": 1,
+  "observed_staged": 0,
+  "ops": 200,
+  "plan_id": "d49206fd-d155-4e22-abbe-f1b2bf113f61",
+  "recovery": {
+    "discard_staging_allowed": false,
+    "found": true,
+    "last_checkpoint": "apply-batch-intent-00000-00064",
+    "outcome": {
+      "ok": "rolled_back"
+    },
+    "project_apply_started": true,
+    "recommended_action": "rollback",
+    "resume_allowed": false,
+    "rollback_allowed": true,
+    "state_before": "applying",
+    "transaction_id": "d49206fd-d155-4e22-abbe-f1b2bf113f61"
+  },
+  "size": 262144,
+  "worker_exit_code": null,
+  "worker_exit_success": false,
+  "worker_result": "EXP01_WORKER_RESULT none"
+}

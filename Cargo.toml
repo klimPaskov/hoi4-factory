@@ -1,0 +1,16 @@
+[workspace]
+resolver = "3"
+members = ["crates/server", "crates/agent", "crates/setup-adapter", "probes/runtime"]
+
+[workspace.package]
+version = "0.0.0"
+edition = "2024"
+license = "AGPL-3.0-only"
+repository = "https://github.com/klimPaskov/hoi4-factory"
+publish = false
+
+[workspace.dependencies]
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "signal"] }
+axum = "0.8"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

@@ -203,11 +203,11 @@ def main() -> int:
         tests = read_json("docs/05-verification/test-catalog.json")["tests"]
         req_ids = {r["id"] for r in reqs}
         test_ids = {t["id"] for t in tests}
-        expected = {f"REQ-{i:03d}" for i in range(1,49)}
-        if req_ids != expected or len(reqs) != 48: matrix_errors.append("Requirement inventory is not exactly REQ-001..048")
+        expected = {f"REQ-{i:03d}" for i in range(1,51)}
+        if req_ids != expected or len(reqs) != 50: matrix_errors.append("Requirement inventory is not exactly REQ-001..050")
         if len(test_ids) != len(tests): matrix_errors.append("Duplicate test IDs")
         rows = matrix["requirements"]
-        if {m["requirement"] for m in rows} != expected or len(rows) != 48:
+        if {m["requirement"] for m in rows} != expected or len(rows) != 50:
             matrix_errors.append("Acceptance does not cover each requirement exactly once")
         source = {r["id"]: r for r in reqs}
         for m in rows:
@@ -248,8 +248,11 @@ def main() -> int:
             if name != p.parent.name or not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*",name):
                 skill_errors.append(f"{p.relative_to(root)}: invalid name")
             if not 30 <= len(desc) <= 1024: skill_errors.append(f"{name}: unusable description")
-            if client == ".claude" and values.get("disable-model-invocation") != "true":
-                skill_errors.append(f"{name}: expected explicit Claude invocation")
+            # ADR-023: stage start and integration audits stay maintainer-invoked. Validation and lesson
+            # capture run automatically at handoff.
+            manual = name in {"start-implementation-stage", "audit-hoi4-integrations"}
+            if client == ".claude" and (values.get("disable-model-invocation") == "true") != manual:
+                skill_errors.append(f"{name}: Claude invocation mode differs from ADR-023")
     if "@AGENTS.md" not in (root / "CLAUDE.md").read_text():
         skill_errors.append("CLAUDE does not import AGENTS")
     try:

@@ -23,7 +23,7 @@ Implementation is deferred by the maintainer. The next implementation action, wh
 | Project root | Working-folder README, shared developer instructions and native client configuration |
 | scripts | Planning validator and skill synchronization utilities |
 | docs/00-research | Primary-source audits, exact pins, license/maintenance observations, source coverage and evidence ledgers |
-| docs/01-product | 48 requirements, users, required scenarios, optional visuals/autonomy and traceability |
+| docs/01-product | 50 requirements, users, required scenarios, optional visuals/autonomy and traceability |
 | docs/02-architecture | Maintainer decisions, the selected direction and two research candidates, ADRs, state model, ten contracts, deployment and security |
 | docs/03-subsystem-specs | 13 detailed subsystem specifications with functional, failure, recovery and acceptance behavior |
 | docs/04-implementation-stages | Eight stages, 48 work packets, 47 exit gates and prioritized deferred scope |

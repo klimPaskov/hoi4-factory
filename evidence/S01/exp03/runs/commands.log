@@ -1,0 +1,20 @@
++ cargo build --release --locked -p factory-runtime-probe
+exit=0
++ docker compose -f compose.yaml -f probes/runtime/compose.db-port.yaml up -d --no-deps db
+exit=0
+db ready after 1s
++ target/release/runtime-probe journal --phase reset
+exit=0
++ target/release/runtime-probe broker
+exit=0
++ target/release/runtime-probe faults
+exit=0
++ target/release/runtime-probe journal --phase a
+exit=0
++ docker compose -f compose.yaml -f probes/runtime/compose.db-port.yaml restart db
+exit=0
+db ready after 2s
++ target/release/runtime-probe journal --phase b
+exit=0
++ target/release/runtime-probe worker --live
+exit=0

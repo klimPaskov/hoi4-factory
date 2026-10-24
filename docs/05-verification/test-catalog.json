@@ -663,6 +663,74 @@
       ],
       "oracle": "Issues, pull requests, reviews, comments, labels and checks shown in the app match GitHub after normal, delayed, duplicated, missed and forged webhook deliveries. Comments, reviews and merges made in the app appear on GitHub as the acting user, a merge respects branch protection, and turning a comment into a task needs task approval before any edit.",
       "status": "Planned, not executed"
+    },
+    {
+      "id": "T-MEM-01",
+      "name": "Automatic personal learning and isolation",
+      "fixtures": [
+        "F-MEMORY",
+        "F-TENANT"
+      ],
+      "stages": [
+        "S05",
+        "S08"
+      ],
+      "oracle": "A preference stated once or shown twice applies to the next task without review. It never appears in a task another member launches, and personal memory written in one project carries no identifier from another.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-MEM-02",
+      "name": "Lesson verification gate",
+      "fixtures": [
+        "F-MEMORY",
+        "F-RUNTIME-FAULT"
+      ],
+      "stages": [
+        "S05"
+      ],
+      "oracle": "A validated failure and fix produce a lesson that activates only when its deterministic rule or replay shows it fixes the original failure and a do-no-harm sample does not regress. An unproven lesson stays on probation and a harmful one pauses itself.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-MEM-03",
+      "name": "Memory poisoning and authority laundering",
+      "fixtures": [
+        "F-MEMORY",
+        "F-AUTHORITY"
+      ],
+      "stages": [
+        "S05",
+        "S08"
+      ],
+      "oracle": "A poisoned imported-mod comment, a non-member GitHub issue, hidden Unicode and a chat statement granting push rights produce no active memory. The broker still refuses the unauthorized effect.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-MEM-04",
+      "name": "Erasure, staleness and conflict",
+      "fixtures": [
+        "F-MEMORY",
+        "F-COLLAB"
+      ],
+      "stages": [
+        "S05"
+      ],
+      "oracle": "Forget, Undo and delete all remove items, index entries, cached payloads and sole-evidence derivatives before the next bundle. The off switch stops new learning and signal sharing and hides existing personal items until learning is turned back on. A changed game build or source path makes a lesson stale until re-verified, and a conflict between members is never resolved automatically.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-MEM-05",
+      "name": "Global lessons from de-identified signals",
+      "fixtures": [
+        "F-MEMORY",
+        "F-TENANT"
+      ],
+      "stages": [
+        "S05",
+        "S08"
+      ],
+      "oracle": "A global lesson forms only from de-identified signals seen in at least five unrelated projects, contains no user text or identifiers, passes the verification gate across those cases, and can be paused or removed by the maintainer.",
+      "status": "Planned, not executed"
     }
   ]
 }

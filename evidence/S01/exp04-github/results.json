@@ -1,0 +1,129 @@
+{
+  "probe": "S01 GitHub App on disposable repository",
+  "app": {
+    "id": 5453675,
+    "slug": "hoi4-factory-dev",
+    "permissions": {
+      "contents": "write",
+      "pull_requests": "write",
+      "issues": "write",
+      "checks": "read",
+      "statuses": "read",
+      "metadata": "read"
+    },
+    "events": [],
+    "created_at": "2026-10-24T10:06:41Z"
+  },
+  "repository": "klimPaskov/hoi4-factory-test-mod",
+  "evidence_kind": "live GitHub API and Git transport",
+  "secrets_recorded": false,
+  "results": [
+    {
+      "check": "app_installation_present",
+      "passed": true,
+      "http": 200,
+      "installations": 1
+    },
+    {
+      "check": "installation_is_selected_repositories_only",
+      "passed": true,
+      "repository_selection": "selected"
+    },
+    {
+      "check": "installation_token_minted",
+      "passed": true,
+      "http": 201,
+      "token_prefix": "ghs_",
+      "expires_at": "2026-10-24T11:07:26Z",
+      "granted_permissions": {
+        "checks": "read",
+        "contents": "write",
+        "issues": "write",
+        "metadata": "read",
+        "pull_requests": "write",
+        "statuses": "read"
+      },
+      "repositories": [
+        "klimPaskov/hoi4-factory-test-mod"
+      ],
+      "installation_repository_selection": "selected"
+    },
+    {
+      "check": "installation_scope_is_probe_repo_only",
+      "passed": true,
+      "http": 200,
+      "repositories": [
+        "klimPaskov/hoi4-factory-test-mod"
+      ]
+    },
+    {
+      "check": "token_cannot_reach_other_private_repository",
+      "passed": true,
+      "read_http": 404,
+      "write_http": 404
+    },
+    {
+      "check": "read_contents",
+      "passed": true,
+      "http": 200,
+      "sha": "e0994020f97e8760ebf03f8c1fd7dfa36a21875b"
+    },
+    {
+      "check": "push_owned_branch_and_reconcile_ref",
+      "passed": true,
+      "push_exit": 0,
+      "remote_matches_local": true,
+      "token_absent_from_git_config": true
+    },
+    {
+      "check": "pushed_bytes_preserved_crlf",
+      "passed": true,
+      "sha256_local": "766cb9e702d39180f97eaeefa47afb0d21bfbf007d37a69ded0e359ce74bd0fd",
+      "sha256_remote": "766cb9e702d39180f97eaeefa47afb0d21bfbf007d37a69ded0e359ce74bd0fd"
+    },
+    {
+      "check": "pull_request_lost_reply_reconciled_without_duplicate",
+      "passed": true,
+      "found_after_lost_reply": 1,
+      "duplicate_attempt_http": 422,
+      "duplicate_message": "A pull request already exists for klimPaskov:s01-probe-1792836448."
+    },
+    {
+      "check": "pull_request_diff_readable",
+      "passed": true,
+      "http": 200
+    },
+    {
+      "check": "pull_request_review_with_line_comment",
+      "passed": true,
+      "http": 200,
+      "review_author_type": "Bot"
+    },
+    {
+      "check": "check_runs_readable",
+      "passed": true,
+      "http": 200,
+      "total": 0
+    },
+    {
+      "check": "merge_with_expected_head_and_idempotent_reconcile",
+      "passed": true,
+      "merged": true,
+      "second_merge_http": 200,
+      "squash_commits_for_pr": 1
+    },
+    {
+      "check": "issue_create_comment_label_close_reopen",
+      "passed": true,
+      "http": [
+        201,
+        201,
+        200,
+        200,
+        200
+      ],
+      "author_type": "Bot",
+      "author_login": "hoi4-factory-dev[bot]"
+    }
+  ]
+}

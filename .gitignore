@@ -1,0 +1,6 @@
+# Disposable probe clones, build output and local secrets
+.work/
+target/
+node_modules/
+.env
+.env.*

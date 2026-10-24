@@ -1,0 +1,21 @@
+{
+ "byte_total": 46,
+ "content_digest": "888adf1c10403b84018b310720d5de104594b590b451f5550b3962d2b8d569a5",
+ "entries": {
+  "canary.txt": {
+   "gid": 0,
+   "ino": 377772,
+   "mode": "0o644",
+   "mtime_ns": 1792835983103951458,
+   "sha256": "3f52b2eedbc0226e690f0ea7064643a6bc7ed4932d005075e7cbd340bf4760fc",
+   "size": 46,
+   "type": "file",
+   "uid": 0
+  }
+ },
+ "entry_count": 1,
+ "file_count": 1,
+ "git": null,
+ "root": "/srv/hoi4f/outside",
+ "tool": "probes/setup/inventory.py"
+}

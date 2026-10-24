@@ -1,0 +1,31 @@
+{
+  "elapsed_ms": 26823,
+  "hoi4ms_leftovers_after_kill": [
+    "exp01_setup/managed/.hoi4ms-quarantine-5a80c4c211414609a426abc009d4da79-rollback-exp01-create-0080.tmp"
+  ],
+  "hoi4ms_leftovers_after_recovery": [],
+  "kill": "recover_only",
+  "killed_at": "recover_only",
+  "observed_managed": 0,
+  "observed_staged": 0,
+  "ops": 200,
+  "plan_id": "6ab1118c-9e00-4f50-9ac5-87fba1c1f93d",
+  "recovery": {
+    "discard_staging_allowed": false,
+    "found": true,
+    "last_checkpoint": "rollback-exp01-create-0080",
+    "outcome": {
+      "ok": "rolled_back"
+    },
+    "project_apply_started": true,
+    "recommended_action": "rollback",
+    "resume_allowed": false,
+    "rollback_allowed": true,
+    "state_before": "rolling_back",
+    "transaction_id": "cf34429c-ccbf-4652-aa3c-05180240d874"
+  },
+  "size": 262144,
+  "worker_exit_code": null,
+  "worker_exit_success": true,
+  "worker_result": "EXP01_WORKER_RESULT not_started"
+}

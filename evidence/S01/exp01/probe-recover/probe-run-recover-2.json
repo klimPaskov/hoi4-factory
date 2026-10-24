@@ -1,0 +1,141 @@
+{
+  "apply_without_analysis": {
+    "app_root_created": false,
+    "error": "credential error: a confirmed selected-provider analysis is required before apply",
+    "refused": true
+  },
+  "confinement": [
+    {
+      "detail": "traversal or non-normal component refused",
+      "input": "../outside",
+      "refused": true
+    },
+    {
+      "detail": "absolute or backslash path refused",
+      "input": "/etc",
+      "refused": true
+    },
+    {
+      "detail": "traversal or non-normal component refused",
+      "input": "acct-a/../../etc",
+      "refused": true
+    },
+    {
+      "detail": null,
+      "input": "acct-a/escape-link",
+      "refused": false
+    },
+    {
+      "detail": null,
+      "input": "acct-a/escape-link/passwd",
+      "refused": false
+    }
+  ],
+  "plan": {
+    "desktop_build_plan_reachable": false,
+    "reason": "hoi4_mod_setup::commands is #[cfg(feature = \"desktop\")] and private; build_plan, approve_scan_evidence, confirm_codex_analysis and the prepared-plan store live there",
+    "validate_plan_without_analysis": {
+      "refused": "credential error: a confirmed selected-provider analysis is required before apply"
+    }
+  },
+  "probe": "exp01-setup-probe",
+  "project_root": "/srv/hoi4f/workspaces/acct-a/project2",
+  "recovery_fresh": {
+    "incomplete": null,
+    "ok": true
+  },
+  "recovery_interrupted": {
+    "project_apply_started": true,
+    "recommended_action": "rollback",
+    "resume_allowed": false,
+    "rollback": {
+      "ok": "rolled_back"
+    },
+    "rollback_allowed": true,
+    "state": "applying",
+    "transaction_id": "1d5c0b87-2b73-4704-baf5-d11cdcba54e6"
+  },
+  "scan": {
+    "bytes_read": 1671,
+    "cancelled": false,
+    "conflicts": [
+      {
+        "details": "Existing managed content will be compared by hash before update.",
+        "id": "conflict..agents.skills",
+        "kind": "managed_file_exists",
+        "path": ".agents/skills",
+        "severity": "warn"
+      },
+      {
+        "details": "Existing project instructions require a three-way merge or explicit keep decision.",
+        "id": "conflict.agents",
+        "kind": "managed_file_exists",
+        "path": "AGENTS.md",
+        "severity": "warn"
+      },
+      {
+        "details": "Git metadata exists, but bounded status evidence was incomplete; review before maintenance.",
+        "id": "scan.git.inspection",
+        "kind": "other",
+        "path": "@scan/git-summary",
+        "severity": "warn"
+      }
+    ],
+    "detected": [
+      {
+        "key": "display_name",
+        "reason": "The name field of descriptor.mod.",
+        "value": "EXP01 Synthetic Import Fixture"
+      },
+      {
+        "key": "descriptor_tags",
+        "reason": "The tags field of descriptor.mod.",
+        "value": [
+          "Alternative History",
+          "Gameplay"
+        ]
+      },
+      {
+        "key": "localisation_convention",
+        "reason": "Language headers and encodings of the sampled localisation files.",
+        "value": "english; UTF-8 with BOM; versioned keys such as key:0"
+      },
+      {
+        "key": "folder_profile",
+        "reason": "Content folders that already hold game files.",
+        "value": [
+          "common/national_focus",
+          "localisation"
+        ]
+      },
+      {
+        "key": "documentation_convention",
+        "reason": "The documentation files found in the project.",
+        "value": "A README at the project root"
+      }
+    ],
+    "directories_scanned": 4,
+    "files_scanned": 4,
+    "findings": 19,
+    "limits_hit": [],
+    "ok": true,
+    "partial": false,
+    "read_only": true,
+    "scan_id": "e3f074ea-4f1b-4ffc-b677-c9c7a98e2da0",
+    "semantic_analysis": {
+      "analysis_id": null,
+      "auth_mode": "chatgpt",
+      "engine": "codex_app_server",
+      "input_manifest": [],
+      "model": null,
+      "output_schema_id": "codex-analysis/1.0.0",
+      "requested": true,
+      "required": true,
+      "response_sha256": null,
+      "status": "authentication_required",
+      "suggestions": [],
+      "transport": "stdio_jsonl"
+    }
+  },
+  "workspace_root": "/srv/hoi4f/workspaces"
+}

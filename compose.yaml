@@ -1,0 +1,33 @@
+# HOI4 Factory development services. S01 skeleton: server and PostgreSQL only.
+name: hoi4-factory
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: docker/server.Dockerfile
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      FACTORY_LISTEN: "0.0.0.0:8080"
+      DATABASE_URL: "postgres://factory@db:5432/factory"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:17.6-bookworm@sha256:f3bd19c606e442c3d7bdfa8002e03fe260a1023351e0ea4598032022b68dd6e3
+    environment:
+      POSTGRES_USER: factory
+      POSTGRES_DB: factory
+      # Development only. The database port is not published outside the Compose network.
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "factory"]
+      interval: 2s
+      retries: 30
+
+volumes:
+  db-data:

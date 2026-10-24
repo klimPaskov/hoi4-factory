@@ -1,0 +1,317 @@
+Candidate acceptance (recovery)	UNKNOWN STEP	﻿2026-10-19T16:05:58.7373146Z Current runner version: '2.337.0'
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7399262Z ##[group]Runner Image Provisioner
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7400194Z Hosted Compute Agent
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7400732Z Version: 20261002.596
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7401335Z Commit: c3d12f3313a95f25162a1503be624f3b0617f8c0
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7402392Z Build Date: 2026-10-02T22:28:27Z
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7403108Z Worker ID: {685df7dc-d77c-4df2-b341-fb83b51f2faa}
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7403807Z Region: westus
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7404300Z Cloud: Azure
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7404818Z ##[endgroup]
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7406350Z ##[group]Operating System
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7406958Z Microsoft Windows Server 2025
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7407575Z 10.0.26100
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7408041Z Datacenter
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7408536Z ##[endgroup]
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7409058Z ##[group]Runner Image
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7409602Z Image: windows-2025-vs2026
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7410190Z Version: 20261007.264.1
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7411673Z Included Software: https://github.com/actions/runner-images/blob/win25-vs2026/20261007.264/images/windows/Windows2025-VS2026-Readme.md
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7413290Z Image Release: https://github.com/actions/runner-images/releases/tag/win25-vs2026%2F20261007.264
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7414204Z ##[endgroup]
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7415338Z ##[group]GITHUB_TOKEN Permissions
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7418238Z Contents: read
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7418892Z Metadata: read
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7419402Z ##[endgroup]
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7421537Z Secret source: Actions
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7422521Z Cache mode: write
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7423375Z Prepare workflow directory
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7823283Z Prepare all required actions
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:58.7898282Z Getting action download info
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:59.1715478Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:59.3085430Z Download action repository 'actions/setup-node@820762786026740c76f36085b0efc47a31fe5020' (SHA:820762786026740c76f36085b0efc47a31fe5020)
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:59.4857578Z Download action repository 'actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97' (SHA:5fda3b95a4ea91299a34e894583c3862153e4b97)
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:05:59.6264253Z Download action repository 'actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c' (SHA:3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c)
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:00.0730891Z Download action repository 'actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a' (SHA:043fb46d1a93c77aae656e7c1c64a875d1fc6a0a)
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:00.3193987Z Complete job name: Candidate acceptance (recovery)
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:00.4698541Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:00.4700105Z with:
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:00.4700651Z   persist-credentials: false
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:00.4701335Z   repository: klimPaskov/HOI4-Mod-Setup
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:00.4707374Z   token: ***
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:00.4707930Z   ssh-strict: true
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:00.4708465Z   ssh-user: git
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:00.4708927Z   clean: true
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:00.4709431Z   sparse-checkout-cone-mode: true
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:00.4710027Z   fetch-depth: 1
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:00.4710492Z   fetch-tags: false
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:00.4710977Z   show-progress: true
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:00.4711468Z   lfs: false
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:00.4711920Z   submodules: false
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:00.4712413Z   set-safe-directory: true
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:00.4712979Z   allow-unsafe-pr-checkout: false
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:00.4713856Z ##[endgroup]
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:00.6226617Z Syncing repository: klimPaskov/HOI4-Mod-Setup
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:00.6228937Z ##[group]Getting Git version info
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:00.6229739Z Working directory is 'D:\a\HOI4-Mod-Setup\HOI4-Mod-Setup'
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:00.7199621Z [command]"C:\Program Files\Git\bin\git.exe" version
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:01.1097284Z git version 2.56.0.windows.2
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:01.1167925Z ##[endgroup]
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:01.1175245Z Temporarily overriding HOME='D:\a\_temp\5d900760-85a0-4538-950b-8ce091f10246' before making global git config changes
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:01.1181068Z Adding repository directory to the temporary git global config as a safe directory
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:01.1185287Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\HOI4-Mod-Setup\HOI4-Mod-Setup
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:01.1902310Z Deleting the contents of 'D:\a\HOI4-Mod-Setup\HOI4-Mod-Setup'
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:01.1907406Z ##[group]Determining repository object format
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:01.1909561Z ##[endgroup]
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:01.1910786Z ##[group]Initializing the repository
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:01.1918673Z [command]"C:\Program Files\Git\bin\git.exe" init D:\a\HOI4-Mod-Setup\HOI4-Mod-Setup
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:01.2842223Z Initialized empty Git repository in D:/a/HOI4-Mod-Setup/HOI4-Mod-Setup/.git/
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:01.2905477Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/klimPaskov/HOI4-Mod-Setup
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:01.3673447Z ##[endgroup]
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:01.3674686Z ##[group]Disabling automatic garbage collection
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:01.3681194Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:01.4075977Z ##[endgroup]
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:01.4077093Z ##[group]Setting up auth
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:01.4077896Z Removing SSH command configuration
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:01.4086324Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:01.4487098Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:02.9653357Z Removing HTTP extra header
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:02.9668544Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:03.0062161Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:03.5820728Z Removing includeIf entries pointing to credentials config files
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:03.5831512Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:03.6237367Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:04.2254739Z [command]"C:\Program Files\Git\bin\git.exe" config --file D:\a\_temp\git-credentials-bcb07a72-7a1c-42bc-89df-7a54aa8be7f1.config http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:04.2664491Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:D:/a/HOI4-Mod-Setup/HOI4-Mod-Setup/.git.path D:\a\_temp\git-credentials-bcb07a72-7a1c-42bc-89df-7a54aa8be7f1.config
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:04.3048273Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:D:/a/HOI4-Mod-Setup/HOI4-Mod-Setup/.git/worktrees/*.path D:\a\_temp\git-credentials-bcb07a72-7a1c-42bc-89df-7a54aa8be7f1.config
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:04.3585772Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-bcb07a72-7a1c-42bc-89df-7a54aa8be7f1.config
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:04.3975870Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-bcb07a72-7a1c-42bc-89df-7a54aa8be7f1.config
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:04.4362050Z ##[endgroup]
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:04.4362865Z ##[group]Fetching the repository
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:04.4374138Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +4488a418cad56a158273cb66c4ce7794696b7ed1:refs/remotes/origin/main
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:05.9912870Z From https://github.com/klimPaskov/HOI4-Mod-Setup
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:05.9914926Z  * [new ref]         4488a418cad56a158273cb66c4ce7794696b7ed1 -> origin/main
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:05.9981627Z [command]"C:\Program Files\Git\bin\git.exe" branch --list --remote origin/main
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:06.0453580Z   origin/main
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:06.0502784Z [command]"C:\Program Files\Git\bin\git.exe" rev-parse refs/remotes/origin/main
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:06.0905477Z 4488a418cad56a158273cb66c4ce7794696b7ed1
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:06.0943036Z ##[endgroup]
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:06.0944451Z ##[group]Determining the checkout info
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:06.0944919Z ##[endgroup]
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:06.0953926Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:06.1455753Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:06.1867456Z ##[group]Checking out the ref
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:06.1879072Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force -B main refs/remotes/origin/main
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:06.4405086Z Switched to a new branch 'main'
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:06.4476440Z branch 'main' set up to track 'origin/main'.
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:06.4538409Z ##[endgroup]
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:06.5071547Z [command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:06.5535800Z 4488a418cad56a158273cb66c4ce7794696b7ed1
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:06.5584588Z ##[group]Removing auth
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:06.5585080Z Removing SSH command configuration
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:06.5598434Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:06.6011858Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:07.1750669Z Removing HTTP extra header
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:07.1760154Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:07.2189391Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:07.7791521Z Removing includeIf entries pointing to credentials config files
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:07.7802604Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:07.8292708Z includeif.gitdir:D:/a/HOI4-Mod-Setup/HOI4-Mod-Setup/.git.path
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:07.8294396Z includeif.gitdir:D:/a/HOI4-Mod-Setup/HOI4-Mod-Setup/.git/worktrees/*.path
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:07.8295585Z includeif.gitdir:/github/workspace/.git.path
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:07.8296281Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:07.8351226Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:D:/a/HOI4-Mod-Setup/HOI4-Mod-Setup/.git.path
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:07.8851885Z D:\a\_temp\git-credentials-bcb07a72-7a1c-42bc-89df-7a54aa8be7f1.config
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:07.8915510Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:D:/a/HOI4-Mod-Setup/HOI4-Mod-Setup/.git.path D\:\\a\\_temp\\git\-credentials\-bcb07a72\-7a1c\-42bc\-89df\-7a54aa8be7f1\.config
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:07.9465301Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:D:/a/HOI4-Mod-Setup/HOI4-Mod-Setup/.git/worktrees/*.path
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:07.9927187Z D:\a\_temp\git-credentials-bcb07a72-7a1c-42bc-89df-7a54aa8be7f1.config
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:07.9999045Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:D:/a/HOI4-Mod-Setup/HOI4-Mod-Setup/.git/worktrees/*.path D\:\\a\\_temp\\git\-credentials\-bcb07a72\-7a1c\-42bc\-89df\-7a54aa8be7f1\.config
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:08.0577787Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:/github/workspace/.git.path
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:08.1062280Z /github/runner_temp/git-credentials-bcb07a72-7a1c-42bc-89df-7a54aa8be7f1.config
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:08.1124310Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-bcb07a72\-7a1c\-42bc\-89df\-7a54aa8be7f1\.config
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:08.1738506Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:08.2184157Z /github/runner_temp/git-credentials-bcb07a72-7a1c-42bc-89df-7a54aa8be7f1.config
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:08.2283656Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-bcb07a72\-7a1c\-42bc\-89df\-7a54aa8be7f1\.config
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:08.2832566Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:08.9304210Z Removing credentials config 'D:\a\_temp\git-credentials-bcb07a72-7a1c-42bc-89df-7a54aa8be7f1.config'
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:08.9315785Z ##[endgroup]
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:08.9888357Z ##[group]Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:08.9888906Z with:
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:08.9889126Z   node-version: 22
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:08.9889378Z   check-latest: false
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:08.9892816Z   token: ***
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:08.9893063Z   package-manager-cache: true
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:08.9893346Z ##[endgroup]
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:09.1584615Z Found in cache @ C:\hostedtoolcache\windows\node\22.23.3\x64
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:09.1590904Z ##[group]Environment details
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.1307875Z node: v22.23.3
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.1308251Z npm: 10.9.9
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.1308534Z yarn: 1.22.22
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.1309223Z ##[endgroup]
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.1641628Z ##[group]Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.1642100Z with:
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.1642295Z   python-version: 3.13
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.1642511Z   check-latest: false
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.1644877Z   token: ***
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.1645080Z   update-environment: true
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.1645315Z   allow-prereleases: false
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.1645539Z   freethreaded: false
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.1645737Z ##[endgroup]
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.3190602Z ##[group]Installed versions
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.3395727Z Successfully set up CPython (3.13.16)
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.3396225Z ##[endgroup]
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.3703424Z ##[group]Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.3703920Z with:
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.3704128Z   name: hoi4-mod-setup-ci-windows-x64
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.3704397Z   path: dist/release
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.3704609Z   merge-multiple: false
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.3704848Z   repository: klimPaskov/HOI4-Mod-Setup
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.3705127Z   run-id: 39281117181
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.3705330Z   skip-decompress: false
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.3705549Z   digest-mismatch: error
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.3705753Z env:
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.3706009Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.13.16\x64
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.3706489Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.13.16\x64/lib/pkgconfig
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.3706948Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.13.16\x64
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.3707354Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.13.16\x64
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.3707787Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.13.16\x64
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.3708102Z ##[endgroup]
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.5360977Z Downloading single artifact
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.8443756Z Preparing to download the following artifacts:
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:14.8445394Z - hoi4-mod-setup-ci-windows-x64 (ID: 12201941954, Size: 7491704, Expected Digest: sha256:a98d0efa4708374dba7c92a2955295c5c3d78988026f505a7b3bb0e55278ca2b)
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:15.3991285Z Redirecting to blob download url: https://productionresultssa17.blob.core.windows.net/actions-results/a59425b2-7e23-8541-ab75-f5a38f4de5ff/workflow-job-run-1e5accb6-31d5-545f-abbf-681af3347792/artifacts/4fcd3c2d2ecd43c109c3a5e6441bed66c9b6b74c1e769bdee941e3d9e9762ecb.zip
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:15.3992776Z Starting download of artifact to: D:\a\HOI4-Mod-Setup\HOI4-Mod-Setup\dist\release
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:15.6998972Z (node:3120) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:15.7001456Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:16.4315016Z SHA256 digest of downloaded artifact is a98d0efa4708374dba7c92a2955295c5c3d78988026f505a7b3bb0e55278ca2b
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:16.4316147Z Artifact download completed successfully.
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:16.4317371Z Total of 1 artifact(s) downloaded
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:16.4327556Z Download artifact has finished successfully
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:16.4776684Z ##[group]Run corepack enable
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:16.4777250Z [36;1mcorepack enable[0m
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:16.4777682Z [36;1mpnpm install --frozen-lockfile[0m
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:16.5753774Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:16.5754221Z env:
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:16.5754562Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.13.16\x64
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:16.5755152Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.13.16\x64/lib/pkgconfig
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:16.5755731Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.13.16\x64
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:16.5756328Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.13.16\x64
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:16.5756937Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.13.16\x64
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:16.5757334Z ##[endgroup]
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:17.4842544Z ! Corepack is about to download https://registry.npmjs.org/pnpm/-/pnpm-11.9.0.tgz
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:25.2011109Z ? Verifying lockfile against supply-chain policies (220 entries)...
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:25.2142155Z Lockfile is up to date, resolution step is skipped
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:25.3315871Z Progress: resolved 1, reused 0, downloaded 0, added 0
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:25.3904526Z Packages: +160
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:25.3911746Z ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:26.3430110Z Progress: resolved 160, reused 0, downloaded 7, added 0
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:27.3766539Z Progress: resolved 160, reused 0, downloaded 73, added 4
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:28.3765648Z Progress: resolved 160, reused 0, downloaded 160, added 51
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:28.7177855Z ✓ Lockfile passes supply-chain policies (220 entries in 3.5s)
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:28.8937235Z Progress: resolved 160, reused 0, downloaded 160, added 160, done
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.4223118Z .../esbuild@0.25.12/node_modules/esbuild postinstall$ node install.js
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.5855988Z .../esbuild@0.25.12/node_modules/esbuild postinstall: Done
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.6435149Z 
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.6435646Z dependencies:
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.6435962Z + @tauri-apps/api 2.11.1
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.6436218Z + react 19.3.0
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.6436465Z + react-dom 19.3.0
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.6436629Z 
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.6436754Z devDependencies:
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.6437269Z + @playwright/test 1.62.1
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.6438290Z + @tauri-apps/cli 2.11.5
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.6438899Z + @testing-library/jest-dom 6.10.0
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.6439563Z + @testing-library/react 16.3.3
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.6440109Z + @types/react 19.3.0
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.6440621Z + @types/react-dom 19.3.0
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.6441153Z + @vitejs/plugin-react 4.7.0
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.6441663Z + jsdom 26.1.0
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.6442101Z + typescript 5.9.3
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.6442515Z + vite 6.4.3
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.6442896Z + vitest 4.1.11
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.6443138Z 
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.6828274Z Done in 5.8s using pnpm v11.9.0
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.7831070Z ##[group]Run pnpm test:released-e2e $env:E2E_SCENARIO
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.7831644Z [36;1mpnpm test:released-e2e $env:E2E_SCENARIO[0m
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.7905712Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.7906064Z env:
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.7906342Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.13.16\x64
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.7906811Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.13.16\x64/lib/pkgconfig
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.7907566Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.13.16\x64
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.7908011Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.13.16\x64
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.7908439Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.13.16\x64
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.7911050Z   GITHUB_TOKEN: ***
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.7911281Z   E2E_SCENARIO: recovery
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.7911620Z   HOI4_E2E_CANDIDATE_DIR: D:\a\HOI4-Mod-Setup\HOI4-Mod-Setup/dist/release
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:29.7912018Z ##[endgroup]
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:06:30.8591509Z $ node scripts/run_released_e2e.mjs "recovery"
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:08:00.1496703Z E2E recovery: welcome
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:08:40.3481449Z E2E recovery: confirmed-read-only-scan
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:08:40.5881174Z E2E recovery: coding-environments
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:08:40.8282719Z E2E recovery: image-provider
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:08:41.0418087Z E2E recovery: selected-components
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:09:07.2319532Z E2E recovery: dry-run
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:10:17.6108985Z E2E recovery: recovery-without-provider
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:13.6101469Z E2E recovery: failure
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.1421259Z file:///D:/a/HOI4-Mod-Setup/HOI4-Mod-Setup/scripts/run_released_e2e.mjs:652
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.1436204Z if (failure) throw new Error(result.error ?? result.cleanupError ?? "Remote E2E failed.");
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.1441766Z                    ^
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.1442154Z 
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.1442993Z Error: The project was not restored exactly.
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.1445645Z + actual - expected
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.1449363Z 
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.1450673Z + '7a0535daf583fb7c841da4743f393571fd193ea72558308d1f958c40cb099e65'
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.1452247Z - '1641aef28b4d224389dfba187268389ab1321103890601be20f0fe6fa4a6d5ac'
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.1453232Z 
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.1454667Z     at file:///D:/a/HOI4-Mod-Setup/HOI4-Mod-Setup/scripts/run_released_e2e.mjs:652:20
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.1456092Z 
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.1456326Z Node.js v22.23.3
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.2592834Z [ELIFECYCLE] Command failed with exit code 1.
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.8166590Z ##[error]Process completed with exit code 1.
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.8389030Z ##[group]Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.8389589Z with:
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.8389874Z   name: candidate-acceptance-recovery
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.8390464Z   path: test-results/released-recovery/*.png
+Candidate acceptance (recovery)	UNKNOWN STEP	test-results/released-recovery/result.json
+Candidate acceptance (recovery)	UNKNOWN STEP	
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.8391038Z   if-no-files-found: warn
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.8391330Z   retention-days: 14
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.8391627Z   compression-level: 6
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.8391903Z   overwrite: false
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.8392202Z   include-hidden-files: false
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.8392490Z   archive: true
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.8392735Z env:
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.8393062Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.13.16\x64
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.8393633Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.13.16\x64/lib/pkgconfig
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.8394166Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.13.16\x64
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.8394732Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.13.16\x64
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.8395210Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.13.16\x64
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:20.8395607Z ##[endgroup]
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:21.0283032Z With the provided path, there will be 9 files uploaded
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:21.0289172Z Artifact name is valid!
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:21.0290658Z Root directory input is valid!
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:21.4195412Z Uploading artifact: candidate-acceptance-recovery.zip
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:21.4243307Z Beginning upload of artifact content to blob storage
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:22.2059904Z Uploaded bytes 953950
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:22.2774727Z Finished uploading artifact content to blob storage!
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:22.2776178Z SHA256 digest of uploaded artifact is 5d337672d3c46e90928b894a05058e4506609bad2dcde4553b8c844d294e6952
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:22.2777282Z Finalizing artifact upload
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:22.7163584Z Artifact candidate-acceptance-recovery successfully finalized. Artifact ID 12201302573
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:22.7165998Z Artifact candidate-acceptance-recovery has been successfully uploaded! Final size is 953950 bytes. Artifact ID is 12201302573
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:22.7173253Z Artifact download URL: https://github.com/klimPaskov/HOI4-Mod-Setup/actions/runs/39281117181/artifacts/12201302573
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:22.7683254Z Post job cleanup.
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:23.0153244Z [command]"C:\Program Files\Git\bin\git.exe" version
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:23.0608760Z git version 2.56.0.windows.2
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:23.0692499Z Temporarily overriding HOME='D:\a\_temp\71921f70-01c4-4868-be95-44cf897df266' before making global git config changes
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:23.0695394Z Adding repository directory to the temporary git global config as a safe directory
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:23.0709474Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\HOI4-Mod-Setup\HOI4-Mod-Setup
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:23.1129176Z Removing SSH command configuration
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:23.1144443Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:23.1599619Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:23.7930759Z Removing HTTP extra header
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:23.7941039Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:23.8362683Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:24.4799372Z Removing includeIf entries pointing to credentials config files
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:24.4814813Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:24.5260319Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+Candidate acceptance (recovery)	UNKNOWN STEP	2026-10-19T16:11:25.1467960Z Cleaning up orphan processes

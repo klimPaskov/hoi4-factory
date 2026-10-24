@@ -1,0 +1,45 @@
+{
+ "before": "/runs/control-ready-fixed/apply-1/before.json",
+ "after": "/runs/control-ready-fixed/apply-1/after.json",
+ "approved_prefixes": [
+  "exp01_setup/managed",
+  "exp01_setup/replace-me.txt",
+  ".hoi4-mod-setup"
+ ],
+ "unapproved": {
+  "changed": [],
+  "mode_changed": [],
+  "added": [],
+  "removed": [],
+  "metadata_only": []
+ },
+ "approved": {
+  "changed": [],
+  "added": [
+   {
+    "path": "exp01_setup/managed",
+    "type": "dir",
+    "size": null,
+    "sha256": null
+   }
+  ],
+  "removed": []
+ },
+ "all": {
+  "added_files": [],
+  "added_dirs": [
+   "exp01_setup/managed"
+  ],
+  "removed": [],
+  "content_changed": []
+ },
+ "unapproved_bytes_untouched": true,
+ "exact_files": true,
+ "exact_files_and_dirs": false,
+ "git_index_sha256": {
+  "before": "0a7e2e794e1ea219826aa6b4580646c17963c67ae051be76d5d0fb0d5b210f22",
+  "after": "0a7e2e794e1ea219826aa6b4580646c17963c67ae051be76d5d0fb0d5b210f22"
+ },
+ "git_status_identical": true,
+ "git_ls_files_identical": true
+}

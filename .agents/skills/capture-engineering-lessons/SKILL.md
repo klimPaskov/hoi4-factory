@@ -1,6 +1,6 @@
 ---
 name: capture-engineering-lessons
-description: "Use on explicit invocation at a substantive engineering handoff or after a repeatable tooling failure to capture, test and propose reusable guidance. Keep candidates separate from accepted policy, product runtime memory and game design canon."
+description: "Use automatically at every substantive engineering handoff or after a repeatable tooling failure to capture and test reusable guidance, promoting test-backed lessons that change no authority under ADR-023. Keep candidates separate from accepted policy, product runtime memory and game design canon."
 ---
 
 # Capture and review engineering lessons

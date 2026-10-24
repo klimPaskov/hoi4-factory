@@ -1,0 +1,452 @@
+{
+  "cases": [
+    {
+      "case": "B1-HOOK-PATH-TRAVERSAL (RT-04)",
+      "escape_target_absent": true,
+      "evidence_kind": "recorded-real-replay",
+      "executed": false,
+      "input_source": "recorded real model tool call",
+      "report": {
+        "final_args": {
+          "content": "S01 runtime probe ok",
+          "path": "../escape-rt04.txt"
+        },
+        "hooks": [
+          {
+            "args_hash_after": "c561ca79747fe09eed01170fd572fce1ca9da968a0b539b2478fc48d0e5053d1",
+            "args_hash_before": "94b7885ce2b09bc66a456f44374eacf88e773b444d8a45c6bbb1279032c09f6b",
+            "hook": "repair_normalize_path",
+            "tool_after": "write_file",
+            "tool_before": "write_file"
+          }
+        ],
+        "initial_validation": {
+          "Ok": null
+        },
+        "result": {
+          "Err": {
+            "path": "../escape-rt04.txt",
+            "reason": "parent traversal '..'",
+            "refusal": "path_policy"
+          }
+        }
+      },
+      "tool_request": {
+        "name": "write_file",
+        "raw_arguments": "{\"content\":\"S01 runtime probe ok\",\"path\":\"notes/probe.txt\"}"
+      },
+      "tree_snapshot_after": "669cb6cf7ff63e02da3c6e9907944504ec997f4760aac94c83c4695e9d60ec93",
+      "tree_snapshot_before": "669cb6cf7ff63e02da3c6e9907944504ec997f4760aac94c83c4695e9d60ec93",
+      "verdict": "pass"
+    },
+    {
+      "case": "B2-HOOK-ABSOLUTE-PATH (RT-04)",
+      "escape_target_absent": true,
+      "evidence_kind": "recorded-real-replay",
+      "executed": false,
+      "input_source": "recorded real model tool call",
+      "report": {
+        "final_args": {
+          "content": "S01 runtime probe ok",
+          "path": "/tmp/escape-rt04.txt"
+        },
+        "hooks": [
+          {
+            "args_hash_after": "4dd832a2cfb47b70839255d20419539297a6a4ecab47a396c509c09a04562983",
+            "args_hash_before": "94b7885ce2b09bc66a456f44374eacf88e773b444d8a45c6bbb1279032c09f6b",
+            "hook": "repair_absolutize",
+            "tool_after": "write_file",
+            "tool_before": "write_file"
+          }
+        ],
+        "initial_validation": {
+          "Ok": null
+        },
+        "result": {
+          "Err": {
+            "path": "/tmp/escape-rt04.txt",
+            "reason": "absolute path",
+            "refusal": "path_policy"
+          }
+        }
+      },
+      "tool_request": {
+        "name": "write_file",
+        "raw_arguments": "{\"content\":\"S01 runtime probe ok\",\"path\":\"notes/probe.txt\"}"
+      },
+      "tree_snapshot_after": "669cb6cf7ff63e02da3c6e9907944504ec997f4760aac94c83c4695e9d60ec93",
+      "tree_snapshot_before": "669cb6cf7ff63e02da3c6e9907944504ec997f4760aac94c83c4695e9d60ec93",
+      "verdict": "pass"
+    },
+    {
+      "case": "B3-HOOK-NESTED-TRAVERSAL (RT-04)",
+      "escape_target_absent": true,
+      "evidence_kind": "recorded-real-replay",
+      "executed": false,
+      "input_source": "recorded real model tool call",
+      "report": {
+        "final_args": {
+          "content": "S01 runtime probe ok",
+          "path": "notes/../../escape-rt04.txt"
+        },
+        "hooks": [
+          {
+            "args_hash_after": "44fb09f13a2e77d3db816447cd785a1942468d4b76f3790122edfe87f4046dcd",
+            "args_hash_before": "94b7885ce2b09bc66a456f44374eacf88e773b444d8a45c6bbb1279032c09f6b",
+            "hook": "repair_join",
+            "tool_after": "write_file",
+            "tool_before": "write_file"
+          }
+        ],
+        "initial_validation": {
+          "Ok": null
+        },
+        "result": {
+          "Err": {
+            "path": "notes/../../escape-rt04.txt",
+            "reason": "parent traversal '..'",
+            "refusal": "path_policy"
+          }
+        }
+      },
+      "tool_request": {
+        "name": "write_file",
+        "raw_arguments": "{\"content\":\"S01 runtime probe ok\",\"path\":\"notes/probe.txt\"}"
+      },
+      "tree_snapshot_after": "669cb6cf7ff63e02da3c6e9907944504ec997f4760aac94c83c4695e9d60ec93",
+      "tree_snapshot_before": "669cb6cf7ff63e02da3c6e9907944504ec997f4760aac94c83c4695e9d60ec93",
+      "verdict": "pass"
+    },
+    {
+      "case": "B4-HOOK-TYPE-CHANGE (RT-04)",
+      "escape_target_absent": true,
+      "evidence_kind": "recorded-real-replay",
+      "executed": false,
+      "input_source": "recorded real model tool call",
+      "report": {
+        "final_args": {
+          "content": 42,
+          "path": "notes/probe.txt"
+        },
+        "hooks": [
+          {
+            "args_hash_after": "e2cb5b8c81744e78a4b4b0bdfdc814fb6c7787568809541ff7453f589268c20a",
+            "args_hash_before": "94b7885ce2b09bc66a456f44374eacf88e773b444d8a45c6bbb1279032c09f6b",
+            "hook": "repair_coerce_content",
+            "tool_after": "write_file",
+            "tool_before": "write_file"
+          }
+        ],
+        "initial_validation": {
+          "Ok": null
+        },
+        "result": {
+          "Err": {
+            "errors": [
+              "42 is not of type \"string\" at /content"
+            ],
+            "refusal": "schema_invalid"
+          }
+        }
+      },
+      "tool_request": {
+        "name": "write_file",
+        "raw_arguments": "{\"content\":\"S01 runtime probe ok\",\"path\":\"notes/probe.txt\"}"
+      },
+      "tree_snapshot_after": "669cb6cf7ff63e02da3c6e9907944504ec997f4760aac94c83c4695e9d60ec93",
+      "tree_snapshot_before": "669cb6cf7ff63e02da3c6e9907944504ec997f4760aac94c83c4695e9d60ec93",
+      "verdict": "pass"
+    },
+    {
+      "case": "B5-HOOK-UNKNOWN-FIELD (T-RUN-02)",
+      "escape_target_absent": true,
+      "evidence_kind": "recorded-real-replay",
+      "executed": false,
+      "input_source": "recorded real model tool call",
+      "report": {
+        "final_args": {
+          "append": true,
+          "content": "S01 runtime probe ok",
+          "path": "notes/probe.txt"
+        },
+        "hooks": [
+          {
+            "args_hash_after": "3d2efe4f4f04bfe1bfbdd91270179ebc8a73c6f7be0ae4ff92a1217644357245",
+            "args_hash_before": "94b7885ce2b09bc66a456f44374eacf88e773b444d8a45c6bbb1279032c09f6b",
+            "hook": "pre_tool_add_mode",
+            "tool_after": "write_file",
+            "tool_before": "write_file"
+          }
+        ],
+        "initial_validation": {
+          "Ok": null
+        },
+        "result": {
+          "Err": {
+            "errors": [
+              "Additional properties are not allowed ('append' was unexpected) at "
+            ],
+            "refusal": "schema_invalid"
+          }
+        }
+      },
+      "tool_request": {
+        "name": "write_file",
+        "raw_arguments": "{\"content\":\"S01 runtime probe ok\",\"path\":\"notes/probe.txt\"}"
+      },
+      "tree_snapshot_after": "669cb6cf7ff63e02da3c6e9907944504ec997f4760aac94c83c4695e9d60ec93",
+      "tree_snapshot_before": "669cb6cf7ff63e02da3c6e9907944504ec997f4760aac94c83c4695e9d60ec93",
+      "verdict": "pass"
+    },
+    {
+      "case": "B6-HOOK-DROP-REQUIRED (T-RUN-02)",
+      "escape_target_absent": true,
+      "evidence_kind": "recorded-real-replay",
+      "executed": false,
+      "input_source": "recorded real model tool call",
+      "report": {
+        "final_args": {
+          "path": "notes/probe.txt"
+        },
+        "hooks": [
+          {
+            "args_hash_after": "8685f0bc12b2070afa92f0fd1ffdd1831cbb3def569478f5f4c8a8fb21b3bbb9",
+            "args_hash_before": "94b7885ce2b09bc66a456f44374eacf88e773b444d8a45c6bbb1279032c09f6b",
+            "hook": "pre_tool_strip",
+            "tool_after": "write_file",
+            "tool_before": "write_file"
+          }
+        ],
+        "initial_validation": {
+          "Ok": null
+        },
+        "result": {
+          "Err": {
+            "errors": [
+              "\"content\" is a required property at "
+            ],
+            "refusal": "schema_invalid"
+          }
+        }
+      },
+      "tool_request": {
+        "name": "write_file",
+        "raw_arguments": "{\"content\":\"S01 runtime probe ok\",\"path\":\"notes/probe.txt\"}"
+      },
+      "tree_snapshot_after": "669cb6cf7ff63e02da3c6e9907944504ec997f4760aac94c83c4695e9d60ec93",
+      "tree_snapshot_before": "669cb6cf7ff63e02da3c6e9907944504ec997f4760aac94c83c4695e9d60ec93",
+      "verdict": "pass"
+    },
+    {
+      "case": "B7-HOOK-RENAME-TOOL (T-RUN-02)",
+      "escape_target_absent": true,
+      "evidence_kind": "recorded-real-replay",
+      "executed": false,
+      "input_source": "recorded real model tool call",
+      "report": {
+        "final_args": {
+          "content": "S01 runtime probe ok",
+          "path": "notes/probe.txt"
+        },
+        "hooks": [
+          {
+            "args_hash_after": "94b7885ce2b09bc66a456f44374eacf88e773b444d8a45c6bbb1279032c09f6b",
+            "args_hash_before": "94b7885ce2b09bc66a456f44374eacf88e773b444d8a45c6bbb1279032c09f6b",
+            "hook": "pre_tool_rename",
+            "tool_after": "delete_tree",
+            "tool_before": "write_file"
+          }
+        ],
+        "initial_validation": {
+          "Ok": null
+        },
+        "result": {
+          "Err": {
+            "name": "delete_tree",
+            "refusal": "unknown_tool"
+          }
+        }
+      },
+      "tool_request": {
+        "name": "write_file",
+        "raw_arguments": "{\"content\":\"S01 runtime probe ok\",\"path\":\"notes/probe.txt\"}"
+      },
+      "tree_snapshot_after": "669cb6cf7ff63e02da3c6e9907944504ec997f4760aac94c83c4695e9d60ec93",
+      "tree_snapshot_before": "669cb6cf7ff63e02da3c6e9907944504ec997f4760aac94c83c4695e9d60ec93",
+      "verdict": "pass"
+    },
+    {
+      "case": "B8-HOOK-NON-OBJECT-ARGS (T-RUN-02)",
+      "escape_target_absent": true,
+      "evidence_kind": "recorded-real-replay",
+      "executed": false,
+      "input_source": "recorded real model tool call",
+      "report": {
+        "final_args": "{\"path\": \"notes/probe.txt\"",
+        "hooks": [
+          {
+            "args_hash_after": "2fc285616af6a7390b055736c05b5bea31cd254908712b77227ed411ad31b52c",
+            "args_hash_before": "94b7885ce2b09bc66a456f44374eacf88e773b444d8a45c6bbb1279032c09f6b",
+            "hook": "repair_stringify",
+            "tool_after": "write_file",
+            "tool_before": "write_file"
+          }
+        ],
+        "initial_validation": {
+          "Ok": null
+        },
+        "result": {
+          "Err": {
+            "errors": [
+              "\"{\\\"path\\\": \\\"notes/probe.txt\\\"\" is not of type \"object\" at "
+            ],
+            "refusal": "schema_invalid"
+          }
+        }
+      },
+      "tool_request": {
+        "name": "write_file",
+        "raw_arguments": "{\"content\":\"S01 runtime probe ok\",\"path\":\"notes/probe.txt\"}"
+      },
+      "tree_snapshot_after": "669cb6cf7ff63e02da3c6e9907944504ec997f4760aac94c83c4695e9d60ec93",
+      "tree_snapshot_before": "669cb6cf7ff63e02da3c6e9907944504ec997f4760aac94c83c4695e9d60ec93",
+      "verdict": "pass"
+    },
+    {
+      "case": "B9-HOOK-MARKER-OVERWRITE (RT-04)",
+      "escape_target_absent": true,
+      "evidence_kind": "recorded-real-replay",
+      "executed": false,
+      "input_source": "recorded real model tool call",
+      "report": {
+        "final_args": {
+          "content": "S01 runtime probe ok",
+          "path": ".factory-root-id"
+        },
+        "hooks": [
+          {
+            "args_hash_after": "bc0ac42ecc2b1ae0fcb64a606f11ef4c756659f2227daded9a0ea3f53e22ddd7",
+            "args_hash_before": "94b7885ce2b09bc66a456f44374eacf88e773b444d8a45c6bbb1279032c09f6b",
+            "hook": "repair_target_marker",
+            "tool_after": "write_file",
+            "tool_before": "write_file"
+          }
+        ],
+        "initial_validation": {
+          "Ok": null
+        },
+        "result": {
+          "Err": {
+            "path": ".factory-root-id",
+            "reason": "workspace marker is host-owned",
+            "refusal": "path_policy"
+          }
+        }
+      },
+      "tool_request": {
+        "name": "write_file",
+        "raw_arguments": "{\"content\":\"S01 runtime probe ok\",\"path\":\"notes/probe.txt\"}"
+      },
+      "tree_snapshot_after": "669cb6cf7ff63e02da3c6e9907944504ec997f4760aac94c83c4695e9d60ec93",
+      "tree_snapshot_before": "669cb6cf7ff63e02da3c6e9907944504ec997f4760aac94c83c4695e9d60ec93",
+      "verdict": "pass"
+    },
+    {
+      "case": "B10-HOOK-SYMLINK-ESCAPE (RT-04)",
+      "evidence_kind": "recorded-real-replay",
+      "report": {
+        "final_args": {
+          "content": "S01 runtime probe ok",
+          "path": "link/escape-rt04.txt"
+        },
+        "hooks": [
+          {
+            "args_hash_after": "84808d5ac71eb47894da06e0c93f06d0c355fbbad0c80a142b26d808f8cebfd8",
+            "args_hash_before": "94b7885ce2b09bc66a456f44374eacf88e773b444d8a45c6bbb1279032c09f6b",
+            "hook": "repair_via_link",
+            "tool_after": "write_file",
+            "tool_before": "write_file"
+          }
+        ],
+        "initial_validation": {
+          "Ok": null
+        },
+        "result": {
+          "Err": {
+            "path": "link/escape-rt04.txt",
+            "reason": "existing ancestor resolves outside root (symlink escape)",
+            "refusal": "path_policy"
+          }
+        }
+      },
+      "verdict": "pass"
+    },
+    {
+      "after_hash": "9aef8df555d4ae9b1d32673f7f11c8549767884ddefbbfbd0534fb248e296ada",
+      "case": "B0-NO-HOOK positive control",
+      "evidence_kind": "recorded-real-replay",
+      "report": {
+        "final_args": {
+          "content": "S01 runtime probe ok",
+          "path": "notes/probe.txt"
+        },
+        "hooks": [],
+        "initial_validation": {
+          "Ok": null
+        },
+        "result": {
+          "Ok": {
+            "args": {
+              "content": "S01 runtime probe ok",
+              "path": "notes/probe.txt"
+            },
+            "args_hash": "94b7885ce2b09bc66a456f44374eacf88e773b444d8a45c6bbb1279032c09f6b",
+            "rel_path": "notes/probe.txt",
+            "replay_identity": "bac8501a4d4087debdfb1db6c9becd22d3f57753dfa5b0f390c8ab939090c6d5",
+            "root_identity": "8d1d06bb70a3c5aeea4c18b94a654297640c6120b94b219e4a4907aa33328f65",
+            "schema_version": 1,
+            "tool": "write_file",
+            "tool_version": "write_file@1"
+          }
+        }
+      },
+      "verdict": "pass"
+    }
+  ],
+  "evidence_kind": "recorded-real-replay",
+  "host_schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "content": {
+        "maxLength": 4096,
+        "type": "string"
+      },
+      "path": {
+        "maxLength": 200,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9._/-]+$",
+        "type": "string"
+      }
+    },
+    "required": [
+      "path",
+      "content"
+    ],
+    "type": "object"
+  },
+  "input_source": "recorded real model tool call",
+  "probe": "broker",
+  "recording": {
+    "captured": "2026-10-24T11:22:49Z",
+    "evidence_kind_of_capture": "live",
+    "model": "claude-haiku-5-5",
+    "provider": "anthropic-messages",
+    "recording": "probes/runtime/recordings/anthropic-tool-turn.sse",
+    "sse_sha256": "dbaa9e700329cddc32abbf741c7c1156b8193708702e5ba9485ecf1a4bff5bc1"
+  },
+  "workspace": {
+    "identity": "8d1d06bb70a3c5aeea4c18b94a654297640c6120b94b219e4a4907aa33328f65",
+    "root": "\\\\?\\C:\\Users\\klimp\\AppData\\Local\\Temp\\hoi4-factory-s01-runtime\\broker\\root"
+  }
+}

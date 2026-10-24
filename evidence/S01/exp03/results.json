@@ -1,0 +1,1551 @@
+{
+ "experiment": "EXP-03",
+ "stage": "S01",
+ "packet": "S01-W5",
+ "recorded": "2026-10-24",
+ "models": {
+  "openai": {
+   "requested": "gpt-5.4-nano-2026-03-17",
+   "inference_completed": false
+  },
+  "anthropic": {
+   "requested": "claude-haiku-5-5",
+   "reported": "claude-haiku-5-5",
+   "anthropic_version": "2026-10-21"
+  }
+ },
+ "spend": {
+  "openai_usd": 0.0,
+  "anthropic_calls": [
+   {
+    "call": "anthropic-tool-turn",
+    "estimate": {
+     "kind": "estimated",
+     "price": {
+      "cached_input_per_mtok": 0.01,
+      "input_per_mtok": 0.1,
+      "model_prefix": "claude-haiku-5-5",
+      "output_per_mtok": 0.5,
+      "retrieved": "2026-10-24",
+      "source": "https://platform.claude.com/docs/en/about-claude/pricing (Claude Haiku 5.5, prompts up to 100,000 tokens)"
+     },
+     "usage": {
+      "cached_input_tokens": 0,
+      "input_tokens": 508,
+      "output_tokens": 84,
+      "reasoning_tokens": 0
+     },
+     "usd": 9.28e-05
+    },
+    "model": "claude-haiku-5-5"
+   },
+   {
+    "call": "anthropic-followup-turn",
+    "estimate": {
+     "kind": "estimated",
+     "price": {
+      "cached_input_per_mtok": 0.01,
+      "input_per_mtok": 0.1,
+      "model_prefix": "claude-haiku-5-5",
+      "output_per_mtok": 0.5,
+      "retrieved": "2026-10-24",
+      "source": "https://platform.claude.com/docs/en/about-claude/pricing (Claude Haiku 5.5, prompts up to 100,000 tokens)"
+     },
+     "usage": {
+      "cached_input_tokens": 0,
+      "input_tokens": 673,
+      "output_tokens": 29,
+      "reasoning_tokens": 0
+     },
+     "usd": 8.18e-05
+    },
+    "model": "claude-haiku-5-5"
+   },
+   {
+    "call": "anthropic-text-turn",
+    "estimate": {
+     "kind": "estimated",
+     "price": {
+      "cached_input_per_mtok": 0.01,
+      "input_per_mtok": 0.1,
+      "model_prefix": "claude-haiku-5-5",
+      "output_per_mtok": 0.5,
+      "retrieved": "2026-10-24",
+      "source": "https://platform.claude.com/docs/en/about-claude/pricing (Claude Haiku 5.5, prompts up to 100,000 tokens)"
+     },
+     "usage": {
+      "cached_input_tokens": 0,
+      "input_tokens": 37,
+      "output_tokens": 24,
+      "reasoning_tokens": 0
+     },
+     "usd": 1.57e-05
+    },
+    "model": "claude-haiku-5-5"
+   },
+   {
+    "basis": "cancelled: usage incomplete, output counted at the full max_tokens allowance as an upper bound",
+    "call": "anthropic-cancelled-turn",
+    "estimate": {
+     "kind": "estimated",
+     "price": {
+      "cached_input_per_mtok": 0.01,
+      "input_per_mtok": 0.1,
+      "model_prefix": "claude-haiku-5-5",
+      "output_per_mtok": 0.5,
+      "retrieved": "2026-10-24",
+      "source": "https://platform.claude.com/docs/en/about-claude/pricing (Claude Haiku 5.5, prompts up to 100,000 tokens)"
+     },
+     "usage": {
+      "cached_input_tokens": 0,
+      "input_tokens": 37,
+      "output_tokens": 600,
+      "reasoning_tokens": 0
+     },
+     "usd": 0.0003037
+    },
+    "model": "claude-haiku-5-5",
+    "reported_partial_usage": {
+     "cached_input_tokens": 0,
+     "input_tokens": 37,
+     "output_tokens": 4,
+     "reasoning_tokens": 0
+    }
+   },
+   {
+    "call": "worker-live-turn",
+    "estimate": {
+     "kind": "estimated",
+     "price": {
+      "cached_input_per_mtok": 0.01,
+      "input_per_mtok": 0.1,
+      "model_prefix": "claude-haiku-5-5",
+      "output_per_mtok": 0.5,
+      "retrieved": "2026-10-24",
+      "source": "https://platform.claude.com/docs/en/about-claude/pricing (Claude Haiku 5.5, prompts up to 100,000 tokens)"
+     },
+     "usage": {
+      "cached_input_tokens": 0,
+      "input_tokens": 508,
+      "output_tokens": 84,
+      "reasoning_tokens": 0
+     },
+     "usd": 9.28e-05
+    },
+    "model": "claude-haiku-5-5"
+   },
+   {
+    "call": "exp04-container",
+    "estimate": {
+     "kind": "estimated",
+     "price": {
+      "cached_input_per_mtok": 0.01,
+      "input_per_mtok": 0.1,
+      "model_prefix": "claude-haiku-5-5",
+      "output_per_mtok": 0.5,
+      "retrieved": "2026-10-24",
+      "source": "https://platform.claude.com/docs/en/about-claude/pricing (Claude Haiku 5.5, prompts up to 100,000 tokens)"
+     },
+     "usage": {
+      "cached_input_tokens": 0,
+      "input_tokens": 508,
+      "output_tokens": 84,
+      "reasoning_tokens": 0
+     },
+     "usd": 9.28e-05
+    },
+    "model": "claude-haiku-5-5"
+   }
+  ],
+  "anthropic_usd_estimated": 0.0006796,
+  "note": "Estimates from provider-reported usage and the cited price records. The cancelled turn is counted at its max_tokens upper bound. The coordinator's own key check call is not included."
+ },
+ "evidence_kinds": {
+  "live": "real provider request",
+  "recorded-real-replay": "replay of bytes captured byte-for-byte from a real provider stream",
+  "local-execution": "real PostgreSQL, processes, pipes and filesystem with recorded real tool arguments",
+  "static": "source inspection, build metrics, unit tests"
+ },
+ "source_manifest": {
+  "crates/agent/Cargo.toml": "1e69461f6d348bc0f102ee05ea34e8afa489c9c3bd88ddcf69a302ccf1d6ebd0",
+  "crates/agent/src/anthropic.rs": "be98a8be1fb91a72749ba410befe32546b62822400cd38c8c1790d7ae8ac2905",
+  "crates/agent/src/cost.rs": "5199379d28b05b8d75a9513bddb0b30ec75f183de0728ca5329caa1cd8818e67",
+  "crates/agent/src/lib.rs": "78b6781f89f8b7d544ea2c2628adb5250db9a4dc85e40042d63e74749185008c",
+  "crates/agent/src/openai.rs": "8dc6575213e308204a3670f93f5b399cac1b89452491b82ff1b475c932d3d2ba",
+  "crates/agent/src/protocol.rs": "b6c058c08110a2d7f10c051d8a50d6e4bf53dec8ea8caedd050fccdf711db965",
+  "crates/agent/src/sse.rs": "f5a5458a0a1ab277944a940de3ebe573f11bd36b9913acc89cf3e98d2a0f9885",
+  "crates/agent/src/transport.rs": "8c165c83cab99bf7b0c1ec11cbd1adc9ab38bf7cbfe3c5d8f686477088056fa0",
+  "crates/agent/src/types.rs": "2b4495f33ca0e5bc0c2ed7ee7a708f496f42c9acda0d2e43d3fa7c29e08513c9",
+  "probes/runtime/src/broker.rs": "037a251c25dd6f15e844d8da1bfe09b9a128556b2e0e6c1a379f628a9c87cffa",
+  "probes/runtime/src/faults.rs": "500737659038acebd5f9e0c21234b3854d6b405dfe1cea8b10a896c4809dc80e",
+  "probes/runtime/src/journal.rs": "877c6b9fa09bd5c9a0bf0e3e05f6efe52d283e8dd4bd23e5c5878dee95d2e00f",
+  "probes/runtime/src/journal_probe.rs": "270299d9dd2109d1a75bb15edec9a3161d080a5cbed574cdbe4591f14e22fa21",
+  "probes/runtime/src/live.rs": "7910d01d5b20fa0ddbb4338a8b79e8347802834c8c5edb062881cf43ddb31f61",
+  "probes/runtime/src/main.rs": "867b9643271a8d5a81800b32d2739b1837118da7b0c9fbefcc291a62b44c3cf2",
+  "probes/runtime/src/provider.rs": "72066912b9e43a27caa5482c6ee728d65955485cc27d79c9f3d3a0773124c333",
+  "probes/runtime/src/replay_server.rs": "7563135faceca613e2bd8c93fc203b3b0405d72773a610da605bb337c9c35936",
+  "probes/runtime/src/scenario.rs": "d93445e6e406147ba376166fce152fb65fdcd7eff4d3e723d047604179d36ef3",
+  "probes/runtime/src/util.rs": "24c7b13b32aab5fd442ba1fdeff54d81d424e8ff2ec5792660bca5e8fe61c42e",
+  "probes/runtime/src/worker.rs": "5c76d991420d7abb92e91b461fa379cfcb3e5f014008131c19f55b75efebac00",
+  "probes/runtime/compare/thin/src/main.rs": "3b64e62f05ed363ba8daa611c993a59cfae925db51405e4411006707f6a206e3",
+  "probes/runtime/compare/async-openai/src/main.rs": "d8719ac84c26f9d0f2e790393eff288755dd90683cbfbef4f0803cc7ec61becc",
+  "probes/runtime/recordings/anthropic-cancelled-turn.meta.json": "79f365a38f530d9c91c9eaa06a9a64b5ffc33f4b6f252170daa62e4804a902f6",
+  "probes/runtime/recordings/anthropic-cancelled-turn.sse": "0d0c6feb4e292ddcb14482810ef07199e5c0cb6f384e5cbe36ccb800b4f201c3",
+  "probes/runtime/recordings/anthropic-followup-turn.meta.json": "442f8e5c2b0051f75b730ae8f30437b9c4b5709c2222a2c8bf47486eac94a9de",
+  "probes/runtime/recordings/anthropic-followup-turn.sse": "c9f4eb15963f287e53f1a1842f0994321c238c51ad1b4e517f6fc2b95fbc531e",
+  "probes/runtime/recordings/anthropic-text-turn.meta.json": "e8b0375dfb56706d23d22ee778165262bd349962d785814ed0839b739c3c5654",
+  "probes/runtime/recordings/anthropic-text-turn.sse": "cc061e0bc1151d0ad1727e806cbae8bb19a8bdf893ab7cdae924daf70c946e89",
+  "probes/runtime/recordings/anthropic-tool-turn.meta.json": "e36f22b3840fc5c6a012de33e15a5a2369694dc50b16c92bb6caa90d107d5071",
+  "probes/runtime/recordings/anthropic-tool-turn.sse": "dbaa9e700329cddc32abbf741c7c1156b8193708702e5ba9485ecf1a4bff5bc1",
+  "Cargo.toml": "458349b5c7dd6654cfd147e388aed69a067f99c107a383d78d59e01bc4725649",
+  "Cargo.lock": "c6b83d941e93c84c6d7edb7d177ca8a96f177f561412dc5746972a89b86d1346",
+  "rust-toolchain.toml": "559f488c181e0e9e77cf17c29de663977f036ec7ff2e2060585714bf53c52d62",
+  "compose.yaml": "74518c41daa77345e39bfbe8242e49d46d91d73dfe9abdb59f577a582d0d7a25",
+  "probes/runtime/Cargo.toml": "117b98b927fc8fbf5913b91a37667459256014fc9bc4a13621d57c056f1eeb9d",
+  "probes/runtime/run-exp03.sh": "da25ba9d139251cc488913eea3177e395fdca060077f8821085c9dbe863f9d1a",
+  "probes/runtime/run-exp04.sh": "99a8c601a6e54c9e7d193c39a3bb34ad06e0f5826dcfa6d601fb6d854bdf6c0f",
+  "probes/runtime/compose.db-port.yaml": "bfda1420eaf91cbc4099f3ca0032cec7ed04ca1fbfcab559cbb4d55b0e437916",
+  "probes/runtime/licenses.py": "1c47e4c0a24ebfa2f761e59f23a8e34167bdd654da62e344d9a4f0c55ea640c2",
+  "probes/runtime/scan_image_listing.py": "9aa589861aa431eb6153d46ab2bd5f68ab42979036905a16517fb102ffc1e999",
+  "probes/runtime/collect_results.py": "87f08a0fabd04a7c125b7fe845e3c2d4a4497edfb1957851e66ca7a37b77ddcf",
+  "probes/runtime/compare/body.json": "5e3a4813da63c54b214a62fd28b95fa48c36047eea25d8d2443b64813dbf8560",
+  "probes/runtime/compare/measure.sh": "732795372ff724ed1fc9d4c0126f0eaf93a8672ca2fd5a84d925442c375cb41f",
+  "probes/runtime/compare/fault-compare.sh": "786cae0e22017a44cf9b284ece0cc9a2fc24bd2661f562d7e2b39956d7e3d493",
+  "probes/runtime/compare/async-openai/Cargo.toml": "add2c53ff06a24f304efc7d42f8b7482ba2e22f839edecbb5c411956ae44b68b",
+  "probes/runtime/compare/async-openai/Cargo.lock": "6ab1b12270145928db6a279c4f32c513cca96b078cf272154fd64a6653aabaa2",
+  "probes/runtime/compare/thin/Cargo.toml": "40a9de89452f022b92313d29ffa19aa66eef3669595b2d611e442191d500da85",
+  "docker/agent-probe.Dockerfile": "d39c8aae5b2ca774a90ff0bd01adc174f91a9dc8b7a9d4c1aa06dee7653bd030"
+ },
+ "checks": [
+  {
+   "id": "EXP03-OPENAI-MODELS-LIST",
+   "maps_to": [
+    "RT-02"
+   ],
+   "command": "curl GET https://api.openai.com/v1/models (key from env, not printed)",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "live",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/models-list.json",
+    "sha256": "bf08dc45a6cd9623670cb8749586c41928dc96a78ad1a5d1d18a83758d5bff2e"
+   },
+   "verdict": "pass",
+   "limitation": "Proves authentication and model availability only. Not inference."
+  },
+  {
+   "id": "EXP03-OPENAI-AUTH-401",
+   "maps_to": [
+    "RT-06"
+   ],
+   "command": "./target/debug/runtime-probe record (auth_refusal case, deliberately invalid key)",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "live",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/live-record-quota-refusal.json",
+    "sha256": "64b5df5375d93515b227f44defc5c00a1655e2d6f69b6e56281c599aaeb36fcc"
+   },
+   "verdict": "pass",
+   "limitation": "Invalid key at request start. Credential loss mid-task not exercised."
+  },
+  {
+   "id": "EXP03-OPENAI-QUOTA-429",
+   "maps_to": [
+    "RT-06"
+   ],
+   "command": "./target/debug/runtime-probe record (3 model requests, gpt-5.4-nano-2026-03-17)",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "live",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/live-record-quota-refusal.json",
+    "sha256": "64b5df5375d93515b227f44defc5c00a1655e2d6f69b6e56281c599aaeb36fcc"
+   },
+   "verdict": "defect found and fixed, live recheck not run",
+   "limitation": "All three requests returned HTTP 429 type insufficient_quota code credit_balance_exhausted. The first classifier labelled this rate_limited with automatic retry allowed (visible in the artifact). Fixed in crates/agent/src/openai.rs, covered by unit test live_credit_exhausted_is_quota_not_retryable with the provider's own status, type and code. No live re-run under the no-further-OpenAI-calls instruction.",
+   "detail": {
+    "observed": {
+     "class": "rate_limited",
+     "message": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
+     "provider_code": "credit_balance_exhausted",
+     "provider_type": "insufficient_quota",
+     "status": 429
+    },
+    "spend_usd": 0.0
+   }
+  },
+  {
+   "id": "EXP03-OPENAI-STREAM-FAULTS",
+   "maps_to": [
+    "RT-03",
+    "RT-07"
+   ],
+   "command": "not run",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "live",
+   "exit_code": null,
+   "artifact": null,
+   "verdict": "unavailable",
+   "limitation": "OpenAI returned 429 credit_balance_exhausted for both keys on 2026-10-24 and the maintainer chose not to buy credits. No OpenAI stream exists to record or replay. Synthetic streams were not substituted."
+  },
+  {
+   "id": "EXP03-OPENAI-LIVE-TOOL-TURN",
+   "maps_to": [
+    "RT-02"
+   ],
+   "command": "not run",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "live",
+   "exit_code": null,
+   "artifact": null,
+   "verdict": "unavailable",
+   "limitation": "OpenAI returned 429 credit_balance_exhausted for both keys on 2026-10-24 and the maintainer chose not to buy credits. No OpenAI stream exists to record or replay. Synthetic streams were not substituted."
+  },
+  {
+   "id": "EXP03-OPENAI-LIVE-CANCELLATION",
+   "maps_to": [
+    "RT-10"
+   ],
+   "command": "not run",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "live",
+   "exit_code": null,
+   "artifact": null,
+   "verdict": "unavailable",
+   "limitation": "OpenAI returned 429 credit_balance_exhausted for both keys on 2026-10-24 and the maintainer chose not to buy credits. No OpenAI stream exists to record or replay. Synthetic streams were not substituted."
+  },
+  {
+   "id": "EXP03-ANTHROPIC-LIVE-TOOL-TURN",
+   "maps_to": [
+    "RT-02",
+    "T-RUN-05"
+   ],
+   "command": "ANTHROPIC_API_KEY=\"$(powershell.exe ... GetEnvironmentVariable('ANTHROPIC_API_KEY','User'))\" target/release/runtime-probe record-anthropic",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "live",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/live-record-anthropic.json",
+    "sha256": "753c03af5adff86ab409af9c868397cb563a4fb04bebf8d1c4bd1f166ae4ce56"
+   },
+   "verdict": "pass",
+   "limitation": "One fixture, strict tool, tool_choice auto, thinking disabled. Parallel calls and long contexts not probed.",
+   "detail": {
+    "model_reported": "claude-haiku-5-5",
+    "recording": "probes/runtime/recordings/anthropic-tool-turn.sse"
+   }
+  },
+  {
+   "id": "EXP03-ANTHROPIC-LIVE-FOLLOWUP-TURN",
+   "maps_to": [
+    "RT-02"
+   ],
+   "command": "ANTHROPIC_API_KEY=\"$(powershell.exe ... GetEnvironmentVariable('ANTHROPIC_API_KEY','User'))\" target/release/runtime-probe record-anthropic",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "live",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/live-record-anthropic.json",
+    "sha256": "753c03af5adff86ab409af9c868397cb563a4fb04bebf8d1c4bd1f166ae4ce56"
+   },
+   "verdict": "pass",
+   "limitation": "The tool result sent back is the host broker's real execution receipt in a scratch workspace."
+  },
+  {
+   "id": "EXP03-ANTHROPIC-LIVE-CANCELLATION",
+   "maps_to": [
+    "RT-10"
+   ],
+   "command": "ANTHROPIC_API_KEY=\"$(powershell.exe ... GetEnvironmentVariable('ANTHROPIC_API_KEY','User'))\" target/release/runtime-probe record-anthropic",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "live",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/live-record-anthropic.json",
+    "sha256": "753c03af5adff86ab409af9c868397cb563a4fb04bebf8d1c4bd1f166ae4ce56"
+   },
+   "verdict": "pass",
+   "limitation": "Cancellation drops the connection after 9 events. Provider-side billing after cancel is not observable from the client, so cost is the max_tokens upper bound. The no-retry rule is the classifier's decision. No retry was attempted.",
+   "detail": {
+    "cancel_at_ms": 702.5996,
+    "events_at_cancel": 9,
+    "spend": {
+     "basis": "cancelled: usage incomplete, output counted at the full max_tokens allowance as an upper bound",
+     "call": "anthropic-cancelled-turn",
+     "estimate": {
+      "kind": "estimated",
+      "price": {
+       "cached_input_per_mtok": 0.01,
+       "input_per_mtok": 0.1,
+       "model_prefix": "claude-haiku-5-5",
+       "output_per_mtok": 0.5,
+       "retrieved": "2026-10-24",
+       "source": "https://platform.claude.com/docs/en/about-claude/pricing (Claude Haiku 5.5, prompts up to 100,000 tokens)"
+      },
+      "usage": {
+       "cached_input_tokens": 0,
+       "input_tokens": 37,
+       "output_tokens": 600,
+       "reasoning_tokens": 0
+      },
+      "usd": 0.0003037
+     },
+     "model": "claude-haiku-5-5",
+     "reported_partial_usage": {
+      "cached_input_tokens": 0,
+      "input_tokens": 37,
+      "output_tokens": 4,
+      "reasoning_tokens": 0
+     }
+    }
+   }
+  },
+  {
+   "id": "EXP03-ANTHROPIC-AUTH-401",
+   "maps_to": [
+    "RT-06"
+   ],
+   "command": "ANTHROPIC_API_KEY=\"$(powershell.exe ... GetEnvironmentVariable('ANTHROPIC_API_KEY','User'))\" target/release/runtime-probe record-anthropic (auth_refusal case, deliberately invalid key)",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "live",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/live-record-anthropic.json",
+    "sha256": "753c03af5adff86ab409af9c868397cb563a4fb04bebf8d1c4bd1f166ae4ce56"
+   },
+   "verdict": "pass",
+   "limitation": "Invalid key at request start. Quota exhaustion on Anthropic was not observed."
+  },
+  {
+   "id": "EXP03-FAULT-F-TRUNC-MID-ARGS",
+   "maps_to": [
+    "RT-03"
+   ],
+   "command": "target/release/runtime-probe faults",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/stream-faults.json",
+    "sha256": "bfdfff2b22d5e365abf24dd3f488c8e174063510134dd653cd752675fffa21bb"
+   },
+   "verdict": "pass",
+   "limitation": "Faults injected into recorded real Anthropic streams (claude-haiku-5-5). Replay uses the recorded chunk boundaries. A live provider truncation was not observed.",
+   "detail": {
+    "loop_result": {
+     "auto_retry_allowed": false,
+     "class": "incomplete_output",
+     "display": "incomplete output: stream ended mid-event (47 partial line bytes, undispatched=true)",
+     "ok": false
+    },
+    "effect_observed": false,
+    "persisted": {
+     "event_seq": 1,
+     "row_state": "incomplete_output"
+    }
+   }
+  },
+  {
+   "id": "EXP03-FAULT-F-TRUNC-EVENT-BOUNDARY",
+   "maps_to": [
+    "RT-03"
+   ],
+   "command": "target/release/runtime-probe faults",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/stream-faults.json",
+    "sha256": "bfdfff2b22d5e365abf24dd3f488c8e174063510134dd653cd752675fffa21bb"
+   },
+   "verdict": "pass",
+   "limitation": "Faults injected into recorded real Anthropic streams (claude-haiku-5-5). Replay uses the recorded chunk boundaries. A live provider truncation was not observed.",
+   "detail": {
+    "loop_result": {
+     "auto_retry_allowed": false,
+     "class": "incomplete_output",
+     "display": "incomplete output: stream ended without a message_delta stop_reason",
+     "ok": false
+    },
+    "effect_observed": false,
+    "persisted": {
+     "event_seq": 2,
+     "row_state": "incomplete_output"
+    }
+   }
+  },
+  {
+   "id": "EXP03-FAULT-F-MISSING-FINISH-AND-DONE",
+   "maps_to": [
+    "RT-03"
+   ],
+   "command": "target/release/runtime-probe faults",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/stream-faults.json",
+    "sha256": "bfdfff2b22d5e365abf24dd3f488c8e174063510134dd653cd752675fffa21bb"
+   },
+   "verdict": "pass",
+   "limitation": "Faults injected into recorded real Anthropic streams (claude-haiku-5-5). Replay uses the recorded chunk boundaries. A live provider truncation was not observed.",
+   "detail": {
+    "loop_result": {
+     "auto_retry_allowed": false,
+     "class": "incomplete_output",
+     "display": "incomplete output: stream ended without a message_delta stop_reason",
+     "ok": false
+    },
+    "effect_observed": false,
+    "persisted": {
+     "event_seq": 3,
+     "row_state": "incomplete_output"
+    }
+   }
+  },
+  {
+   "id": "EXP03-FAULT-F-MISSING-DONE-ONLY",
+   "maps_to": [
+    "RT-03"
+   ],
+   "command": "target/release/runtime-probe faults",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/stream-faults.json",
+    "sha256": "bfdfff2b22d5e365abf24dd3f488c8e174063510134dd653cd752675fffa21bb"
+   },
+   "verdict": "pass",
+   "limitation": "Faults injected into recorded real Anthropic streams (claude-haiku-5-5). Replay uses the recorded chunk boundaries. A live provider truncation was not observed.",
+   "detail": {
+    "loop_result": {
+     "auto_retry_allowed": false,
+     "class": "incomplete_output",
+     "display": "incomplete output: stream ended without message_stop",
+     "ok": false
+    },
+    "effect_observed": false,
+    "persisted": {
+     "event_seq": 4,
+     "row_state": "incomplete_output"
+    }
+   }
+  },
+  {
+   "id": "EXP03-FAULT-F-MALFORMED-TOOL-JSON",
+   "maps_to": [
+    "RT-03",
+    "T-RUN-02"
+   ],
+   "command": "target/release/runtime-probe faults",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/stream-faults.json",
+    "sha256": "bfdfff2b22d5e365abf24dd3f488c8e174063510134dd653cd752675fffa21bb"
+   },
+   "verdict": "pass",
+   "limitation": "Faults injected into recorded real Anthropic streams (claude-haiku-5-5). Replay uses the recorded chunk boundaries. A live provider truncation was not observed.",
+   "detail": {
+    "loop_result": {
+     "auto_retry_allowed": false,
+     "class": "malformed_tool_arguments",
+     "display": "malformed tool arguments for call 0: EOF while parsing a string at line 1 column 55",
+     "ok": false
+    },
+    "effect_observed": false,
+    "persisted": {
+     "event_seq": 5,
+     "row_state": "malformed_tool_arguments"
+    }
+   }
+  },
+  {
+   "id": "EXP03-FAULT-F-DISCONNECT-AFTER-TOOL-CALL",
+   "maps_to": [
+    "RT-07"
+   ],
+   "command": "target/release/runtime-probe faults",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/stream-faults.json",
+    "sha256": "bfdfff2b22d5e365abf24dd3f488c8e174063510134dd653cd752675fffa21bb"
+   },
+   "verdict": "pass",
+   "limitation": "Faults injected into recorded real Anthropic streams (claude-haiku-5-5). Replay uses the recorded chunk boundaries. A live provider truncation was not observed.",
+   "detail": {
+    "loop_result": {
+     "auto_retry_allowed": false,
+     "class": "transport",
+     "display": "transport failure (Accepted): body stream broke after acceptance: injected disconnect (connection reset) during replay",
+     "ok": false
+    },
+    "effect_observed": false,
+    "persisted": {
+     "event_seq": 6,
+     "row_state": "transport"
+    }
+   }
+  },
+  {
+   "id": "EXP03-FAULT-F-TEXT-TRUNC-MID",
+   "maps_to": [
+    "RT-03"
+   ],
+   "command": "target/release/runtime-probe faults",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/stream-faults.json",
+    "sha256": "bfdfff2b22d5e365abf24dd3f488c8e174063510134dd653cd752675fffa21bb"
+   },
+   "verdict": "pass",
+   "limitation": "Faults injected into recorded real Anthropic streams (claude-haiku-5-5). Replay uses the recorded chunk boundaries. A live provider truncation was not observed.",
+   "detail": {
+    "loop_result": {
+     "auto_retry_allowed": false,
+     "class": "incomplete_output",
+     "display": "incomplete output: stream ended mid-event (48 partial line bytes, undispatched=true)",
+     "ok": false
+    },
+    "effect_observed": false,
+    "persisted": {
+     "event_seq": 7,
+     "row_state": "incomplete_output"
+    }
+   }
+  },
+  {
+   "id": "EXP03-FAULT-F-TEXT-MISSING-FINISH",
+   "maps_to": [
+    "RT-03"
+   ],
+   "command": "target/release/runtime-probe faults",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/stream-faults.json",
+    "sha256": "bfdfff2b22d5e365abf24dd3f488c8e174063510134dd653cd752675fffa21bb"
+   },
+   "verdict": "pass",
+   "limitation": "Faults injected into recorded real Anthropic streams (claude-haiku-5-5). Replay uses the recorded chunk boundaries. A live provider truncation was not observed.",
+   "detail": {
+    "loop_result": {
+     "auto_retry_allowed": false,
+     "class": "incomplete_output",
+     "display": "incomplete output: stream ended without a message_delta stop_reason",
+     "ok": false
+    },
+    "effect_observed": false,
+    "persisted": {
+     "event_seq": 8,
+     "row_state": "incomplete_output"
+    }
+   }
+  },
+  {
+   "id": "EXP03-FAULT-F-NONE",
+   "maps_to": [
+    "F-RUNTIME-FAULT positive control"
+   ],
+   "command": "target/release/runtime-probe faults",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/stream-faults.json",
+    "sha256": "bfdfff2b22d5e365abf24dd3f488c8e174063510134dd653cd752675fffa21bb"
+   },
+   "verdict": "pass",
+   "limitation": "Faults injected into recorded real Anthropic streams (claude-haiku-5-5). Replay uses the recorded chunk boundaries. A live provider truncation was not observed.",
+   "detail": {
+    "loop_result": {
+     "finish_reason": "tool_use",
+     "ok": true,
+     "tool_calls": 1
+    },
+    "effect_observed": true,
+    "persisted": {
+     "event_seq": 11,
+     "row": {
+      "outcome": {
+       "finish_reason": "tool_use",
+       "host": {
+        "after_hash": "9aef8df555d4ae9b1d32673f7f11c8549767884ddefbbfbd0534fb248e296ada",
+        "op_id": "op_215649e045ebf4a8",
+        "published": true
+       }
+      },
+      "state": "succeeded",
+      "worker_generation": 0
+     }
+    }
+   }
+  },
+  {
+   "id": "EXP03-FAULT-F-FOLLOWUP-DISCONNECT-AFTER-SETTLED-TOOL",
+   "maps_to": [
+    "RT-07"
+   ],
+   "command": "target/release/runtime-probe faults",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/stream-faults.json",
+    "sha256": "bfdfff2b22d5e365abf24dd3f488c8e174063510134dd653cd752675fffa21bb"
+   },
+   "verdict": "pass",
+   "limitation": "Faults injected into recorded real Anthropic streams (claude-haiku-5-5). Replay uses the recorded chunk boundaries. A live provider truncation was not observed.",
+   "detail": {
+    "loop_result": {
+     "auto_retry_allowed": false,
+     "class": "transport",
+     "display": "transport failure (Accepted): body stream broke after acceptance: injected disconnect (connection reset) during replay",
+     "ok": false
+    },
+    "effect_observed": false,
+    "persisted": {
+     "event_seq": 12,
+     "row_state": "transport"
+    }
+   }
+  },
+  {
+   "id": "EXP03-BROKER-B1-HOOK-PATH-TRAVERSAL",
+   "maps_to": [
+    "RT-04"
+   ],
+   "command": "target/release/runtime-probe broker",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/broker.json",
+    "sha256": "77c3983c7504701b3a8061e1fb2ecd5140079b39344e534d1ce414a66bcd9a1a"
+   },
+   "verdict": "pass",
+   "limitation": "Initial arguments are the recorded real model tool call. Hooks, final validation, root policy and filesystem effects are real. Windows host filesystem only."
+  },
+  {
+   "id": "EXP03-BROKER-B2-HOOK-ABSOLUTE-PATH",
+   "maps_to": [
+    "RT-04"
+   ],
+   "command": "target/release/runtime-probe broker",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/broker.json",
+    "sha256": "77c3983c7504701b3a8061e1fb2ecd5140079b39344e534d1ce414a66bcd9a1a"
+   },
+   "verdict": "pass",
+   "limitation": "Initial arguments are the recorded real model tool call. Hooks, final validation, root policy and filesystem effects are real. Windows host filesystem only."
+  },
+  {
+   "id": "EXP03-BROKER-B3-HOOK-NESTED-TRAVERSAL",
+   "maps_to": [
+    "RT-04"
+   ],
+   "command": "target/release/runtime-probe broker",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/broker.json",
+    "sha256": "77c3983c7504701b3a8061e1fb2ecd5140079b39344e534d1ce414a66bcd9a1a"
+   },
+   "verdict": "pass",
+   "limitation": "Initial arguments are the recorded real model tool call. Hooks, final validation, root policy and filesystem effects are real. Windows host filesystem only."
+  },
+  {
+   "id": "EXP03-BROKER-B4-HOOK-TYPE-CHANGE",
+   "maps_to": [
+    "RT-04"
+   ],
+   "command": "target/release/runtime-probe broker",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/broker.json",
+    "sha256": "77c3983c7504701b3a8061e1fb2ecd5140079b39344e534d1ce414a66bcd9a1a"
+   },
+   "verdict": "pass",
+   "limitation": "Initial arguments are the recorded real model tool call. Hooks, final validation, root policy and filesystem effects are real. Windows host filesystem only."
+  },
+  {
+   "id": "EXP03-BROKER-B5-HOOK-UNKNOWN-FIELD",
+   "maps_to": [
+    "T-RUN-02"
+   ],
+   "command": "target/release/runtime-probe broker",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/broker.json",
+    "sha256": "77c3983c7504701b3a8061e1fb2ecd5140079b39344e534d1ce414a66bcd9a1a"
+   },
+   "verdict": "pass",
+   "limitation": "Initial arguments are the recorded real model tool call. Hooks, final validation, root policy and filesystem effects are real. Windows host filesystem only."
+  },
+  {
+   "id": "EXP03-BROKER-B6-HOOK-DROP-REQUIRED",
+   "maps_to": [
+    "T-RUN-02"
+   ],
+   "command": "target/release/runtime-probe broker",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/broker.json",
+    "sha256": "77c3983c7504701b3a8061e1fb2ecd5140079b39344e534d1ce414a66bcd9a1a"
+   },
+   "verdict": "pass",
+   "limitation": "Initial arguments are the recorded real model tool call. Hooks, final validation, root policy and filesystem effects are real. Windows host filesystem only."
+  },
+  {
+   "id": "EXP03-BROKER-B7-HOOK-RENAME-TOOL",
+   "maps_to": [
+    "T-RUN-02"
+   ],
+   "command": "target/release/runtime-probe broker",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/broker.json",
+    "sha256": "77c3983c7504701b3a8061e1fb2ecd5140079b39344e534d1ce414a66bcd9a1a"
+   },
+   "verdict": "pass",
+   "limitation": "Initial arguments are the recorded real model tool call. Hooks, final validation, root policy and filesystem effects are real. Windows host filesystem only."
+  },
+  {
+   "id": "EXP03-BROKER-B8-HOOK-NON-OBJECT-ARGS",
+   "maps_to": [
+    "T-RUN-02"
+   ],
+   "command": "target/release/runtime-probe broker",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/broker.json",
+    "sha256": "77c3983c7504701b3a8061e1fb2ecd5140079b39344e534d1ce414a66bcd9a1a"
+   },
+   "verdict": "pass",
+   "limitation": "Initial arguments are the recorded real model tool call. Hooks, final validation, root policy and filesystem effects are real. Windows host filesystem only."
+  },
+  {
+   "id": "EXP03-BROKER-B9-HOOK-MARKER-OVERWRITE",
+   "maps_to": [
+    "RT-04"
+   ],
+   "command": "target/release/runtime-probe broker",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/broker.json",
+    "sha256": "77c3983c7504701b3a8061e1fb2ecd5140079b39344e534d1ce414a66bcd9a1a"
+   },
+   "verdict": "pass",
+   "limitation": "Initial arguments are the recorded real model tool call. Hooks, final validation, root policy and filesystem effects are real. Windows host filesystem only."
+  },
+  {
+   "id": "EXP03-BROKER-B10-HOOK-SYMLINK-ESCAPE",
+   "maps_to": [
+    "RT-04"
+   ],
+   "command": "target/release/runtime-probe broker",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/broker.json",
+    "sha256": "77c3983c7504701b3a8061e1fb2ecd5140079b39344e534d1ce414a66bcd9a1a"
+   },
+   "verdict": "pass",
+   "limitation": "Initial arguments are the recorded real model tool call. Hooks, final validation, root policy and filesystem effects are real. Windows host filesystem only."
+  },
+  {
+   "id": "EXP03-BROKER-B0-NO-HOOK",
+   "maps_to": [
+    "RT-04",
+    "T-RUN-02"
+   ],
+   "command": "target/release/runtime-probe broker",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/broker.json",
+    "sha256": "77c3983c7504701b3a8061e1fb2ecd5140079b39344e534d1ce414a66bcd9a1a"
+   },
+   "verdict": "pass",
+   "limitation": "Initial arguments are the recorded real model tool call. Hooks, final validation, root policy and filesystem effects are real. Windows host filesystem only."
+  },
+  {
+   "id": "EXP03-JOURNAL-J1-INTENT-BEFORE-EFFECT",
+   "maps_to": [
+    "T-RUN-04"
+   ],
+   "command": "target/release/runtime-probe journal --phase a",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "local-execution",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/journal-phase-a.json",
+    "sha256": "e0900d17c9517556673ed26168ee614e6c4a83cc326c972a04062a80c8d57f6b"
+   },
+   "verdict": "pass",
+   "limitation": "PostgreSQL 17.6 in the Compose stack, real child process aborts, recorded real tool arguments. Single host, no replica clock skew."
+  },
+  {
+   "id": "EXP03-JOURNAL-J2-STALE-FENCE-RESULT-CANNOT-PUBLISH",
+   "maps_to": [
+    "T-RUN-03"
+   ],
+   "command": "target/release/runtime-probe journal --phase a",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "local-execution",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/journal-phase-a.json",
+    "sha256": "e0900d17c9517556673ed26168ee614e6c4a83cc326c972a04062a80c8d57f6b"
+   },
+   "verdict": "pass",
+   "limitation": "PostgreSQL 17.6 in the Compose stack, real child process aborts, recorded real tool arguments. Single host, no replica clock skew."
+  },
+  {
+   "id": "EXP03-JOURNAL-J2B-STALE-FENCE-CANNOT-START",
+   "maps_to": [
+    "T-RUN-03"
+   ],
+   "command": "target/release/runtime-probe journal --phase a",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "local-execution",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/journal-phase-a.json",
+    "sha256": "e0900d17c9517556673ed26168ee614e6c4a83cc326c972a04062a80c8d57f6b"
+   },
+   "verdict": "pass",
+   "limitation": "PostgreSQL 17.6 in the Compose stack, real child process aborts, recorded real tool arguments. Single host, no replica clock skew."
+  },
+  {
+   "id": "EXP03-JOURNAL-J3-REPLAY-IDENTITY",
+   "maps_to": [
+    "T-RUN-04",
+    "ORCH-09"
+   ],
+   "command": "target/release/runtime-probe journal --phase a",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "local-execution",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/journal-phase-a.json",
+    "sha256": "e0900d17c9517556673ed26168ee614e6c4a83cc326c972a04062a80c8d57f6b"
+   },
+   "verdict": "pass",
+   "limitation": "PostgreSQL 17.6 in the Compose stack, real child process aborts, recorded real tool arguments. Single host, no replica clock skew."
+  },
+  {
+   "id": "EXP03-JOURNAL-J4-CRASH-CHILDREN",
+   "maps_to": [
+    "T-RUN-04"
+   ],
+   "command": "target/release/runtime-probe journal --phase a",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "local-execution",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/journal-phase-a.json",
+    "sha256": "e0900d17c9517556673ed26168ee614e6c4a83cc326c972a04062a80c8d57f6b"
+   },
+   "verdict": "pass",
+   "limitation": "PostgreSQL 17.6 in the Compose stack, real child process aborts, recorded real tool arguments. Single host, no replica clock skew."
+  },
+  {
+   "id": "EXP03-JOURNAL-J5-PAUSE-AND-REVOCATION-DISPATCH-STOP",
+   "maps_to": [
+    "T-RUN-03"
+   ],
+   "command": "target/release/runtime-probe journal --phase a",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "local-execution",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/journal-phase-a.json",
+    "sha256": "e0900d17c9517556673ed26168ee614e6c4a83cc326c972a04062a80c8d57f6b"
+   },
+   "verdict": "pass",
+   "limitation": "PostgreSQL 17.6 in the Compose stack, real child process aborts, recorded real tool arguments. Single host, no replica clock skew."
+  },
+  {
+   "id": "EXP03-JOURNAL-R1-PERSISTENT-RESTART",
+   "maps_to": [
+    "T-RUN-03"
+   ],
+   "command": "target/release/runtime-probe journal --phase b (after docker compose restart db)",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "local-execution",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/journal-phase-b.json",
+    "sha256": "67862cc501ac0e1a9aad21d3cedbaf9859dd4e9921f3fdffdea0f3f33e48895a"
+   },
+   "verdict": "pass",
+   "limitation": "PostgreSQL 17.6 in the Compose stack, real child process aborts, recorded real tool arguments. Single host, no replica clock skew."
+  },
+  {
+   "id": "EXP03-JOURNAL-R2-PAUSE-SURVIVES-RESTART-AND-REVOKED-EPOCH",
+   "maps_to": [
+    "T-RUN-03"
+   ],
+   "command": "target/release/runtime-probe journal --phase b (after docker compose restart db)",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "local-execution",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/journal-phase-b.json",
+    "sha256": "67862cc501ac0e1a9aad21d3cedbaf9859dd4e9921f3fdffdea0f3f33e48895a"
+   },
+   "verdict": "pass",
+   "limitation": "PostgreSQL 17.6 in the Compose stack, real child process aborts, recorded real tool arguments. Single host, no replica clock skew."
+  },
+  {
+   "id": "EXP03-JOURNAL-R3-CRASH-RECOVERY-UNKNOWN-EFFECT",
+   "maps_to": [
+    "T-RUN-04"
+   ],
+   "command": "target/release/runtime-probe journal --phase b (after docker compose restart db)",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "local-execution",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/journal-phase-b.json",
+    "sha256": "67862cc501ac0e1a9aad21d3cedbaf9859dd4e9921f3fdffdea0f3f33e48895a"
+   },
+   "verdict": "pass",
+   "limitation": "PostgreSQL 17.6 in the Compose stack, real child process aborts, recorded real tool arguments. Single host, no replica clock skew."
+  },
+  {
+   "id": "EXP03-JOURNAL-R4-UNKNOWN-EFFECT-NOT-REPLAYED",
+   "maps_to": [
+    "T-RUN-04"
+   ],
+   "command": "target/release/runtime-probe journal --phase b (after docker compose restart db)",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "local-execution",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/journal-phase-b.json",
+    "sha256": "67862cc501ac0e1a9aad21d3cedbaf9859dd4e9921f3fdffdea0f3f33e48895a"
+   },
+   "verdict": "pass",
+   "limitation": "PostgreSQL 17.6 in the Compose stack, real child process aborts, recorded real tool arguments. Single host, no replica clock skew."
+  },
+  {
+   "id": "EXP03-JOURNAL-R5-EXPLICIT-RECONCILIATION",
+   "maps_to": [
+    "T-RUN-04"
+   ],
+   "command": "target/release/runtime-probe journal --phase b (after docker compose restart db)",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "local-execution",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/journal-phase-b.json",
+    "sha256": "67862cc501ac0e1a9aad21d3cedbaf9859dd4e9921f3fdffdea0f3f33e48895a"
+   },
+   "verdict": "pass",
+   "limitation": "PostgreSQL 17.6 in the Compose stack, real child process aborts, recorded real tool arguments. Single host, no replica clock skew."
+  },
+  {
+   "id": "EXP03-WORKER-W1-HANDSHAKE",
+   "maps_to": [
+    "SPEC-002 worker protocol"
+   ],
+   "command": "target/release/runtime-probe worker --live",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/worker.json",
+    "sha256": "83612e095ef1589295a0c9d414ea9fd3fdb45398e2fd7d5913109fd628a469ec"
+   },
+   "verdict": "pass",
+   "limitation": "Worker is the same binary as the host, on the Windows host. Container and gVisor placement not measured."
+  },
+  {
+   "id": "EXP03-WORKER-W2-INCOMPATIBLE-VERSION-REFUSED",
+   "maps_to": [
+    "SPEC-002 worker protocol"
+   ],
+   "command": "target/release/runtime-probe worker --live",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/worker.json",
+    "sha256": "83612e095ef1589295a0c9d414ea9fd3fdb45398e2fd7d5913109fd628a469ec"
+   },
+   "verdict": "pass",
+   "limitation": "Worker is the same binary as the host, on the Windows host. Container and gVisor placement not measured."
+  },
+  {
+   "id": "EXP03-WORKER-W3-LATE-OLD-GENERATION-FRAME-REJECTED",
+   "maps_to": [
+    "RT-08"
+   ],
+   "command": "target/release/runtime-probe worker --live",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/worker.json",
+    "sha256": "83612e095ef1589295a0c9d414ea9fd3fdb45398e2fd7d5913109fd628a469ec"
+   },
+   "verdict": "pass",
+   "limitation": "Worker is the same binary as the host, on the Windows host. Container and gVisor placement not measured."
+  },
+  {
+   "id": "EXP03-WORKER-W4-FORGED-OLD-GENERATION-STAMP-REJECTED",
+   "maps_to": [
+    "RT-08"
+   ],
+   "command": "target/release/runtime-probe worker --live",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/worker.json",
+    "sha256": "83612e095ef1589295a0c9d414ea9fd3fdb45398e2fd7d5913109fd628a469ec"
+   },
+   "verdict": "pass",
+   "limitation": "Worker is the same binary as the host, on the Windows host. Container and gVisor placement not measured."
+  },
+  {
+   "id": "EXP03-WORKER-W5-WORKER-KILLED-RESTARTED",
+   "maps_to": [
+    "RT-08"
+   ],
+   "command": "target/release/runtime-probe worker --live",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/worker.json",
+    "sha256": "83612e095ef1589295a0c9d414ea9fd3fdb45398e2fd7d5913109fd628a469ec"
+   },
+   "verdict": "pass",
+   "limitation": "Worker is the same binary as the host, on the Windows host. Container and gVisor placement not measured."
+  },
+  {
+   "id": "EXP03-WORKER-W6-UNSOLICITED-OUTPUT-IS-PROTOCOL-VIOLATION",
+   "maps_to": [
+    "SPEC-002 worker protocol"
+   ],
+   "command": "target/release/runtime-probe worker --live",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/worker.json",
+    "sha256": "83612e095ef1589295a0c9d414ea9fd3fdb45398e2fd7d5913109fd628a469ec"
+   },
+   "verdict": "pass",
+   "limitation": "Worker is the same binary as the host, on the Windows host. Container and gVisor placement not measured."
+  },
+  {
+   "id": "EXP03-WORKER-W7-IN-PROCESS-LATE-RESULT-REJECTED",
+   "maps_to": [
+    "RT-08"
+   ],
+   "command": "target/release/runtime-probe worker --live",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/worker.json",
+    "sha256": "83612e095ef1589295a0c9d414ea9fd3fdb45398e2fd7d5913109fd628a469ec"
+   },
+   "verdict": "pass",
+   "limitation": "Worker is the same binary as the host, on the Windows host. Container and gVisor placement not measured."
+  },
+  {
+   "id": "EXP03-WORKER-W8-LIVE-TURN-VIA-WORKER",
+   "maps_to": [
+    "SPEC-002 worker protocol"
+   ],
+   "command": "ANTHROPIC_API_KEY=\"$(powershell.exe ... GetEnvironmentVariable('ANTHROPIC_API_KEY','User'))\" target/release/runtime-probe worker --live",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "live",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/worker.json",
+    "sha256": "83612e095ef1589295a0c9d414ea9fd3fdb45398e2fd7d5913109fd628a469ec"
+   },
+   "verdict": "pass",
+   "limitation": "Worker is the same binary as the host, on the Windows host. Container and gVisor placement not measured."
+  },
+  {
+   "id": "EXP03-COMPARE-PROVIDER-CRATE",
+   "maps_to": [
+    "ADR-011 open question 1"
+   ],
+   "command": "bash probes/runtime/compare/measure.sh <scratch dir> (3 runs, alternating order)",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "static",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/compare/comparison.json",
+    "sha256": "32329a4be59f7032b0d9fbf4ea191821f1cea3d2005995095eb6f855ea4d6de8"
+   },
+   "verdict": "measured",
+   "limitation": "Clean build times vary 107 to 343 s between identical runs on this host, more than the gap between crates. async-openai fault behaviour is from source inspection because no OpenAI stream could be recorded.",
+   "detail": {
+    "thin": {
+     "clean_release_build_s": [
+      342.5,
+      106.7,
+      203.0
+     ],
+     "median_s": 203.0,
+     "unique_normal_deps_including_root": 90,
+     "stripped_release_binary_bytes": 4584960
+    },
+    "async-openai": {
+     "clean_release_build_s": [
+      257.1,
+      302.6,
+      168.9
+     ],
+     "median_s": 257.1,
+     "unique_normal_deps_including_root": 126,
+     "stripped_release_binary_bytes": 5629440
+    }
+   }
+  },
+  {
+   "id": "EXP03-COMPARE-PLACEMENT",
+   "maps_to": [
+    "ADR-011 open question 2",
+    "RT-08"
+   ],
+   "command": "ANTHROPIC_API_KEY=\"$(powershell.exe ... GetEnvironmentVariable('ANTHROPIC_API_KEY','User'))\" target/release/runtime-probe worker --live",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "recorded-real-replay",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/worker.json",
+    "sha256": "83612e095ef1589295a0c9d414ea9fd3fdb45398e2fd7d5913109fd628a469ec"
+   },
+   "verdict": "measured",
+   "limitation": "Release build, Windows host, 200 iterations, one recorded real Anthropic tool-call stream.",
+   "detail": {
+    "build_profile": "release",
+    "in_process_assemble_us": {
+     "max": 490.4,
+     "median": 33.0,
+     "min": 27.8,
+     "n": 200,
+     "p95": 47.3
+    },
+    "payload_bytes": 2666,
+    "worker_internal_assemble_us": {
+     "max": 346.8,
+     "median": 43.0,
+     "min": 25.9,
+     "n": 200,
+     "p95": 57.2
+    },
+    "worker_roundtrip_us": {
+     "max": 2594.4,
+     "median": 224.0,
+     "min": 145.4,
+     "n": 200,
+     "p95": 358.5
+    },
+    "worker_spawn_and_handshake_ms": {
+     "max": 17.5836,
+     "median": 12.1608,
+     "min": 10.363199999999999,
+     "n": 10,
+     "p95": 17.5836
+    }
+   }
+  },
+  {
+   "id": "EXP03-LICENSES",
+   "maps_to": [
+    "S01-W6 licenses",
+    "ADR-017"
+   ],
+   "command": "python -I probes/runtime/licenses.py . factory-agent factory-runtime-probe",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "static",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/licenses.json",
+    "sha256": "4fbe7b6e2ed44b4e13697976aee8c6e64c589f11e77d1f4e43b85b2ae22db519"
+   },
+   "verdict": "pass",
+   "limitation": "Allow-list check over Cargo SPDX metadata. Not legal advice. NOTICE retention still needed at S08.",
+   "detail": {
+    "x86_64-unknown-linux-gnu": {
+     "factory-agent": 107,
+     "factory-runtime-probe": 188
+    },
+    "x86_64-pc-windows-msvc": {
+     "factory-agent": 105,
+     "factory-runtime-probe": 186
+    }
+   }
+  },
+  {
+   "id": "EXP03-AGENT-UNIT-TESTS",
+   "maps_to": [
+    "T-RUN-02",
+    "RT-06"
+   ],
+   "command": "cargo test -p factory-agent",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "static",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp03/runs/unit-tests.json",
+    "sha256": "7877032403f84336d3edef0e4fa8554bd90e29fc67aa5be4e0052e251aaef75a"
+   },
+   "verdict": "pass",
+   "limitation": "Framing, codec, request shapes and HTTP classes. No model output in tests."
+  }
+ ]
+}

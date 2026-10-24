@@ -83,8 +83,10 @@ Strengths are a richer embedded session system and a broadly TypeScript applicat
 | ADR-019 | Claude and OpenAI adapters, monthly allowance on any model, Stripe for credits | Maintainer decision | Allowance cost or provider terms change |
 | ADR-020 | gVisor runtime for per-task tool containers | Maintainer decision, stronger isolation than plain Docker | EXP-07 escape or cross-tenant tests fail |
 | ADR-021 | Verified email, 30-day deletion grace, private or public projects, license-respecting copies, English with translatable strings | Maintainer decision | Abuse, privacy or legal review requires changes |
+| ADR-022 | Automatic personal, project and global memory, verified lessons, no authority in memory | Maintainer decision, personalized agent that stops repeating mistakes | Verification gate cannot keep harmful or poisoned lessons out in EXP-05 |
+| ADR-023 | Automatic engineering learning gated by regression tests | Maintainer decision, self-improving development loop | A test-backed promotion causes a regression or widens authority |
 
-ADR-011 through ADR-021 are recorded maintainer decisions with full records in the [decision record](maintainer-decisions-2026-10-24.md). The others remain proposals. S01 produces decision receipts with evidence and asks for architecture/roadmap review at its end. Approval of S01 does not authorize S02 automatically.
+ADR-011 through ADR-023 are recorded maintainer decisions with full records in the [decision record](maintainer-decisions-2026-10-24.md). The others remain proposals. S01 produces decision receipts with evidence and asks for architecture/roadmap review at its end. Approval of S01 does not authorize S02 automatically.
 
 ## S01 experiment gate
 

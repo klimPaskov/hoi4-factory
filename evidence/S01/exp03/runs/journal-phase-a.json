@@ -1,0 +1,192 @@
+{
+  "checks": [
+    {
+      "id": "J1-INTENT-BEFORE-EFFECT",
+      "op_id": "op_42d10b530cb89e20",
+      "published": true,
+      "state_after_intent_before_effect": "in_flight",
+      "verdict": "pass"
+    },
+    {
+      "fence_a": 1,
+      "fence_b": 2,
+      "id": "J2-STALE-FENCE-RESULT-CANNOT-PUBLISH (T-RUN-03)",
+      "op2_state": "in_flight",
+      "publish_attempt": {
+        "current": 2,
+        "current_owner": "owner-b",
+        "presented": 1,
+        "refusal": "stale_fence"
+      },
+      "verdict": "pass"
+    },
+    {
+      "id": "J2B-STALE-FENCE-CANNOT-START (T-RUN-03)",
+      "refusal": {
+        "current": 2,
+        "current_owner": "owner-b",
+        "presented": 1,
+        "refusal": "stale_fence"
+      },
+      "tree_unchanged": true,
+      "verdict": "pass"
+    },
+    {
+      "changed_root": {
+        "op_id": "op_42d10b530cb89e20",
+        "presented_identity": "d25d8bf41a5b94216b841b0e86168a6e41ecffc5c280ddbfb77aa6ecb9664dcf",
+        "result": {
+          "changed": [
+            "root_identity"
+          ],
+          "decision": "refused",
+          "executes": false,
+          "reason": "replay_identity_mismatch"
+        },
+        "state": "succeeded",
+        "stored_identity": "ecab5f73682f360a81fd5f261c9828bb84650f67c98edecb8b1f6a6302567343"
+      },
+      "changed_tool_version": {
+        "op_id": "op_42d10b530cb89e20",
+        "presented_identity": "64f8b94314850b8d72da9bc642bdb2fec16a62321557832ba552dda1b3a77efd",
+        "result": {
+          "changed": [
+            "tool_version"
+          ],
+          "decision": "refused",
+          "executes": false,
+          "reason": "replay_identity_mismatch"
+        },
+        "state": "succeeded",
+        "stored_identity": "ecab5f73682f360a81fd5f261c9828bb84650f67c98edecb8b1f6a6302567343"
+      },
+      "id": "J3-REPLAY-IDENTITY (T-RUN-04, ORCH-09)",
+      "same_identity": {
+        "op_id": "op_42d10b530cb89e20",
+        "presented_identity": "ecab5f73682f360a81fd5f261c9828bb84650f67c98edecb8b1f6a6302567343",
+        "result": {
+          "decision": "already_applied",
+          "executes": false,
+          "receipt_after_hash": "9aef8df555d4ae9b1d32673f7f11c8549767884ddefbbfbd0534fb248e296ada"
+        },
+        "state": "succeeded",
+        "stored_identity": "ecab5f73682f360a81fd5f261c9828bb84650f67c98edecb8b1f6a6302567343"
+      },
+      "verdict": "pass"
+    },
+    {
+      "children": [
+        {
+          "exit_code": -1073740791,
+          "mode": "before-intent",
+          "success": false
+        },
+        {
+          "exit_code": -1073740791,
+          "mode": "during-effect",
+          "success": false
+        },
+        {
+          "exit_code": -1073740791,
+          "mode": "after-effect",
+          "success": false
+        }
+      ],
+      "id": "J4-CRASH-CHILDREN",
+      "verdict": "pass"
+    },
+    {
+      "id": "J5-PAUSE-AND-REVOCATION-DISPATCH-STOP (T-RUN-03)",
+      "refusal": {
+        "refusal": "paused"
+      },
+      "revocation_epoch": 2,
+      "verdict": "pass"
+    }
+  ],
+  "control": [
+    true,
+    2
+  ],
+  "events": [
+    {
+      "payload_hash": "d5d1a1eccdc5345d0faacaec0d3706b50cd3af8d5b83ee26bee62a54755a45f8",
+      "seq": 13,
+      "type": "tool_intent"
+    },
+    {
+      "payload_hash": "759909e42dbc98b085ffc74b56feceda87a95126dfb731b7fe8963678e514c4f",
+      "seq": 14,
+      "type": "tool_settled"
+    },
+    {
+      "payload_hash": "a7b66a506d12fcba5168a6d84bb6bbc8d5d1579216c2f458397fb7e7fafa5374",
+      "seq": 15,
+      "type": "tool_intent"
+    },
+    {
+      "payload_hash": "5b0efec266421121175e202a218f9ae6445a75f43e095d5df21e60f17803fea8",
+      "seq": 16,
+      "type": "tool_intent"
+    },
+    {
+      "payload_hash": "95e218c92dee91bc6d46acf9e4f0cb549d328db2067e5a8804c4bdc9882ccde3",
+      "seq": 17,
+      "type": "tool_intent"
+    },
+    {
+      "payload_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "seq": 18,
+      "type": "paused"
+    },
+    {
+      "payload_hash": "f3f863b76bd24639bde98174a396d231f6f936d396700fcd603a9dc66f895012",
+      "seq": 19,
+      "type": "grant_revoked"
+    }
+  ],
+  "evidence_kind": "live-local (PostgreSQL 17 in Compose, real process crashes)",
+  "input_source": "recorded real model tool call",
+  "last_fence": 6,
+  "op_ids": {
+    "op1": "op_42d10b530cb89e20",
+    "op2_stale": "op_438fe02767b167af"
+  },
+  "ops": [
+    {
+      "after_hash": "9aef8df555d4ae9b1d32673f7f11c8549767884ddefbbfbd0534fb248e296ada",
+      "fence": 1,
+      "observation": null,
+      "op_id": "op_42d10b530cb89e20",
+      "state": "succeeded"
+    },
+    {
+      "after_hash": null,
+      "fence": 1,
+      "observation": null,
+      "op_id": "op_438fe02767b167af",
+      "state": "in_flight"
+    },
+    {
+      "after_hash": null,
+      "fence": 4,
+      "observation": null,
+      "op_id": "op_163231417ee01b67",
+      "state": "in_flight"
+    },
+    {
+      "after_hash": null,
+      "fence": 5,
+      "observation": null,
+      "op_id": "op_5551b6fa5b03cc1a",
+      "state": "in_flight"
+    }
+  ],
+  "phase": "a",
+  "postgres": "17.6 (Debian 17.6-2.pgdg12+1)",
+  "probe": "journal",
+  "workspace": {
+    "identity": "45c1cc7e84ce99ff0cc8fb7b34d1f0b104a01233fec624e94e4c5f6aea123b74",
+    "root": "\\\\?\\C:\\Users\\klimp\\AppData\\Local\\Temp\\hoi4-factory-s01-runtime\\journal\\root"
+  }
+}

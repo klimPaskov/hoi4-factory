@@ -1,0 +1,7 @@
+# S01 EXP-03 probe override (owned by S01-W5). Publishes the Compose PostgreSQL
+# service on the loopback interface only, so host-side probes can reach it.
+# Use: docker compose -f compose.yaml -f probes/runtime/compose.db-port.yaml up -d --no-deps db
+services:
+  db:
+    ports:
+      - "127.0.0.1:55432:5432"

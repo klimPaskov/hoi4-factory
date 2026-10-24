@@ -1,0 +1,21 @@
+[package]
+name = "exp01-setup-probe"
+version = "0.0.0"
+edition = "2021"
+rust-version = "1.88"
+publish = false
+license = "AGPL-3.0-only"
+description = "EXP-01 binding probe: embed HOI4-Mod-Setup services on server workspace paths"
+
+# Standalone probe, not a member of the factory workspace.
+[workspace]
+resolver = "2"
+
+[dependencies]
+# Both pinned to the audited Setup revision. Neither enables the `desktop`
+# feature, so Tauri is not compiled.
+hoi4-setup-core = { git = "https://github.com/klimPaskov/HOI4-Mod-Setup", rev = "4488a418cad56a158273cb66c4ce7794696b7ed1" }
+hoi4-mod-setup = { git = "https://github.com/klimPaskov/HOI4-Mod-Setup", rev = "4488a418cad56a158273cb66c4ce7794696b7ed1", default-features = false }
+serde_json = "1.0"
+uuid = { version = "1.17", features = ["v4"] }
+chrono = "0.4"

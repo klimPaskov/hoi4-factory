@@ -1,0 +1,29 @@
+{
+  "elapsed_ms": 481694,
+  "hoi4ms_leftovers_after_kill": [],
+  "hoi4ms_leftovers_after_recovery": [],
+  "kill": "none",
+  "killed_at": "not_killed",
+  "observed_managed": 0,
+  "observed_staged": 0,
+  "ops": 200,
+  "plan_id": "3a1abb1e-4f7d-407f-8b2f-f749c8a489bf",
+  "recovery": {
+    "discard_staging_allowed": false,
+    "found": true,
+    "last_checkpoint": "readiness report",
+    "outcome": {
+      "ok": "rolled_back"
+    },
+    "project_apply_started": true,
+    "recommended_action": "rollback",
+    "resume_allowed": false,
+    "rollback_allowed": true,
+    "state_before": "interrupted",
+    "transaction_id": "3a1abb1e-4f7d-407f-8b2f-f749c8a489bf"
+  },
+  "size": 262144,
+  "worker_exit_code": 0,
+  "worker_exit_success": true,
+  "worker_result": "EXP01_WORKER_RESULT err transaction error: readiness is blocked; success lock was not written: descriptor.project: The internal descriptor parses and contains the required project metadata. Check is not satisfied."
+}

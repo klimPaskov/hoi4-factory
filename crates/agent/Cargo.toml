@@ -1,0 +1,27 @@
+[package]
+name = "factory-agent"
+description = "HOI4 Factory native model loop. Holds no filesystem, Git or grant authority."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+# The crate receives byte sinks and byte sources from its caller. It never opens
+# files, runs Git or checks grants. Host-side broker and journal code lives in
+# the host (S01: probes/runtime).
+
+[features]
+default = ["openai", "anthropic", "protocol"]
+openai = ["http"]
+anthropic = ["http"]
+http = ["dep:reqwest"]
+protocol = ["tokio/io-util"]
+
+[dependencies]
+bytes = "1"
+serde.workspace = true
+serde_json.workspace = true
+thiserror = "2"
+tokio = { workspace = true, features = ["sync", "time"] }
+reqwest = { version = "0.13.5", default-features = false, features = ["rustls"], optional = true }

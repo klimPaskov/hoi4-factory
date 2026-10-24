@@ -1,0 +1,5 @@
+debconf: delaying package configuration, since apt-utils is not installed
+MODE=0711 worker_result=EXP01_WORKER_RESULT err transaction error: Permission denied (os error 13)
+198   openat(4, "acct", O_RDONLY|O_NOFOLLOW|O_CLOEXEC|O_DIRECTORY) = -1 EACCES (Permission denied)
+MODE=0755 worker_result=EXP01_WORKER_RESULT err transaction error: readiness is blocked; success lock was not written: descriptor.project: The internal descriptor parses and contains the required project metadata. Check is not satisfied.
+docker_exit=0

@@ -23,7 +23,7 @@ An **Account** signs in through GitHub or email. A **Project** belongs to one ow
 
 An **ApprovalGrant** contains allowed operation classes, roots, budgets, expiry and revocation epoch. A **Proposal** contains an expected base, operations and intended postconditions. A **ToolReceipt** records intent and outcome. An **EvidenceRecord** identifies exact artifacts and checks. A **ReviewDecision** binds a reviewer and reason to a specific proposal hash.
 
-A **KnowledgeCandidate** is separate from an **ApprovedCanonVersion**. Runtime lessons and engineering lessons have separate domains and destinations. Search projections can reference either, but an unapproved candidate cannot acquire authority by appearing in a retrieved context.
+A **KnowledgeCandidate** is separate from an **ApprovedCanonVersion**. Runtime lessons and engineering lessons have separate domains and destinations. Search projections can reference either, but an unapproved candidate cannot acquire authority by appearing in a retrieved context. Runtime memory under ADR-022 learns automatically within the lanes of SPEC-004. MemoryItem and FeedbackEvent rows live in PostgreSQL with account and project on every row and row-level security, and memory is always data, never authority, whatever its state.
 
 ## Referential and ordering rules
 

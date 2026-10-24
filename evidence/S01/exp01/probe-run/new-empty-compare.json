@@ -1,0 +1,32 @@
+{
+ "before": "/out/probe/new-empty-before.json",
+ "after": "/out/probe/new-empty-after.json",
+ "approved_prefixes": [],
+ "unapproved": {
+  "changed": [],
+  "mode_changed": [],
+  "added": [],
+  "removed": [],
+  "metadata_only": []
+ },
+ "approved": {
+  "changed": [],
+  "added": [],
+  "removed": []
+ },
+ "all": {
+  "added_files": [],
+  "added_dirs": [],
+  "removed": [],
+  "content_changed": []
+ },
+ "unapproved_bytes_untouched": true,
+ "exact_files": true,
+ "exact_files_and_dirs": true,
+ "git_index_sha256": {
+  "before": null,
+  "after": null
+ },
+ "git_status_identical": true,
+ "git_ls_files_identical": true
+}

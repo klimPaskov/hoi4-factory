@@ -1,0 +1,428 @@
+{
+  "cases": [
+    {
+      "case": "F-TRUNC-MID-ARGS (RT-03)",
+      "effect_observed": false,
+      "evidence_kind": "recorded-real-replay",
+      "fault": {
+        "TruncateAt": 1567
+      },
+      "host": null,
+      "loop_result": {
+        "auto_retry_allowed": false,
+        "class": "incomplete_output",
+        "display": "incomplete output: stream ended mid-event (47 partial line bytes, undispatched=true)",
+        "ok": false
+      },
+      "op_intents_after": 0,
+      "op_intents_before": 0,
+      "persisted_attempt": {
+        "event_seq": 1,
+        "row_state": "incomplete_output"
+      },
+      "recording": {
+        "captured": "2026-10-24T11:22:49Z",
+        "evidence_kind_of_capture": "live",
+        "model": "claude-haiku-5-5",
+        "provider": "anthropic-messages",
+        "recording": "probes/runtime/recordings/anthropic-tool-turn.sse",
+        "sse_sha256": "dbaa9e700329cddc32abbf741c7c1156b8193708702e5ba9485ecf1a4bff5bc1"
+      },
+      "verdict": "pass",
+      "workspace_snapshot_after": "95cd5fed8ee55d2fb1f2984a86c585853bf15d70a0815fed1e31809caaf8a38c",
+      "workspace_snapshot_before": "95cd5fed8ee55d2fb1f2984a86c585853bf15d70a0815fed1e31809caaf8a38c"
+    },
+    {
+      "case": "F-TRUNC-EVENT-BOUNDARY (RT-03)",
+      "effect_observed": false,
+      "evidence_kind": "recorded-real-replay",
+      "fault": {
+        "TruncateAt": 2214
+      },
+      "host": null,
+      "loop_result": {
+        "auto_retry_allowed": false,
+        "class": "incomplete_output",
+        "display": "incomplete output: stream ended without a message_delta stop_reason",
+        "ok": false
+      },
+      "op_intents_after": 0,
+      "op_intents_before": 0,
+      "persisted_attempt": {
+        "event_seq": 2,
+        "row_state": "incomplete_output"
+      },
+      "recording": {
+        "captured": "2026-10-24T11:22:49Z",
+        "evidence_kind_of_capture": "live",
+        "model": "claude-haiku-5-5",
+        "provider": "anthropic-messages",
+        "recording": "probes/runtime/recordings/anthropic-tool-turn.sse",
+        "sse_sha256": "dbaa9e700329cddc32abbf741c7c1156b8193708702e5ba9485ecf1a4bff5bc1"
+      },
+      "verdict": "pass",
+      "workspace_snapshot_after": "95cd5fed8ee55d2fb1f2984a86c585853bf15d70a0815fed1e31809caaf8a38c",
+      "workspace_snapshot_before": "95cd5fed8ee55d2fb1f2984a86c585853bf15d70a0815fed1e31809caaf8a38c"
+    },
+    {
+      "case": "F-MISSING-FINISH-AND-DONE (RT-03)",
+      "effect_observed": false,
+      "evidence_kind": "recorded-real-replay",
+      "fault": {
+        "DropEvents": [
+          "{\"type\":\"message_delta\",\"delta\":{\"stop_reason\":\"tool_use\",\"stop_sequence\":null,\"stop_details\":null,\"container\":null},\"usage\":{\"input_tokens\":508,\"cache_creation_input_tokens\":0,\"cache_read_input_tokens\":0,\"output_tokens\":84,\"output_tokens_details\":{\"thinking_tokens\":0}}              }",
+          "\"type\":\"message_stop\""
+        ]
+      },
+      "host": null,
+      "loop_result": {
+        "auto_retry_allowed": false,
+        "class": "incomplete_output",
+        "display": "incomplete output: stream ended without a message_delta stop_reason",
+        "ok": false
+      },
+      "op_intents_after": 0,
+      "op_intents_before": 0,
+      "persisted_attempt": {
+        "event_seq": 3,
+        "row_state": "incomplete_output"
+      },
+      "recording": {
+        "captured": "2026-10-24T11:22:49Z",
+        "evidence_kind_of_capture": "live",
+        "model": "claude-haiku-5-5",
+        "provider": "anthropic-messages",
+        "recording": "probes/runtime/recordings/anthropic-tool-turn.sse",
+        "sse_sha256": "dbaa9e700329cddc32abbf741c7c1156b8193708702e5ba9485ecf1a4bff5bc1"
+      },
+      "verdict": "pass",
+      "workspace_snapshot_after": "95cd5fed8ee55d2fb1f2984a86c585853bf15d70a0815fed1e31809caaf8a38c",
+      "workspace_snapshot_before": "95cd5fed8ee55d2fb1f2984a86c585853bf15d70a0815fed1e31809caaf8a38c"
+    },
+    {
+      "case": "F-MISSING-DONE-ONLY (RT-03)",
+      "effect_observed": false,
+      "evidence_kind": "recorded-real-replay",
+      "fault": {
+        "DropEvents": [
+          "\"type\":\"message_stop\""
+        ]
+      },
+      "host": null,
+      "loop_result": {
+        "auto_retry_allowed": false,
+        "class": "incomplete_output",
+        "display": "incomplete output: stream ended without message_stop",
+        "ok": false
+      },
+      "op_intents_after": 0,
+      "op_intents_before": 0,
+      "persisted_attempt": {
+        "event_seq": 4,
+        "row_state": "incomplete_output"
+      },
+      "recording": {
+        "captured": "2026-10-24T11:22:49Z",
+        "evidence_kind_of_capture": "live",
+        "model": "claude-haiku-5-5",
+        "provider": "anthropic-messages",
+        "recording": "probes/runtime/recordings/anthropic-tool-turn.sse",
+        "sse_sha256": "dbaa9e700329cddc32abbf741c7c1156b8193708702e5ba9485ecf1a4bff5bc1"
+      },
+      "verdict": "pass",
+      "workspace_snapshot_after": "95cd5fed8ee55d2fb1f2984a86c585853bf15d70a0815fed1e31809caaf8a38c",
+      "workspace_snapshot_before": "95cd5fed8ee55d2fb1f2984a86c585853bf15d70a0815fed1e31809caaf8a38c"
+    },
+    {
+      "case": "F-MALFORMED-TOOL-JSON (RT-03, T-RUN-02)",
+      "effect_observed": false,
+      "evidence_kind": "recorded-real-replay",
+      "fault": {
+        "DropEvents": [
+          "{\"type\":\"content_block_delta\",\"index\":0,\"delta\":{\"type\":\"input_json_delta\",\"partial_json\":\"e.txt\\\"}\"} }"
+        ]
+      },
+      "host": null,
+      "loop_result": {
+        "auto_retry_allowed": false,
+        "class": "malformed_tool_arguments",
+        "display": "malformed tool arguments for call 0: EOF while parsing a string at line 1 column 55",
+        "ok": false
+      },
+      "op_intents_after": 0,
+      "op_intents_before": 0,
+      "persisted_attempt": {
+        "event_seq": 5,
+        "row_state": "malformed_tool_arguments"
+      },
+      "recording": {
+        "captured": "2026-10-24T11:22:49Z",
+        "evidence_kind_of_capture": "live",
+        "model": "claude-haiku-5-5",
+        "provider": "anthropic-messages",
+        "recording": "probes/runtime/recordings/anthropic-tool-turn.sse",
+        "sse_sha256": "dbaa9e700329cddc32abbf741c7c1156b8193708702e5ba9485ecf1a4bff5bc1"
+      },
+      "verdict": "pass",
+      "workspace_snapshot_after": "95cd5fed8ee55d2fb1f2984a86c585853bf15d70a0815fed1e31809caaf8a38c",
+      "workspace_snapshot_before": "95cd5fed8ee55d2fb1f2984a86c585853bf15d70a0815fed1e31809caaf8a38c"
+    },
+    {
+      "case": "F-DISCONNECT-AFTER-TOOL-CALL (RT-07)",
+      "effect_observed": false,
+      "evidence_kind": "recorded-real-replay",
+      "fault": {
+        "DisconnectAt": 2214
+      },
+      "host": null,
+      "loop_result": {
+        "auto_retry_allowed": false,
+        "class": "transport",
+        "display": "transport failure (Accepted): body stream broke after acceptance: injected disconnect (connection reset) during replay",
+        "ok": false
+      },
+      "op_intents_after": 0,
+      "op_intents_before": 0,
+      "persisted_attempt": {
+        "event_seq": 6,
+        "row_state": "transport"
+      },
+      "recording": {
+        "captured": "2026-10-24T11:22:49Z",
+        "evidence_kind_of_capture": "live",
+        "model": "claude-haiku-5-5",
+        "provider": "anthropic-messages",
+        "recording": "probes/runtime/recordings/anthropic-tool-turn.sse",
+        "sse_sha256": "dbaa9e700329cddc32abbf741c7c1156b8193708702e5ba9485ecf1a4bff5bc1"
+      },
+      "verdict": "pass",
+      "workspace_snapshot_after": "95cd5fed8ee55d2fb1f2984a86c585853bf15d70a0815fed1e31809caaf8a38c",
+      "workspace_snapshot_before": "95cd5fed8ee55d2fb1f2984a86c585853bf15d70a0815fed1e31809caaf8a38c"
+    },
+    {
+      "case": "F-TEXT-TRUNC-MID (RT-03)",
+      "effect_observed": false,
+      "evidence_kind": "recorded-real-replay",
+      "fault": {
+        "TruncateAt": 911
+      },
+      "host": null,
+      "loop_result": {
+        "auto_retry_allowed": false,
+        "class": "incomplete_output",
+        "display": "incomplete output: stream ended mid-event (48 partial line bytes, undispatched=true)",
+        "ok": false
+      },
+      "op_intents_after": 0,
+      "op_intents_before": 0,
+      "persisted_attempt": {
+        "event_seq": 7,
+        "row_state": "incomplete_output"
+      },
+      "recording": {
+        "captured": "2026-10-24T11:22:52Z",
+        "evidence_kind_of_capture": "live",
+        "model": "claude-haiku-5-5",
+        "provider": "anthropic-messages",
+        "recording": "probes/runtime/recordings/anthropic-text-turn.sse",
+        "sse_sha256": "cc061e0bc1151d0ad1727e806cbae8bb19a8bdf893ab7cdae924daf70c946e89"
+      },
+      "verdict": "pass",
+      "workspace_snapshot_after": "95cd5fed8ee55d2fb1f2984a86c585853bf15d70a0815fed1e31809caaf8a38c",
+      "workspace_snapshot_before": "95cd5fed8ee55d2fb1f2984a86c585853bf15d70a0815fed1e31809caaf8a38c"
+    },
+    {
+      "case": "F-TEXT-MISSING-FINISH (RT-03)",
+      "effect_observed": false,
+      "evidence_kind": "recorded-real-replay",
+      "fault": {
+        "DropEvents": [
+          "{\"type\":\"message_delta\",\"delta\":{\"stop_reason\":\"end_turn\",\"stop_sequence\":null,\"stop_details\":null,\"container\":null},\"usage\":{\"input_tokens\":37,\"cache_creation_input_tokens\":0,\"cache_read_input_tokens\":0,\"output_tokens\":24,\"output_tokens_details\":{\"thinking_tokens\":0}}            }",
+          "\"type\":\"message_stop\""
+        ]
+      },
+      "host": null,
+      "loop_result": {
+        "auto_retry_allowed": false,
+        "class": "incomplete_output",
+        "display": "incomplete output: stream ended without a message_delta stop_reason",
+        "ok": false
+      },
+      "op_intents_after": 0,
+      "op_intents_before": 0,
+      "persisted_attempt": {
+        "event_seq": 8,
+        "row_state": "incomplete_output"
+      },
+      "recording": {
+        "captured": "2026-10-24T11:22:52Z",
+        "evidence_kind_of_capture": "live",
+        "model": "claude-haiku-5-5",
+        "provider": "anthropic-messages",
+        "recording": "probes/runtime/recordings/anthropic-text-turn.sse",
+        "sse_sha256": "cc061e0bc1151d0ad1727e806cbae8bb19a8bdf893ab7cdae924daf70c946e89"
+      },
+      "verdict": "pass",
+      "workspace_snapshot_after": "95cd5fed8ee55d2fb1f2984a86c585853bf15d70a0815fed1e31809caaf8a38c",
+      "workspace_snapshot_before": "95cd5fed8ee55d2fb1f2984a86c585853bf15d70a0815fed1e31809caaf8a38c"
+    },
+    {
+      "case": "F-NONE baseline executes once",
+      "effect_observed": true,
+      "evidence_kind": "recorded-real-replay",
+      "fault": "None",
+      "host": {
+        "after_hash": "9aef8df555d4ae9b1d32673f7f11c8549767884ddefbbfbd0534fb248e296ada",
+        "op_id": "op_215649e045ebf4a8",
+        "published": true
+      },
+      "loop_result": {
+        "finish_reason": "tool_use",
+        "ok": true,
+        "tool_calls": 1
+      },
+      "op_intents_after": 1,
+      "op_intents_before": 0,
+      "persisted_attempt": {
+        "event_seq": 11,
+        "row": {
+          "outcome": {
+            "finish_reason": "tool_use",
+            "host": {
+              "after_hash": "9aef8df555d4ae9b1d32673f7f11c8549767884ddefbbfbd0534fb248e296ada",
+              "op_id": "op_215649e045ebf4a8",
+              "published": true
+            }
+          },
+          "state": "succeeded",
+          "worker_generation": 0
+        }
+      },
+      "recording": {
+        "captured": "2026-10-24T11:22:49Z",
+        "evidence_kind_of_capture": "live",
+        "model": "claude-haiku-5-5",
+        "provider": "anthropic-messages",
+        "recording": "probes/runtime/recordings/anthropic-tool-turn.sse",
+        "sse_sha256": "dbaa9e700329cddc32abbf741c7c1156b8193708702e5ba9485ecf1a4bff5bc1"
+      },
+      "verdict": "pass",
+      "workspace_snapshot_after": "7caec6cbf1f57364b1208c72c81a8cfcc9f6946d8c1d223c72d597c25b2bdbc1",
+      "workspace_snapshot_before": "95cd5fed8ee55d2fb1f2984a86c585853bf15d70a0815fed1e31809caaf8a38c"
+    },
+    {
+      "case": "F-FOLLOWUP-DISCONNECT-AFTER-SETTLED-TOOL (RT-07)",
+      "effect_observed": false,
+      "evidence_kind": "recorded-real-replay",
+      "fault": {
+        "DisconnectAt": 961
+      },
+      "host": null,
+      "loop_result": {
+        "auto_retry_allowed": false,
+        "class": "transport",
+        "display": "transport failure (Accepted): body stream broke after acceptance: injected disconnect (connection reset) during replay",
+        "ok": false
+      },
+      "op_intents_after": 1,
+      "op_intents_before": 1,
+      "persisted_attempt": {
+        "event_seq": 12,
+        "row_state": "transport"
+      },
+      "recording": {
+        "captured": "2026-10-24T11:22:51Z",
+        "evidence_kind_of_capture": "live",
+        "model": "claude-haiku-5-5",
+        "provider": "anthropic-messages",
+        "recording": "probes/runtime/recordings/anthropic-followup-turn.sse",
+        "sse_sha256": "c9f4eb15963f287e53f1a1842f0994321c238c51ad1b4e517f6fc2b95fbc531e"
+      },
+      "recovery_consulted_receipt": {
+        "op_id": "op_215649e045ebf4a8",
+        "presented_identity": "ff88a5f9d9f601048938ba9af2bb18efb667b9c058a67161eef0e817efb70b2b",
+        "result": {
+          "decision": "already_applied",
+          "executes": false,
+          "receipt_after_hash": "9aef8df555d4ae9b1d32673f7f11c8549767884ddefbbfbd0534fb248e296ada"
+        },
+        "state": "succeeded",
+        "stored_identity": "ff88a5f9d9f601048938ba9af2bb18efb667b9c058a67161eef0e817efb70b2b"
+      },
+      "settled_ops_total": 1,
+      "verdict": "pass",
+      "workspace_snapshot_after": "7caec6cbf1f57364b1208c72c81a8cfcc9f6946d8c1d223c72d597c25b2bdbc1",
+      "workspace_snapshot_before": "7caec6cbf1f57364b1208c72c81a8cfcc9f6946d8c1d223c72d597c25b2bdbc1"
+    }
+  ],
+  "event_log": [
+    {
+      "payload_hash": "ebe4b8d4c89754b5c59541ee8d71055914045f3b8832eb934db4a0302d8f81c7",
+      "seq": 1,
+      "type": "attempt_incomplete_output"
+    },
+    {
+      "payload_hash": "b8760e5fcd8d02c333e196c9bca4a8eca9de9c8f6e515225cbf26891795a8a97",
+      "seq": 2,
+      "type": "attempt_incomplete_output"
+    },
+    {
+      "payload_hash": "55ab5a38228c45bdb5d8210d722ce6d234f347d6a9820a65f67cb203291c7213",
+      "seq": 3,
+      "type": "attempt_incomplete_output"
+    },
+    {
+      "payload_hash": "c94f1d6522c23bf35f2792f85fc5ef43dba982fc45e89aa1dcf1dfab1c3a50cf",
+      "seq": 4,
+      "type": "attempt_incomplete_output"
+    },
+    {
+      "payload_hash": "dff03f826e92edfad14abdf43a5e5baefe9969be7f94300da65862c9706495f1",
+      "seq": 5,
+      "type": "attempt_malformed_tool_arguments"
+    },
+    {
+      "payload_hash": "b41ea909c76d35427580d238a391980ac1c371ee135189d05bc41d15faa94ca1",
+      "seq": 6,
+      "type": "attempt_transport"
+    },
+    {
+      "payload_hash": "42cf562b8ff92dd17d63feb4a990b46867c053f4c9b2b378e069dbf6cd7510ad",
+      "seq": 7,
+      "type": "attempt_incomplete_output"
+    },
+    {
+      "payload_hash": "72082069843f171107f89a9412242fe8d595e07c70c7eaf2e030839b89757a65",
+      "seq": 8,
+      "type": "attempt_incomplete_output"
+    },
+    {
+      "payload_hash": "381a981a79c790affb4938eaef946a8b1b6b56b2889fb4492148f0ad3b485e53",
+      "seq": 9,
+      "type": "tool_intent"
+    },
+    {
+      "payload_hash": "3ff84128be57022de294182d9f1616228f81cd2e620503f1d48b164042fa74de",
+      "seq": 10,
+      "type": "tool_settled"
+    },
+    {
+      "payload_hash": "88a835e5adb98f6ca5527576205f16fa0838869d905b78062e8df81f21c3dbf8",
+      "seq": 11,
+      "type": "attempt_succeeded"
+    },
+    {
+      "payload_hash": "14ca4f20215eb99ccb46ff2defb4a0c60a7a77057a135191b7406cb4ab5c5648",
+      "seq": 12,
+      "type": "attempt_transport"
+    }
+  ],
+  "evidence_kind": "recorded-real-replay",
+  "lease": {
+    "fence": 1,
+    "owner": "faults-host"
+  },
+  "postgres": "17.6 (Debian 17.6-2.pgdg12+1)",
+  "probe": "stream-faults",
+  "workspace_id": "ws-stream-faults"
+}

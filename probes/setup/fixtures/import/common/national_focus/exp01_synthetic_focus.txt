@@ -1,0 +1,26 @@
+# Original synthetic focus fragment for HOI4 Factory EXP-01.
+# Written for this fixture only. It is not taken from any game or mod.
+focus_tree = {
+	id = exp01_synthetic_tree
+	country = { factor = 0 }
+	focus = {
+		id = EXP01_harbor_survey
+		icon = GFX_goal_generic_construct_infrastructure
+		x = 3
+		y = 0
+		cost = 10
+		completion_reward = {
+			add_political_power = 25
+		}
+	}
+	focus = {
+		id = EXP01_coastal_rail
+		prerequisite = { focus = EXP01_harbor_survey }
+		x = 3
+		y = 1
+		cost = 10
+		completion_reward = {
+			add_stability = 0.02
+		}
+	}
+}

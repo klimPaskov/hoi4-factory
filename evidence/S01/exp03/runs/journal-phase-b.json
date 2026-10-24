@@ -1,0 +1,277 @@
+{
+  "checks": [
+    {
+      "event_prefix_identical": true,
+      "events_now": 7,
+      "id": "R1-PERSISTENT-RESTART (T-RUN-03)",
+      "paused_persisted": true,
+      "phase_a_events": 7,
+      "revocation_epoch_persisted": 2,
+      "verdict": "pass",
+      "workspace_identity_same": true
+    },
+    {
+      "id": "R2-PAUSE-SURVIVES-RESTART-AND-REVOKED-EPOCH (T-RUN-03)",
+      "old_epoch_after_resume": {
+        "current": 2,
+        "presented": 1,
+        "refusal": "revoked_epoch"
+      },
+      "verdict": "pass",
+      "while_paused": {
+        "refusal": "paused"
+      }
+    },
+    {
+      "before_intent_crash_left_no_op_and_no_file": true,
+      "classifications": [
+        "target_matches_intended_after_hash",
+        "target_unchanged_from_before_hash",
+        "target_matches_intended_after_hash"
+      ],
+      "fence_increasing_across_restart": true,
+      "id": "R3-CRASH-RECOVERY-UNKNOWN-EFFECT (T-RUN-04, ORCH-02..04)",
+      "recovery": {
+        "lease": {
+          "fence": 8,
+          "owner": "recovery-host"
+        },
+        "unknown_effects": [
+          {
+            "observation": {
+              "auto_replay": false,
+              "before_hash": "absent",
+              "classification": "target_matches_intended_after_hash",
+              "intended_after_hash": "9aef8df555d4ae9b1d32673f7f11c8549767884ddefbbfbd0534fb248e296ada",
+              "intent_fence": 1,
+              "observed_hash": "9aef8df555d4ae9b1d32673f7f11c8549767884ddefbbfbd0534fb248e296ada",
+              "recovered_by": "recovery-host",
+              "recovery_fence": 8,
+              "staging_files_left": []
+            },
+            "op_id": "op_438fe02767b167af"
+          },
+          {
+            "observation": {
+              "auto_replay": false,
+              "before_hash": "absent",
+              "classification": "target_unchanged_from_before_hash",
+              "intended_after_hash": "9aef8df555d4ae9b1d32673f7f11c8549767884ddefbbfbd0534fb248e296ada",
+              "intent_fence": 4,
+              "observed_hash": "absent",
+              "recovered_by": "recovery-host",
+              "recovery_fence": 8,
+              "staging_files_left": [
+                "probe.factory-staging-op_163231417ee01b67"
+              ]
+            },
+            "op_id": "op_163231417ee01b67"
+          },
+          {
+            "observation": {
+              "auto_replay": false,
+              "before_hash": "absent",
+              "classification": "target_matches_intended_after_hash",
+              "intended_after_hash": "9aef8df555d4ae9b1d32673f7f11c8549767884ddefbbfbd0534fb248e296ada",
+              "intent_fence": 5,
+              "observed_hash": "9aef8df555d4ae9b1d32673f7f11c8549767884ddefbbfbd0534fb248e296ada",
+              "recovered_by": "recovery-host",
+              "recovery_fence": 8,
+              "staging_files_left": []
+            },
+            "op_id": "op_5551b6fa5b03cc1a"
+          }
+        ]
+      },
+      "tree_unchanged_by_recovery": true,
+      "verdict": "pass"
+    },
+    {
+      "decisions": [
+        {
+          "op_id": "op_438fe02767b167af",
+          "presented_identity": "68e0b0d700055d429c9199744b2cae94837d4b947c60b7693456eeb8309af36f",
+          "result": {
+            "decision": "blocked",
+            "executes": false,
+            "reason": "op is unknown_effect, reconciliation required before any replay"
+          },
+          "state": "unknown_effect",
+          "stored_identity": "5f7309cee8a5085730b1bed3d3af10b78bf92639976c38465c505ad966937923"
+        },
+        {
+          "op_id": "op_163231417ee01b67",
+          "presented_identity": "68e0b0d700055d429c9199744b2cae94837d4b947c60b7693456eeb8309af36f",
+          "result": {
+            "decision": "blocked",
+            "executes": false,
+            "reason": "op is unknown_effect, reconciliation required before any replay"
+          },
+          "state": "unknown_effect",
+          "stored_identity": "cdd6f307396888d68b123dfdb30ea9aceae7561ff3af5c66d19bd3dc343c0d60"
+        },
+        {
+          "op_id": "op_5551b6fa5b03cc1a",
+          "presented_identity": "68e0b0d700055d429c9199744b2cae94837d4b947c60b7693456eeb8309af36f",
+          "result": {
+            "decision": "blocked",
+            "executes": false,
+            "reason": "op is unknown_effect, reconciliation required before any replay"
+          },
+          "state": "unknown_effect",
+          "stored_identity": "1e58d8362662994a83e76fb658a9a817dbcc8d71c3f5542089601c1ea3d4d8ec"
+        }
+      ],
+      "id": "R4-UNKNOWN-EFFECT-NOT-REPLAYED (T-RUN-04)",
+      "verdict": "pass"
+    },
+    {
+      "id": "R5-EXPLICIT-RECONCILIATION",
+      "result": {
+        "after_reconcile": {
+          "op_id": "op_5551b6fa5b03cc1a",
+          "presented_identity": "1e58d8362662994a83e76fb658a9a817dbcc8d71c3f5542089601c1ea3d4d8ec",
+          "result": {
+            "decision": "already_applied",
+            "executes": false,
+            "receipt_after_hash": "9aef8df555d4ae9b1d32673f7f11c8549767884ddefbbfbd0534fb248e296ada"
+          },
+          "state": "reconciled_applied",
+          "stored_identity": "1e58d8362662994a83e76fb658a9a817dbcc8d71c3f5542089601c1ea3d4d8ec"
+        },
+        "op_id": "op_5551b6fa5b03cc1a",
+        "verdict": "pass"
+      },
+      "verdict": "pass"
+    }
+  ],
+  "events": [
+    {
+      "payload_hash": "d5d1a1eccdc5345d0faacaec0d3706b50cd3af8d5b83ee26bee62a54755a45f8",
+      "seq": 13,
+      "type": "tool_intent"
+    },
+    {
+      "payload_hash": "759909e42dbc98b085ffc74b56feceda87a95126dfb731b7fe8963678e514c4f",
+      "seq": 14,
+      "type": "tool_settled"
+    },
+    {
+      "payload_hash": "a7b66a506d12fcba5168a6d84bb6bbc8d5d1579216c2f458397fb7e7fafa5374",
+      "seq": 15,
+      "type": "tool_intent"
+    },
+    {
+      "payload_hash": "5b0efec266421121175e202a218f9ae6445a75f43e095d5df21e60f17803fea8",
+      "seq": 16,
+      "type": "tool_intent"
+    },
+    {
+      "payload_hash": "95e218c92dee91bc6d46acf9e4f0cb549d328db2067e5a8804c4bdc9882ccde3",
+      "seq": 17,
+      "type": "tool_intent"
+    },
+    {
+      "payload_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "seq": 18,
+      "type": "paused"
+    },
+    {
+      "payload_hash": "f3f863b76bd24639bde98174a396d231f6f936d396700fcd603a9dc66f895012",
+      "seq": 19,
+      "type": "grant_revoked"
+    },
+    {
+      "payload_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "seq": 20,
+      "type": "resumed"
+    },
+    {
+      "payload_hash": "9473137de8373fa54d260313dd8bb3b5c01ae68c94720a30b2ca042ab2817168",
+      "seq": 21,
+      "type": "unknown_effect_recorded"
+    },
+    {
+      "payload_hash": "080cd3b007ce850f135dc6b7ee9262d330f78d72ee794a0357e2c4aa479b057e",
+      "seq": 22,
+      "type": "unknown_effect_recorded"
+    },
+    {
+      "payload_hash": "098f527aed66d8a251752cb4eb6400f9b8b5518f54b6bd9dca70c5ad837dabb4",
+      "seq": 23,
+      "type": "unknown_effect_recorded"
+    },
+    {
+      "payload_hash": "dc4e8c262ce21c2d5bc8a6969e6f78682ccc0486951009287829c83fd79c8fa0",
+      "seq": 24,
+      "type": "reconciled"
+    }
+  ],
+  "evidence_kind": "live-local (PostgreSQL 17 in Compose after container restart, new process)",
+  "input_source": "recorded real model tool call",
+  "ops": [
+    {
+      "after_hash": "9aef8df555d4ae9b1d32673f7f11c8549767884ddefbbfbd0534fb248e296ada",
+      "fence": 1,
+      "observation": null,
+      "op_id": "op_42d10b530cb89e20",
+      "state": "succeeded"
+    },
+    {
+      "after_hash": null,
+      "fence": 1,
+      "observation": {
+        "auto_replay": false,
+        "before_hash": "absent",
+        "classification": "target_matches_intended_after_hash",
+        "intended_after_hash": "9aef8df555d4ae9b1d32673f7f11c8549767884ddefbbfbd0534fb248e296ada",
+        "intent_fence": 1,
+        "observed_hash": "9aef8df555d4ae9b1d32673f7f11c8549767884ddefbbfbd0534fb248e296ada",
+        "recovered_by": "recovery-host",
+        "recovery_fence": 8,
+        "staging_files_left": []
+      },
+      "op_id": "op_438fe02767b167af",
+      "state": "unknown_effect"
+    },
+    {
+      "after_hash": null,
+      "fence": 4,
+      "observation": {
+        "auto_replay": false,
+        "before_hash": "absent",
+        "classification": "target_unchanged_from_before_hash",
+        "intended_after_hash": "9aef8df555d4ae9b1d32673f7f11c8549767884ddefbbfbd0534fb248e296ada",
+        "intent_fence": 4,
+        "observed_hash": "absent",
+        "recovered_by": "recovery-host",
+        "recovery_fence": 8,
+        "staging_files_left": [
+          "probe.factory-staging-op_163231417ee01b67"
+        ]
+      },
+      "op_id": "op_163231417ee01b67",
+      "state": "unknown_effect"
+    },
+    {
+      "after_hash": "9aef8df555d4ae9b1d32673f7f11c8549767884ddefbbfbd0534fb248e296ada",
+      "fence": 5,
+      "observation": {
+        "auto_replay": false,
+        "before_hash": "absent",
+        "classification": "target_matches_intended_after_hash",
+        "intended_after_hash": "9aef8df555d4ae9b1d32673f7f11c8549767884ddefbbfbd0534fb248e296ada",
+        "intent_fence": 5,
+        "observed_hash": "9aef8df555d4ae9b1d32673f7f11c8549767884ddefbbfbd0534fb248e296ada",
+        "recovered_by": "recovery-host",
+        "recovery_fence": 8,
+        "staging_files_left": []
+      },
+      "op_id": "op_5551b6fa5b03cc1a",
+      "state": "reconciled_applied"
+    }
+  ],
+  "phase": "b",
+  "postgres": "17.6 (Debian 17.6-2.pgdg12+1)",
+  "probe": "journal"
+}

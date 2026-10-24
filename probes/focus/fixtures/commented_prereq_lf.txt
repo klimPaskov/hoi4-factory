@@ -1,0 +1,38 @@
+# EXP-02 synthetic fixture: comment inside a prerequisite block
+focus_tree = {
+	id = exp_cmt_tree
+	default = no
+
+	focus = {
+		id = exp_c_root
+		icon = GFX_exp_icon_c_root
+		x = 2
+		y = 0
+		cost = 10
+		ai_will_do = { factor = 1 }
+		completion_reward = { add_political_power = 10 }
+	}
+
+	focus = {
+		id = exp_c_side
+		icon = GFX_exp_icon_c_side
+		x = 4
+		y = 0
+		cost = 10
+		ai_will_do = { factor = 1 }
+		completion_reward = { add_political_power = 10 }
+	}
+
+	focus = {
+		id = exp_c_next
+		icon = GFX_exp_icon_c_next
+		prerequisite = {
+			focus = exp_c_root # keep this note
+		}
+		x = 2
+		y = 1
+		cost = 5
+		ai_will_do = { factor = 1 }
+		completion_reward = { add_stability = 0.01 }
+	}
+}

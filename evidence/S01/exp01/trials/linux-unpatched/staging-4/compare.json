@@ -1,0 +1,36 @@
+{
+ "before": "/runs/unpatched/staging-4/before.json",
+ "after": "/runs/unpatched/staging-4/after.json",
+ "approved_prefixes": [
+  "exp01_setup/managed",
+  "exp01_setup/replace-me.txt",
+  ".hoi4-mod-setup"
+ ],
+ "unapproved": {
+  "changed": [],
+  "mode_changed": [],
+  "added": [],
+  "removed": [],
+  "metadata_only": []
+ },
+ "approved": {
+  "changed": [],
+  "added": [],
+  "removed": []
+ },
+ "all": {
+  "added_files": [],
+  "added_dirs": [],
+  "removed": [],
+  "content_changed": []
+ },
+ "unapproved_bytes_untouched": true,
+ "exact_files": true,
+ "exact_files_and_dirs": true,
+ "git_index_sha256": {
+  "before": "097d6ca922d30df7268a7609c92fd7d8633ad66e183a7e591dfcdbfece3d1eab",
+  "after": "097d6ca922d30df7268a7609c92fd7d8633ad66e183a7e591dfcdbfece3d1eab"
+ },
+ "git_status_identical": true,
+ "git_ls_files_identical": true
+}

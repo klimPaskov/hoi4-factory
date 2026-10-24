@@ -2,6 +2,15 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.1.3, 2026-10-24, S01 handoff
+
+- S01-L06, promoted automatically under ADR-023: classify provider quota on error type and code. OpenAI exhausted credit (429, `insufficient_quota`, `credit_balance_exhausted`) is a non-retryable quota stop. Destination: SPEC-002. Test: `live_credit_exhausted_is_quota_not_retryable`, passing on 2026-10-24.
+- `validate-stage` and `capture-engineering-lessons` became agent-invocable and `start-implementation-stage` and `audit-hoi4-integrations` stayed maintainer-only, by maintainer decision ADR-023. Generator and validator changed together.
+- The package validator now expects REQ-001 through REQ-050, after ADR-022 added the two memory requirements.
+- 22 other S01 candidates are recorded under `engineering/knowledge/candidates/` and are not accepted. Nine wait for a regression test, nine are captured only, one is rejected and three were applied by maintainer decision.
+
+Evidence: [S01 learning review](../../evidence/S01/learning-review.md) and [checks](../../evidence/S01/checks.json). Rollback: revert the S01 commit.
+
 ## 0.1.2, 2026-10-24, maintainer revision and repository setup
 
 - The package validator now expects REQ-001 through REQ-048, after the maintainer decisions added three requirements.

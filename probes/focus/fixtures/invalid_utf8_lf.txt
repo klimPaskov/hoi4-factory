@@ -1,0 +1,58 @@
+# EXP-02 synthetic fixture: basic tree (original text, not game content)
+focus_tree = {
+	id = exp_basic_tree # trailing comment on the tree id
+	country = {
+		factor = 0
+		modifier = { add = 10 tag = XAA }
+	}
+	default = no
+
+	# leading comment before the root focus
+	focus = {
+		id = exp_root
+		icon = GFX_exp_icon_root
+		x = 4
+		y = 0
+		cost = 10 # ten weeks
+		search_filters = { FOCUS_FILTER_POLITICAL }
+		ai_will_do = { factor = 1 }
+		completion_reward = {
+			add_political_power = 25 # small reward Å stray byte
+		}
+	}
+
+	focus = {
+		id = exp_left
+		icon = GFX_exp_icon_left
+		prerequisite = { focus = exp_root }
+		mutually_exclusive = { focus = exp_right }
+		x = 2
+		y = 1
+		cost = 5
+		ai_will_do = { factor = 2 }
+		completion_reward = { add_stability = 0.05 }
+	}
+
+	focus = {
+		id = exp_right
+		icon = GFX_exp_icon_right
+		prerequisite = { focus = exp_root }
+		mutually_exclusive = { focus = exp_left }
+		x = 6
+		y = 1
+		cost = 5
+		ai_will_do = { factor = 1 }
+		completion_reward = { add_war_support = 0.05 }
+	}
+
+	focus = {
+		id = exp_join
+		icon = GFX_exp_icon_join
+		prerequisite = { focus = exp_left focus = exp_right }
+		x = 4
+		y = 2
+		cost = 7
+		ai_will_do = { factor = 1 }
+		completion_reward = { add_political_power = 50 }
+	}
+}

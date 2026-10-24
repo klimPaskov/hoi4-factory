@@ -1,7 +1,6 @@
 ---
 name: validate-stage
-description: "Use on explicit invocation to review one HOI4 Factory stage against its acceptance rows, changed artifacts and actual evidence. Distinguish pass, fail, unavailable and not applicable. Do not claim game behavior from source checks or authorize the next stage."
-disable-model-invocation: true
+description: "Use automatically before every stage handoff, or on request, to review one HOI4 Factory stage against its acceptance rows, changed artifacts and actual evidence. Distinguish pass, fail, unavailable and not applicable. Do not claim game behavior from source checks or authorize the next stage."
 ---
 
 # Validate one stage

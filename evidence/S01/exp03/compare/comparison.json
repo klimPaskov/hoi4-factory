@@ -1,0 +1,76 @@
+{
+ "evidence_kind": "static (build metrics and source inspection)",
+ "host": "Windows 11 x86_64, 12 logical CPUs, rustc 1.97.1, cargo build --release -j 12, fresh CARGO_TARGET_DIR per crate, sources pre-downloaded",
+ "crates": {
+  "thin": "probes/runtime/compare/thin (factory-agent, default-features=false, features=[openai])",
+  "async-openai": "probes/runtime/compare/async-openai (async-openai =0.42.2, features rustls + chat-completion)"
+ },
+ "run_order": {
+  "run1": "thin first",
+  "run2": "async-openai first",
+  "run3": "thin first"
+ },
+ "results": {
+  "thin": {
+   "clean_release_build_s": [
+    342.5,
+    106.7,
+    203.0
+   ],
+   "median_s": 203.0,
+   "unique_normal_deps_including_root": 90,
+   "stripped_release_binary_bytes": 4584960
+  },
+  "async-openai": {
+   "clean_release_build_s": [
+    257.1,
+    302.6,
+    168.9
+   ],
+   "median_s": 257.1,
+   "unique_normal_deps_including_root": 126,
+   "stripped_release_binary_bytes": 5629440
+  }
+ },
+ "binary_size_delta_bytes_async_minus_thin": 1044480,
+ "dependency_delta_async_minus_thin": 36,
+ "cargo_metadata_normal_closure_linux": {
+  "thin": 106,
+  "async-openai": 139
+ },
+ "license": {
+  "async-openai": "MIT",
+  "flagged_in_closure": 0
+ },
+ "behaviour_from_source_inspection": {
+  "raw_byte_capture": {
+   "thin": "yes, Tee sink receives every body chunk unchanged with chunk boundaries (used for all recordings)",
+   "async-openai": "no public hook. stream_mapped_raw_events in src/client.rs wraps response.bytes_stream() in eventsource_stream::EventStream inside a spawned task and yields parsed events. Capture would need the optional middleware feature and a custom tower service that rebuilds reqwest::Response around a teed body."
+  },
+  "missing_done_marker": {
+   "thin": "IncompleteOutput (stream ended without [DONE] marker)",
+   "async-openai": "indistinguishable from success. The task breaks on [DONE] and also ends the stream on EOF, so the consumer sees the same None in both cases (src/client.rs 0.42.2)"
+  },
+  "truncation_mid_event": {
+   "thin": "IncompleteOutput with partial line byte count from SseParser::finish",
+   "async-openai": "eventsource-stream 0.2.3 sets Terminated and returns None at EOF, discarding a buffered partial event without an error (src/event_stream.rs lines 288-290)"
+  },
+  "tool_call_deltas": {
+   "thin": "assembled by index into raw argument text, parsed only after a clean finish",
+   "async-openai": "exposes ChatCompletionMessageToolCallChunk deltas. Assembly and JSON parsing are left to the caller"
+  },
+  "malformed_args": {
+   "thin": "MalformedToolArguments error class, turn not executable",
+   "async-openai": "no detection. arguments is Option<String> and the doc comment tells the caller to validate"
+  },
+  "http_errors": {
+   "thin": "HttpRefusal with class auth, quota, rate_limited and others, plus auto_retry_allowed",
+   "async-openai": "OpenAIError::ApiError(ApiErrorResponse). Its optional OpenAIRetryLayer (middleware feature) treats 429 insufficient_quota as permanent, the SimpleRetryPolicy retries every 429"
+  },
+  "anthropic_support": {
+   "thin": "own Messages adapter in the same crate, live evidence in EXP-03",
+   "async-openai": "none, OpenAI only. A second crate or own adapter would still be needed for ADR-019"
+  }
+ },
+ "fault_surfacing_by_replay": "unavailable: the replay comparison serves OpenAI-format recordings through runtime-probe serve-replay, and no OpenAI stream could be recorded (429 credit_balance_exhausted on both OpenAI keys). The async-openai rows above are source inspection only."
+}

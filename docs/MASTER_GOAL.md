@@ -22,6 +22,8 @@ Make correctness claims precise. A source render, a static check, a simulation a
 
 Preserve contribution ownership through intent, source changes, evidence, Git review and GitHub pull requests. Start with one reliable agent writer. All collaboration happens in the application: GitHub issues, pull requests, reviews, comments and merges are available there, so contributors never need to open GitHub. Invited human collaborators work on owned branches under the same rules, and parallel agents follow after conflict and recovery tests pass.
 
+The agent learns automatically from feedback and outcomes. Personal memory follows each user, project memory is shared by members and verified global lessons help everyone. A lesson becomes active only after it is shown to prevent its original failure, and memory never grants authority.
+
 Keep a full game reference copy, the latest build with all DLC, on the server for validation and previews. It is read-only and never leaves the server as raw files. The game-rights review is completed before the service is exposed on a public domain.
 
 ## First useful slice and first release
@@ -81,7 +83,7 @@ All numeric performance and evaluation budgets are proposed and attached to fixt
 
 ## Navigation and change control
 
-The 48 stable requirements are in [product requirements](01-product/product-requirements.md). [Traceability](01-product/requirements-traceability.md) links them to decisions, 13 subsystem specs, stages and acceptance. The [roadmap](04-implementation-stages/ROADMAP.md) contains eight dependency-led stages. The [implementation master goal](06-agent-handoffs/IMPLEMENTATION_MASTER_GOAL.md) tells a future agent how to begin one authorized stage.
+The 50 stable requirements are in [product requirements](01-product/product-requirements.md). [Traceability](01-product/requirements-traceability.md) links them to decisions, 13 subsystem specs, stages and acceptance. The [roadmap](04-implementation-stages/ROADMAP.md) contains eight dependency-led stages. The [implementation master goal](06-agent-handoffs/IMPLEMENTATION_MASTER_GOAL.md) tells a future agent how to begin one authorized stage.
 
 Changes to approved requirements, architecture, security or distribution need a recorded maintainer decision. Routine evidence-backed corrections within an authorized stage remain normal reviewable work. Every substantive handoff includes an engineering learning review and a configuration review, including a justified no-change result.
 

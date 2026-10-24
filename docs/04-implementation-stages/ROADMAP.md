@@ -57,7 +57,7 @@ After S05, S06 and S07 may progress in parallel when they have separate modules 
 
 A stage is complete only when every mandatory exit gate has a result against its final revision. A known source-loss, cross-account or unauthorized-write failure blocks the affected capability. Missing credentials, hardware, a GitHub test repository or a user-operated game produce an explicit unavailable result. They do not count as a pass.
 
-The [acceptance matrix](../05-verification/REQUIREMENTS-ACCEPTANCE-MATRIX.md) maps all 48 requirements and all 47 stage gates to planned checks. The [evaluation matrix](../05-verification/EVALUATION-MATRIX.md) defines model tasks and measurement. Stage evidence uses the six-file handoff convention in [the handoff template](../06-agent-handoffs/STAGE-HANDOFF-TEMPLATE.md).
+The [acceptance matrix](../05-verification/REQUIREMENTS-ACCEPTANCE-MATRIX.md) maps all 50 requirements and all 47 stage gates to planned checks. The [evaluation matrix](../05-verification/EVALUATION-MATRIX.md) defines model tasks and measurement. Stage evidence uses the six-file handoff convention in [the handoff template](../06-agent-handoffs/STAGE-HANDOFF-TEMPLATE.md).
 
 Review a stage's actual result before authorizing the next. The future agent reports a concrete next-stage scope and stops. No handoff grants automatic progression.
 

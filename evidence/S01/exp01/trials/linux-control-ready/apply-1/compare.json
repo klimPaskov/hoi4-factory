@@ -1,0 +1,53 @@
+{
+ "before": "/runs/control-ready/apply-1/before.json",
+ "after": "/runs/control-ready/apply-1/after.json",
+ "approved_prefixes": [
+  "exp01_setup/managed",
+  "exp01_setup/replace-me.txt",
+  ".hoi4-mod-setup"
+ ],
+ "unapproved": {
+  "changed": [],
+  "mode_changed": [],
+  "added": [],
+  "removed": [],
+  "metadata_only": []
+ },
+ "approved": {
+  "changed": [],
+  "added": [
+   {
+    "path": "exp01_setup/managed",
+    "type": "dir",
+    "size": null,
+    "sha256": null
+   },
+   {
+    "path": "exp01_setup/managed/.hoi4ms-662605c7-f640-4bb2-824f-7c54dff1132a.tmp",
+    "type": "file",
+    "size": 262144,
+    "sha256": "fe4a443eb6869afe5ee40da3dab9cab007b0188fdec92914cb70358a8aeb8231"
+   }
+  ],
+  "removed": []
+ },
+ "all": {
+  "added_files": [
+   "exp01_setup/managed/.hoi4ms-662605c7-f640-4bb2-824f-7c54dff1132a.tmp"
+  ],
+  "added_dirs": [
+   "exp01_setup/managed"
+  ],
+  "removed": [],
+  "content_changed": []
+ },
+ "unapproved_bytes_untouched": true,
+ "exact_files": false,
+ "exact_files_and_dirs": false,
+ "git_index_sha256": {
+  "before": "71bd6d13e66018f4af93a165527d980dc3156422b4250da630379daace9bd46c",
+  "after": "71bd6d13e66018f4af93a165527d980dc3156422b4250da630379daace9bd46c"
+ },
+ "git_status_identical": false,
+ "git_ls_files_identical": true
+}

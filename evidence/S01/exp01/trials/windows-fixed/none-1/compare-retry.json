@@ -1,0 +1,43 @@
+{
+ "before": "C:/Users/klimp/Documents/Projects/hoi4-factory/.work/exp01/runs-win/fixed/none-1/before.json",
+ "after": "C:/Users/klimp/Documents/Projects/hoi4-factory/.work/exp01/runs-win/fixed/none-1/after-retry.json",
+ "approved_prefixes": [],
+ "unapproved": {
+  "changed": [],
+  "mode_changed": [],
+  "added": [
+   {
+    "path": "exp01_setup/managed",
+    "type": "dir",
+    "size": null,
+    "sha256": null
+   }
+  ],
+  "removed": [],
+  "metadata_only": [
+   "exp01_setup/replace-me.txt"
+  ]
+ },
+ "approved": {
+  "changed": [],
+  "added": [],
+  "removed": []
+ },
+ "all": {
+  "added_files": [],
+  "added_dirs": [
+   "exp01_setup/managed"
+  ],
+  "removed": [],
+  "content_changed": []
+ },
+ "unapproved_bytes_untouched": false,
+ "exact_files": true,
+ "exact_files_and_dirs": false,
+ "git_index_sha256": {
+  "before": "3d98fa4c5e05e5080b05e326325b9d79aa850c6c0d69d124fea5a2db9789952e",
+  "after": "3d98fa4c5e05e5080b05e326325b9d79aa850c6c0d69d124fea5a2db9789952e"
+ },
+ "git_status_identical": true,
+ "git_ls_files_identical": true
+}

@@ -1,0 +1,37 @@
+﻿# EXP-02 synthetic fixture: standalone shared focus branch
+shared_focus = {
+	id = exp_ss_shared
+	icon = GFX_exp_icon_ss_shared
+	x = 8
+	y = 0
+	cost = 5
+	ai_will_do = { factor = 1 }
+	completion_reward = { add_political_power = 5 }
+}
+
+focus_tree = {
+	id = exp_ss_tree
+	default = no
+	shared_focus = exp_ss_shared
+
+	focus = {
+		id = exp_ss_root
+		icon = GFX_exp_icon_ss_root
+		x = 2
+		y = 0
+		cost = 10
+		ai_will_do = { factor = 1 }
+		completion_reward = { add_political_power = 10 }
+	}
+
+	focus = {
+		id = exp_ss_next
+		icon = GFX_exp_icon_ss_next
+		prerequisite = { focus = exp_ss_root }
+		x = 2
+		y = 1
+		cost = 6
+		ai_will_do = { factor = 1 }
+		completion_reward = { add_war_support = 0.02 }
+	}
+}

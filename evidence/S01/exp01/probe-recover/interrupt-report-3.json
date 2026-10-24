@@ -1,0 +1,23 @@
+{
+  "elapsed_ms": 265117,
+  "hoi4ms_leftovers_after_kill": [
+    "exp01_setup/managed/.hoi4ms-908b500e-2ecb-44c8-b00b-5bf457558b49.tmp"
+  ],
+  "hoi4ms_leftovers_after_recovery": [
+    "exp01_setup/managed/.hoi4ms-908b500e-2ecb-44c8-b00b-5bf457558b49.tmp"
+  ],
+  "kill": "apply",
+  "killed_at": "apply managed_files_seen=1",
+  "observed_managed": 1,
+  "observed_staged": 0,
+  "ops": 200,
+  "plan_id": "62769c71-906a-47de-b7cd-ed5375cb3a29",
+  "recovery": {
+    "found": false,
+    "skipped": true
+  },
+  "size": 262144,
+  "worker_exit_code": null,
+  "worker_exit_success": false,
+  "worker_result": "EXP01_WORKER_RESULT none"
+}

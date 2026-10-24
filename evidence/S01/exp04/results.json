@@ -1,0 +1,231 @@
+{
+ "experiment": "EXP-04",
+ "stage": "S01",
+ "packet": "S01-W5",
+ "recorded": "2026-10-24",
+ "image": {
+  "tag": "hoi4-factory-agent-probe:s01",
+  "image_id": "sha256:d31ea492a4418930952b7d68b54e2328d9ba9ff12c57d253d2940c05172b4e27",
+  "repo_digests": [
+   "hoi4-factory-agent-probe@sha256:d31ea492a4418930952b7d68b54e2328d9ba9ff12c57d253d2940c05172b4e27"
+  ],
+  "size_bytes": 37817617,
+  "os_arch": "linux/amd64",
+  "user": "factory",
+  "entrypoint": [
+   "/usr/local/bin/runtime-probe"
+  ],
+  "env": [
+   "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+  ],
+  "base_images": {
+   "build": "rust:1.97.1-slim-bookworm@sha256:2775a09d208ff0d7c1f50490c45b62db929e87ba1dcbc3f2132ac71a704bcdd3",
+   "runtime": "debian:bookworm-slim@sha256:7ff6ba31527b9e336162fa061746c366c4b2032f4d2cff2078bea43f78efe3f8"
+  },
+  "added_packages": [
+   "ca-certificates 20250419~deb12u2"
+  ]
+ },
+ "checks": [
+  {
+   "id": "EXP04-IMAGE-BUILD",
+   "maps_to": [
+    "RT-01",
+    "ADR-013"
+   ],
+   "command": "docker build --progress=plain -f docker/agent-probe.Dockerfile -t hoi4-factory-agent-probe:s01 .",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "static",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp04/runs/build.err",
+    "sha256": "9f95bc40501fffec16c8c34afc592c7e18618fadd7d40edf642d090b0d7278a1"
+   },
+   "verdict": "pass",
+   "limitation": "Local Docker Desktop 28.5.2 build. No registry push, so the digest is the local image ID.",
+   "detail": {
+    "image_id": "sha256:d31ea492a4418930952b7d68b54e2328d9ba9ff12c57d253d2940c05172b4e27"
+   }
+  },
+  {
+   "id": "EXP04-FS-NO-CODING-CLI-OR-RUNTIME",
+   "maps_to": [
+    "RT-01",
+    "T-RUN-01"
+   ],
+   "command": "docker export $(docker create IMAGE) | tar -t, then python -I probes/runtime/scan_image_listing.py",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "static",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp04/runs/filesystem-scan.json",
+    "sha256": "80be80937d04a383955a3fab2a1f13fc0d4ef97e4bc3dfe900c2c42b762d214c"
+   },
+   "verdict": "pass",
+   "limitation": "Name-pattern scan over all 4747 entries. Two hits were reviewed as false positives (CA bundle symlink, libstdc++ gdb scripts). Base OS shells and perl-base remain, they are not coding CLIs.",
+   "detail": {
+    "hits": {
+     "coding_cli": [],
+     "node_runtime": [],
+     "python_runtime": [],
+     "credential_file": [],
+     "game_file": [],
+     "recordings_or_evidence": []
+    },
+    "reviewed_false_positives": [
+     {
+      "path": "usr/lib/ssl/cert.pem",
+      "reason": "symlink to /etc/ssl/certs/ca-certificates.crt, the public CA bundle"
+     },
+     {
+      "path": "usr/share/gcc/python",
+      "reason": "libstdc++6 gdb pretty-printer scripts, no Python interpreter is installed"
+     }
+    ],
+    "base_os_interpreters_present": [
+     "usr/bin/bash",
+     "usr/bin/dash",
+     "usr/bin/perl",
+     "usr/bin/sh"
+    ]
+   }
+  },
+  {
+   "id": "EXP04-NO-CREDENTIAL-IN-IMAGE",
+   "maps_to": [
+    "ADR-013",
+    "SPEC-002"
+   ],
+   "command": "docker export | python -I in-memory comparison against both key values, plus key-prefix pattern scan",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "static",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp04/runs/secret-scan.json",
+    "sha256": "dde06caecf9a77366191158660c0262de7ffa96c7a5f5ceca367c5b9a424c0b3"
+   },
+   "verdict": "pass",
+   "limitation": "Only the deliberately invalid probe key literal matched the prefix pattern. Image Env holds only PATH.",
+   "detail": {
+    "exported_bytes": 103584256,
+    "key_values_present": {
+     "OPENAI_API_KEY": false,
+     "ANTHROPIC_API_KEY": false
+    },
+    "keys_available_for_comparison": {
+     "OPENAI_API_KEY": true,
+     "ANTHROPIC_API_KEY": true
+    },
+    "key_prefix_pattern_hits": 3,
+    "note": "key values compared in memory, never printed",
+    "key_prefix_pattern_review": {
+     "hits": 3,
+     "known_probe_literal_hits": 3,
+     "other_hits": 0,
+     "known_literal": "sk-ant-s01-invalid-probe-key (deliberately invalid key used by the auth refusal probe, compiled into the binary)"
+    }
+   }
+  },
+  {
+   "id": "EXP04-NO-GAME-FILES",
+   "maps_to": [
+    "ADR-015"
+   ],
+   "command": "same scan as EXP04-FS-NO-CODING-CLI-OR-RUNTIME",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "static",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp04/runs/filesystem-scan.json",
+    "sha256": "80be80937d04a383955a3fab2a1f13fc0d4ef97e4bc3dfe900c2c42b762d214c"
+   },
+   "verdict": "pass",
+   "limitation": "Pattern scan for HOI4 paths and asset types. No game copy exists on this host to compare against."
+  },
+  {
+   "id": "EXP04-NO-KEY-REFUSES-BEFORE-SEND",
+   "maps_to": [
+    "SPEC-002 credentials"
+   ],
+   "command": "env -u OPENAI_API_KEY -u ANTHROPIC_API_KEY docker run --rm hoi4-factory-agent-probe:s01 live-once",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "static",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp04/runs/run-no-key.json",
+    "sha256": "06c303077b706a2cf1c6889a895ac8e3f9234f02d8146350b0458c9b3b66720f"
+   },
+   "verdict": "pass",
+   "limitation": "Local check, no network request."
+  },
+  {
+   "id": "EXP04-LIVE-NATIVE-REQUEST",
+   "maps_to": [
+    "RT-01",
+    "T-RUN-01",
+    "S01 gate 4"
+   ],
+   "command": "ANTHROPIC_API_KEY=\"$(powershell.exe ... GetEnvironmentVariable('ANTHROPIC_API_KEY','User'))\" docker run --rm -e ANTHROPIC_API_KEY hoi4-factory-agent-probe:s01 live-once",
+   "revision_inputs": {
+    "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+    "working_tree": "uncommitted S01 changes on main",
+    "source_manifest_sha256": "4893979ac41c873867928da3c998a6aa619e75e237916a45c35d24a9922f4e8d"
+   },
+   "evidence_kind": "live",
+   "exit_code": 0,
+   "artifact": {
+    "path": "evidence/S01/exp04/runs/live-once.json",
+    "sha256": "aed185b60bf68b9a523955308b308bdcb2940a922c37b7f1de281e4042c406b6"
+   },
+   "verdict": "pass",
+   "limitation": "One request to Anthropic Messages (claude-haiku-5-5) from the container. OpenAI from the container was not attempted because both OpenAI keys return 429.",
+   "detail": {
+    "status": 200,
+    "model": "claude-haiku-5-5",
+    "finish_reason": "tool_use",
+    "spend": {
+     "call": "exp04-container",
+     "estimate": {
+      "kind": "estimated",
+      "price": {
+       "cached_input_per_mtok": 0.01,
+       "input_per_mtok": 0.1,
+       "model_prefix": "claude-haiku-5-5",
+       "output_per_mtok": 0.5,
+       "retrieved": "2026-10-24",
+       "source": "https://platform.claude.com/docs/en/about-claude/pricing (Claude Haiku 5.5, prompts up to 100,000 tokens)"
+      },
+      "usage": {
+       "cached_input_tokens": 0,
+       "input_tokens": 508,
+       "output_tokens": 84,
+       "reasoning_tokens": 0
+      },
+      "usd": 9.28e-05
+     },
+     "model": "claude-haiku-5-5"
+    }
+   }
+  }
+ ]
+}

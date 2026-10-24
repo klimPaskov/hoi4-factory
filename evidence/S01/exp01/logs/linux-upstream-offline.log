@@ -1,0 +1,42 @@
+rustc 1.88.0 (6b00bc388 2025-06-23)
+cargo 1.88.0 (873a06493 2025-05-10)
+Linux 0e5fd783f15b 6.6.87.2-microsoft-standard-WSL2 #1 SMP PREEMPT_DYNAMIC Thu Jun  5 18:30:46 UTC 2025 x86_64 GNU/Linux
+debconf: delaying package configuration, since apt-utils is not installed
+apt_exit=0
+source_rev=856940f2a629e0e2f3e03fc484cb0c0309c96734
+libdbus-1-dev 1.14.10-1~deb12u1
+libgtk-3-dev 3.24.38-2~deb12u3
+libwebkit2gtk-4.1-dev 2.50.6-1~deb12u2
+pkg-config 1.8.1-1
+rev=4488a418cad56a158273cb66c4ce7794696b7ed1
+info: syncing channel updates for '1.88.0-x86_64-unknown-linux-gnu'
+info: latest update on 2025-06-26, rust version 1.88.0 (6b00bc388 2025-06-23)
+info: downloading component 'clippy'
+info: downloading component 'rustfmt'
+info: installing component 'clippy'
+info: installing component 'rustfmt'
+   Compiling hoi4-mod-setup v0.6.3 (/build/src-tauri)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 27.37s
+     Running unittests src/lib.rs (/target/debug/deps/hoi4_mod_setup-dfdd8a386cb18392)
+
+running 1 test
+test commands::lifecycle_tests::offline_lifecycle::offline_all_component_install_import_repair_remove_and_rollback ... FAILED
+
+failures:
+
+---- commands::lifecycle_tests::offline_lifecycle::offline_all_component_install_import_repair_remove_and_rollback stdout ----
+offline: building fresh all-component plan
+
+thread 'commands::lifecycle_tests::offline_lifecycle::offline_all_component_install_import_repair_remove_and_rollback' panicked at src-tauri/src/commands_lifecycle_tests.rs:825:55:
+called `Result::unwrap()` on an `Err` value: Process("the trusted native Node runtime is unavailable")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    commands::lifecycle_tests::offline_lifecycle::offline_all_component_install_import_repair_remove_and_rollback
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 703 filtered out; finished in 54.84s
+
+error: test failed, to rerun pass `--lib`
+cargo_exit=101
+docker_exit=0

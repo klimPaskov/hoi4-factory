@@ -1,0 +1,38 @@
+{
+ "entries": 4747,
+ "hits": {
+  "coding_cli": [],
+  "node_runtime": [],
+  "python_runtime": [],
+  "credential_file": [],
+  "game_file": [],
+  "recordings_or_evidence": []
+ },
+ "clean": true,
+ "allowed_ca_bundle_pem_count": 148,
+ "reviewed_false_positives": [
+  {
+   "path": "usr/lib/ssl/cert.pem",
+   "reason": "symlink to /etc/ssl/certs/ca-certificates.crt, the public CA bundle"
+  },
+  {
+   "path": "usr/share/gcc/python",
+   "reason": "libstdc++6 gdb pretty-printer scripts, no Python interpreter is installed"
+  }
+ ],
+ "base_os_interpreters_present": [
+  "usr/bin/bash",
+  "usr/bin/dash",
+  "usr/bin/perl",
+  "usr/bin/sh"
+ ],
+ "agent_binary_present": true,
+ "patterns": {
+  "coding_cli": "(^|/)(claude|claude-code|codex|aider|opencode|gemini|cursor|copilot|goose|continue|cline|amp|pi)(\\.exe)?$|(^|/)@anthropic-ai/|(^|/)@openai/codex",
+  "node_runtime": "(^|/)(node|nodejs|npm|npx|pnpm|yarn|bun|deno)(\\.exe)?$|(^|/)node_modules/",
+  "python_runtime": "(^|/)python[0-9.]*$|(^|/)pip[0-9.]*$|(^|/)lib/python[0-9.]+/",
+  "credential_file": "(^|/)(\\.env(\\..*)?|\\.netrc|\\.git-credentials|\\.npmrc|\\.pypirc|credentials(\\.json)?|id_rsa|id_ed25519|.*\\.pem|.*\\.key|auth\\.json|\\.claude\\.json)$",
+  "game_file": "(?i)(hearts of iron|hoi4(\\.exe)?$|(^|/)common/national_focus/|(^|/)interface/.*\\.gfx$|\\.dds$|(^|/)map/provinces\\.bmp$|(^|/)history/countries/)",
+  "recordings_or_evidence": "(^|/)(recordings|evidence)/|\\.sse$"
+ }
+}

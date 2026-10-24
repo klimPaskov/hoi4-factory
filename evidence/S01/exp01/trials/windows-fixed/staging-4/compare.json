@@ -1,0 +1,36 @@
+{
+ "before": "C:/Users/klimp/Documents/Projects/hoi4-factory/.work/exp01/runs-win/fixed/staging-4/before.json",
+ "after": "C:/Users/klimp/Documents/Projects/hoi4-factory/.work/exp01/runs-win/fixed/staging-4/after.json",
+ "approved_prefixes": [
+  "exp01_setup/managed",
+  "exp01_setup/replace-me.txt",
+  ".hoi4-mod-setup"
+ ],
+ "unapproved": {
+  "changed": [],
+  "mode_changed": [],
+  "added": [],
+  "removed": [],
+  "metadata_only": []
+ },
+ "approved": {
+  "changed": [],
+  "added": [],
+  "removed": []
+ },
+ "all": {
+  "added_files": [],
+  "added_dirs": [],
+  "removed": [],
+  "content_changed": []
+ },
+ "unapproved_bytes_untouched": true,
+ "exact_files": true,
+ "exact_files_and_dirs": true,
+ "git_index_sha256": {
+  "before": "2004bceb461644ccae4d5a738b3bdbd16fe1fa6a5a6e8449eaccbaf7a7b9461f",
+  "after": "2004bceb461644ccae4d5a738b3bdbd16fe1fa6a5a6e8449eaccbaf7a7b9461f"
+ },
+ "git_status_identical": true,
+ "git_ls_files_identical": true
+}

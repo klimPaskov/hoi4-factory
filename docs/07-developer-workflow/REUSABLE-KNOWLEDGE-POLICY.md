@@ -32,14 +32,14 @@ Record nonsecret evidence. Do not copy raw credentials, private personal paths, 
 | Captured | Specific observation with provenance | Investigation aid, explicitly unaccepted |
 | Tested | Relevant reproduction or bounded experiment recorded | Candidate recommendation with limitations |
 | Reviewed | Owner assessed scope, counterexample and proposed diff | Ready for an acceptance or rejection decision |
-| Accepted | Review and applicable authority recorded | Versioned project guidance within stated bounds |
+| Accepted | Review and applicable authority recorded, or automatic promotion under ADR-023 | Versioned project guidance within stated bounds |
 | Rejected | Claim unsupported, harmful or not reusable | Retain reason, do not use as policy |
 | Superseded | A newer accepted record replaces it | Keep history and replacement link |
 | Expired | Version bounds or review trigger no longer hold | Revalidate before applying as accepted guidance |
 
 One successful task does not automatically justify a global rule. Prefer the narrowest useful instruction. Promote a reusable workflow when it has a clear trigger, expected result, verification and a failure path. Keep transient command output in stage evidence instead of loading it into every session.
 
-The implementation agent may capture candidates, write tests and propose diffs within its already authorized stage. Routine factual corrections can follow ordinary repository review without repeated permission requests. Changes that broaden tool authority, access roots, external data transfer, paid operations, approved product scope or game design authority require the corresponding owner approval before activation. A skill edit must not be used to give itself broader permission.
+Under ADR-023, a tested lesson is promoted automatically when a passing regression test reproduces the failure and confirms the fix, and the change touches no tool authority, access root, external data transfer, paid operation, approved product scope or game design authority. The promotion records the test, the diff and a changelog entry, and a later counterexample returns it to review. The implementation agent may capture candidates, write tests and propose diffs within its already authorized stage. Routine factual corrections can follow ordinary repository review without repeated permission requests. Changes that broaden tool authority, access roots, external data transfer, paid operations, approved product scope or game design authority require the corresponding owner approval before activation. A skill edit must not be used to give itself broader permission.
 
 ## Choosing the destination
 

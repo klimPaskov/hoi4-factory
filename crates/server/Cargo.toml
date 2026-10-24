@@ -1,0 +1,13 @@
+[package]
+name = "factory-server"
+description = "HOI4 Factory web server and workspace host"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+axum.workspace = true
+tokio.workspace = true
+serde_json.workspace = true

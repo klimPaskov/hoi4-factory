@@ -1,0 +1,15 @@
++ docker build --progress=plain -f docker/agent-probe.Dockerfile -t hoi4-factory-agent-probe:s01 .
+exit=0
+build_seconds=153
++ docker image inspect hoi4-factory-agent-probe:s01
+exit=0
++ docker history --no-trunc --format {{.CreatedBy}} hoi4-factory-agent-probe:s01
+exit=0
++ docker export b9a8f3e1d209996f12c43d1629f93ee51ff039ff58b9c213e2c5509f1af07a96 | tar -t
+exit=0
+scan exit=0
++ env -u OPENAI_API_KEY -u ANTHROPIC_API_KEY docker run --rm hoi4-factory-agent-probe:s01 live-once
+exit=0
++ docker run --rm -e ANTHROPIC_API_KEY hoi4-factory-agent-probe:s01 live-once
+exit=0
++ docker export | python secret scan, both key values compared in memory, exit=0

@@ -1,0 +1,6 @@
+{
+  "error": "ANTHROPIC_API_KEY is not set",
+  "evidence_kind": "live",
+  "ok": false,
+  "request_sent": false
+}

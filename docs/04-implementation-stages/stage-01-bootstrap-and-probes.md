@@ -1,6 +1,6 @@
 # S01: Claude Code bootstrap and architectural probes
 
-Status: **Proposed future implementation stage**. Nothing in this packet was executed as product implementation during planning. Primary agent: Claude Code. Delegate only bounded work with explicit file ownership. Revised on 2026-10-24 for the [maintainer decisions](../02-architecture/maintainer-decisions-2026-10-24.md) ADR-011 through ADR-017. The maintainer has deferred implementation, so this packet is not authorized yet.
+Status: **Executed 2026-10-24, review requested**. The result and decision receipt are in [the S01 handoff](../../evidence/S01/handoff.md). Primary agent: Claude Code. Delegate only bounded work with explicit file ownership. Revised on 2026-10-24 for the [maintainer decisions](../02-architecture/maintainer-decisions-2026-10-24.md) ADR-011 through ADR-017. The maintainer authorized this stage on 2026-10-24 with the amendments recorded in [the S01 scope](../../evidence/S01/scope.md).
 
 ## Objective and non-goals
 

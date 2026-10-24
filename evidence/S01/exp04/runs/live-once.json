@@ -1,0 +1,64 @@
+{
+  "anthropic_version": "2026-10-21",
+  "elapsed_ms": 1811.695161,
+  "evidence_kind": "live",
+  "host": {
+    "arch": "x86_64",
+    "os": "linux"
+  },
+  "provider": "anthropic-messages",
+  "result": {
+    "error": null,
+    "spend": {
+      "call": "exp04-container",
+      "estimate": {
+        "kind": "estimated",
+        "price": {
+          "cached_input_per_mtok": 0.01,
+          "input_per_mtok": 0.1,
+          "model_prefix": "claude-haiku-5-5",
+          "output_per_mtok": 0.5,
+          "retrieved": "2026-10-24",
+          "source": "https://platform.claude.com/docs/en/about-claude/pricing (Claude Haiku 5.5, prompts up to 100,000 tokens)"
+        },
+        "usage": {
+          "cached_input_tokens": 0,
+          "input_tokens": 508,
+          "output_tokens": 84,
+          "reasoning_tokens": 0
+        },
+        "usd": 0.0000928
+      },
+      "model": "claude-haiku-5-5"
+    },
+    "status": 200,
+    "turn": {
+      "bytes": 2658,
+      "events": 16,
+      "finish_reason": "tool_use",
+      "model": "claude-haiku-5-5",
+      "provider": "anthropic-messages",
+      "response_id": "msg_011CgLyt8y5bPQGzimmAQSeu",
+      "text": "",
+      "tool_calls": [
+        {
+          "arguments": {
+            "content": "S01 runtime probe ok",
+            "path": "notes/probe.txt"
+          },
+          "id": "toolu_01XaNxCJQQtEtRnnSS4diZ1S",
+          "index": 0,
+          "name": "write_file",
+          "raw_arguments": "{\"content\": \"S01 runtime probe ok\", \"path\": \"notes/probe.txt\"}"
+        }
+      ],
+      "usage": {
+        "cached_input_tokens": 0,
+        "input_tokens": 508,
+        "output_tokens": 84,
+        "reasoning_tokens": 0
+      }
+    }
+  },
+  "runtime_build": "factory-agent/0.0.0"
+}

@@ -1,0 +1,889 @@
+{
+ "schema_version": 1,
+ "experiment": "EXP-01",
+ "stage": "S01",
+ "recorded": "2026-10-24",
+ "setup_revision": "4488a418cad56a158273cb66c4ce7794696b7ed1",
+ "image": "rust@sha256:af306cfa71d987911a781c37b59d7d67d934f49684058f96cf72079c3626bfe0 (rust:1.88-bookworm)",
+ "factory_base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+ "fixtures": "probes/setup/fixtures (original synthetic), built by probes/setup/build_fixture.sh",
+ "independent_inventory": [
+  "probes/setup/inventory.py",
+  "probes/setup/compare_inventory.py"
+ ],
+ "checks": [
+  {
+   "id": "EXP01-CI-01",
+   "title": "Fetch failed recovery job log",
+   "command": "gh run view 39281117181 --repo klimPaskov/HOI4-Mod-Setup --job 118160257466 --log",
+   "working_dir": "evidence/S01/exp01/ci",
+   "toolchain": "gh 2.87.3",
+   "input_revision": "run head 4488a418cad56a158273cb66c4ce7794696b7ed1",
+   "exit_code": 0,
+   "evidence_kind": "remote CI observation",
+   "result": "Job failed at scripts/run_released_e2e.mjs:652 with 'The project was not restored exactly' digest 7a0535da... versus 1641aef2...",
+   "limitation": "GitHub log retention. The log has no per-file inventory",
+   "artifacts": [
+    {
+     "path": "evidence/S01/exp01/ci/job-118160257466.log",
+     "sha256": "0c43c001f79f1f3e9a6ce63bbc331aa053bec521595cea84b46c2773fc335db4"
+    },
+    {
+     "path": "evidence/S01/exp01/ci/run.json",
+     "sha256": "2eacf84b656d6babe1e7fa783b6c5e241271ca35b0bb2d9577557cd8247c6cab"
+    }
+   ]
+  },
+  {
+   "id": "EXP01-CI-02",
+   "title": "Download recovery CI artifact",
+   "command": "gh run download 39281117181 --repo klimPaskov/HOI4-Mod-Setup -n candidate-acceptance-recovery",
+   "working_dir": ".work/exp01/ci-artifact-recovery",
+   "toolchain": "gh 2.87.3",
+   "input_revision": "artifact 12201302573 sha256:5d337672d3c46e90928b894a05058e4506609bad2dcde4553b8c844d294e6952",
+   "exit_code": 0,
+   "evidence_kind": "remote CI artifact",
+   "result": "Interruption observed in state 'applying' after a verified non-skip operation, rollback reached 'rolled_back', exact inventory digest differed",
+   "limitation": "Artifact stores only screenshots and digests, so the extra path in CI cannot be named from artifacts",
+   "artifacts": [
+    {
+     "path": "evidence/S01/exp01/ci/candidate-acceptance-recovery-result.json",
+     "sha256": "29236056f6c0cb3ef933e2cd4f661de2a6c27fc2e3f2f87ed43ca19696c3aff6"
+    },
+    {
+     "path": "evidence/S01/exp01/ci/candidate-acceptance-recovery-artifact.sha256",
+     "sha256": "20a99ad50aef7c8d8c024e0c77f97ee99caa272287304258404034346a2f0828"
+    }
+   ]
+  },
+  {
+   "id": "EXP01-SRC-01",
+   "title": "Static reading of assertOriginals and write_atomic_noreplace_from",
+   "command": "read scripts/released_e2e_support.mjs:188-226, src-tauri/src/safe_fs.rs:583-660, src-tauri/src/transaction.rs:4392-4560",
+   "working_dir": ".work/HOI4-Mod-Setup",
+   "toolchain": "none",
+   "input_revision": "HOI4-Mod-Setup 4488a418cad56a158273cb66c4ce7794696b7ed1",
+   "exit_code": null,
+   "evidence_kind": "source reading",
+   "result": "assertOriginals passes per-file checks first, so a digest-only failure means extra files. Placement writes a random .hoi4ms-<uuid>.tmp beside the destination before an exclusive rename and nothing journals or sweeps it",
+   "limitation": "Reading alone is not proof. Trials below supply execution evidence",
+   "artifacts": []
+  },
+  {
+   "id": "EXP01-TEST-WIN-UPSTREAM",
+   "title": "Upstream transaction and lifecycle tests on Windows host",
+   "command": "cargo +1.88.0 test --locked --manifest-path src-tauri/Cargo.toml --all-features --lib -- transaction:: commands::lifecycle_tests::",
+   "working_dir": ".work/HOI4-Mod-Setup",
+   "toolchain": "Windows 11 host, rustup toolchain 1.88.0-x86_64-pc-windows-msvc (rustc 1.88.0 6b00bc388)",
+   "input_revision": "HOI4-Mod-Setup 4488a418cad56a158273cb66c4ce7794696b7ed1",
+   "exit_code": 0,
+   "evidence_kind": "source test execution",
+   "result": "test result: ok. 147 passed; 0 failed; 6 ignored; 0 measured; 556 filtered out; finished in 559.76s",
+   "limitation": "6 lifecycle tests are #[ignore] upstream and need an explicit package checkout or live installs",
+   "artifacts": [
+    {
+     "path": "evidence/S01/exp01/logs/win-host-upstream-tests.log",
+     "sha256": "14aa051660e268823b9205847093ba7d74857a111d7231b2197f2abc72ac7f06"
+    }
+   ]
+  },
+  {
+   "id": "EXP01-TEST-LINUX-NODEPS",
+   "title": "Upstream lib tests in Linux container without system deps",
+   "command": "cargo test --locked --manifest-path src-tauri/Cargo.toml --lib -- transaction::",
+   "working_dir": "/build (copy of .work/HOI4-Mod-Setup)",
+   "toolchain": "rust@sha256:af306cfa71d987911a781c37b59d7d67d934f49684058f96cf72079c3626bfe0 (rust:1.88-bookworm)",
+   "input_revision": "HOI4-Mod-Setup 4488a418cad56a158273cb66c4ce7794696b7ed1",
+   "exit_code": 101,
+   "evidence_kind": "build execution",
+   "result": "Build fails: libdbus-sys needs dbus-1 via pkg-config (keyring sync-secret-service on Linux) even with the desktop feature off",
+   "limitation": "None. This is the dependency finding itself",
+   "artifacts": [
+    {
+     "path": "evidence/S01/exp01/logs/linux-nodesktop-nodeps.log",
+     "sha256": "e36e9f1298591378fe9fb5bd01fdb3714736f4d8561df1d492f64d9f01ae1802"
+    }
+   ]
+  },
+  {
+   "id": "EXP01-TEST-LINUX-UPSTREAM",
+   "title": "Upstream transaction and safe_fs tests in Linux container, desktop feature off",
+   "command": "apt-get install libdbus-1-dev pkg-config; cargo test --locked --manifest-path src-tauri/Cargo.toml --lib -- transaction:: safe_fs:: --test-threads=4",
+   "working_dir": "/build (copy of .work/HOI4-Mod-Setup)",
+   "toolchain": "rust@sha256:af306cfa71d987911a781c37b59d7d67d934f49684058f96cf72079c3626bfe0 (rust:1.88-bookworm)",
+   "input_revision": "HOI4-Mod-Setup 4488a418cad56a158273cb66c4ce7794696b7ed1",
+   "exit_code": 0,
+   "evidence_kind": "source test execution",
+   "result": "test result: ok. 155 passed; 0 failed; 0 ignored; 0 measured; 437 filtered out; finished in 337.15s",
+   "limitation": "Container-local apt packages. First attempt in the earlier session was interrupted by a Docker restart (logs/linux-nodesktop-tests-interrupted-session.log)",
+   "artifacts": [
+    {
+     "path": "evidence/S01/exp01/logs/linux-upstream-nodesktop.log",
+     "sha256": "45e197e074e6843d038f9229f8304c9fe982a864076d64db1a7ec4561f5137b5"
+    }
+   ]
+  },
+  {
+   "id": "EXP01-TEST-LINUX-DESKTOP",
+   "title": "Upstream lifecycle tests in Linux container with Tauri and webkit deps",
+   "command": "apt-get install libwebkit2gtk-4.1-dev libgtk-3-dev ...; cargo test --locked --manifest-path src-tauri/Cargo.toml --all-features --lib -- commands::lifecycle_tests::",
+   "working_dir": "/build (copy of .work/HOI4-Mod-Setup)",
+   "toolchain": "rust@sha256:af306cfa71d987911a781c37b59d7d67d934f49684058f96cf72079c3626bfe0 (rust:1.88-bookworm)",
+   "input_revision": "HOI4-Mod-Setup 4488a418cad56a158273cb66c4ce7794696b7ed1",
+   "exit_code": 0,
+   "evidence_kind": "source test execution",
+   "result": "test result: ok. 3 passed; 0 failed; 6 ignored; 0 measured; 695 filtered out; finished in 0.09s",
+   "limitation": "Only 3 lifecycle tests run without an explicit package checkout. The desktop feature requires webkit2gtk and gtk in the build image",
+   "artifacts": [
+    {
+     "path": "evidence/S01/exp01/logs/linux-upstream-desktop.log",
+     "sha256": "7d6bb0b31006ad2a5eb143f29786cec591b1f3c8232cec2ece0ddb95624969b3"
+    }
+   ]
+  },
+  {
+   "id": "EXP01-TEST-LINUX-OFFLINE",
+   "title": "Ignored offline all-component install/import/repair/remove/rollback test",
+   "command": "HOI4_MOD_SETUP_SOURCE_REPOSITORY=/agentic cargo test --all-features --lib -- --ignored --exact commands::lifecycle_tests::offline_lifecycle::offline_all_component_install_import_repair_remove_and_rollback",
+   "working_dir": "/build",
+   "toolchain": "rust@sha256:af306cfa71d987911a781c37b59d7d67d934f49684058f96cf72079c3626bfe0 (rust:1.88-bookworm)",
+   "input_revision": "HOI4-Mod-Setup 4488a418cad56a158273cb66c4ce7794696b7ed1 with Agentic-HOI4-Modding 856940f2a629e0e2f3e03fc484cb0c0309c96734",
+   "exit_code": 101,
+   "evidence_kind": "source test execution",
+   "result": "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 703 filtered out; finished in 54.84s",
+   "limitation": "build_plan failed before any write: Process('the trusted native Node runtime is unavailable'). The rust image has no Node. Rerun with a pinned Node was not attempted to keep the work bounded, so this check is unavailable, not failed",
+   "artifacts": [
+    {
+     "path": "evidence/S01/exp01/logs/linux-upstream-offline.log",
+     "sha256": "a6e4ea451f7d9c8e3923da7b122f691827fb64ee5644741eb83c12fc6ca25f6c"
+    }
+   ]
+  },
+  {
+   "id": "EXP01-REPRO-WINDOWS",
+   "title": "Interruption trials on unpatched Setup, windows",
+   "command": "probes/setup/run_trials.sh <harness> probes/setup <runs> unpatched \"none:1 apply:20 staging:5 finalization:3\"",
+   "working_dir": ".work/exp01/runs-win",
+   "toolchain": "Windows 11 host, rustup toolchain 1.88.0-x86_64-pc-windows-msvc (rustc 1.88.0 6b00bc388)",
+   "input_revision": "HOI4-Mod-Setup 4488a418cad56a158273cb66c4ce7794696b7ed1 plus local test harness only (patch/harness-include.diff, patch/exp01_repro.rs)",
+   "exit_code": 0,
+   "evidence_kind": "process-kill execution with independent inventory",
+   "result": {
+    "windows-unpatched": {
+     "apply": {
+      "actions": {
+       "rollback": 20
+      },
+      "exact_files": 3,
+      "git_index_unchanged": 20,
+      "leftover_temp_after_recovery": 17,
+      "outcomes": {
+       "{\"ok\": \"rolled_back\"}": 20
+      },
+      "trials": 20,
+      "unapproved_untouched": 20
+     },
+     "finalization": {
+      "actions": {
+       "rollback": 1
+      },
+      "exact_files": 1,
+      "git_index_unchanged": 1,
+      "leftover_temp_after_recovery": 0,
+      "outcomes": {
+       "{\"ok\": \"rolled_back\"}": 1
+      },
+      "trials": 1,
+      "unapproved_untouched": 1
+     },
+     "none": {
+      "actions": {
+       "rollback": 1
+      },
+      "exact_files": 1,
+      "git_index_unchanged": 1,
+      "leftover_temp_after_recovery": 0,
+      "outcomes": {
+       "{\"ok\": \"rolled_back\"}": 1
+      },
+      "trials": 1,
+      "unapproved_untouched": 1
+     },
+     "staging": {
+      "actions": {
+       "discard_staging": 5
+      },
+      "exact_files": 5,
+      "git_index_unchanged": 5,
+      "leftover_temp_after_recovery": 0,
+      "outcomes": {
+       "{\"ok\": \"staging_discarded\"}": 5
+      },
+      "trials": 5,
+      "unapproved_untouched": 5
+     }
+    },
+    "windows-unpatched-fin": {
+     "finalization": {
+      "actions": {
+       "rollback": 3
+      },
+      "exact_files": 3,
+      "git_index_unchanged": 3,
+      "leftover_temp_after_recovery": 0,
+      "outcomes": {
+       "{\"ok\": \"rolled_back\"}": 3
+      },
+      "trials": 3,
+      "unapproved_untouched": 3
+     }
+    }
+   },
+   "limitation": "Process kill via Child::kill (TerminateProcess), finalization via upstream HOI4_MOD_SETUP_TEST_ABORT_AT=after_lock_write. Synthetic 200x256 KiB plan, not the Kaiserreich CI fixture. Plain fixture descriptor lacks picture=, so its finalization trials end at the readiness block and roll back instead of reaching the abort checkpoint",
+   "artifacts": [
+    {
+     "path": "evidence/S01/exp01/trials/windows-unpatched.jsonl",
+     "sha256": "60b10d5e9c87f588f999aa6cb2c968ffc198e79a9635d88c7ec8ffe125df87f5"
+    },
+    {
+     "path": "evidence/S01/exp01/trials/windows-unpatched-fin.jsonl",
+     "sha256": "196953b038d6986925e781871ef1c7f3505192945b2945a1fdbf2eb040061d08"
+    },
+    {
+     "path": "evidence/S01/exp01/trials/summary.json",
+     "sha256": "ce3470f7ed194a3619746151e8d4c7b868d0b003a4026e036ebc2a3cd471281e"
+    }
+   ]
+  },
+  {
+   "id": "EXP01-REPRO-LINUX",
+   "title": "Interruption trials on unpatched Setup, linux",
+   "command": "probes/setup/run_trials.sh <harness> probes/setup <runs> unpatched \"none:1 apply:20 staging:5 finalization:3\"",
+   "working_dir": "/runs in container, copied to .work/exp01/out-linux",
+   "toolchain": "rust@sha256:af306cfa71d987911a781c37b59d7d67d934f49684058f96cf72079c3626bfe0 (rust:1.88-bookworm)",
+   "input_revision": "HOI4-Mod-Setup 4488a418cad56a158273cb66c4ce7794696b7ed1 plus local test harness only (patch/harness-include.diff, patch/exp01_repro.rs)",
+   "exit_code": 0,
+   "evidence_kind": "process-kill execution with independent inventory",
+   "result": {
+    "linux-unpatched": {
+     "apply": {
+      "actions": {
+       "rollback": 20
+      },
+      "exact_files": 0,
+      "git_index_unchanged": 20,
+      "leftover_temp_after_recovery": 20,
+      "outcomes": {
+       "{\"ok\": \"rolled_back\"}": 20
+      },
+      "trials": 20,
+      "unapproved_untouched": 20
+     },
+     "finalization": {
+      "actions": {
+       "rollback": 3
+      },
+      "exact_files": 3,
+      "git_index_unchanged": 3,
+      "leftover_temp_after_recovery": 0,
+      "outcomes": {
+       "{\"ok\": \"rolled_back\"}": 3
+      },
+      "trials": 3,
+      "unapproved_untouched": 3
+     },
+     "none": {
+      "actions": {
+       "rollback": 1
+      },
+      "exact_files": 1,
+      "git_index_unchanged": 1,
+      "leftover_temp_after_recovery": 0,
+      "outcomes": {
+       "{\"ok\": \"rolled_back\"}": 1
+      },
+      "trials": 1,
+      "unapproved_untouched": 1
+     },
+     "staging": {
+      "actions": {
+       "discard_staging": 5
+      },
+      "exact_files": 5,
+      "git_index_unchanged": 5,
+      "leftover_temp_after_recovery": 0,
+      "outcomes": {
+       "{\"ok\": \"staging_discarded\"}": 5
+      },
+      "trials": 5,
+      "unapproved_untouched": 5
+     }
+    }
+   },
+   "limitation": "Process kill via Child::kill (SIGKILL), finalization via upstream abort checkpoint. Synthetic 200x256 KiB plan, not the Kaiserreich CI fixture. Plain fixture descriptor lacks picture=, so its finalization trials end at the readiness block and roll back instead of reaching the abort checkpoint",
+   "artifacts": [
+    {
+     "path": "evidence/S01/exp01/trials/linux-unpatched.jsonl",
+     "sha256": "e8471e6195b1bcd4a13ecac2baedb69110792bef51268e710db267a7b95a20d7"
+    },
+    {
+     "path": "evidence/S01/exp01/trials/summary.json",
+     "sha256": "ce3470f7ed194a3619746151e8d4c7b868d0b003a4026e036ebc2a3cd471281e"
+    }
+   ]
+  },
+  {
+   "id": "EXP01-FIX-WINDOWS",
+   "title": "Same trials with the confirming fix, windows",
+   "command": "probes/setup/run_trials.sh <fixed harness> probes/setup <runs> fixed \"none:1 apply:20 staging:5 finalization:3\"",
+   "working_dir": ".work/exp01",
+   "toolchain": "Windows 11 host, rustup toolchain 1.88.0-x86_64-pc-windows-msvc (rustc 1.88.0 6b00bc388)",
+   "input_revision": "HOI4-Mod-Setup 4488a418cad56a158273cb66c4ce7794696b7ed1 plus harness plus confirming fix (patch/fix-placement-temp.diff)",
+   "exit_code": 0,
+   "evidence_kind": "process-kill execution with independent inventory",
+   "result": {
+    "windows-fixed": {
+     "apply": {
+      "actions": {
+       "rollback": 20
+      },
+      "exact_files": 20,
+      "git_index_unchanged": 20,
+      "leftover_temp_after_recovery": 0,
+      "outcomes": {
+       "{\"ok\": \"rolled_back\"}": 20
+      },
+      "trials": 20,
+      "unapproved_untouched": 20
+     },
+     "finalization": {
+      "actions": {
+       "rollback": 3
+      },
+      "exact_files": 3,
+      "git_index_unchanged": 3,
+      "leftover_temp_after_recovery": 0,
+      "outcomes": {
+       "{\"ok\": \"rolled_back\"}": 3
+      },
+      "trials": 3,
+      "unapproved_untouched": 3
+     },
+     "none": {
+      "actions": {
+       "None": 1
+      },
+      "exact_files": 0,
+      "git_index_unchanged": 1,
+      "leftover_temp_after_recovery": 0,
+      "outcomes": {
+       "null": 1
+      },
+      "trials": 1,
+      "unapproved_untouched": 1
+     },
+     "staging": {
+      "actions": {
+       "discard_staging": 5
+      },
+      "exact_files": 5,
+      "git_index_unchanged": 5,
+      "leftover_temp_after_recovery": 0,
+      "outcomes": {
+       "{\"ok\": \"staging_discarded\"}": 5
+      },
+      "trials": 5,
+      "unapproved_untouched": 5
+     }
+    },
+    "apply_trials_with_bound_placement_temp_after_kill": 19
+   },
+   "limitation": "Windows none-1 harness was terminated externally (exit 1, no panic) during its rollback, see EXP01-RETRY-WIN. Linux first fixed attempt is invalid (corrupt rlib in a target volume after the Docker restart, logs/linux-repro-fixed-corrupt-target.log)",
+   "artifacts": [
+    {
+     "path": "evidence/S01/exp01/trials/windows-fixed.jsonl",
+     "sha256": "87ed56e561683c9949f4d6b41c4fb026cdd6c721a0e3655beb195d9cdfe721bb"
+    }
+   ]
+  },
+  {
+   "id": "EXP01-FIX-LINUX",
+   "title": "Same trials with the confirming fix, linux",
+   "command": "probes/setup/run_trials.sh <fixed harness> probes/setup <runs> fixed \"none:1 apply:20 staging:5 finalization:3\"",
+   "working_dir": ".work/exp01",
+   "toolchain": "rust@sha256:af306cfa71d987911a781c37b59d7d67d934f49684058f96cf72079c3626bfe0 (rust:1.88-bookworm)",
+   "input_revision": "HOI4-Mod-Setup 4488a418cad56a158273cb66c4ce7794696b7ed1 plus harness plus confirming fix (patch/fix-placement-temp.diff)",
+   "exit_code": 0,
+   "evidence_kind": "process-kill execution with independent inventory",
+   "result": {
+    "linux-fixed": {
+     "apply": {
+      "actions": {
+       "rollback": 20
+      },
+      "exact_files": 20,
+      "git_index_unchanged": 20,
+      "leftover_temp_after_recovery": 0,
+      "outcomes": {
+       "{\"ok\": \"rolled_back\"}": 20
+      },
+      "trials": 20,
+      "unapproved_untouched": 20
+     },
+     "finalization": {
+      "actions": {
+       "rollback": 3
+      },
+      "exact_files": 3,
+      "git_index_unchanged": 3,
+      "leftover_temp_after_recovery": 0,
+      "outcomes": {
+       "{\"ok\": \"rolled_back\"}": 3
+      },
+      "trials": 3,
+      "unapproved_untouched": 3
+     },
+     "none": {
+      "actions": {
+       "rollback": 1
+      },
+      "exact_files": 1,
+      "git_index_unchanged": 1,
+      "leftover_temp_after_recovery": 0,
+      "outcomes": {
+       "{\"ok\": \"rolled_back\"}": 1
+      },
+      "trials": 1,
+      "unapproved_untouched": 1
+     },
+     "staging": {
+      "actions": {
+       "discard_staging": 5
+      },
+      "exact_files": 5,
+      "git_index_unchanged": 5,
+      "leftover_temp_after_recovery": 0,
+      "outcomes": {
+       "{\"ok\": \"staging_discarded\"}": 5
+      },
+      "trials": 5,
+      "unapproved_untouched": 5
+     }
+    },
+    "apply_trials_with_bound_placement_temp_after_kill": 20
+   },
+   "limitation": "Rerun after removing the corrupted target volume",
+   "artifacts": [
+    {
+     "path": "evidence/S01/exp01/trials/linux-fixed.jsonl",
+     "sha256": "ddab163b9af099e5057d932fc6b206ee4490511e8cbf10a444d98be9988ab9b9"
+    }
+   ]
+  },
+  {
+   "id": "EXP01-RETRY-WIN",
+   "title": "Recover-only retry of an externally interrupted rollback (fixed, Windows)",
+   "command": "EXP01_TRIAL_KILL=recover_only <fixed harness> --exact transaction::tests::exp01_repro::exp01_trial",
+   "working_dir": ".work/exp01/runs-win/fixed/none-1",
+   "toolchain": "Windows 11 host, rustup toolchain 1.88.0-x86_64-pc-windows-msvc (rustc 1.88.0 6b00bc388)",
+   "input_revision": "HOI4-Mod-Setup 4488a418cad56a158273cb66c4ce7794696b7ed1 plus harness plus confirming fix (patch/fix-placement-temp.diff)",
+   "exit_code": 0,
+   "evidence_kind": "recovery execution with independent inventory",
+   "result": "Journal state rolling_back, recommended rollback, retry rolled_back, rollback quarantine leftover settled, exact files restored, only an empty created directory remains",
+   "limitation": "Cause of the external termination is unknown",
+   "artifacts": [
+    {
+     "path": "evidence/S01/exp01/trials/windows-fixed/none-1/report-retry.json",
+     "sha256": "21195c86ea361402bf2f4fbe410c63f6366a16b2ef174ea78b2f568af26bfcfe"
+    },
+    {
+     "path": "evidence/S01/exp01/trials/windows-fixed/none-1/compare-retry.json",
+     "sha256": "5f91420490d96d2a02e4a6fd531b56fcce87d802388dbde406af79649b4f3ba4"
+    }
+   ]
+  },
+  {
+   "id": "EXP01-CONTROL-WINDOWS",
+   "title": "Completed apply and finalization recovery with a readiness-valid descriptor, windows",
+   "command": "EXP01_DESCRIPTOR_PICTURE=1 run_trials.sh ... control-ready \"none:1 [apply:3]\" and final-ready \"finalization:3\"",
+   "working_dir": ".work/exp01",
+   "toolchain": "Windows 11 host, rustup toolchain 1.88.0-x86_64-pc-windows-msvc (rustc 1.88.0 6b00bc388)",
+   "input_revision": "HOI4-Mod-Setup 4488a418cad56a158273cb66c4ce7794696b7ed1 plus local test harness only (patch/harness-include.diff, patch/exp01_repro.rs) and HOI4-Mod-Setup 4488a418cad56a158273cb66c4ce7794696b7ed1 plus harness plus confirming fix (patch/fix-placement-temp.diff)",
+   "exit_code": 0,
+   "evidence_kind": "process-kill execution with independent inventory",
+   "result": {
+    "windows-control-ready": {
+     "none": {
+      "actions": {
+       "None": 1
+      },
+      "exact_files": 0,
+      "git_index_unchanged": 1,
+      "leftover_temp_after_recovery": 0,
+      "outcomes": {
+       "null": 1
+      },
+      "trials": 1,
+      "unapproved_untouched": 1
+     }
+    },
+    "windows-control-ready-fixed": {
+     "none": {
+      "actions": {
+       "None": 1
+      },
+      "exact_files": 0,
+      "git_index_unchanged": 1,
+      "leftover_temp_after_recovery": 0,
+      "outcomes": {
+       "null": 1
+      },
+      "trials": 1,
+      "unapproved_untouched": 1
+     }
+    },
+    "windows-final-ready": {
+     "finalization": {
+      "actions": {
+       "resume": 3
+      },
+      "exact_files": 0,
+      "git_index_unchanged": 3,
+      "leftover_temp_after_recovery": 0,
+      "outcomes": {
+       "{\"ok\": \"completed\"}": 3
+      },
+      "trials": 3,
+      "unapproved_untouched": 3
+     }
+    },
+    "windows-final-ready-fixed": {
+     "finalization": {
+      "actions": {
+       "resume": 3
+      },
+      "exact_files": 0,
+      "git_index_unchanged": 3,
+      "leftover_temp_after_recovery": 0,
+      "outcomes": {
+       "{\"ok\": \"completed\"}": 3
+      },
+      "trials": 3,
+      "unapproved_untouched": 3
+     }
+    }
+   },
+   "limitation": "Approved paths are exp01_setup/managed, exp01_setup/replace-me.txt and .hoi4-mod-setup. The descriptor variant adds one picture= line before the baseline commit",
+   "artifacts": [
+    {
+     "path": "evidence/S01/exp01/trials/windows-control-ready.jsonl",
+     "sha256": "50ab3c207b7822f54897163cecf56854da09dafa51ebc4d98c079635b9350421"
+    },
+    {
+     "path": "evidence/S01/exp01/trials/windows-control-ready-fixed.jsonl",
+     "sha256": "172fa5cb9496c4d0d15f53ad480dd5d109a7b340563e4938ac7a25db6dbe484d"
+    },
+    {
+     "path": "evidence/S01/exp01/trials/windows-final-ready.jsonl",
+     "sha256": "006b9d23b614ad44135c3cdc177ce3b19c7390739cf9aa11b247ad642cddb74f"
+    },
+    {
+     "path": "evidence/S01/exp01/trials/windows-final-ready-fixed.jsonl",
+     "sha256": "344edbde04354810edfeb8100fa74a8a308646ff6b38990ca0ecfc3493404707"
+    }
+   ]
+  },
+  {
+   "id": "EXP01-CONTROL-LINUX",
+   "title": "Completed apply and finalization recovery with a readiness-valid descriptor, linux",
+   "command": "EXP01_DESCRIPTOR_PICTURE=1 run_trials.sh ... control-ready \"none:1 [apply:3]\" and final-ready \"finalization:3\"",
+   "working_dir": ".work/exp01",
+   "toolchain": "rust@sha256:af306cfa71d987911a781c37b59d7d67d934f49684058f96cf72079c3626bfe0 (rust:1.88-bookworm)",
+   "input_revision": "HOI4-Mod-Setup 4488a418cad56a158273cb66c4ce7794696b7ed1 plus local test harness only (patch/harness-include.diff, patch/exp01_repro.rs) and HOI4-Mod-Setup 4488a418cad56a158273cb66c4ce7794696b7ed1 plus harness plus confirming fix (patch/fix-placement-temp.diff)",
+   "exit_code": 0,
+   "evidence_kind": "process-kill execution with independent inventory",
+   "result": {
+    "linux-control-ready": {
+     "apply": {
+      "actions": {
+       "rollback": 3
+      },
+      "exact_files": 0,
+      "git_index_unchanged": 3,
+      "leftover_temp_after_recovery": 3,
+      "outcomes": {
+       "{\"ok\": \"rolled_back\"}": 3
+      },
+      "trials": 3,
+      "unapproved_untouched": 3
+     },
+     "none": {
+      "actions": {
+       "None": 1
+      },
+      "exact_files": 0,
+      "git_index_unchanged": 1,
+      "leftover_temp_after_recovery": 0,
+      "outcomes": {
+       "null": 1
+      },
+      "trials": 1,
+      "unapproved_untouched": 1
+     }
+    },
+    "linux-control-ready-fixed": {
+     "apply": {
+      "actions": {
+       "rollback": 3
+      },
+      "exact_files": 3,
+      "git_index_unchanged": 3,
+      "leftover_temp_after_recovery": 0,
+      "outcomes": {
+       "{\"ok\": \"rolled_back\"}": 3
+      },
+      "trials": 3,
+      "unapproved_untouched": 3
+     },
+     "none": {
+      "actions": {
+       "None": 1
+      },
+      "exact_files": 0,
+      "git_index_unchanged": 1,
+      "leftover_temp_after_recovery": 0,
+      "outcomes": {
+       "null": 1
+      },
+      "trials": 1,
+      "unapproved_untouched": 1
+     }
+    },
+    "linux-final-ready": {
+     "finalization": {
+      "actions": {
+       "resume": 3
+      },
+      "exact_files": 0,
+      "git_index_unchanged": 3,
+      "leftover_temp_after_recovery": 0,
+      "outcomes": {
+       "{\"ok\": \"completed\"}": 3
+      },
+      "trials": 3,
+      "unapproved_untouched": 3
+     }
+    },
+    "linux-final-ready-fixed": {
+     "finalization": {
+      "actions": {
+       "resume": 3
+      },
+      "exact_files": 0,
+      "git_index_unchanged": 3,
+      "leftover_temp_after_recovery": 0,
+      "outcomes": {
+       "{\"ok\": \"completed\"}": 3
+      },
+      "trials": 3,
+      "unapproved_untouched": 3
+     }
+    }
+   },
+   "limitation": "Approved paths are exp01_setup/managed, exp01_setup/replace-me.txt and .hoi4-mod-setup. The descriptor variant adds one picture= line before the baseline commit",
+   "artifacts": [
+    {
+     "path": "evidence/S01/exp01/trials/linux-control-ready.jsonl",
+     "sha256": "407d99e6343aa7ab422fe22504af47edb8456136179a2f7073f46a8c9c7cebd4"
+    },
+    {
+     "path": "evidence/S01/exp01/trials/linux-control-ready-fixed.jsonl",
+     "sha256": "7d5f4206a3cc26bd7ec19b0ce7190a6d156439ee190b3a2e0bda48b0a0698342"
+    },
+    {
+     "path": "evidence/S01/exp01/trials/linux-final-ready.jsonl",
+     "sha256": "e7bd0c819ee66549c556cbb602826c4a22cc825e7bc38a75d257939416361de9"
+    },
+    {
+     "path": "evidence/S01/exp01/trials/linux-final-ready-fixed.jsonl",
+     "sha256": "9a53a13c750cf99d88fa7d8f47d5ba5c6717f7cece76bdc5a202b125346b0b28"
+    }
+   ]
+  },
+  {
+   "id": "EXP01-FIX-REGRESSION",
+   "title": "Upstream tests on the fixed clone",
+   "command": "cargo test --locked --manifest-path src-tauri/Cargo.toml --lib -- transaction:: safe_fs::",
+   "working_dir": ".work/exp01/setup-fixed",
+   "toolchain": "Windows 11 host, rustup toolchain 1.88.0-x86_64-pc-windows-msvc (rustc 1.88.0 6b00bc388) and rust@sha256:af306cfa71d987911a781c37b59d7d67d934f49684058f96cf72079c3626bfe0 (rust:1.88-bookworm)",
+   "input_revision": "HOI4-Mod-Setup 4488a418cad56a158273cb66c4ce7794696b7ed1 plus harness plus confirming fix (patch/fix-placement-temp.diff)",
+   "exit_code": 0,
+   "evidence_kind": "source test execution",
+   "result": {
+    "windows": "test result: ok. 165 passed; 0 failed; 0 ignored; 0 measured; 432 filtered out; finished in 992.57s",
+    "linux": "test result: ok. 157 passed; 0 failed; 0 ignored; 0 measured; 437 filtered out; finished in 1177.63s"
+   },
+   "limitation": "Counts include the two env-gated harness tests, which return immediately. The fix has no new upstream unit test",
+   "artifacts": [
+    {
+     "path": "evidence/S01/exp01/logs/win-fixed-upstream-tests.log",
+     "sha256": "f6e5024b35fee2e7c6f5d9916e1a462c3efcc6fd3734c19aa66c1784806e1ec5"
+    },
+    {
+     "path": "evidence/S01/exp01/logs/linux-fixed-nodesktop.log",
+     "sha256": "35466406ce0946378e8ce698fa81622059de3030602168b6c6d1af57da4a6ea7"
+    }
+   ]
+  },
+  {
+   "id": "EXP01-PROBE-BUILD",
+   "title": "Probe crate embedding hoi4-setup-core and hoi4-mod-setup (desktop off) as git deps",
+   "command": "cargo build --release (probes/setup, Cargo.lock seeded from upstream)",
+   "working_dir": "/work/probe",
+   "toolchain": "rust@sha256:af306cfa71d987911a781c37b59d7d67d934f49684058f96cf72079c3626bfe0 (rust:1.88-bookworm)",
+   "input_revision": "git rev 4488a418cad56a158273cb66c4ce7794696b7ed1",
+   "exit_code": 0,
+   "evidence_kind": "build execution",
+   "result": "Builds on Linux. No tauri, wry, tao, webkit or gtk crate in the normal graph. tauri-build, tauri-utils and tauri-winres are compiled as build deps of hoi4-mod-setup. Runtime links libdbus-1.so.3 through keyring",
+   "limitation": "Probe calls public scanner and transaction APIs only. commands.rs is not reachable",
+   "artifacts": [
+    {
+     "path": "evidence/S01/exp01/probe-run/probe-build.log",
+     "sha256": "efbc5d61772b73d4662662474bd576dd3e1b8546a859cb5ba70f96f938e5212f"
+    },
+    {
+     "path": "evidence/S01/exp01/probe-run/probe-Cargo.lock",
+     "sha256": "3b5e83c0aac77a36f298e980527926b5b1fbb283abcd784dfe3e49d2bf3ba972"
+    },
+    {
+     "path": "evidence/S01/exp01/probe-run/probe-tree-normal.txt",
+     "sha256": "6b543788346347748bd036d05828556e4aa5865810235f93d049c24a4d59b93a"
+    },
+    {
+     "path": "evidence/S01/exp01/probe-run/probe-ldd.txt",
+     "sha256": "c2c8a7cd5cfa7b8d5928a9d290e7d8b69c5db66f4721ff426568515ee6af910e"
+    },
+    {
+     "path": "evidence/S01/exp01/probe-run/probe-bin.sha256",
+     "sha256": "446a0fba665d4b74b1393975bd05fa612d75f6fc3d02e9917fe3795af9546111"
+    }
+   ]
+  },
+  {
+   "id": "EXP01-PROBE-IMPORT",
+   "title": "Probe on F-SETUP-IMPORT: confinement, read-only scan, analysis gate, refused apply, fresh recovery",
+   "command": "runuser -u exp01 -- exp01-setup-probe /srv/hoi4f/workspaces acct-a/project /srv/hoi4f/state/acct-a",
+   "working_dir": "/srv/hoi4f",
+   "toolchain": "rust@sha256:af306cfa71d987911a781c37b59d7d67d934f49684058f96cf72079c3626bfe0 (rust:1.88-bookworm)",
+   "input_revision": "probe binary 3ceb0ac76d38192f6906baae24e18090634c25ee2f9d4b6004655330e63e4270",
+   "exit_code": 0,
+   "evidence_kind": "embedded service execution with independent inventory",
+   "result": "5 of 5 outside paths refused by the probe gate. Scan ok, read_only, semantic_analysis required with status authentication_required. validate_plan and run_transaction refuse with 'a confirmed selected-provider analysis is required before apply', no app root created. Inventory byte-identical including .git/index",
+   "limitation": "The confinement gate is probe code, Setup has none. No model was called by design",
+   "artifacts": [
+    {
+     "path": "evidence/S01/exp01/probe-run/probe-run1.json",
+     "sha256": "4a58165c31cb228bf1fd2844a6b95be3d6e51b4e129af09d283aba8b54acb24d"
+    },
+    {
+     "path": "evidence/S01/exp01/probe-run/project-before.json",
+     "sha256": "26e14e61331ce7750ff44526e061ea2d989f93e3160b655556fd7d8ba264251f"
+    },
+    {
+     "path": "evidence/S01/exp01/probe-run/project-after-run1.json",
+     "sha256": "26e14e61331ce7750ff44526e061ea2d989f93e3160b655556fd7d8ba264251f"
+    },
+    {
+     "path": "evidence/S01/exp01/probe-run/project-compare-run1.json",
+     "sha256": "1cc59f903a6444613d420973f10694aa00bad5eed998ae208604339d91cd89d3"
+    },
+    {
+     "path": "evidence/S01/exp01/probe-run/outside-compare.json",
+     "sha256": "832d50156338cbaf7812aa3aa3b6370b4d203a05b4495e463d2eacfa2c17d3bf"
+    },
+    {
+     "path": "evidence/S01/exp01/probe-run/workspace-layout.txt",
+     "sha256": "1da30c0f00ee1598d76760b12eb664e2df543581a2f6f2dbe6e106d0f45cd3cb"
+    }
+   ]
+  },
+  {
+   "id": "EXP01-PROBE-NEW",
+   "title": "Probe on F-SETUP-NEW empty owned directory",
+   "command": "exp01-setup-probe /srv/hoi4f/workspaces acct-a/new-empty /srv/hoi4f/state/acct-a",
+   "working_dir": "/srv/hoi4f",
+   "toolchain": "rust@sha256:af306cfa71d987911a781c37b59d7d67d934f49684058f96cf72079c3626bfe0 (rust:1.88-bookworm)",
+   "input_revision": "probe binary 3ceb0ac7...",
+   "exit_code": 0,
+   "evidence_kind": "embedded service execution with independent inventory",
+   "result": "Scan ok on the empty root, apply refused by the analysis gate, directory still empty",
+   "limitation": "The generated closure of a new project was not produced: the plan builder is desktop-only and analysis was not run",
+   "artifacts": [
+    {
+     "path": "evidence/S01/exp01/probe-run/probe-run-new.json",
+     "sha256": "43f938633490045a4b498b986f37f70e2d5dd8551cad0c5f284a9bded535e921"
+    },
+    {
+     "path": "evidence/S01/exp01/probe-run/new-empty-compare.json",
+     "sha256": "cffad59afc17c7aea721e091147849fcd1711abca4effa837d2a9258852781ba"
+    }
+   ]
+  },
+  {
+   "id": "EXP01-PROBE-RECOVER",
+   "title": "Interrupted real apply recovered through the embedded library with no provider",
+   "command": "harness EXP01_TRIAL_KILL=apply EXP01_SKIP_RECOVERY=1, then exp01-setup-probe ... setup-app-interrupted (x3)",
+   "working_dir": "/srv/hoi4f",
+   "toolchain": "rust@sha256:af306cfa71d987911a781c37b59d7d67d934f49684058f96cf72079c3626bfe0 (rust:1.88-bookworm)",
+   "input_revision": "HOI4-Mod-Setup 4488a418cad56a158273cb66c4ce7794696b7ed1 plus local test harness only (patch/harness-include.diff, patch/exp01_repro.rs) (kill) and upstream git dep (recovery)",
+   "exit_code": 0,
+   "evidence_kind": "embedded service execution with independent inventory",
+   "result": "3 of 3: find_incomplete_transaction found state applying, recommended rollback, rollback ok, and each left one .hoi4ms-<uuid>.tmp. Same defect through the embedded path",
+   "limitation": "Unpatched upstream library",
+   "artifacts": [
+    {
+     "path": "evidence/S01/exp01/probe-recover/probe-run-recover-1.json",
+     "sha256": "e5209f8ba06b24fd3a0d9f037a51eb3ed85c6a38c9935caa347c9b4a1545f8af"
+    },
+    {
+     "path": "evidence/S01/exp01/probe-recover/project2-compare-recover-1.json",
+     "sha256": "365020872b62afab3be39ec24ffa3e320257e299c58bcd2e5bab1537c6b1e29e"
+    },
+    {
+     "path": "evidence/S01/exp01/probe-recover/project2-compare-recover-2.json",
+     "sha256": "634b35dfc360cb18e0077626fa9da64113bc137da84c2768571611e9add5eee5"
+    },
+    {
+     "path": "evidence/S01/exp01/probe-recover/project2-compare-recover-3.json",
+     "sha256": "a16f76991ec764e308045487d8fc4f29f7c05ed0a447b772c0d0a1bf605d1252"
+    },
+    {
+     "path": "evidence/S01/exp01/logs/linux-probe-recover.log",
+     "sha256": "ebea773291325b8f79caf1e3ddfaa1d79dfc9fa64dae1e2fc4d2f94d39543e46"
+    }
+   ]
+  },
+  {
+   "id": "EXP01-PROBE-ANCESTOR",
+   "title": "Apply under a traverse-only account directory",
+   "command": "strace -f harness with parent mode 0711 then 0755 (probes/setup/debug_ancestor_access.sh)",
+   "working_dir": "/srv/t",
+   "toolchain": "rust@sha256:af306cfa71d987911a781c37b59d7d67d934f49684058f96cf72079c3626bfe0 (rust:1.88-bookworm)",
+   "input_revision": "HOI4-Mod-Setup 4488a418cad56a158273cb66c4ce7794696b7ed1 plus local test harness only (patch/harness-include.diff, patch/exp01_repro.rs)",
+   "exit_code": 0,
+   "evidence_kind": "system call trace",
+   "result": "With 0711 the transaction fails with EACCES on openat(parent fd, 'acct', O_RDONLY|O_DIRECTORY). RootedDir opens every ancestor for reading. Scan works with 0711",
+   "limitation": "Layout constraint for the server, not a security defect in Setup",
+   "artifacts": [
+    {
+     "path": "evidence/S01/exp01/logs/linux-ancestor-access-strace.log",
+     "sha256": "46d74b49048378a6d4aa1807d67ac1b6c7c63e613c3cd043b0bf440d4df2473c"
+    },
+    {
+     "path": "evidence/S01/exp01/probe-run/interrupt-report.json",
+     "sha256": "66f936c384185b0d6c88f30f42916936e5ff90fefbbd8802bcef52d53fc560b8"
+    }
+   ]
+  }
+ ]
+}

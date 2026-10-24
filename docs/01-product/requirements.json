@@ -192,7 +192,7 @@
   {
     "id": "REQ-020",
     "title": "Reviewable runtime learning",
-    "requirement": "Capture candidate lessons with evidence and applicability, allowing approval, rejection and supersession without self-granted authority.",
+    "requirement": "Learn automatically within tiered lanes. Personal preferences apply at once, project and global lessons activate only after evidence-based verification, conflicts between members go to owner review, and no lesson changes canon, grants, tools or permissions.",
     "spec": "SPEC-004",
     "spec_file": "../03-subsystem-specs/004-context-memory-and-runtime-learning.md",
     "stage": "S05",
@@ -352,7 +352,7 @@
   {
     "id": "REQ-036",
     "title": "Continuous engineering learning",
-    "requirement": "Require evidence-based learning reviews after meaningful development, with the smallest useful versioned change or a justified no-change result.",
+    "requirement": "Run evidence-based learning reviews automatically after meaningful development. A lesson backed by a passing regression test that changes no authority, external effect, cost or approved scope is promoted automatically, and anything else needs owner review.",
     "spec": "SPEC-012",
     "spec_file": "../03-subsystem-specs/012-engineering-guidance-skills-and-learning.md",
     "stage": "S01",
@@ -478,5 +478,25 @@
     "stage": "S02",
     "stage_file": "../04-implementation-stages/stage-02-onboarding-and-workspaces.md",
     "acceptance": "AC-048"
+  },
+  {
+    "id": "REQ-049",
+    "title": "Personal and shared memory with feedback",
+    "requirement": "Learn per-user preferences and per-project conventions and lessons from explicit and implicit feedback, apply them automatically within their scope, and let users forget items, delete all and switch learning off.",
+    "spec": "SPEC-004",
+    "spec_file": "../03-subsystem-specs/004-context-memory-and-runtime-learning.md",
+    "stage": "S05",
+    "stage_file": "../04-implementation-stages/stage-05-context-and-recovery-hardening.md",
+    "acceptance": "AC-049"
+  },
+  {
+    "id": "REQ-050",
+    "title": "Memory isolation, safety and erasure",
+    "requirement": "Scope every memory and feedback record to its account and project, never select another user's or project's memory, treat memory as data with no authority, block poisoned or authority-shaped writes, and erase deleted items with everything derived only from them.",
+    "spec": "SPEC-004",
+    "spec_file": "../03-subsystem-specs/004-context-memory-and-runtime-learning.md",
+    "stage": "S05",
+    "stage_file": "../04-implementation-stages/stage-05-context-and-recovery-hardening.md",
+    "acceptance": "AC-050"
   }
 ]

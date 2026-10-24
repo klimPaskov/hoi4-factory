@@ -1,0 +1,32 @@
+{
+ "before": "/out/probe/project-before.json",
+ "after": "/out/probe/project-after-run1.json",
+ "approved_prefixes": [],
+ "unapproved": {
+  "changed": [],
+  "mode_changed": [],
+  "added": [],
+  "removed": [],
+  "metadata_only": []
+ },
+ "approved": {
+  "changed": [],
+  "added": [],
+  "removed": []
+ },
+ "all": {
+  "added_files": [],
+  "added_dirs": [],
+  "removed": [],
+  "content_changed": []
+ },
+ "unapproved_bytes_untouched": true,
+ "exact_files": true,
+ "exact_files_and_dirs": true,
+ "git_index_sha256": {
+  "before": "110400e0b33800b5a2b08a3fe25864452856cb4c21de1af03a1cc41f9006d883",
+  "after": "110400e0b33800b5a2b08a3fe25864452856cb4c21de1af03a1cc41f9006d883"
+ },
+ "git_status_identical": true,
+ "git_ls_files_identical": true
+}

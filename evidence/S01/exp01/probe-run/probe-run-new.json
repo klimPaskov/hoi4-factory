@@ -1,0 +1,76 @@
+{
+  "apply_without_analysis": {
+    "app_root_created": false,
+    "error": "credential error: a confirmed selected-provider analysis is required before apply",
+    "refused": true
+  },
+  "confinement": [
+    {
+      "detail": "traversal or non-normal component refused",
+      "input": "../outside",
+      "refused": true
+    },
+    {
+      "detail": "absolute or backslash path refused",
+      "input": "/etc",
+      "refused": true
+    },
+    {
+      "detail": "traversal or non-normal component refused",
+      "input": "acct-a/../../etc",
+      "refused": true
+    },
+    {
+      "detail": "symlink component refused: /srv/hoi4f/workspaces/acct-a/escape-link",
+      "input": "acct-a/escape-link",
+      "refused": true
+    },
+    {
+      "detail": "symlink component refused: /srv/hoi4f/workspaces/acct-a/escape-link",
+      "input": "acct-a/escape-link/passwd",
+      "refused": true
+    }
+  ],
+  "plan": {
+    "desktop_build_plan_reachable": false,
+    "reason": "hoi4_mod_setup::commands is #[cfg(feature = \"desktop\")] and private; build_plan, approve_scan_evidence, confirm_codex_analysis and the prepared-plan store live there",
+    "validate_plan_without_analysis": {
+      "refused": "credential error: a confirmed selected-provider analysis is required before apply"
+    }
+  },
+  "probe": "exp01-setup-probe",
+  "project_root": "/srv/hoi4f/workspaces/acct-a/new-empty",
+  "recovery_fresh": {
+    "incomplete": null,
+    "ok": true
+  },
+  "scan": {
+    "bytes_read": 0,
+    "cancelled": false,
+    "conflicts": [],
+    "detected": [],
+    "directories_scanned": 1,
+    "files_scanned": 0,
+    "findings": 17,
+    "limits_hit": [],
+    "ok": true,
+    "partial": false,
+    "read_only": true,
+    "scan_id": "ead9dba8-6af9-4cdb-b935-7587405519b5",
+    "semantic_analysis": {
+      "analysis_id": null,
+      "auth_mode": "chatgpt",
+      "engine": "codex_app_server",
+      "input_manifest": [],
+      "model": null,
+      "output_schema_id": "codex-analysis/1.0.0",
+      "requested": true,
+      "required": true,
+      "response_sha256": null,
+      "status": "authentication_required",
+      "suggestions": [],
+      "transport": "stdio_jsonl"
+    }
+  },
+  "workspace_root": "/srv/hoi4f/workspaces"
+}

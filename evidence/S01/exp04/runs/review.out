@@ -1,0 +1,3 @@
+lrwxrwxrwx 1 root root 34 Sep 23 03:52 /usr/lib/ssl/cert.pem -> /etc/ssl/certs/ca-certificates.crt
+checked
+libstdc++6:amd64: /usr/share/gcc/python

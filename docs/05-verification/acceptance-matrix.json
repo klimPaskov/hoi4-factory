@@ -378,12 +378,14 @@
       "acceptance": "AC-020",
       "scope": "MVP",
       "decisions": [
-        "ADR-004"
+        "ADR-022"
       ],
       "tests": [
-        "T-CTX-04"
+        "T-CTX-04",
+        "T-MEM-02",
+        "T-MEM-05"
       ],
-      "oracle": "Lesson review supports approval, rejection, supersession and rollback without changing canon.",
+      "oracle": "Preferences apply without review, a lesson activates only after it flags or fixes its original failure without harming past successes, and authority-shaped memories are refused.",
       "execution_status": "Planned, not executed."
     },
     {
@@ -690,12 +692,13 @@
       "acceptance": "AC-036",
       "scope": "MVP",
       "decisions": [
-        "ADR-008"
+        "ADR-008",
+        "ADR-023"
       ],
       "tests": [
         "T-DEV-04"
       ],
-      "oracle": "Every substantive handoff records an evidenced minimal learning update or justified no-change result.",
+      "oracle": "A tested non-authority lesson reaches guidance and the changelog without manual review, and an authority-widening lesson is held for the owner.",
       "execution_status": "Planned, not executed."
     },
     {
@@ -932,6 +935,48 @@
         "T-HOI-02"
       ],
       "oracle": "Tools read the mounted reference read-only, evidence names its build and DLC set, and no export, image or API response contains raw game files.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-049",
+      "title": "Personal and shared memory with feedback",
+      "spec": "SPEC-004",
+      "spec_file": "../03-subsystem-specs/004-context-memory-and-runtime-learning.md",
+      "stage": "S05",
+      "stage_file": "../04-implementation-stages/stage-05-context-and-recovery-hardening.md",
+      "acceptance": "AC-049",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-022"
+      ],
+      "tests": [
+        "T-MEM-01",
+        "T-MEM-02",
+        "T-MEM-04"
+      ],
+      "oracle": "A stated or repeated preference shapes the next task without review, a verified project lesson reaches every member's matching task, and forget, delete all and the off switch take effect on the next bundle.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-050",
+      "title": "Memory isolation, safety and erasure",
+      "spec": "SPEC-004",
+      "spec_file": "../03-subsystem-specs/004-context-memory-and-runtime-learning.md",
+      "stage": "S05",
+      "stage_file": "../04-implementation-stages/stage-05-context-and-recovery-hardening.md",
+      "acceptance": "AC-050",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-022",
+        "ADR-012"
+      ],
+      "tests": [
+        "T-MEM-01",
+        "T-MEM-03",
+        "T-MEM-04",
+        "T-MEM-05"
+      ],
+      "oracle": "No task sees another user's personal or another project's memory, poisoned inputs and authority statements yield no memory, and deleted items leave no trace in the next bundle.",
       "execution_status": "Planned, not executed."
     }
   ],
@@ -1177,7 +1222,9 @@
       "ordinal": 1,
       "tests": [
         "T-CTX-01",
-        "T-DEV-04"
+        "T-DEV-04",
+        "T-MEM-01",
+        "T-MEM-03"
       ],
       "status": "Planned, not executed"
     },
@@ -1186,7 +1233,8 @@
       "stage": "S05",
       "ordinal": 2,
       "tests": [
-        "T-CTX-02"
+        "T-CTX-02",
+        "T-MEM-04"
       ],
       "status": "Planned, not executed"
     },
@@ -1204,7 +1252,10 @@
       "stage": "S05",
       "ordinal": 4,
       "tests": [
-        "T-CTX-04"
+        "T-CTX-04",
+        "T-MEM-02",
+        "T-MEM-04",
+        "T-MEM-05"
       ],
       "status": "Planned, not executed"
     },
@@ -1213,7 +1264,8 @@
       "stage": "S05",
       "ordinal": 5,
       "tests": [
-        "T-CTX-02"
+        "T-CTX-02",
+        "T-MEM-02"
       ],
       "status": "Planned, not executed"
     },

@@ -1,0 +1,13 @@
+    Finished `release` profile [optimized] target(s) in 0.54s
+ Container hoi4-factory-db-1  Running
+wrote C:\Users\klimp\Documents\Projects\hoi4-factory\probes\runtime\../..\evidence/S01\exp03\runs\journal-phase-reset.json
+wrote C:\Users\klimp\Documents\Projects\hoi4-factory\probes\runtime\../..\evidence/S01\exp03\runs\broker.json
+wrote C:\Users\klimp\Documents\Projects\hoi4-factory\probes\runtime\../..\evidence/S01\exp03\runs\stream-faults.json
+crash child before-intent: fence 3
+crash child during-effect: fence 4
+crash child after-effect: fence 5
+wrote C:\Users\klimp\Documents\Projects\hoi4-factory\probes\runtime\../..\evidence/S01\exp03\runs\journal-phase-a.json
+ Container hoi4-factory-db-1  Restarting
+ Container hoi4-factory-db-1  Started
+wrote C:\Users\klimp\Documents\Projects\hoi4-factory\probes\runtime\../..\evidence/S01\exp03\runs\journal-phase-b.json
+wrote C:\Users\klimp\Documents\Projects\hoi4-factory\probes\runtime\../..\evidence/S01\exp03\runs\worker.json

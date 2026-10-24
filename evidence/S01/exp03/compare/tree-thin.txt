@@ -1,0 +1,90 @@
+atomic-waker v1.1.2
+aws-lc-rs v1.18.2
+aws-lc-sys v0.46.0
+base64 v0.23.1
+bitflags v2.13.2
+bytes v1.12.1
+compare-thin v0.0.0 (C:\Users\klimp\Documents\Projects\hoi4-factory\probes\runtime\compare\thin)
+displaydoc v0.2.7 (proc-macro)
+factory-agent v0.0.0 (C:\Users\klimp\Documents\Projects\hoi4-factory\crates\agent)
+form_urlencoded v1.2.2
+futures-channel v0.3.34
+futures-core v0.3.34
+futures-task v0.3.34
+futures-util v0.3.34
+http v1.5.0
+http-body v1.1.0
+http-body-util v0.1.5
+httparse v1.10.1
+hyper v1.12.0
+hyper-rustls v0.27.10
+hyper-util v0.1.21
+icu_collections v2.4.0
+icu_locale_core v2.4.0
+icu_normalizer v2.4.0
+icu_normalizer_data v2.4.0
+icu_properties v2.4.0
+icu_properties_data v2.4.0
+icu_provider v2.4.0
+idna v1.1.0
+idna_adapter v1.2.2
+ipnet v2.12.2
+itoa v1.0.18
+libc v0.2.191
+litemap v0.8.3
+log v0.4.34
+memchr v2.8.3
+mio v1.2.4
+once_cell v1.21.4
+percent-encoding v2.3.2
+pin-project-lite v0.2.17
+potential_utf v0.1.6
+proc-macro2 v1.0.107
+quote v1.0.47
+reqwest v0.13.5
+rustls v0.23.46
+rustls-pki-types v1.15.1
+rustls-platform-verifier v0.7.1
+rustls-webpki v0.103.16
+serde v1.0.229
+serde_core v1.0.229
+serde_derive v1.0.229 (proc-macro)
+serde_json v1.0.154
+slab v0.4.12
+smallvec v1.16.4
+socket2 v0.6.5
+stable_deref_trait v1.2.1
+subtle v2.6.1
+syn v3.0.9
+sync_wrapper v1.0.2
+synstructure v0.14.0
+thiserror v2.0.21
+thiserror-impl v2.0.21 (proc-macro)
+tinystr v0.8.5
+tokio v1.54.1
+tokio-macros v2.7.2 (proc-macro)
+tokio-rustls v0.26.6
+tower v0.5.3
+tower-http v0.6.11
+tower-layer v0.3.3
+tower-service v0.3.3
+tracing v0.1.44
+tracing-core v0.1.36
+try-lock v0.2.5
+unicode-ident v1.0.27
+untrusted v0.9.0
+url v2.5.8
+utf8_iter v1.0.4
+want v0.3.2
+windows-link v0.2.1
+windows-sys v0.61.2
+writeable v0.6.4
+yoke v0.8.4
+yoke-derive v0.8.4 (proc-macro)
+zerofrom v0.1.8
+zerofrom-derive v0.1.8 (proc-macro)
+zeroize v1.9.1
+zerotrie v0.2.5
+zerovec v0.11.9
+zerovec-derive v0.11.7 (proc-macro)
+zmij v1.0.23

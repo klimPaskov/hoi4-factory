@@ -1,0 +1,118 @@
+spriteTypes = {
+	spriteType = {
+		name = "GFX_exp_icon_b_root"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_c_next"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_c_root"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_c_side"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_created"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_d_root"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_d_twin_a"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_d_twin_b"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_join"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_left"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_o_orphan"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_o_root"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_r_anchor"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_r_child"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_r_grandchild"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_right"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_root"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_s_a"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_s_after"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_s_b"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_s_root"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_ss_next"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_ss_root"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_ss_shared"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_t_next"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_t_root"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_u_const"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_u_plain"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+	spriteType = {
+		name = "GFX_exp_icon_u_root"
+		texturefile = "gfx/interface/goals/exp02_placeholder.dds"
+	}
+}

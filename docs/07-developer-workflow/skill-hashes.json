@@ -2,7 +2,7 @@
   "schema_version": 1,
   "version": "0.1.1",
   "generator": "scripts/sync_skills.py",
-  "metadata_sha256": "6e8d22f11bc3220e9110639f25c7375d90605a0c1eeea32f64bfb42a7656eeed",
+  "metadata_sha256": "841e9f809574cab4bc484118bdbed48a86d955da858317e822a03bb175a56c6a",
   "scope": "Only these repository projections. No personal installation.",
   "skills": [
     {
@@ -39,23 +39,23 @@
       "generated": [
         {
           "path": ".claude/skills/capture-engineering-lessons/SKILL.md",
-          "sha256": "b733bccaddd43c8ca31c5521717077bd2dff3fc2b88da48ee3067ebe035743f2"
+          "sha256": "0a868122eb7676dda6bf49473dd263f76658174f34565df8ca3503949faae9ee"
         },
         {
           "path": ".codex/skills/capture-engineering-lessons/SKILL.md",
-          "sha256": "94a3e7eaeaabed18721bd58c76927b5ab41d49a7d54af6d6d80d9ba2899460f9"
+          "sha256": "0a868122eb7676dda6bf49473dd263f76658174f34565df8ca3503949faae9ee"
         },
         {
           "path": ".codex/skills/capture-engineering-lessons/agents/openai.yaml",
-          "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94"
+          "sha256": "8619a54e8c098122a7f3881394f84ca89b684366e848233a29ad18b6ec363935"
         },
         {
           "path": ".agents/skills/capture-engineering-lessons/SKILL.md",
-          "sha256": "94a3e7eaeaabed18721bd58c76927b5ab41d49a7d54af6d6d80d9ba2899460f9"
+          "sha256": "0a868122eb7676dda6bf49473dd263f76658174f34565df8ca3503949faae9ee"
         },
         {
           "path": ".agents/skills/capture-engineering-lessons/agents/openai.yaml",
-          "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94"
+          "sha256": "8619a54e8c098122a7f3881394f84ca89b684366e848233a29ad18b6ec363935"
         }
       ]
     },
@@ -93,23 +93,23 @@
       "generated": [
         {
           "path": ".claude/skills/validate-stage/SKILL.md",
-          "sha256": "9a44fadf6fd39b80b884a5c37371d2ce65e3848854003a4168a9a7f71031c000"
+          "sha256": "afa6509340b7c7cb4f5e32b91f1c7ed287e6829aefe4bc41f44110bf276c243b"
         },
         {
           "path": ".codex/skills/validate-stage/SKILL.md",
-          "sha256": "9696e301d88ccab747c5040f58528cb88d8f169012b4a5079072e423afddaa1a"
+          "sha256": "afa6509340b7c7cb4f5e32b91f1c7ed287e6829aefe4bc41f44110bf276c243b"
         },
         {
           "path": ".codex/skills/validate-stage/agents/openai.yaml",
-          "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94"
+          "sha256": "8619a54e8c098122a7f3881394f84ca89b684366e848233a29ad18b6ec363935"
         },
         {
           "path": ".agents/skills/validate-stage/SKILL.md",
-          "sha256": "9696e301d88ccab747c5040f58528cb88d8f169012b4a5079072e423afddaa1a"
+          "sha256": "afa6509340b7c7cb4f5e32b91f1c7ed287e6829aefe4bc41f44110bf276c243b"
         },
         {
           "path": ".agents/skills/validate-stage/agents/openai.yaml",
-          "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94"
+          "sha256": "8619a54e8c098122a7f3881394f84ca89b684366e848233a29ad18b6ec363935"
         }
       ]
     }

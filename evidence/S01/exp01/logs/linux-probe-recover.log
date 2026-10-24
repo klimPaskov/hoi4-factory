@@ -1,0 +1,23 @@
+debconf: delaying package configuration, since apt-utils is not installed
+3ceb0ac76d38192f6906baae24e18090634c25ee2f9d4b6004655330e63e4270  /target/release/exp01-setup-probe
+5f318ca03a36c5b1bf78043dc7e920b47bfbf4685741b14b2cd2a91636861cc5  /target/debug/deps/hoi4_mod_setup-b5b13ec949d466c9
+{"out": "/out/probe-recover/project2-before-1.json", "entries": 100, "files": 55, "content_digest": "e5fae47d049e024a15fd55ecd3b44d973dbe2697cf36c0b07f06ed049f8caab1"}
+{"out": "/out/probe-recover/project2-after-kill-1.json", "entries": 102, "files": 56, "content_digest": "a4fb7393bf03ffbd4c3badb0e3ba775fec17a4924f5cc1c723319b47509c8ace"}
+attempt=1 probe_exit=0
+{"out": "/out/probe-recover/project2-after-recover-1.json", "entries": 102, "files": 56, "content_digest": "a4fb7393bf03ffbd4c3badb0e3ba775fec17a4924f5cc1c723319b47509c8ace"}
+{"unapproved_bytes_untouched": false, "exact_files": false, "exact_files_and_dirs": false, "added_files": ["exp01_setup/managed/.hoi4ms-8ffd6d02-ae83-4f33-844f-67b59b820196.tmp"], "git_status_identical": false, "metadata_only_unapproved": 0}
+/srv/hoi4f/workspaces/acct-a/project2/exp01_setup/managed/.hoi4ms-8ffd6d02-ae83-4f33-844f-67b59b820196.tmp
+{"out": "/out/probe-recover/project2-before-2.json", "entries": 100, "files": 55, "content_digest": "e5fae47d049e024a15fd55ecd3b44d973dbe2697cf36c0b07f06ed049f8caab1"}
+{"out": "/out/probe-recover/project2-after-kill-2.json", "entries": 102, "files": 56, "content_digest": "255c2691cf49aacf13be55c25998e1e916f528505b4404a257ca9bb63ddb19f4"}
+attempt=2 probe_exit=0
+{"out": "/out/probe-recover/project2-after-recover-2.json", "entries": 102, "files": 56, "content_digest": "255c2691cf49aacf13be55c25998e1e916f528505b4404a257ca9bb63ddb19f4"}
+{"unapproved_bytes_untouched": false, "exact_files": false, "exact_files_and_dirs": false, "added_files": ["exp01_setup/managed/.hoi4ms-9a7cbc00-d0c4-44a6-bb77-0ca4a414fd08.tmp"], "git_status_identical": false, "metadata_only_unapproved": 0}
+/srv/hoi4f/workspaces/acct-a/project2/exp01_setup/managed/.hoi4ms-9a7cbc00-d0c4-44a6-bb77-0ca4a414fd08.tmp
+{"out": "/out/probe-recover/project2-before-3.json", "entries": 100, "files": 55, "content_digest": "e5fae47d049e024a15fd55ecd3b44d973dbe2697cf36c0b07f06ed049f8caab1"}
+{"out": "/out/probe-recover/project2-after-kill-3.json", "entries": 102, "files": 56, "content_digest": "bd681650be072387ca039fb59b50c08c863e02f05d4c56827442598bba98d877"}
+attempt=3 probe_exit=0
+{"out": "/out/probe-recover/project2-after-recover-3.json", "entries": 102, "files": 56, "content_digest": "bd681650be072387ca039fb59b50c08c863e02f05d4c56827442598bba98d877"}
+{"unapproved_bytes_untouched": false, "exact_files": false, "exact_files_and_dirs": false, "added_files": ["exp01_setup/managed/.hoi4ms-908b500e-2ecb-44c8-b00b-5bf457558b49.tmp"], "git_status_identical": false, "metadata_only_unapproved": 0}
+/srv/hoi4f/workspaces/acct-a/project2/exp01_setup/managed/.hoi4ms-908b500e-2ecb-44c8-b00b-5bf457558b49.tmp
+done
+docker_exit=0

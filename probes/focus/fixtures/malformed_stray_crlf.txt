@@ -1,0 +1,22 @@
+# EXP-02 synthetic fixture: malformed, a stray closing brace and an unterminated string
+focus_tree = {
+	id = exp_stray_tree
+	default = no
+
+	focus = {
+		id = exp_t_root
+		icon = GFX_exp_icon_t_root
+		x = 1
+		y = 0
+		cost = 10
+		ai_will_do = { factor = 1 }
+		completion_reward = { add_political_power = 10 }
+	}
+	}
+	focus = {
+		id = exp_t_next
+		icon = "GFX_exp_icon_t_next
+		x = 1
+		y = 1
+	}
+}

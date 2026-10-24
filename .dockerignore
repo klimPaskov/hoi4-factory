@@ -1,0 +1,8 @@
+target/
+.work/
+.git/
+evidence/
+docs/
+node_modules/
+.env
+.env.*

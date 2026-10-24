@@ -1,0 +1,202 @@
+{
+  "schema_version": 1,
+  "stage": "S01",
+  "base_revision": "290af7c48ce160d4f7461b90aedc92528295330b",
+  "sources": [
+    {
+      "path": "evidence/S01/exp02/results.json",
+      "sha256": "fbb86b1f48a18a2662d3301fced6b4014d59a9a266a8fd074e17968bc365a7ff"
+    },
+    {
+      "path": "evidence/S01/exp03/results.json",
+      "sha256": "ac93ea280eab02583148ff9d9cead501d924ff7e4c195b988cb4635d63fd9def"
+    },
+    {
+      "path": "evidence/S01/exp04/results.json",
+      "sha256": "c35f11c969d94c8df466b4869ca8fabf9cd056ab16a8bad866051c770a202526"
+    },
+    {
+      "path": "evidence/S01/exp04-github/results.json",
+      "sha256": "97ec95650160aebc1260e23903feeca1b2912e589a43e8ef865f54fc4bf1003a"
+    },
+    {
+      "path": ".work/validate-w2.json",
+      "sha256": "939682e439a5d83197d7db9754cb68d4403d01ca7b57631f57829017859aa157"
+    },
+    {
+      "path": ".work/v-mem2.json",
+      "sha256": "939682e439a5d83197d7db9754cb68d4403d01ca7b57631f57829017859aa157"
+    },
+    {
+      "path": "evidence/S01/scope.md",
+      "sha256": "320dd629fe5c566329e5c978ff5b69862cc0dbcdb68f75179b9a0179125be915"
+    },
+    {
+      "path": "docs/04-implementation-stages/stage-01-bootstrap-and-probes.md",
+      "sha256": "fe93993b5d52b133c4917f93c5a4b580f1bc5716e9bf2443216d3e5213724c41"
+    },
+    {
+      "path": "evidence/S01/config-review.md",
+      "sha256": "5518bcd718a877b2515f9204487fbf40add7ec4e53cafefd9624764475e8a0c0"
+    },
+    {
+      "path": "evidence/S01/exp01/results.json",
+      "sha256": "a4e107e078ac3b06399a741c5f358631561861dac7731e0e2b9a99db7e9b4146"
+    }
+  ],
+  "experiments": {
+    "EXP-02": {
+      "total": 105,
+      "pass": 91,
+      "fail": 6,
+      "refused_safely": 8,
+      "unavailable": 0,
+      "summary": "Focus source-fidelity probe ran 105 repeatable cases in a Linux container with 91 pass, 6 fail (invalid-UTF-8 LF fixtures and one stale-plan case, each judged by independent byte and semantic oracles) and 8 refused safely; a separate upstream test run hit one timeout under host load (100 of 101 tests passed) and was not re-run."
+    },
+    "EXP-03": {
+      "total": 54,
+      "pass": 48,
+      "fail": 0,
+      "refused_safely": 0,
+      "unavailable": 3,
+      "other": {
+        "defect found and fixed, live recheck not run": 1,
+        "measured": 2
+      },
+      "summary": "Runtime probe recorded 54 checks: 48 pass, 3 OpenAI live checks unavailable because both keys returned 429 credit_balance_exhausted, 2 measured comparisons (provider crate and execution placement), and 1 OpenAI quota check recorded as a defect found and fixed with the live recheck not run; Anthropic live and recorded-real-replay checks pass."
+    },
+    "EXP-04": {
+      "total": 6,
+      "pass": 6,
+      "fail": 0,
+      "refused_safely": 0,
+      "unavailable": 0,
+      "summary": "Container probe: all 6 checks pass, including one live Anthropic claude-haiku-5-5 request from the image, a filesystem scan with no coding CLI or runtime, and no credentials or game files; no OpenAI request was attempted from the container because both keys returned 429."
+    },
+    "EXP-04-github": {
+      "total": 14,
+      "pass": 14,
+      "fail": 0,
+      "refused_safely": 0,
+      "unavailable": 0,
+      "summary": "All 14 live GitHub checks on the disposable repository passed: the App is installed only on klimPaskov/hoi4-factory-test-mod, its minted token was granted contents write, pull_requests write, issues write, checks read, statuses read and metadata read, and the token could not reach another private repository."
+    },
+    "EXP-01": {
+      "total": 21,
+      "summary": "CI recovery mismatch reproduced on Windows (17 of 20) and Linux (20 of 20): a random-name placement temp file survives a hard kill and rollback. A local confirming fix restored exactly in 20 of 20 per side. Import preservation passed. Production apply stays blocked at 4488a418 until an upstream fix lands.",
+      "verdict_field": null,
+      "note": "exp01/results.json records a free-text result per check and no verdict field. Dispositions are in exp01/report.md sections 1 to 5."
+    }
+  },
+  "package_checks": [
+    {
+      "command": "PYTHONUTF8=1 py -3.13 scripts/validate_package.py --root . --working-tree",
+      "status": "pass",
+      "checks": 11,
+      "failed": [],
+      "source": ".work/v-mem2.json",
+      "note": "validate-w2.json records the same status, check count and empty failed list. Neither output records its command text; the command string is taken from the index brief. archive_checked is false in both."
+    },
+    {
+      "command": "PYTHONUTF8=1 py -3.13 scripts/sync_skills.py --check",
+      "status": "pass",
+      "source": "evidence/S01/config-review.md",
+      "note": "Recorded as pass in config-review.md; no check count is recorded."
+    }
+  ],
+  "gates": {
+    "S01-G1": {
+      "status": "pass",
+      "evidence": [
+        ".work/v-mem2.json",
+        ".work/validate-w2.json",
+        "evidence/S01/config-review.md"
+      ],
+      "note": "Validator reports 11 checks and 0 failures. config-review.md records sync_skills --check pass and that Claude Code loaded CLAUDE.md with the AGENTS.md import. Codex live loading was not performed, so the client-loading evidence covers Claude Code only. Rechecked on the final tree. Client loading observed in this Claude Code session. Codex live loading not performed."
+    },
+    "S01-G2": {
+      "status": "fail",
+      "evidence": [
+        "evidence/S01/exp01/report.md",
+        "evidence/S01/exp01/results.json",
+        "evidence/S01/exp01/trials/summary.json"
+      ],
+      "note": "New and import fixtures and the reproduced recovery case have exact before and after evidence on server paths. The recovery case is an unresolved source-preservation defect at the pinned revision (extra temp file after rollback), so per the gate it blocks production apply reliance. A confirming local fix exists but is not upstream. F-SETUP-NEW generated files were not produced because the plan builder is desktop-only."
+    },
+    "S01-G3": {
+      "status": "partial",
+      "evidence": [
+        "evidence/S01/exp03/results.json"
+      ],
+      "note": "Anthropic live tool-turn, follow-up and cancellation checks, all recorded-real-replay stream faults, broker hook cases, journal and worker checks pass. The OpenAI live stream-fault, tool-turn and cancellation checks are unavailable (429 credit_balance_exhausted on both keys; maintainer declined to buy credits), so the requirement for every listed fault is not fully met. EXP03-OPENAI-QUOTA-429 has no live recheck. Provider-crate and placement comparisons are measured; placement was measured on the Windows host only, so container and gVisor placement are not measured."
+    },
+    "S01-G4": {
+      "status": "pass",
+      "evidence": [
+        "evidence/S01/exp04/results.json",
+        "evidence/S01/exp04-github/results.json"
+      ],
+      "note": "Container: one live Anthropic claude-haiku-5-5 request passed from the image, which the filesystem scan shows has no coding CLI or runtime. No OpenAI container request was attempted (429), so OpenAI from the container remains explicitly unsupported. Image built locally on Docker Desktop with no registry push. GitHub: App installed only on the disposable klimPaskov/hoi4-factory-test-mod; granted scope contents write, pull_requests write, issues write, checks read, statuses read, metadata read; secrets not recorded."
+    },
+    "S01-G5": {
+      "status": "pass",
+      "evidence": [
+        "evidence/S01/handoff.md"
+      ],
+      "note": "Decision receipt with pins, supported operations, unknowns and proposed S02 scope is in handoff.md. Review requested, S02 not started."
+    }
+  },
+  "validation": {
+    "date": "2026-10-24",
+    "by": "validate-stage run by the implementing agent under ADR-023",
+    "tree": "base 290af7c plus uncommitted S01 changes, identical to the S01 commit that follows",
+    "final_checks": [
+      {
+        "command": "PYTHONUTF8=1 py -3.13 scripts/validate_package.py --root . --working-tree",
+        "kind": "static",
+        "result": "pass, 11 checks, 0 failed"
+      },
+      {
+        "command": "PYTHONUTF8=1 py -3.13 scripts/sync_skills.py --check",
+        "kind": "static",
+        "result": "pass, 4 skills"
+      },
+      {
+        "command": "cargo test --workspace --quiet",
+        "kind": "tool execution",
+        "toolchain": "rust 1.97.1",
+        "result": "pass, 9 passed, 0 failed"
+      },
+      {
+        "command": "sha256 of exp03 results.json source_manifest entries against current files",
+        "kind": "input identity",
+        "result": "48 of 48 match, EXP-03 evidence applies to the final tree"
+      },
+      {
+        "command": "sha256 of probes/focus/fixtures/* against fixtures/manifest.json",
+        "kind": "input identity",
+        "result": "17 of 17 match"
+      },
+      {
+        "command": "docker image inspect hoi4-factory-agent-probe:s01 and hoi4f-exp02-agent-tools:25f5641",
+        "kind": "input identity",
+        "result": "IDs equal the recorded d31ea492... and a30012e9..."
+      },
+      {
+        "command": "docker compose up -d --build --wait server, curl /healthz",
+        "kind": "tool execution",
+        "result": "first attempt FAILED: probe crate joined the workspace but the server Dockerfile did not copy it. Fixed by copying probes/runtime manifest and src into the build stage. Rebuilt image sha256:bd05985c99127e61768f4134ad721e2a6c5a332f3f4dcb2c290dde598b9e3f50 answered {\"status\":\"ok\"}"
+      },
+      {
+        "command": "docker run hoi4-factory-server: ls /usr/local/bin and command -v claude codex node npm python3 cargo rustc",
+        "kind": "static",
+        "result": "only factory-server, none of the listed commands present"
+      }
+    ],
+    "not_rerun": "Live provider probes and the EXP-01 trials were not rerun. Their inputs are unchanged and rerunning costs time and spend without resolving a new risk."
+  },
+  "stage_disposition": {
+    "status": "complete with narrowed scope",
+    "summary": "G1, G4 and G5 pass. G3 partial: every listed fault passes on Anthropic live and recorded-real replay, OpenAI live faults unavailable because the OpenAI keys have no API balance. G2 fail by design of the gate: the reproduced recovery case is an unresolved source-preservation defect at the pinned Setup revision, so production apply reliance stays blocked until an upstream fix lands. The stage deliverable, evidence and decision receipt are complete."
+  }
+}

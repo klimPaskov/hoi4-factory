@@ -1,0 +1,48 @@
+{
+ "command": "cargo test -p factory-agent",
+ "exit_code": 0,
+ "rustc": "1.97.1",
+ "tests": [
+  {
+   "name": "openai::tests::status_classes",
+   "result": "ok"
+  },
+  {
+   "name": "anthropic::tests::classes",
+   "result": "ok"
+  },
+  {
+   "name": "anthropic::tests::request_shape",
+   "result": "ok"
+  },
+  {
+   "name": "protocol::tests::roundtrip_and_oversize",
+   "result": "ok"
+  },
+  {
+   "name": "sse::tests::splits_across_chunks_and_line_endings",
+   "result": "ok"
+  },
+  {
+   "name": "openai::tests::body_shape",
+   "result": "ok"
+  },
+  {
+   "name": "types::tests::redacts_key_like_tokens",
+   "result": "ok"
+  },
+  {
+   "name": "sse::tests::reports_partial_tail",
+   "result": "ok"
+  },
+  {
+   "name": "openai::tests::live_credit_exhausted_is_quota_not_retryable",
+   "result": "ok"
+  }
+ ],
+ "summary": [
+  "test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s",
+  "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+ ],
+ "model_output_used": false
+}

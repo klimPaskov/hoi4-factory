@@ -1,0 +1,178 @@
+diff --git a/src-tauri/src/safe_fs.rs b/src-tauri/src/safe_fs.rs
+index 371f913..ae5ef2a 100644
+--- a/src-tauri/src/safe_fs.rs
++++ b/src-tauri/src/safe_fs.rs
+@@ -376,6 +376,23 @@ impl RootedDir {
+     /// Copy `source_relative` into `destination_relative` through a synced
+     /// temporary file and an exclusive rename. Returns `Ok(false)` without
+     /// changing the destination when any entry already occupies that name.
++    pub(crate) fn copy_file_atomic_noreplace_named_to(
++        &self,
++        source_relative: &str,
++        destination: &RootedDir,
++        destination_relative: &str,
++        temporary_leaf: &str,
++    ) -> Result<bool, AppError> {
++        let source = self.open_regular_file(source_relative)?;
++        let permissions = source.metadata()?.permissions();
++        destination.write_atomic_noreplace_from_named(
++            destination_relative,
++            &mut &source,
++            Some(permissions),
++            Some(temporary_leaf),
++        )
++    }
++
+     pub(crate) fn copy_file_atomic_noreplace_to(
+         &self,
+         source_relative: &str,
+@@ -627,6 +644,20 @@ impl RootedDir {
+         relative: &str,
+         reader: &mut R,
+         permissions: Option<Permissions>,
++    ) -> Result<bool, AppError> {
++        self.write_atomic_noreplace_from_named(relative, reader, permissions, None)
++    }
++
++    /// Like `write_atomic_noreplace_from`, but with a caller-derived temporary
++    /// leaf. A transaction passes a name bound to its own transaction and
++    /// operation IDs, so recovery can find and remove a temporary file that a
++    /// hard stop left between creation and the exclusive rename.
++    pub(crate) fn write_atomic_noreplace_from_named<R: Read>(
++        &self,
++        relative: &str,
++        reader: &mut R,
++        permissions: Option<Permissions>,
++        temporary_leaf: Option<&str>,
+     ) -> Result<bool, AppError> {
+         let (parent, leaf) = self.open_parent(relative, true)?;
+         parent.verify_bound_to_path()?;
+@@ -635,7 +666,13 @@ impl RootedDir {
+             Err(error) if error_is_missing(&error) => {}
+             Err(error) => return Err(error),
+         }
+-        let temporary = OsString::from(format!(".hoi4ms-{}.tmp", Uuid::new_v4()));
++        let temporary = match temporary_leaf {
++            Some(name) => {
++                validate_component(OsStr::new(name))?;
++                OsString::from(name)
++            }
++            None => OsString::from(format!(".hoi4ms-{}.tmp", Uuid::new_v4())),
++        };
+         let mut file = open_new_file_at(&parent, &temporary)?;
+         let mut result = (|| {
+             io::copy(reader, &mut file)?;
+diff --git a/src-tauri/src/transaction.rs b/src-tauri/src/transaction.rs
+index 51bd4b9..ed9cec4 100644
+--- a/src-tauri/src/transaction.rs
++++ b/src-tauri/src/transaction.rs
+@@ -4389,17 +4389,71 @@ enum LiveChange<'a> {
+     Delete,
+ }
+ 
++/// Temporary leaf for placing new bytes at an operation's destination. It is
++/// derived from the transaction and operation like the quarantine name, so a
++/// file left by a hard stop between creation and rename is attributable.
++const PLACEMENT_PREFIX: &str = ".hoi4ms-placing-";
++
++fn placement_temp_leaf(quarantine_leaf: &str) -> String {
++    match quarantine_leaf.strip_prefix(QUARANTINE_PREFIX) {
++        Some(rest) => format!("{PLACEMENT_PREFIX}{rest}"),
++        None => format!(
++            "{PLACEMENT_PREFIX}{}.tmp",
++            &sha256_bytes(quarantine_leaf.as_bytes())[..32]
++        ),
++    }
++}
++
++/// Remove placement temporaries this transaction may have left in its
++/// operations' destination directories. The names are bound to the
++/// transaction ID, so no user file or other transaction can own them.
++fn remove_interrupted_placement_temps(
++    project: &RootedDir,
++    journal: &TransactionJournal,
++) -> Result<(), AppError> {
++    for operation in &journal.operations {
++        if operation.external
++            || matches!(
++                operation.action,
++                Some(OperationAction::Skip | OperationAction::External) | None
++            )
++        {
++            continue;
++        }
++        let leaf = placement_temp_leaf(&quarantine_leaf_name(
++            journal.transaction_id,
++            &operation.id,
++        ));
++        let relative = quarantine_relative(&operation.destination, &leaf)?;
++        if project.is_regular_file(&relative).unwrap_or(false) {
++            project.remove_file(&relative)?;
++        }
++    }
++    Ok(())
++}
++
+ fn place_new_leaf(
+     directory: &RootedDir,
+     destination: &str,
+     change: &LiveChange<'_>,
++    temporary_leaf: &str,
+ ) -> Result<bool, AppError> {
+     match change {
+         LiveChange::Copy {
+             source,
+             source_relative,
+-        } => source.copy_file_atomic_noreplace_to(source_relative, directory, destination),
+-        LiveChange::Bytes(bytes) => directory.write_atomic_noreplace(destination, bytes),
++        } => source.copy_file_atomic_noreplace_named_to(
++            source_relative,
++            directory,
++            destination,
++            temporary_leaf,
++        ),
++        LiveChange::Bytes(bytes) => directory.write_atomic_noreplace_from_named(
++            destination,
++            &mut &bytes[..],
++            None,
++            Some(temporary_leaf),
++        ),
+         LiveChange::MoveFrom(from) => directory.rename_file_noreplace(from, destination),
+         LiveChange::Delete => Ok(true),
+     }
+@@ -4430,8 +4484,9 @@ fn mutate_live_leaf(
+     fault: &dyn Fn(QuarantineBoundary) -> Result<(), AppError>,
+     barrier: &dyn Fn(LiveMutationBarrier),
+ ) -> Result<Option<String>, AppError> {
++    let placement_leaf = placement_temp_leaf(quarantine_leaf);
+     let Some(expected) = expected_current else {
+-        if !place_new_leaf(directory, destination, &change)? {
++        if !place_new_leaf(directory, destination, &change, &placement_leaf)? {
+             return Err(AppError::Transaction(format!(
+                 "local precondition changed during apply: a file appeared at {destination} and was kept"
+             )));
+@@ -4538,7 +4593,7 @@ fn mutate_live_leaf(
+     }
+     fault(QuarantineBoundary::AfterVerification)?;
+     barrier(LiveMutationBarrier::AfterQuarantineVerified);
+-    match place_new_leaf(directory, destination, &change) {
++    match place_new_leaf(directory, destination, &change, &placement_leaf) {
+         Ok(true) => Ok(Some(quarantine)),
+         Ok(false) => Err(AppError::Transaction(format!(
+             "local precondition changed during apply: a file appeared at {destination} and was kept; the reviewed bytes are kept at {quarantine}"
+@@ -7075,6 +7130,7 @@ pub fn rollback_transaction(
+     compact_operation_checkpoints(store, journal)?;
+     if let Some(project) = project_directory.as_ref() {
+         settle_journal_lock_quarantines(project, journal)?;
++        remove_interrupted_placement_temps(project, journal)?;
+     }
+     let (mut rollback_journal, rollback_store) =
+         prepare_rollback_transaction(&project_root, journal, &app, project_directory.as_ref())?;
+@@ -9174,6 +9230,7 @@ mod tests {
+ 
+     use super::*;
+     use crate::paths::transaction_root;
++    mod exp01_repro;
+     use crate::readiness::manifest_wiki_pages;
+     use crate::security::atomic_write_json;
+     use std::process::Command;

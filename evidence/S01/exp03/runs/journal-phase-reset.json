@@ -1,0 +1,4 @@
+{
+  "postgres": "17.6 (Debian 17.6-2.pgdg12+1)",
+  "reset": "s01_runtime_probe"
+}

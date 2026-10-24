@@ -1,0 +1,43 @@
+﻿# EXP-02 synthetic fixture: unknown and unsupported syntax
+@exp_cost = 6
+focus_tree = {
+	id = exp_unknown_tree
+	default = no
+	reset_on_civilwar = no
+	exp_tree_custom = { alpha = beta gamma = { 1 2 3 } }
+
+	focus = {
+		id = exp_u_root
+		icon = GFX_exp_icon_u_root
+		x = 3
+		y = 0
+		cost = 10
+		exp_custom_block = { foo = bar } # not a modelled focus key
+		cancel_if_invalid = no
+		ai_will_do = { factor = 1 }
+		completion_reward = { add_political_power = 10 }
+	}
+
+	focus = {
+		id = exp_u_const
+		icon = GFX_exp_icon_u_const
+		prerequisite = { focus = exp_u_root }
+		x = 3
+		y = 1
+		cost = @exp_cost
+		ai_will_do = { factor = 1 }
+		completion_reward = { add_stability = 0.01 }
+	}
+
+	focus = {
+		id = exp_u_plain
+		icon = GFX_exp_icon_u_plain
+		prerequisite = { focus = exp_u_root }
+		x = 5
+		y = 2
+		cost = 4
+		available = { exp_weird_trigger < 3 }
+		ai_will_do = { factor = 1 }
+		completion_reward = { add_war_support = 0.01 }
+	}
+}

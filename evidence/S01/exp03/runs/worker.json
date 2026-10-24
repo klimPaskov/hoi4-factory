@@ -1,0 +1,267 @@
+{
+  "checks": [
+    {
+      "handshake_ms": 11.046999999999999,
+      "hello": {
+        "adapters": [
+          "openai-chat-completions",
+          "anthropic-messages (no live evidence)"
+        ],
+        "attempt_id": "-",
+        "kind": "hello",
+        "protocol_version": 1,
+        "request_id": "hello",
+        "runtime_build": "factory-agent/0.0.0",
+        "schema_version": 1,
+        "worker_generation": 1
+      },
+      "id": "W1-HANDSHAKE",
+      "verdict": "pass"
+    },
+    {
+      "id": "W2-INCOMPATIBLE-VERSION-REFUSED",
+      "result": "incompatible handshake refused before any task: {\"schema_version\":1,\"worker_generation\":2,\"request_id\":\"hello\",\"attempt_id\":\"-\",\"kind\":\"hello\",\"protocol_version\":99,\"runtime_build\":\"factory-agent/0.0.0\",\"adapters\":[\"openai-chat-completions\",\"anthropic-messages (no live evidence)\"]}",
+      "tasks_sent": 0,
+      "verdict": "pass"
+    },
+    {
+      "event_order_unchanged": true,
+      "gen1": 1,
+      "gen1_killed_exit_code": 1,
+      "gen2": 3,
+      "gen2_accepted": {
+        "frame_generation": 3,
+        "seq": 26
+      },
+      "id": "W3-LATE-OLD-GENERATION-FRAME-REJECTED (RT-08)",
+      "late_frame": {
+        "channel_generation": 1,
+        "current": 3,
+        "frame_generation": 1,
+        "rejected": "stale_channel_generation",
+        "request_id": "req_6755a8418ceb5532"
+      },
+      "verdict": "pass"
+    },
+    {
+      "id": "W4-FORGED-OLD-GENERATION-STAMP-REJECTED (RT-08)",
+      "received": {
+        "channel_generation": 3,
+        "frame_generation": 1
+      },
+      "result": {
+        "current": 3,
+        "frame_generation": 1,
+        "rejected": "stale_frame_generation",
+        "request_id": "req_a25db8e6ce69e460"
+      },
+      "verdict": "pass"
+    },
+    {
+      "attempt_row": {
+        "outcome": {
+          "auto_retry": false,
+          "outcome": "unknown",
+          "request_id": "req_7aaee9fe4064a1f0",
+          "termination": "ExitStatus(ExitStatus(1))"
+        },
+        "state": "worker_lost",
+        "worker_generation": 3
+      },
+      "eof_observed": true,
+      "id": "W5-WORKER-KILLED-RESTARTED (RT-08, RT-10)",
+      "requests_sent_for_attempt": 1,
+      "restarted_generation": 4,
+      "termination": "ExitStatus(ExitStatus(1))",
+      "verdict": "pass"
+    },
+    {
+      "id": "W6-UNSOLICITED-OUTPUT-IS-PROTOCOL-VIOLATION",
+      "result": "protocol violation during handshake, worker terminated: frame length 2003792491 exceeds maximum 1048576",
+      "verdict": "pass"
+    },
+    {
+      "current_generation": 6,
+      "id": "W7-IN-PROCESS-LATE-RESULT-REJECTED (RT-08)",
+      "rejected": true,
+      "task_generation": 4,
+      "turn_assembled": true,
+      "verdict": "pass"
+    },
+    {
+      "evidence_kind": "live",
+      "id": "W8-LIVE-TURN-VIA-WORKER",
+      "result": {
+        "assemble_us": 1848659.2,
+        "ok": true,
+        "turn": {
+          "bytes": 2703,
+          "events": 16,
+          "finish_reason": "tool_use",
+          "model": "claude-haiku-5-5",
+          "provider": "anthropic-messages",
+          "response_id": "msg_011CgLyekGifMdrpNke7iPg4",
+          "text": "",
+          "tool_calls": [
+            {
+              "arguments": {
+                "content": "S01 runtime probe ok",
+                "path": "notes/probe.txt"
+              },
+              "id": "toolu_01N4jk1SkSQY3SedxR83LoZk",
+              "index": 0,
+              "name": "write_file",
+              "raw_arguments": "{\"content\": \"S01 runtime probe ok\", \"path\": \"notes/probe.txt\"}"
+            }
+          ],
+          "usage": {
+            "cached_input_tokens": 0,
+            "input_tokens": 508,
+            "output_tokens": 84,
+            "reasoning_tokens": 0
+          }
+        }
+      },
+      "spend": {
+        "call": "worker-live-turn",
+        "estimate": {
+          "kind": "estimated",
+          "price": {
+            "cached_input_per_mtok": 0.01,
+            "input_per_mtok": 0.1,
+            "model_prefix": "claude-haiku-5-5",
+            "output_per_mtok": 0.5,
+            "retrieved": "2026-10-24",
+            "source": "https://platform.claude.com/docs/en/about-claude/pricing (Claude Haiku 5.5, prompts up to 100,000 tokens)"
+          },
+          "usage": {
+            "cached_input_tokens": 0,
+            "input_tokens": 508,
+            "output_tokens": 84,
+            "reasoning_tokens": 0
+          },
+          "usd": 0.0000928
+        },
+        "model": "claude-haiku-5-5"
+      },
+      "verdict": "pass"
+    }
+  ],
+  "durable_events": [
+    {
+      "payload_hash": "c7ceaee0ef6ad7ac5ee6c2551d22a2dcd87a404afadf8d9b142f7700f996a7dd",
+      "seq": 25,
+      "type": "attempt_worker_unresponsive_superseded"
+    },
+    {
+      "payload_hash": "007b1a4d890c2e3b55035308d3ae13aa8b8880fc13bce2f1f61b59d0d25fd75d",
+      "seq": 26,
+      "type": "attempt_turn_result_accepted"
+    },
+    {
+      "payload_hash": "7193846f38a256449809be6278b02f64dbcaa1272f861d098ca45ff7792b462e",
+      "seq": 27,
+      "type": "attempt_worker_lost"
+    }
+  ],
+  "evidence_kind": "recorded-real-replay",
+  "host_diagnostics": [
+    {
+      "kind": "frame_rejected",
+      "payload": {
+        "channel_generation": 1,
+        "current": 3,
+        "frame_generation": 1,
+        "rejected": "stale_channel_generation",
+        "request_id": "req_6755a8418ceb5532"
+      }
+    },
+    {
+      "kind": "stale_channel_item_dropped",
+      "payload": {
+        "channel_generation": 1,
+        "current": 3,
+        "error": "channel closed",
+        "rejected": "stale_channel_closed"
+      }
+    },
+    {
+      "kind": "frame_rejected",
+      "payload": {
+        "current": 3,
+        "frame_generation": 1,
+        "rejected": "stale_frame_generation",
+        "request_id": "req_a25db8e6ce69e460"
+      }
+    }
+  ],
+  "max_frame_bytes": 1048576,
+  "overhead": {
+    "build_profile": "release",
+    "in_process_assemble_us": {
+      "max": 490.4,
+      "median": 33.0,
+      "min": 27.8,
+      "n": 200,
+      "p95": 47.3
+    },
+    "payload_bytes": 2666,
+    "worker_internal_assemble_us": {
+      "max": 346.8,
+      "median": 43.0,
+      "min": 25.9,
+      "n": 200,
+      "p95": 57.2
+    },
+    "worker_roundtrip_us": {
+      "max": 2594.4,
+      "median": 224.0,
+      "min": 145.4,
+      "n": 200,
+      "p95": 358.5
+    },
+    "worker_spawn_and_handshake_ms": {
+      "max": 17.5836,
+      "median": 12.1608,
+      "min": 10.363199999999999,
+      "n": 10,
+      "p95": 17.5836
+    }
+  },
+  "payload": "recorded real stream bytes",
+  "probe": "worker",
+  "protocol_version": 1,
+  "recording": {
+    "captured": "2026-10-24T11:22:49Z",
+    "evidence_kind_of_capture": "live",
+    "model": "claude-haiku-5-5",
+    "provider": "anthropic-messages",
+    "recording": "probes/runtime/recordings/anthropic-tool-turn.sse",
+    "sse_sha256": "dbaa9e700329cddc32abbf741c7c1156b8193708702e5ba9485ecf1a4bff5bc1"
+  },
+  "spend": [
+    {
+      "call": "worker-live-turn",
+      "estimate": {
+        "kind": "estimated",
+        "price": {
+          "cached_input_per_mtok": 0.01,
+          "input_per_mtok": 0.1,
+          "model_prefix": "claude-haiku-5-5",
+          "output_per_mtok": 0.5,
+          "retrieved": "2026-10-24",
+          "source": "https://platform.claude.com/docs/en/about-claude/pricing (Claude Haiku 5.5, prompts up to 100,000 tokens)"
+        },
+        "usage": {
+          "cached_input_tokens": 0,
+          "input_tokens": 508,
+          "output_tokens": 84,
+          "reasoning_tokens": 0
+        },
+        "usd": 0.0000928
+      },
+      "model": "claude-haiku-5-5"
+    }
+  ],
+  "worker_stderr_lines": 16
+}
