@@ -6,5 +6,29 @@ edition.workspace = true
 license.workspace = true
 repository.workspace = true
 publish.workspace = true
+build = "build.rs"
 
 [dependencies]
+hoi4-mod-setup.workspace = true
+hoi4-setup-core.workspace = true
+factory-workspace = { path = "../workspace" }
+factory-accounts = { path = "../accounts" }
+axum.workspace = true
+tokio = { workspace = true, features = ["sync", "time", "rt"] }
+sqlx = { workspace = true, features = ["json"] }
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+async-trait.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+[build-dependencies]
+toml = "0.8"
+
+[dev-dependencies]
+tempfile.workspace = true
+tokio = { workspace = true, features = ["net", "io-util", "time", "sync"] }
+factory-agent = { path = "../agent", default-features = false, features = ["anthropic"] }
