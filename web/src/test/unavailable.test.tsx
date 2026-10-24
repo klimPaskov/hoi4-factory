@@ -64,36 +64,19 @@ describe('endpoints that are not built yet', () => {
     expect(await screen.findByText('GitHub import is not available yet')).toBeInTheDocument();
   });
 
-  it('scans a mod that is present and shows the dry run before anything is applied', async () => {
+  it('scans a mod that is present and writes nothing before the person approves a plan', async () => {
     const { requests } = mockApi({
       ...base(),
       'GET /projects/prj_1/workspace': { json: { workspace: { has_source: true, origin: 'upload', file_count: 1234 } } },
       'POST /projects/prj_1/setup/scan': { json: { scan_id: 's1', facts: [{ label: 'Mod name', value: 'مود' }] } },
-      'GET /projects/prj_1/setup/plan': {
-        json: {
-          plan: {
-            plan_id: 'p1',
-            operations: [
-              { path: 'descriptor.mod', action: 'change' },
-              { path: 'common/new.txt', action: 'create' },
-              { path: 'map/provinces.bmp', action: 'preserve' },
-            ],
-          },
-        },
-      },
-      'POST /projects/prj_1/setup/apply': { json: { status: 'applied' } },
     });
     renderApp('/projects/prj_1');
     const user = userEvent.setup();
     expect(await screen.findByText('1,234')).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Scan the mod' }));
+    // Setup status, recovery and the rest answer 404 on an older server: the wizard just starts.
+    await user.click(await screen.findByRole('button', { name: 'Scan the mod' }));
     expect(await screen.findByText('مود')).toHaveAttribute('dir', 'auto');
-    await user.click(screen.getByRole('button', { name: 'Show what Setup would change' }));
-    expect(await screen.findByText('descriptor.mod')).toBeInTheDocument();
-    expect(requests.some((r) => r.path.endsWith('/setup/apply'))).toBe(false);
-    await user.click(screen.getByRole('button', { name: 'Apply this plan' }));
-    await user.click(screen.getByRole('button', { name: 'Yes, apply it' }));
-    expect(await screen.findByText('Done. The plan was applied.')).toBeInTheDocument();
-    expect(requests.find((r) => r.path.endsWith('/setup/apply'))?.body).toEqual({ plan_id: 'p1' });
+    expect(await screen.findByRole('button', { name: 'Analyze with Claude' })).toBeInTheDocument();
+    expect(requests.some((r) => r.path.endsWith('/setup/apply') || r.path.endsWith('/setup/approve'))).toBe(false);
   });
 });

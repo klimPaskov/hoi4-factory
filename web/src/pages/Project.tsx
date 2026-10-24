@@ -43,7 +43,10 @@ function ProjectView({ id }: { id: string }) {
 function ProjectBody({ project, onChanged }: { project: Project; onChanged: (project: Project) => void }) {
   const { t } = useTranslation();
   const [workspaceVersion, setWorkspaceVersion] = useState(0);
+  // The wizard restores its own step from the server. A scan made by "Create new" is handed to
+  // it, and a new `wizardKey` makes it start from that scan (or from the server's status).
   const [scan, setScan] = useState<SetupScan | null>(null);
+  const [wizardKey, setWizardKey] = useState(0);
   const pending = project.deleted_at !== null;
   const canWork = project.role === 'owner' || project.role === 'maintainer';
 
@@ -76,14 +79,21 @@ function ProjectBody({ project, onChanged }: { project: Project; onChanged: (pro
                 projectId={project.id}
                 onBroughtIn={() => {
                   setScan(null);
+                  setWizardKey((k) => k + 1);
                   setWorkspaceVersion((v) => v + 1);
                 }}
                 onScanned={(next) => {
                   setScan(next);
+                  setWizardKey((k) => k + 1);
                   setWorkspaceVersion((v) => v + 1);
                 }}
               />
-              <SetupReview projectId={project.id} scan={scan} onScan={setScan} />
+              <SetupReview
+                key={wizardKey}
+                projectId={project.id}
+                initialScan={scan}
+                onChanged={() => setWorkspaceVersion((v) => v + 1)}
+              />
             </>
           ) : (
             <Alert kind="info">{t('project.readOnly')}</Alert>

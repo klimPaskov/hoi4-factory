@@ -19,7 +19,7 @@ export interface RecordedRequest {
   body: unknown;
 }
 
-type Handler = MockResponse | ((request: RecordedRequest) => MockResponse);
+export type Handler = MockResponse | ((request: RecordedRequest) => MockResponse);
 
 export function envelope(
   code: string,
