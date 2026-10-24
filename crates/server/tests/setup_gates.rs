@@ -11,7 +11,7 @@
 //! tests replay such a recording: the reply is the provider's bytes, with only `input_sha256`
 //! rebound to the current request (see `support/setup_support.rs`). No reply is ever written by
 //! hand.
-#![allow(dead_code, private_interfaces)]
+#![allow(dead_code, private_interfaces, unused_imports)]
 
 #[path = "../../intake/tests/common/mod.rs"]
 mod common;
@@ -425,16 +425,28 @@ async fn g1_import_live() {
 }
 
 #[tokio::test]
+#[cfg_attr(
+    not(unix),
+    ignore = "applies a Setup plan: run on Linux (scripts/linux-tests.sh); on Windows Setup blocks readiness on the uninstalled MCP route"
+)]
 async fn g1_upload_replayed() {
     g1_upload(false).await
 }
 
 #[tokio::test]
+#[cfg_attr(
+    not(unix),
+    ignore = "applies a Setup plan: run on Linux (scripts/linux-tests.sh); on Windows Setup blocks readiness on the uninstalled MCP route"
+)]
 async fn g1_new_replayed() {
     g1_new(false).await
 }
 
 #[tokio::test]
+#[cfg_attr(
+    not(unix),
+    ignore = "applies a Setup plan: run on Linux (scripts/linux-tests.sh); on Windows Setup blocks readiness on the uninstalled MCP route"
+)]
 async fn g1_import_replayed() {
     g1_import(false).await
 }
@@ -558,13 +570,20 @@ async fn g2_preserves(label: &str, replace_readme: bool, live: bool) {
 
     let after = inventory_of(&h, &alice, &project);
     let diff = before.diff(&after);
-    let allowed_changed: Vec<&str> = if replace_readme { vec!["README.md"] } else { vec![] };
+    let allowed_changed: Vec<&str> = if replace_readme {
+        vec!["README.md"]
+    } else {
+        vec![]
+    };
     assert_eq!(
         diff.changed.iter().map(String::as_str).collect::<Vec<_>>(),
         allowed_changed,
         "only a change the reviewer chose may alter an existing file: {diff:?}"
     );
-    assert!(diff.removed.is_empty() && diff.mode_changed.is_empty(), "{diff:?}");
+    assert!(
+        diff.removed.is_empty() && diff.mode_changed.is_empty(),
+        "{diff:?}"
+    );
     assert!(
         !diff.index_changed,
         "the staged state of the author's Git index is untouched"
@@ -604,11 +623,19 @@ async fn g2_preserves(label: &str, replace_readme: bool, live: bool) {
 }
 
 #[tokio::test]
+#[cfg_attr(
+    not(unix),
+    ignore = "applies a Setup plan: run on Linux (scripts/linux-tests.sh); on Windows Setup blocks readiness on the uninstalled MCP route"
+)]
 async fn g2_preserves_everything_unless_a_reviewed_change_covers_it() {
     g2_preserves("upload-fixture", false, false).await
 }
 
 #[tokio::test]
+#[cfg_attr(
+    not(unix),
+    ignore = "applies a Setup plan: run on Linux (scripts/linux-tests.sh); on Windows Setup blocks readiness on the uninstalled MCP route"
+)]
 async fn g2_a_reviewed_replacement_changes_exactly_that_file() {
     g2_preserves("upload-fixture", true, false).await
 }
@@ -630,7 +657,10 @@ async fn g3_rerun(live: bool) {
     // First run.
     let analysis = flow.scan_and_analyze("existing", None).await;
     assert_eq!(analysis.status, 200, "analyze 1: {}", analysis.text);
-    model.finish(label, "G3: three analyses of one project, before and after setup");
+    model.finish(
+        label,
+        "G3: three analyses of one project, before and after setup",
+    );
     let plan = flow.confirm_and_plan(&analysis).await;
     let settled = settle_conflicts(&flow, &plan, "keep").await;
     let first = approve_apply(&flow, &settled).await;
@@ -640,7 +670,10 @@ async fn g3_rerun(live: bool) {
     // Second run, nothing changed in between.
     let analysis = flow.scan_and_analyze("existing", None).await;
     assert_eq!(analysis.status, 200, "analyze 2: {}", analysis.text);
-    model.finish(label, "G3: three analyses of one project, before and after setup");
+    model.finish(
+        label,
+        "G3: three analyses of one project, before and after setup",
+    );
     let plan = flow.confirm_and_plan(&analysis).await;
     assert_eq!(plan.status, 200, "plan 2: {}", plan.text);
     assert_eq!(
@@ -672,7 +705,10 @@ async fn g3_rerun(live: bool) {
     std::fs::write(&claude, &edited).unwrap();
     let analysis = flow.scan_and_analyze("existing", None).await;
     assert_eq!(analysis.status, 200, "analyze 3: {}", analysis.text);
-    model.finish(label, "G3: three analyses of one project, before and after setup");
+    model.finish(
+        label,
+        "G3: three analyses of one project, before and after setup",
+    );
     let plan = flow.confirm_and_plan(&analysis).await;
     assert_eq!(plan.status, 200, "plan 3: {}", plan.text);
     let conflict = plan.body["plan"]["conflicts"]
@@ -706,6 +742,10 @@ async fn g3_rerun_live() {
 }
 
 #[tokio::test]
+#[cfg_attr(
+    not(unix),
+    ignore = "applies a Setup plan: run on Linux (scripts/linux-tests.sh); on Windows Setup blocks readiness on the uninstalled MCP route"
+)]
 async fn g3_rerun_is_clean_and_an_edited_generated_file_is_a_conflict() {
     g3_rerun(false).await
 }
@@ -721,9 +761,7 @@ async fn g3_rerun_is_clean_and_an_edited_generated_file_is_a_conflict() {
 
 use hoi4_mod_setup::models::{CodexAnalysisRecord, InstallationPlan, PreparedFile};
 use hoi4_mod_setup::service::{DefaultPlanBuilder, PlanBuilder, PlanRequest, root_identity};
-use hoi4_mod_setup::transaction::{
-    LiveMutationBarrier, TransactionOptions, run_transaction,
-};
+use hoi4_mod_setup::transaction::{LiveMutationBarrier, TransactionOptions, run_transaction};
 
 const LOCAL_ENDPOINT: &str = "http://127.0.0.1:11434/v1/chat/completions";
 
@@ -874,7 +912,10 @@ async fn recovery_of(scene: &Scene) -> Value {
     let resp = scene
         .user
         .client
-        .get(&format!("/api/v1/projects/{}/setup/recovery", scene.project))
+        .get(&format!(
+            "/api/v1/projects/{}/setup/recovery",
+            scene.project
+        ))
         .await;
     assert_eq!(resp.status, 200, "{}", resp.text);
     resp.body["recovery"].clone()
@@ -939,6 +980,10 @@ const CASES: &[Case] = &[
 ];
 
 #[tokio::test]
+#[cfg_attr(
+    not(unix),
+    ignore = "applies a Setup plan: run on Linux (scripts/linux-tests.sh); on Windows Setup blocks readiness on the uninstalled MCP route"
+)]
 async fn g4_graceful_interruptions_are_classified_and_recoverable() {
     let model = model_for("upload-fixture", false);
     let h = gate_harness(&model, None).await;
@@ -968,7 +1013,11 @@ async fn g4_graceful_interruptions_are_classified_and_recoverable() {
 
         // Classified: exactly one action, the one the journal permits.
         let recovery = recovery_of(&scene).await;
-        assert_eq!(recovery["variant"], case.variant, "{}: {recovery}", case.name);
+        assert_eq!(
+            recovery["variant"], case.variant,
+            "{}: {recovery}",
+            case.name
+        );
         assert_eq!(recovery["allowed_action"], case.action, "{}", case.name);
         assert_eq!(recovery["owner_active"], false);
         // The workspace handoff is withheld while a transaction waits.
@@ -1004,13 +1053,25 @@ async fn g4_graceful_interruptions_are_classified_and_recoverable() {
         let done = recover_via_http(&scene, &recovery).await;
         assert_eq!(done.status, 200, "{}: {}", case.name, done.text);
         assert_eq!(done.body["recovery"]["action"], case.action);
-        assert_eq!(done.body["recovery"]["journal_state"], case.ends, "{}", case.name);
+        assert_eq!(
+            done.body["recovery"]["journal_state"], case.ends,
+            "{}",
+            case.name
+        );
         let after = inventory_of(&h, &scene.user, &scene.project);
         let diff = scene.before.diff(&after);
         if case.restores {
-            assert!(diff.is_empty(), "{}: restoration differs: {diff:?}", case.name);
+            assert!(
+                diff.is_empty(),
+                "{}: restoration differs: {diff:?}",
+                case.name
+            );
             if case.ends == "rolled_back" {
-                assert_eq!(done.body["recovery"]["restoration"]["exact"], true, "{}", case.name);
+                assert_eq!(
+                    done.body["recovery"]["restoration"]["exact"], true,
+                    "{}",
+                    case.name
+                );
             }
         } else {
             assert!(
@@ -1031,6 +1092,10 @@ async fn g4_graceful_interruptions_are_classified_and_recoverable() {
 /// the finalization case is the dead end that Setup pull request 107 fixes, so the test records
 /// what this revision does instead of asserting an outcome it cannot have.
 #[tokio::test]
+#[cfg_attr(
+    not(unix),
+    ignore = "applies a Setup plan: run on Linux (scripts/linux-tests.sh); on Windows Setup blocks readiness on the uninstalled MCP route"
+)]
 async fn g4_post_install_and_finalization_boundaries_are_classified() {
     let model = model_for("upload-fixture", false);
     let h = gate_harness(&model, None).await;
@@ -1065,8 +1130,12 @@ async fn g4_post_install_and_finalization_boundaries_are_classified() {
         let action = recovery["allowed_action"].as_str().map(str::to_owned);
         println!("G4 [{name}]: classified {variant}, permitted action {action:?}");
         assert!(
-            ["rollback_required_partial_apply", "verifiable_finalization", "manual_review"]
-                .contains(&variant.as_str()),
+            [
+                "rollback_required_partial_apply",
+                "verifiable_finalization",
+                "manual_review"
+            ]
+            .contains(&variant.as_str()),
             "{name}: {variant}"
         );
         // Nothing new may be applied on top of it.
@@ -1082,16 +1151,28 @@ async fn g4_post_install_and_finalization_boundaries_are_classified() {
         }
         let done = recover_via_http(&scene, &recovery).await;
         let end = if done.status == 200 {
-            done.body["recovery"]["journal_state"].as_str().unwrap().to_owned()
+            done.body["recovery"]["journal_state"]
+                .as_str()
+                .unwrap()
+                .to_owned()
         } else {
-            format!("refused: {} {}", done.error_code(), done.body["error"]["message"])
+            format!(
+                "refused: {} {}",
+                done.error_code(),
+                done.body["error"]["message"]
+            )
         };
         println!("G4 [{name}]: recover {action:?} ended as {end}");
         let after = recovery_of(&scene).await;
         if variant == "rollback_required_partial_apply" {
             assert_eq!(done.status, 200, "{}", done.text);
             assert_eq!(done.body["recovery"]["restoration"]["exact"], true);
-            assert!(scene.before.diff(&inventory_of(&h, &scene.user, &scene.project)).is_empty());
+            assert!(
+                scene
+                    .before
+                    .diff(&inventory_of(&h, &scene.user, &scene.project))
+                    .is_empty()
+            );
             assert!(after.is_null());
         } else if done.status == 200 {
             assert_eq!(done.body["recovery"]["journal_state"], "completed");
@@ -1108,7 +1189,10 @@ async fn g4_post_install_and_finalization_boundaries_are_classified() {
 /// Called by the transaction engine inside the window around a live change. In the child it
 /// reports "ready" and then waits to be killed.
 fn kill_window(_destination: &std::path::Path, index: usize, barrier: LiveMutationBarrier) {
-    let want_index: usize = std::env::var("HF_G4_KILL_OP").ok().and_then(|v| v.parse().ok()).unwrap_or(usize::MAX);
+    let want_index: usize = std::env::var("HF_G4_KILL_OP")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(usize::MAX);
     let want = std::env::var("HF_G4_KILL_AT").unwrap_or_default();
     let here = match barrier {
         LiveMutationBarrier::AfterPrecondition => "precondition",
@@ -1158,7 +1242,13 @@ async fn hard_kill(window: &str, op: usize) {
     let signal = scene.state_root.parent().unwrap().join("child-ready");
     let plan_file = scene.state_root.parent().unwrap().join("child-plan-id");
     let mut child = Command::new(std::env::current_exe().unwrap())
-        .args(["--ignored", "--exact", "g4_child_applies", "--nocapture", "--test-threads=1"])
+        .args([
+            "--ignored",
+            "--exact",
+            "g4_child_applies",
+            "--nocapture",
+            "--test-threads=1",
+        ])
         .env("HF_G4_ROOT", &scene.source)
         .env("HF_G4_STATE", &scene.state_root)
         .env("HF_G4_PLAN_FILE", &plan_file)
@@ -1174,31 +1264,51 @@ async fn hard_kill(window: &str, op: usize) {
         if let Some(status) = child.try_wait().unwrap() {
             panic!("the child ended ({status}) before it reached the kill window");
         }
-        assert!(started.elapsed().as_secs() < 900, "the child never reached the kill window");
+        assert!(
+            started.elapsed().as_secs() < 900,
+            "the child never reached the kill window"
+        );
         tokio::time::sleep(std::time::Duration::from_millis(50)).await;
     }
-    let plan_id: Uuid = std::fs::read_to_string(&plan_file).unwrap().trim().parse().unwrap();
+    let plan_id: Uuid = std::fs::read_to_string(&plan_file)
+        .unwrap()
+        .trim()
+        .parse()
+        .unwrap();
     keep_pre_apply_inventory(&scene, plan_id);
     // The hard stop: TerminateProcess on Windows, SIGKILL on Linux. No cleanup code runs.
     child.kill().expect("kill the child");
     let status = child.wait().unwrap();
-    assert!(!status.success(), "the child was killed, not finished: {status}");
+    assert!(
+        !status.success(),
+        "the child was killed, not finished: {status}"
+    );
 
     let recovery = recovery_of(&scene).await;
-    assert!(!recovery.is_null(), "a killed apply leaves a journal the server finds");
+    assert!(
+        !recovery.is_null(),
+        "a killed apply leaves a journal the server finds"
+    );
     let variant = recovery["variant"].as_str().unwrap().to_owned();
     println!(
         "G4 kill [{window} of operation {op}]: classified {variant}, permitted {}",
         recovery["allowed_action"]
     );
     assert_eq!(variant, "rollback_required_partial_apply");
-    assert_eq!(recovery["allowed_action"], "rollback", "resume is never offered after a partial apply");
+    assert_eq!(
+        recovery["allowed_action"], "rollback",
+        "resume is never offered after a partial apply"
+    );
     let done = recover_via_http(&scene, &recovery).await;
     assert_eq!(done.status, 200, "{}", done.text);
     assert_eq!(done.body["recovery"]["journal_state"], "rolled_back");
-    let diff = scene.before.diff(&inventory_of(&h, &scene.user, &scene.project));
+    let diff = scene
+        .before
+        .diff(&inventory_of(&h, &scene.user, &scene.project));
     let exact = done.body["recovery"]["restoration"]["exact"] == true;
-    println!("G4 kill [{window} of operation {op}]: restored exactly = {exact}; differences = {diff:?}");
+    println!(
+        "G4 kill [{window} of operation {op}]: restored exactly = {exact}; differences = {diff:?}"
+    );
     if factory_setup_adapter::SETUP_PIN.contains_pr_105_fix {
         assert!(exact && diff.is_empty(), "{diff:?}");
     } else {
@@ -1211,7 +1321,9 @@ async fn hard_kill(window: &str, op: usize) {
             .chain(&diff.removed)
             .collect();
         assert!(
-            strays.iter().all(|p| p.contains(".hoi4ms-") || p.ends_with(".tmp")),
+            strays
+                .iter()
+                .all(|p| p.contains(".hoi4ms-") || p.ends_with(".tmp")),
             "only a placement temporary may be left behind: {diff:?}"
         );
         assert!(diff.mode_changed.is_empty() && !diff.index_changed);
@@ -1220,6 +1332,10 @@ async fn hard_kill(window: &str, op: usize) {
 }
 
 #[tokio::test]
+#[cfg_attr(
+    not(unix),
+    ignore = "applies a Setup plan: run on Linux (scripts/linux-tests.sh); on Windows Setup blocks readiness on the uninstalled MCP route"
+)]
 async fn g4_a_killed_process_leaves_a_recoverable_state() {
     // Before the first live change of the first operation, then in the placement window of the
     // second one (one file is installed, the journal does not know it yet).
@@ -1230,6 +1346,10 @@ async fn g4_a_killed_process_leaves_a_recoverable_state() {
 // ----- the gates, in order, over HTTP ----------------------------------------------------------
 
 #[tokio::test]
+#[cfg_attr(
+    not(unix),
+    ignore = "applies a Setup plan: run on Linux (scripts/linux-tests.sh); on Windows Setup blocks readiness on the uninstalled MCP route"
+)]
 async fn the_gates_hold_in_order_and_a_restart_expires_the_session() {
     let model = model_for("upload-fixture", false);
     let mut h = gate_harness(&model, None).await;
@@ -1255,8 +1375,17 @@ async fn the_gates_hold_in_order_and_a_restart_expires_the_session() {
     assert_eq!(scan.status, 200, "{}", scan.text);
     assert_eq!(flow.get("status").await.body["step"], "scanned");
     let r = flow.post("analyze", json!({})).await;
-    assert_eq!(code(&r), (409, "evidence_not_approved".into()), "{}", r.text);
-    assert_eq!(model.replay.as_ref().unwrap().calls_made(), 0, "the model was not called");
+    assert_eq!(
+        code(&r),
+        (409, "evidence_not_approved".into()),
+        "{}",
+        r.text
+    );
+    assert_eq!(
+        model.replay.as_ref().unwrap().calls_made(),
+        0,
+        "the model was not called"
+    );
     // Only what the scan offered, and only for the latest scan.
     let r = flow
         .post(
@@ -1264,7 +1393,12 @@ async fn the_gates_hold_in_order_and_a_restart_expires_the_session() {
             json!({"scan_id": scan.body["scan_id"], "references": ["not-offered"]}),
         )
         .await;
-    assert_eq!(code(&r), (409, "unknown_evidence_reference".into()), "{}", r.text);
+    assert_eq!(
+        code(&r),
+        (409, "unknown_evidence_reference".into()),
+        "{}",
+        r.text
+    );
     let r = flow
         .post(
             "evidence",
@@ -1292,14 +1426,24 @@ async fn the_gates_hold_in_order_and_a_restart_expires_the_session() {
     assert_eq!(analysis.status, 200, "{}", analysis.text);
     assert_eq!(flow.get("status").await.body["step"], "analyzed");
     let r = flow.post("plan", json!({})).await;
-    assert_eq!(code(&r), (409, "analysis_not_confirmed".into()), "{}", r.text);
+    assert_eq!(
+        code(&r),
+        (409, "analysis_not_confirmed".into()),
+        "{}",
+        r.text
+    );
     let r = flow
         .post(
             "confirm",
             json!({"analysis_id": Uuid::new_v4(), "values": analysis.body["values"]}),
         )
         .await;
-    assert_eq!(code(&r), (409, "analysis_not_in_session".into()), "{}", r.text);
+    assert_eq!(
+        code(&r),
+        (409, "analysis_not_in_session".into()),
+        "{}",
+        r.text
+    );
     let mut bad = analysis.body["values"].clone();
     bad["identity"]["project_id"] = json!("");
     let r = flow
@@ -1323,7 +1467,10 @@ async fn the_gates_hold_in_order_and_a_restart_expires_the_session() {
     let r = flow.post("apply", json!({"plan_id": plan_id})).await;
     assert_eq!(code(&r), (409, "plan_not_approved".into()), "{}", r.text);
     let r = flow
-        .post("approve", json!({"plan_id": plan_id, "plan_sha256": "0".repeat(64)}))
+        .post(
+            "approve",
+            json!({"plan_id": plan_id, "plan_sha256": "0".repeat(64)}),
+        )
         .await;
     assert_eq!(code(&r), (409, "plan_changed".into()), "{}", r.text);
     let r = flow
@@ -1361,11 +1508,16 @@ async fn the_gates_hold_in_order_and_a_restart_expires_the_session() {
     assert_eq!(code(&r), (409, "plan_changed".into()), "{}", r.text);
     let inventory = inventory_of(&h, &alice, &project);
     assert!(
-        inventory.diff(&inventory_of(&h, &alice, &project)).is_empty(),
+        inventory
+            .diff(&inventory_of(&h, &alice, &project))
+            .is_empty(),
         "every refusal so far changed nothing"
     );
     let source = h.workspace_source(&alice, &project);
-    assert!(!source.join("CLAUDE.md").exists(), "nothing was written before the apply");
+    assert!(
+        !source.join("CLAUDE.md").exists(),
+        "nothing was written before the apply"
+    );
 
     // One owner: two applies of the approved plan race, one wins.
     let r = flow
@@ -1379,8 +1531,15 @@ async fn the_gates_hold_in_order_and_a_restart_expires_the_session() {
         flow.post("apply", json!({"plan_id": plan_id})),
         flow.post("apply", json!({"plan_id": plan_id}))
     );
-    let winners = [&a, &b].iter().filter(|r| r.status == 200 && r.body["status"] == "applied").count();
-    assert_eq!(winners, 1, "exactly one apply wins: {} / {}", a.text, b.text);
+    let winners = [&a, &b]
+        .iter()
+        .filter(|r| r.status == 200 && r.body["status"] == "applied")
+        .count();
+    assert_eq!(
+        winners, 1,
+        "exactly one apply wins: {} / {}",
+        a.text, b.text
+    );
     let loser = if a.status == 200 { &b } else { &a };
     assert!(
         ["project_busy", "plan_not_approved"].contains(&loser.error_code()),
@@ -1411,12 +1570,20 @@ async fn the_gates_hold_in_order_and_a_restart_expires_the_session() {
         ("approve", json!({"plan_id": plan_id, "plan_sha256": "0"})),
     ] {
         let r = flow.post(tail, body).await;
-        assert_eq!(code(&r), (409, "setup_session_expired".into()), "{tail}: {}", r.text);
+        assert_eq!(
+            code(&r),
+            (409, "setup_session_expired".into()),
+            "{tail}: {}",
+            r.text
+        );
     }
     // What does not need a session still works: the plan record, the recovery view, the workspace.
     assert_eq!(flow.get("plan").await.status, 200);
     assert_eq!(flow.get("recovery").await.status, 200);
-    let ws = alice.client.get(&format!("/api/v1/projects/{project}/workspace")).await;
+    let ws = alice
+        .client
+        .get(&format!("/api/v1/projects/{project}/workspace"))
+        .await;
     assert_eq!(ws.body["summary"]["setup_state"], "completed");
     // Scanning again starts over.
     let scan = flow.post("scan", json!({"mode": "existing"})).await;
@@ -1436,7 +1603,10 @@ async fn a_lost_new_mod_session_keeps_its_brief_for_the_next_scan() {
         project: project.clone(),
     };
     let scan = flow
-        .post("scan", json!({"mode": "create", "description": NEW_MOD_BRIEF}))
+        .post(
+            "scan",
+            json!({"mode": "create", "description": NEW_MOD_BRIEF}),
+        )
         .await;
     assert_eq!(scan.status, 200, "{}", scan.text);
     assert_eq!(scan.body["evidence"]["required"], false);
@@ -1458,8 +1628,15 @@ async fn a_lost_new_mod_session_keeps_its_brief_for_the_next_scan() {
         client: &alice.client,
         project: other,
     };
-    let r = flow.post("scan", json!({"mode": "create", "description": "x"})).await;
-    assert_eq!((r.status, r.error_code()), (409, "workspace_not_empty"), "{}", r.text);
+    let r = flow
+        .post("scan", json!({"mode": "create", "description": "x"}))
+        .await;
+    assert_eq!(
+        (r.status, r.error_code()),
+        (409, "workspace_not_empty"),
+        "{}",
+        r.text
+    );
 }
 
 // ----- two accounts ----------------------------------------------------------------------------
@@ -1525,7 +1702,10 @@ async fn two_accounts_cannot_see_each_others_setup_records_over_http() {
     let r = bflow.get("plan").await;
     assert_eq!((r.status, r.error_code()), (409, "plan_not_built"));
     let created = bflow
-        .post("scan", json!({"mode": "create", "description": "Bob's own mod"}))
+        .post(
+            "scan",
+            json!({"mode": "create", "description": "Bob's own mod"}),
+        )
         .await;
     assert_eq!(created.status, 200, "{}", created.text);
     for (tail, body) in [
@@ -1550,8 +1730,18 @@ async fn two_accounts_cannot_see_each_others_setup_records_over_http() {
     // Alice is unaffected: her session, her plan and her bytes.
     let status = aflow.get("status").await;
     assert_eq!(status.body["step"], "planned");
-    assert_eq!(status.body["plan"]["plan_sha256"], alice_plan["plan_sha256"]);
-    assert!(!h.data_dir.path().join("workspaces").join(&bob.id).join(&alice_project).exists());
+    assert_eq!(
+        status.body["plan"]["plan_sha256"],
+        alice_plan["plan_sha256"]
+    );
+    assert!(
+        !h.data_dir
+            .path()
+            .join("workspaces")
+            .join(&bob.id)
+            .join(&alice_project)
+            .exists()
+    );
     assert!(
         !status.text.contains(&bob.id),
         "no trace of the other account in Alice's answers"
@@ -1589,7 +1779,11 @@ async fn a_revoked_installation_during_import_leaves_the_workspace_untouched() {
         "{}",
         refused.text
     );
-    println!("revoked import: {} {}", refused.status, refused.error_code());
+    println!(
+        "revoked import: {} {}",
+        refused.status,
+        refused.error_code()
+    );
     // Nothing was created: no workspace directory, no Setup scan target, no repository link in use.
     let project_dir = h
         .data_dir
@@ -1597,7 +1791,10 @@ async fn a_revoked_installation_during_import_leaves_the_workspace_untouched() {
         .join("workspaces")
         .join(&alice.id)
         .join(&project);
-    assert!(!project_dir.exists(), "the failed import left no workspace behind");
+    assert!(
+        !project_dir.exists(),
+        "the failed import left no workspace behind"
+    );
     let ws = alice
         .client
         .get(&format!("/api/v1/projects/{project}/workspace"))

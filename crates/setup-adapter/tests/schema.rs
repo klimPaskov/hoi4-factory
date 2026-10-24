@@ -196,7 +196,10 @@ fn the_pin_agrees_with_cargo_lock_and_is_a_single_place() {
     // follow the flag, and this build uses Setup's DefaultPlanBuilder, so the flag must be true.
     let pin = std::hint::black_box(SETUP_PIN);
     assert_eq!(pin.counts_for_recovery_gates(), pin.contains_pr_105_fix);
-    assert!(pin.default_plan_builder, "the server plans with DefaultPlanBuilder");
+    assert!(
+        pin.default_plan_builder,
+        "the server plans with DefaultPlanBuilder"
+    );
     assert_eq!(pin.pr_105_head, "a300b90439fcf907b9e684f3df8443322d7b7848");
     assert_eq!(pin.repository, "klimPaskov/HOI4-Mod-Setup");
 }

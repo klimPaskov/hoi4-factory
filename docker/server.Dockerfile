@@ -21,9 +21,15 @@ RUN cargo build --release --locked -p factory-server
 
 FROM debian:bookworm-slim@sha256:7ff6ba31527b9e336162fa061746c366c4b2032f4d2cff2078bea43f78efe3f8
 # git: the workspace crate drives the git CLI. ca-certificates: TLS to GitHub and mail relays.
+# nodejs: the Node runtime Setup writes into the generated coding-client configuration. On Linux
+# Setup accepts only /usr/bin/node installed by Debian's own `nodejs` package (it checks the
+# root-owned dpkg checksum receipt), so a binary copied from a node image is refused. The version
+# is pinned to what the digest-pinned base image's archive offers; raise it deliberately.
+ARG NODEJS_VERSION=18.20.4+dfsg-1~deb12u3
 RUN apt-get update \
- && apt-get install -y --no-install-recommends git ca-certificates \
- && rm -rf /var/lib/apt/lists/*
+ && apt-get install -y --no-install-recommends git ca-certificates nodejs=${NODEJS_VERSION} \
+ && rm -rf /var/lib/apt/lists/* \
+ && /usr/bin/node --version
 RUN useradd --system --uid 10001 --no-create-home factory \
  && install -d -o 10001 -g 10001 -m 0755 /data \
  && install -d -m 0755 /game
@@ -31,6 +37,7 @@ COPY --from=build /src/target/release/factory-server /usr/local/bin/factory-serv
 ENV FACTORY_LISTEN=0.0.0.0:8080 \
     FACTORY_DATA_ROOT=/data \
     FACTORY_GAME_REF=/game \
+    FACTORY_NODE_EXECUTABLE=/usr/bin/node \
     HOME=/tmp
 USER 10001
 EXPOSE 8080

@@ -200,7 +200,8 @@ export interface SetupAnalysis {
   source: { revision: string; manifest_sha256: string };
   summary: string;
   warnings: string[];
-  proposals: { key: string; value: string; confidence: number; reason: string }[];
+  /** `value` is a string, or a list of strings for tags and folders. */
+  proposals: { key: string; value: unknown; confidence: number; reason: string }[];
   values: ReviewValues;
   component_recommendations: { component_id: string; recommendation: string; reason: string }[];
 }

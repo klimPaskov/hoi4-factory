@@ -22,9 +22,13 @@
 
 use std::sync::Arc;
 
-use hoi4_mod_setup::codex::{ApprovedEvidence, CodexAnalysis, MAX_EVIDENCE_BYTES, MAX_EVIDENCE_ITEMS};
+use hoi4_mod_setup::codex::{
+    ApprovedEvidence, CodexAnalysis, MAX_EVIDENCE_BYTES, MAX_EVIDENCE_ITEMS,
+};
 use hoi4_mod_setup::credentials::{AI_PROVIDER_ENVIRONMENT_NAME, provider_name};
-use hoi4_mod_setup::models::{CodexAnalysisRecord, CredentialReference, Platform, ScanResult, SourceMode};
+use hoi4_mod_setup::models::{
+    CodexAnalysisRecord, CredentialReference, Platform, ScanResult, SourceMode,
+};
 use hoi4_mod_setup::security::sha256_bytes;
 use hoi4_mod_setup::source::{SourceRequest, SourceResolution, resolve_source};
 use serde::{Deserialize, Serialize};
@@ -256,7 +260,13 @@ pub fn values_from_analysis(analysis: &CodexAnalysis, defaults: &ReviewDefaults)
         analysis
             .proposals
             .iter()
-            .find(|p| serde_json::to_value(&p.key).ok().and_then(|k| k.as_str().map(str::to_owned)).as_deref() == Some(name))
+            .find(|p| {
+                serde_json::to_value(&p.key)
+                    .ok()
+                    .and_then(|k| k.as_str().map(str::to_owned))
+                    .as_deref()
+                    == Some(name)
+            })
             .map(|p| p.value.clone())
             .unwrap_or(Value::Null)
     };
@@ -287,7 +297,10 @@ fn check_text(field: &'static str, value: &str, required: bool) -> Result<(), Se
         return Err(invalid(field, format!("{field} is required.")));
     }
     if value.chars().count() > MAX_TEXT_CHARS || value.chars().any(|c| c == '\0') {
-        return Err(invalid(field, format!("{field} is too long or contains an invalid character.")));
+        return Err(invalid(
+            field,
+            format!("{field} is too long or contains an invalid character."),
+        ));
     }
     Ok(())
 }
@@ -324,7 +337,11 @@ impl ReviewValues {
         let c = &self.conventions;
         check_text("agents_profile", &c.agents_profile, true)?;
         check_text("localisation_convention", &c.localisation_convention, true)?;
-        check_text("documentation_convention", &c.documentation_convention, true)?;
+        check_text(
+            "documentation_convention",
+            &c.documentation_convention,
+            true,
+        )?;
         Ok(())
     }
 }
@@ -419,7 +436,10 @@ impl SetupAdapter {
             .lock()
             .map_err(|_| SetupError::Internal("session registry poisoned".into()))?
             .remove(&(account, project, session));
-        self.inner.store.close_session(&access.scope, session.0).await
+        self.inner
+            .store
+            .close_session(&access.scope, session.0)
+            .await
     }
 
     /// The newest session this account left open on the project, and whether this process still
@@ -591,25 +611,29 @@ impl SetupAdapter {
                 capability: "analyzeSetup",
                 reason: "no model is configured on this server".into(),
             })?;
-        let fetcher = self
-            .inner
-            .source
-            .clone()
-            .ok_or_else(|| SetupError::CapabilityUnavailable {
-                capability: "source",
-                reason: "this server has no source for the Setup workflow package".into(),
-            })?;
-        let (mode, brief, scan, approved) = Self::review_of(&active, |review| {
-            let intent = review
-                .intent
-                .as_ref()
-                .ok_or_else(|| SetupError::precondition("scan_required", "Scan the mod first."))?;
-            let scan = review
-                .scan
+        let fetcher =
+            self.inner
+                .source
                 .clone()
-                .ok_or_else(|| SetupError::precondition("scan_required", "Scan the mod first."))?;
-            Ok((intent.mode, intent.brief.clone(), scan, review.approved.clone()))
-        })?;
+                .ok_or_else(|| SetupError::CapabilityUnavailable {
+                    capability: "source",
+                    reason: "this server has no source for the Setup workflow package".into(),
+                })?;
+        let (mode, brief, scan, approved) =
+            Self::review_of(&active, |review| {
+                let intent = review.intent.as_ref().ok_or_else(|| {
+                    SetupError::precondition("scan_required", "Scan the mod first.")
+                })?;
+                let scan = review.scan.clone().ok_or_else(|| {
+                    SetupError::precondition("scan_required", "Scan the mod first.")
+                })?;
+                Ok((
+                    intent.mode,
+                    intent.brief.clone(),
+                    scan,
+                    review.approved.clone(),
+                ))
+            })?;
         let evidence = match (mode, approved) {
             (SetupMode::Create, _) => Vec::new(),
             (SetupMode::Existing, Some(list)) => list,
@@ -722,45 +746,54 @@ impl SetupAdapter {
         ctx: OpContext,
     ) -> Result<ConfirmedView, SetupError> {
         let active = self.session(account, project, session)?;
-        let route = self
-            .inner
-            .analysis_route
-            .clone()
-            .ok_or_else(|| SetupError::CapabilityUnavailable {
-                capability: "analyzeSetup",
-                reason: "no model is configured on this server".into(),
-            })?;
+        let route =
+            self.inner
+                .analysis_route
+                .clone()
+                .ok_or_else(|| SetupError::CapabilityUnavailable {
+                    capability: "analyzeSetup",
+                    reason: "no model is configured on this server".into(),
+                })?;
         values.validate()?;
-        let (record, analysis, source, mode, scan_id) = Self::review_of(&active, |review| {
-            let draft = review.analysis.as_ref().ok_or_else(|| {
-                SetupError::stale(
-                    "analysis_not_in_session",
-                    "There is no analysis to confirm. Run the analysis first.",
-                )
+        let (record, analysis, source, mode, scan_id) =
+            Self::review_of(&active, |review| {
+                let draft = review.analysis.as_ref().ok_or_else(|| {
+                    SetupError::stale(
+                        "analysis_not_in_session",
+                        "There is no analysis to confirm. Run the analysis first.",
+                    )
+                })?;
+                if draft.view.analysis_id != analysis_id {
+                    return Err(SetupError::stale(
+                        "analysis_not_in_session",
+                        "That analysis is no longer the current one. Run the analysis again.",
+                    ));
+                }
+                let mode = review.intent.as_ref().map(|i| i.mode).ok_or_else(|| {
+                    SetupError::precondition("scan_required", "Scan the mod first.")
+                })?;
+                let scan_id = review.scan.as_ref().map(|s| s.scan_id).ok_or_else(|| {
+                    SetupError::precondition("scan_required", "Scan the mod first.")
+                })?;
+                Ok((
+                    draft.record.clone(),
+                    draft.analysis.clone(),
+                    draft.source.clone(),
+                    mode,
+                    scan_id,
+                ))
             })?;
-            if draft.view.analysis_id != analysis_id {
-                return Err(SetupError::stale(
-                    "analysis_not_in_session",
-                    "That analysis is no longer the current one. Run the analysis again.",
-                ));
-            }
-            let mode = review.intent.as_ref().map(|i| i.mode).ok_or_else(|| {
-                SetupError::precondition("scan_required", "Scan the mod first.")
-            })?;
-            let scan_id = review.scan.as_ref().map(|s| s.scan_id).ok_or_else(|| {
-                SetupError::precondition("scan_required", "Scan the mod first.")
-            })?;
-            Ok((
-                draft.record.clone(),
-                draft.analysis.clone(),
-                draft.source.clone(),
-                mode,
-                scan_id,
-            ))
-        })?;
         let recommendations = serde_json::to_value(&analysis.component_recommendations)
             .map_err(|e| SetupError::Internal(e.to_string()))?;
-        let mut state = compose_state(&active, &route, mode, &source, scan_id, &values, recommendations);
+        let mut state = compose_state(
+            &active,
+            &route,
+            mode,
+            &source,
+            scan_id,
+            &values,
+            recommendations,
+        );
         let fields = proposal_keys(&analysis);
         let confirmed = self
             .confirm_setup_analysis(
@@ -889,7 +922,8 @@ fn candidates_of(
             if active.redactor.leaks(excerpt) || active.redactor.leaks(&first.path) {
                 continue;
             }
-            if candidates.len() >= MAX_EVIDENCE_ITEMS || bytes + excerpt.len() > MAX_EVIDENCE_BYTES {
+            if candidates.len() >= MAX_EVIDENCE_ITEMS || bytes + excerpt.len() > MAX_EVIDENCE_BYTES
+            {
                 truncated = true;
                 continue;
             }

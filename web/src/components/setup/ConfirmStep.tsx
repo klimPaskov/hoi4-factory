@@ -273,7 +273,7 @@ function ConfirmForm({
                     <td dir="ltr" className="path">
                       {proposal.key}
                     </td>
-                    <td dir="auto">{String(proposal.value)}</td>
+                    <td dir="auto">{typeof proposal.value === 'string' ? proposal.value : JSON.stringify(proposal.value)}</td>
                     <td>{t('setup.confirm.percent', { percent: formatNumber(percent(proposal.confidence)) })}</td>
                     <td dir="auto">{proposal.reason}</td>
                   </tr>

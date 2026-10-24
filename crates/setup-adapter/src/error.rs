@@ -90,7 +90,10 @@ pub enum SetupError {
     Stale { code: &'static str, message: String },
     /// A value the person entered cannot be used. `field` names it for the form.
     #[error("{message}")]
-    InvalidValues { field: &'static str, message: String },
+    InvalidValues {
+        field: &'static str,
+        message: String,
+    },
     /// Setup itself refused or failed.
     #[error("setup {}: {message}", kind.as_str())]
     Native { kind: NativeKind, message: String },

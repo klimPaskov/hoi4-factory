@@ -8,6 +8,9 @@
 //! /app/installations`, which the double does not implement) is replaced by a fixed list here,
 //! and `HttpAppInstallations` is exercised separately against a tiny stub.
 
+// The shared harness has parts only the Setup gate tests use (restart, replacement collaborators).
+#![allow(dead_code)]
+
 #[path = "../../intake/tests/common/mod.rs"]
 mod common;
 

@@ -49,12 +49,12 @@ pub use model::{
     ANTHROPIC_UNSUPPORTED_KEYWORDS, ModelClient, ModelError, ModelReply, ModelRequest,
     analysis_contract, json_object_from_text, strip_schema_keywords,
 };
-pub use ops_scan::confirmation_values;
 pub use ops_review::{
     ConfirmedView, EvidenceCandidate, EvidenceCandidates, ProposalView, RecommendationView,
     ReviewConventions, ReviewDefaults, ReviewDraft, ReviewIdentity, ReviewSnapshot, ReviewValues,
     SetupMode, SourceSummary, values_from_analysis,
 };
+pub use ops_scan::confirmation_values;
 pub use pin::{SETUP_PIN, SetupPin};
 pub use recovery::{RecoveryVariant, RecoveryView, classify as classify_recovery, journal_sha256};
 pub use redact::Redactor;
