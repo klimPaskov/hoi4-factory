@@ -1,0 +1,557 @@
+{
+  "schema_version": 1,
+  "package": "hoi4-factory",
+  "version": "v02",
+  "date": "2026-10-23",
+  "self_audit_exclusions": [
+    "docs/05-verification/verification-run.json",
+    "docs/MANIFEST.json"
+  ],
+  "files": [
+    {
+      "path": ".agents/skills/audit-hoi4-integrations/SKILL.md",
+      "bytes": 4005,
+      "sha256": "189e8ddb9f36f146f701bb57637860b2e9fbc0a3a792362feb83389055646897"
+    },
+    {
+      "path": ".agents/skills/audit-hoi4-integrations/agents/openai.yaml",
+      "bytes": 43,
+      "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94"
+    },
+    {
+      "path": ".agents/skills/capture-engineering-lessons/SKILL.md",
+      "bytes": 3962,
+      "sha256": "94a3e7eaeaabed18721bd58c76927b5ab41d49a7d54af6d6d80d9ba2899460f9"
+    },
+    {
+      "path": ".agents/skills/capture-engineering-lessons/agents/openai.yaml",
+      "bytes": 43,
+      "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94"
+    },
+    {
+      "path": ".agents/skills/start-implementation-stage/SKILL.md",
+      "bytes": 4162,
+      "sha256": "1a96032c088c578eb14d36eb817917bcef08dc2ea0fcc64860b00eeb1cc34152"
+    },
+    {
+      "path": ".agents/skills/start-implementation-stage/agents/openai.yaml",
+      "bytes": 43,
+      "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94"
+    },
+    {
+      "path": ".agents/skills/validate-stage/SKILL.md",
+      "bytes": 3901,
+      "sha256": "9696e301d88ccab747c5040f58528cb88d8f169012b4a5079072e423afddaa1a"
+    },
+    {
+      "path": ".agents/skills/validate-stage/agents/openai.yaml",
+      "bytes": 43,
+      "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94"
+    },
+    {
+      "path": ".claude/settings.json",
+      "bytes": 319,
+      "sha256": "d58b82a1ddd0ecd5fdb48039a82d4eebcdc5af607138d6e1531476d02053e490"
+    },
+    {
+      "path": ".claude/skills/audit-hoi4-integrations/SKILL.md",
+      "bytes": 4036,
+      "sha256": "af459f3dd49baafce381f8bb1a4c2d0afb9fbce32123279f1fc21f671f376dda"
+    },
+    {
+      "path": ".claude/skills/capture-engineering-lessons/SKILL.md",
+      "bytes": 3993,
+      "sha256": "b733bccaddd43c8ca31c5521717077bd2dff3fc2b88da48ee3067ebe035743f2"
+    },
+    {
+      "path": ".claude/skills/start-implementation-stage/SKILL.md",
+      "bytes": 4193,
+      "sha256": "19733fc2cf51b120deb9c9970e332893129a28b674407ca2c26ba66b69d3b159"
+    },
+    {
+      "path": ".claude/skills/validate-stage/SKILL.md",
+      "bytes": 3932,
+      "sha256": "9a44fadf6fd39b80b884a5c37371d2ce65e3848854003a4168a9a7f71031c000"
+    },
+    {
+      "path": ".codex/config.toml",
+      "bytes": 901,
+      "sha256": "2d3286d2c881bfe6dd8c6e0325ce7a44375a9958ff4d2137b6f77526e95961ed"
+    },
+    {
+      "path": ".codex/skills/audit-hoi4-integrations/SKILL.md",
+      "bytes": 4005,
+      "sha256": "189e8ddb9f36f146f701bb57637860b2e9fbc0a3a792362feb83389055646897"
+    },
+    {
+      "path": ".codex/skills/audit-hoi4-integrations/agents/openai.yaml",
+      "bytes": 43,
+      "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94"
+    },
+    {
+      "path": ".codex/skills/capture-engineering-lessons/SKILL.md",
+      "bytes": 3962,
+      "sha256": "94a3e7eaeaabed18721bd58c76927b5ab41d49a7d54af6d6d80d9ba2899460f9"
+    },
+    {
+      "path": ".codex/skills/capture-engineering-lessons/agents/openai.yaml",
+      "bytes": 43,
+      "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94"
+    },
+    {
+      "path": ".codex/skills/start-implementation-stage/SKILL.md",
+      "bytes": 4162,
+      "sha256": "1a96032c088c578eb14d36eb817917bcef08dc2ea0fcc64860b00eeb1cc34152"
+    },
+    {
+      "path": ".codex/skills/start-implementation-stage/agents/openai.yaml",
+      "bytes": 43,
+      "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94"
+    },
+    {
+      "path": ".codex/skills/validate-stage/SKILL.md",
+      "bytes": 3901,
+      "sha256": "9696e301d88ccab747c5040f58528cb88d8f169012b4a5079072e423afddaa1a"
+    },
+    {
+      "path": ".codex/skills/validate-stage/agents/openai.yaml",
+      "bytes": 43,
+      "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94"
+    },
+    {
+      "path": ".mcp.json",
+      "bytes": 342,
+      "sha256": "20b5f1ad55bb8e4a891efc2cccc6c886bf8a9242874cabda66083a2b5259a512"
+    },
+    {
+      "path": "AGENTS.md",
+      "bytes": 5706,
+      "sha256": "62ffaf6703ea06fc57d6df50cd20fa3459c9a0f3d55eff22e06b189c3a2910f4"
+    },
+    {
+      "path": "CLAUDE.md",
+      "bytes": 2409,
+      "sha256": "659585c5c41bd83519847f861e5233cb35b9da2179d385ce5e44fff0a550ccde"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3298,
+      "sha256": "66039a6256120dcc349f6ed1a49f63a8fc2caacae4b3b3ed78314f2831d3aeb2"
+    },
+    {
+      "path": "docs/00-research/00-executive-recommendation.md",
+      "bytes": 6885,
+      "sha256": "577cfa12091abdae11ac372253bf790f4a5fb7899099b957eabcb7a3bd8432f6"
+    },
+    {
+      "path": "docs/00-research/01-research-sources.md",
+      "bytes": 30911,
+      "sha256": "e0d770100389fea445fcc7ea0b8443a69f096ff94d680b046483bc32ddfb9dfd"
+    },
+    {
+      "path": "docs/00-research/02-existing-assets-audit.md",
+      "bytes": 30793,
+      "sha256": "65cb0d308e63a5ff5af1e1921322572254794b198b5e4e8f40ad4345e4384e6d"
+    },
+    {
+      "path": "docs/00-research/03-candidate-comparison.md",
+      "bytes": 25747,
+      "sha256": "44e2cc8977c352f10b60fe919e869cc8f84a423cf842d8fa879e57007c6953b6"
+    },
+    {
+      "path": "docs/00-research/04-evidence-and-research-log.md",
+      "bytes": 9954,
+      "sha256": "f3e4aa6ba9bdfcdf92d717ea91ac2ffb8415718f27b91d2278a60caef7404e11"
+    },
+    {
+      "path": "docs/00-research/05-developer-guidance-research.md",
+      "bytes": 12498,
+      "sha256": "bdb4d14bba7176b2e1d3c60bcc3a6e724dd9eeffc9d3363e681e2ab586fb696b"
+    },
+    {
+      "path": "docs/00-research/06-context-protocols-and-evaluation-research.md",
+      "bytes": 7859,
+      "sha256": "5683605a3a5655f5eef049c0467b66adafbdf6025226c91c2884366eeab34b81"
+    },
+    {
+      "path": "docs/00-research/agentic-projection-check.json",
+      "bytes": 367,
+      "sha256": "b7ac4198420361360a762fd6807086bf196815fc1fbe44cbfa8bca651a36cff9"
+    },
+    {
+      "path": "docs/00-research/context-guidance-audit.json",
+      "bytes": 56127,
+      "sha256": "b100828bffe55b98bfd3d9f4f4273c0de702a0ffa234a378014b34c1c5fc8d1f"
+    },
+    {
+      "path": "docs/00-research/evidence-a.json",
+      "bytes": 63362,
+      "sha256": "7512bd8048327e1c98e95730660cf45002ad03a265ebc780268834e110c4fd6c"
+    },
+    {
+      "path": "docs/00-research/evidence-b.json",
+      "bytes": 151971,
+      "sha256": "b57dc1f36b91dec8909820a413e55cd3290024b7fb7eab16130498681beb4f87"
+    },
+    {
+      "path": "docs/00-research/evidence-c.json",
+      "bytes": 23942,
+      "sha256": "35cb8f811ce03e5699729381f83acaed433761f5c14290a1ecf4d1cfd769b060"
+    },
+    {
+      "path": "docs/00-research/evidence-root.json",
+      "bytes": 19604,
+      "sha256": "e2ef57ef186865532378be662422f579906ce8fb8df70f7dba0ade89868f4593"
+    },
+    {
+      "path": "docs/00-research/source-registry.json",
+      "bytes": 133053,
+      "sha256": "762bc8a8e7c4994f4d32b3e78359bb6576b5be8b5f4ec7b34571475260194229"
+    },
+    {
+      "path": "docs/00-research/supplied-source-coverage.json",
+      "bytes": 95591,
+      "sha256": "fb64596bbb534fd39226f72a9d2d74aae34828a062664c3375b14658776815ea"
+    },
+    {
+      "path": "docs/01-product/product-requirements.md",
+      "bytes": 14792,
+      "sha256": "4b4aa9924885eed7a7c7e6876dfb1d99a4a281739103e241d6f6686c0705f407"
+    },
+    {
+      "path": "docs/01-product/requirements-traceability.md",
+      "bytes": 14205,
+      "sha256": "ca7221684524ffaba7ae50f60c75784b2aefd2368638319972422168d2704113"
+    },
+    {
+      "path": "docs/01-product/requirements.json",
+      "bytes": 19891,
+      "sha256": "84877b5a436e9118a190e1bc59a937ce8b28a09039f808ecefa67ab32c6c2acd"
+    },
+    {
+      "path": "docs/01-product/users-and-workflows.md",
+      "bytes": 10180,
+      "sha256": "77dc95b0d736b63a8bff53dd01ae30a2d2a382e5e67db8862608ebc7e009e155"
+    },
+    {
+      "path": "docs/01-product/visual-and-autonomy-model.md",
+      "bytes": 6046,
+      "sha256": "8feabfb7a52fd47dd752616d5aac12164dd02af7e8ade441dad61e6b156e7220"
+    },
+    {
+      "path": "docs/02-architecture/contracts-and-interfaces.md",
+      "bytes": 10277,
+      "sha256": "f682681d811714a7c1d85d56ea4ce77510ea179db3acc8c5e9346f4854cea889"
+    },
+    {
+      "path": "docs/02-architecture/data-context-and-state.md",
+      "bytes": 8191,
+      "sha256": "5ed5d7a10835a3e04406d46d5d33bba83e0f99d4d4d18500a17591090d8bfa08"
+    },
+    {
+      "path": "docs/02-architecture/deployment-and-security.md",
+      "bytes": 6243,
+      "sha256": "f810a7161c99534c6d8d58706497a5cc4049611dbeb116af485f7d01e146e4cf"
+    },
+    {
+      "path": "docs/02-architecture/options-and-decisions.md",
+      "bytes": 9805,
+      "sha256": "db3212d34c1c49a5986af4cadc0f87ec4f9d98ec3f425de26e063e03e47e85b7"
+    },
+    {
+      "path": "docs/02-architecture/recommended-architecture.md",
+      "bytes": 8799,
+      "sha256": "7d65065598ebf6983bc6033b573837e73b9ae3800376b1b36609976908c04591"
+    },
+    {
+      "path": "docs/03-subsystem-specs/001-onboarding-and-mod-setup.md",
+      "bytes": 13869,
+      "sha256": "0a5a2522aa6a95e2ef94a7ab691c4c1dc1409638039ed03cd1ffaad0e2b0a5c0"
+    },
+    {
+      "path": "docs/03-subsystem-specs/002-native-runtime-and-models.md",
+      "bytes": 11644,
+      "sha256": "0a2a8bd3b025509a4f19b5665cbcacdb324960a86d8416fd4c7fc763464a87f5"
+    },
+    {
+      "path": "docs/03-subsystem-specs/003-orchestration-and-recovery.md",
+      "bytes": 11560,
+      "sha256": "0d4911c9e594ab5e2e5ebc7c072a983a393e25f4986efbf4678869cd781e8510"
+    },
+    {
+      "path": "docs/03-subsystem-specs/004-context-memory-and-runtime-learning.md",
+      "bytes": 10440,
+      "sha256": "4e6b7b6491ce1d630893c53cc7d00cc982c72f3215f7e8092276ad35fdb47326"
+    },
+    {
+      "path": "docs/03-subsystem-specs/005-git-collaboration-and-review.md",
+      "bytes": 11536,
+      "sha256": "f6a29a7d4b1a6e9986f25665950eaa4c38ee3f2a6e75039fb41c0705f02f6ed3"
+    },
+    {
+      "path": "docs/03-subsystem-specs/006-hoi4-tools-and-validation.md",
+      "bytes": 12771,
+      "sha256": "9bc0c93f4ac29eff309351dcb258efe501da3e7f31d28cc572d88eb1014586f0"
+    },
+    {
+      "path": "docs/03-subsystem-specs/007-visual-state-synchronization.md",
+      "bytes": 12628,
+      "sha256": "ac66220c91a829aea1e93dd5146c477a70b19a4b4338e4c2cf47ab0deb7fd85e"
+    },
+    {
+      "path": "docs/03-subsystem-specs/008-maps.md",
+      "bytes": 16336,
+      "sha256": "4b283d9fbddb9b6dbcde18cf8ea65d457873283f19abf5b6d21baa69c20477b0"
+    },
+    {
+      "path": "docs/03-subsystem-specs/009-focus-and-other-editors.md",
+      "bytes": 12202,
+      "sha256": "e5f23fce54a26448019edd9573a0f4f1ab135d83c1c27e01dc7cdcc84314ba7f"
+    },
+    {
+      "path": "docs/03-subsystem-specs/010-assets-localization-and-content.md",
+      "bytes": 13107,
+      "sha256": "db009def1b402f93f740b66ff11c1398f8a8943d1cd8e224615bb72e9c645ca9"
+    },
+    {
+      "path": "docs/03-subsystem-specs/011-extensibility-sandbox-and-permissions.md",
+      "bytes": 12954,
+      "sha256": "f66e602d2a322451fb86c92b4da000d128dadc8d347a0c600a36b1879747ac9e"
+    },
+    {
+      "path": "docs/03-subsystem-specs/012-engineering-guidance-skills-and-learning.md",
+      "bytes": 10095,
+      "sha256": "56cf43322e4dbb9e47c06ddb8ae78c61d9848062fb9afda8abd1be640a14e31c"
+    },
+    {
+      "path": "docs/03-subsystem-specs/013-config-reuse-and-developer-environment.md",
+      "bytes": 11083,
+      "sha256": "7c6b97eb5eec77518f0478ef4ce8b074b2b37319687f836a87d35d6b786271c1"
+    },
+    {
+      "path": "docs/04-implementation-stages/BACKLOG-AND-DEFERRED-SCOPE.md",
+      "bytes": 6550,
+      "sha256": "8a210675b334c813fac54646bcfe339924fb26ac5ce6c19a836d9b1ead4dbdf7"
+    },
+    {
+      "path": "docs/04-implementation-stages/ROADMAP.md",
+      "bytes": 7378,
+      "sha256": "7c5467c557292b2db2d01d0f11d063678f3217f1cfbfd69dbfd097ce77307e40"
+    },
+    {
+      "path": "docs/04-implementation-stages/stage-01-bootstrap-and-probes.md",
+      "bytes": 11182,
+      "sha256": "e09cc165fed7a749e71c03803bd24906efa7e3af473b5e1678a1ce81f99a3734"
+    },
+    {
+      "path": "docs/04-implementation-stages/stage-02-onboarding-and-workspaces.md",
+      "bytes": 8888,
+      "sha256": "b386fd7e4da7fd1864152b04b8f92ca6c34b02cf81eb3237c6db94d07fff3949"
+    },
+    {
+      "path": "docs/04-implementation-stages/stage-03-native-agent-and-durability.md",
+      "bytes": 9556,
+      "sha256": "a3051bf76088cd9bf2982e1975acfae2ec9aa57e46888158536c0ae456930e04"
+    },
+    {
+      "path": "docs/04-implementation-stages/stage-04-focus-vertical-slice.md",
+      "bytes": 8986,
+      "sha256": "c2f710953985dc6843a49d44171d5f3c8702ba8865dff22e01a0bb210350729b"
+    },
+    {
+      "path": "docs/04-implementation-stages/stage-05-context-and-recovery-hardening.md",
+      "bytes": 8404,
+      "sha256": "664b99120618d953e32df614ccdf1664e3ec45a9211e7aa7c97ca59e6d02dc5c"
+    },
+    {
+      "path": "docs/04-implementation-stages/stage-06-collaboration-and-content.md",
+      "bytes": 8360,
+      "sha256": "f5157c90465f75fd80f99c954f28e1d18cf04ce637cccd5cece70bb3cecd72a8"
+    },
+    {
+      "path": "docs/04-implementation-stages/stage-07-maps-and-structured-import.md",
+      "bytes": 8500,
+      "sha256": "f21c55911d3eb4cb87a14e3f102f45e4b3e48b324efb4280348cb694a468d326"
+    },
+    {
+      "path": "docs/04-implementation-stages/stage-08-packaging-and-pilot.md",
+      "bytes": 9356,
+      "sha256": "a058eb17fb8543b8c24cb998a455c4794cef7849a21b9c7e861317c44bbbdb4c"
+    },
+    {
+      "path": "docs/05-verification/EVALUATION-MATRIX.md",
+      "bytes": 12113,
+      "sha256": "e6178a071381f12f2be7b55b36419aee84d2007b3efbb0ddb88811db06100093"
+    },
+    {
+      "path": "docs/05-verification/PLANNING-PACKAGE-QUALITY-REVIEW.md",
+      "bytes": 11403,
+      "sha256": "acb821bf02ec428c2ced79403400ca8aa77c772b296e5ac823a04bda619f3570"
+    },
+    {
+      "path": "docs/05-verification/PROJECT-LAYOUT-REVIEW.md",
+      "bytes": 3859,
+      "sha256": "7a6186c0dab5bfe71916bfed6d2c29d56163183d687ad790032b976bc2543ac3"
+    },
+    {
+      "path": "docs/05-verification/REQUIREMENTS-ACCEPTANCE-MATRIX.md",
+      "bytes": 21981,
+      "sha256": "8e0385d184356dd04c80ac81052e21ec50af78d2be979af0582e42fc15787579"
+    },
+    {
+      "path": "docs/05-verification/RISKS-DECISIONS-AND-OPEN-QUESTIONS.md",
+      "bytes": 13192,
+      "sha256": "dae8f280185a2dbf36ffa578737e14b3db3d062d4c0c891f529eafe322224c9b"
+    },
+    {
+      "path": "docs/05-verification/TEST-STRATEGY.md",
+      "bytes": 21525,
+      "sha256": "babd789ef7088bcd557b6f83289770f2c3fdd938b03c50d74370551efedd616c"
+    },
+    {
+      "path": "docs/05-verification/acceptance-matrix.json",
+      "bytes": 37591,
+      "sha256": "307fcc3253d3dcb278d9fb45967a49dce0ffffe53ca50ae72c27a9bbac08cee4"
+    },
+    {
+      "path": "docs/05-verification/starter-config-and-skills-checks.json",
+      "bytes": 9140,
+      "sha256": "406786d4c2d334b21e6712a2a8dfd94c5fa1ad381052cde4137b2cac083db4ba"
+    },
+    {
+      "path": "docs/05-verification/test-catalog.json",
+      "bytes": 18429,
+      "sha256": "ed1e2343744c677bf2114c7cbc2b7198e25497560872160e03df4d5735246c99"
+    },
+    {
+      "path": "docs/05-verification/validator-negative-fixtures.json",
+      "bytes": 3638,
+      "sha256": "212169e8f9af5a95c8c73a82b0d3ba0e139c32f52dc76f55bb777dca3c2eb842"
+    },
+    {
+      "path": "docs/06-agent-handoffs/AGENT-WORKFLOW-AND-REVIEW-RULES.md",
+      "bytes": 6237,
+      "sha256": "c5f8807916648f44abbb961d1b16fc62c74c31fe08fadd6c86dc2b8f48d2837d"
+    },
+    {
+      "path": "docs/06-agent-handoffs/CLAUDE-CODE-START-STAGE-01.md",
+      "bytes": 6847,
+      "sha256": "a57587d5e978695bb55e15528271b82a7bf4a09c52a71a5ba9796c04a54b81d1"
+    },
+    {
+      "path": "docs/06-agent-handoffs/IMPLEMENTATION_MASTER_GOAL.md",
+      "bytes": 4848,
+      "sha256": "334c6f1e88e95ea8b7e18483abd7824dda67740cd2d7bb9555ba8a03aaf13c4b"
+    },
+    {
+      "path": "docs/06-agent-handoffs/STAGE-HANDOFF-TEMPLATE.md",
+      "bytes": 4568,
+      "sha256": "9ee744289302f219745c004992c322003b6ab20e9c422739e52f6cf1b36e21cc"
+    },
+    {
+      "path": "docs/06-agent-handoffs/START-STAGE-01.md",
+      "bytes": 4776,
+      "sha256": "ccc9127673391d7d4631f918f0d7c78a956464d5cc66c84db8340867c4c129d8"
+    },
+    {
+      "path": "docs/07-developer-workflow/CONFIG-FIELD-MAP.csv",
+      "bytes": 119368,
+      "sha256": "db56aadc3151e3e62d51e9fa5c91b5b13a8abf3e741854eb040e7f829a1f8721"
+    },
+    {
+      "path": "docs/07-developer-workflow/CONFIG-MIGRATION-REPORT.md",
+      "bytes": 13070,
+      "sha256": "5718abe0465f88414ac71554668b67652bbda43e8a81fc70f0b3c64b0d8b6215"
+    },
+    {
+      "path": "docs/07-developer-workflow/CONFIG-SOURCE-INVENTORY.json",
+      "bytes": 20234,
+      "sha256": "7b254893d48c0680f3a21410dd02d40df83cbb7306cf8b50128ccadd15986c27"
+    },
+    {
+      "path": "docs/07-developer-workflow/ENVIRONMENT-BOOTSTRAP-AND-CHECKS.md",
+      "bytes": 10070,
+      "sha256": "02c466deb00ec17188c12c5e0e1ed89889ce52e54b1bfa1fcac0e3c86037280d"
+    },
+    {
+      "path": "docs/07-developer-workflow/KNOWLEDGE-CHANGELOG.md",
+      "bytes": 2307,
+      "sha256": "0ee5806f6c4b4d7d4502ed1619d5c2bc5edbaa423bff552387e34a06eb703423"
+    },
+    {
+      "path": "docs/07-developer-workflow/REUSABLE-KNOWLEDGE-POLICY.md",
+      "bytes": 7095,
+      "sha256": "25f6805b811c9bcb7c7adb618e401d88d4f5e9fd49ad4bba40ff96209fb7083e"
+    },
+    {
+      "path": "docs/07-developer-workflow/SKILLS-AND-INSTRUCTION-MAP.md",
+      "bytes": 7421,
+      "sha256": "8ddaada825466d0f0dfc9c95892878ebe2f6d67dbe9f1f7c7796ffc898c491fd"
+    },
+    {
+      "path": "docs/07-developer-workflow/skill-hashes.json",
+      "bytes": 4929,
+      "sha256": "75701fef95e76bb6736077ece2a702d9676b457ccba5b25b626985208c45a06e"
+    },
+    {
+      "path": "docs/07-developer-workflow/skill-trigger-fixtures.json",
+      "bytes": 4742,
+      "sha256": "e0874c2a314563e6da35351ed57c10e1d70ea02a7ca89e0a007cad7f1829aeee"
+    },
+    {
+      "path": "docs/07-developer-workflow/skill-workflows/audit-hoi4-integrations/BODY.md",
+      "bytes": 3614,
+      "sha256": "7a783f998538920f16b938241c863c46fbbd39456231499020a6ea9b2e5421ff"
+    },
+    {
+      "path": "docs/07-developer-workflow/skill-workflows/capture-engineering-lessons/BODY.md",
+      "bytes": 3566,
+      "sha256": "9e268bb0c2a1ac6234851e29c29a69897e7ecddeeec811068d038405d7d4e884"
+    },
+    {
+      "path": "docs/07-developer-workflow/skill-workflows/start-implementation-stage/BODY.md",
+      "bytes": 3780,
+      "sha256": "dd36cb0b2c0766da8addb0bb8b21faca6e2721596a4f1a585d32440d44ef9ea2"
+    },
+    {
+      "path": "docs/07-developer-workflow/skill-workflows/validate-stage/BODY.md",
+      "bytes": 3580,
+      "sha256": "c3ad723ca921810de37b50f431b4f98cc496fbebde8aecca885b1e72f0dec775"
+    },
+    {
+      "path": "docs/07-developer-workflow/skills.json",
+      "bytes": 1424,
+      "sha256": "6e8d22f11bc3220e9110639f25c7375d90605a0c1eeea32f64bfb42a7656eeed"
+    },
+    {
+      "path": "docs/MANIFEST.md",
+      "bytes": 15601,
+      "sha256": "4d3c32ef73dd68d8ee6f7ffdc4d32f4cb1cdbc55bcacc4d28b4fac2ac8c5aa70"
+    },
+    {
+      "path": "docs/MASTER_GOAL.md",
+      "bytes": 8808,
+      "sha256": "bd2c045b1bf184bfb9fa1140d95d678320e39ee996d780f13fcd1f5e5b187cb5"
+    },
+    {
+      "path": "docs/PACKAGE_STATUS.md",
+      "bytes": 5967,
+      "sha256": "d73dc15f1db550f129235a29a250b39f2827b13cb8e94e6edbee8e1a3a946716"
+    },
+    {
+      "path": "docs/README.md",
+      "bytes": 6902,
+      "sha256": "4caf406cac5083fa8a57e3f60476c1edca8a0fd1641736144ee59a0036a8720a"
+    },
+    {
+      "path": "scripts/sync_skills.py",
+      "bytes": 6693,
+      "sha256": "db88a97b147290dbb05cc66df37a20baaf2c6f69594ac415d632a701f53115e8"
+    },
+    {
+      "path": "scripts/validate_package.py",
+      "bytes": 28403,
+      "sha256": "adc5bd4d2187c4051d1ecdb333035a5a717308ff66d493670b1ed0b9fc08bd4d"
+    }
+  ]
+}

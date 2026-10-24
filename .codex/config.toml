@@ -1,0 +1,25 @@
+# Project-scoped planning starter, reviewed 2026-10-23.
+# Derived from Agentic-HOI4-Modding commit 856940f2a629e0e2f3e03fc484cb0c0309c96734.
+# See docs/07-developer-workflow/CONFIG-MIGRATION-REPORT.md before adoption.
+# This is an instruction byte ceiling, not a model context window.
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+project_doc_max_bytes = 184320
+
+[agents]
+# Current canonical key. The source legacy max_threads value was 24.
+max_concurrent_threads_per_session = 4
+# Source max_depth is V1-only and ignored by V2, so it is not a starter guarantee.
+
+[mcp_servers.hoi4_agent_tools]
+enabled = false
+command = "hoi4-agent-tools.cmd"
+cwd = "."
+startup_timeout_sec = 120
+tool_timeout_sec = 600
+default_tools_approval_mode = "prompt"
+env = { HOI4_AGENT_STDIO_IDLE_EXIT_MINUTES = "30" }
+
+[mcp_servers.comfy_cloud_portraits]
+enabled = false
+url = "https://cloud.comfy.org/mcp"

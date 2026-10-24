@@ -1,0 +1,1179 @@
+{
+  "schema_version": "1.0.0",
+  "audit_date": "2026-10-23",
+  "scope": "Pinned root AGENTS.md, CLAUDE.md and CONTRIBUTING.md for Beacon, Entire and MFS, plus absence verification for agentglass",
+  "evidence_policy": {
+    "guidance_presence_and_contents": "Verified by retrieved pinned text and git tree inspection",
+    "runtime_behavior": "Unexecuted in this audit. Behavioral statements are guidance declarations unless separately supported by the parent's earlier source audit",
+    "license_scope": "No new license audit. This supplements existing SRC-R01 to SRC-R04 evidence",
+    "secondary_references": "Linked subsystem references are recorded as future read prerequisites, not claimed fully read here"
+  },
+  "repository_commands_executed": [],
+  "completed_read_chunk_ids": [
+    "G01",
+    "G02",
+    "G03",
+    "G04",
+    "G05",
+    "G06",
+    "G07",
+    "G08",
+    "G09",
+    "G10",
+    "G11",
+    "G12",
+    "G13",
+    "G14",
+    "G15",
+    "G16"
+  ],
+  "files": [
+    {
+      "repository": "Asymptote-Labs/agent-beacon",
+      "revision": "cfbd7b1d721664e3b1b5ca2fca5eac4327532c07",
+      "repository_path": "AGENTS.md",
+      "source_url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/AGENTS.md",
+      "git_mode": "100644",
+      "git_blob_sha1": "b98c4465ced22106d3aa852ea8df59513a5cbf8f",
+      "repository_blob_bytes": 2463,
+      "blob_url": "https://api.github.com/repos/Asymptote-Labs/agent-beacon/git/blobs/b98c4465ced22106d3aa852ea8df59513a5cbf8f",
+      "symlink_target": null,
+      "retrieved_body_bytes": 2463,
+      "retrieved_body_sha256": "e500769c965bbd7bda4fa6f87fc7953f8a7c30a4f08631fbaaea879ad70b95d9",
+      "retrieved_body_line_count": 57,
+      "read_chunks": [
+        {
+          "id": "G01",
+          "path": "research/root-guidance/beacon/AGENTS.md",
+          "first_line": 1,
+          "last_line": 57,
+          "characters": 2463,
+          "completed": true,
+          "output_truncated": false
+        }
+      ],
+      "fully_read": true,
+      "cache_representation": "Exact regular repository file bytes",
+      "repository_blob_sha256": "e500769c965bbd7bda4fa6f87fc7953f8a7c30a4f08631fbaaea879ad70b95d9",
+      "computed_git_blob_sha1": "b98c4465ced22106d3aa852ea8df59513a5cbf8f",
+      "repository_blob_identity_verified": true
+    },
+    {
+      "repository": "Asymptote-Labs/agent-beacon",
+      "revision": "cfbd7b1d721664e3b1b5ca2fca5eac4327532c07",
+      "repository_path": "CLAUDE.md",
+      "source_url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CLAUDE.md",
+      "git_mode": "100644",
+      "git_blob_sha1": "63cfaf4747447f180c687efb5529ed9547af75fe",
+      "repository_blob_bytes": 87796,
+      "blob_url": "https://api.github.com/repos/Asymptote-Labs/agent-beacon/git/blobs/63cfaf4747447f180c687efb5529ed9547af75fe",
+      "symlink_target": null,
+      "retrieved_body_bytes": 87796,
+      "retrieved_body_sha256": "6b9d7bb8908a86ab27048e2d0b6b21a1632001848798c4d44ede7b84eb7944db",
+      "retrieved_body_line_count": 600,
+      "read_chunks": [
+        {
+          "id": "G02",
+          "path": "research/root-guidance/beacon/CLAUDE.md",
+          "first_line": 1,
+          "last_line": 31,
+          "characters": 13646,
+          "completed": true,
+          "output_truncated": false
+        },
+        {
+          "id": "G03",
+          "path": "research/root-guidance/beacon/CLAUDE.md",
+          "first_line": 32,
+          "last_line": 56,
+          "characters": 12641,
+          "completed": true,
+          "output_truncated": false
+        },
+        {
+          "id": "G04",
+          "path": "research/root-guidance/beacon/CLAUDE.md",
+          "first_line": 57,
+          "last_line": 72,
+          "characters": 13539,
+          "completed": true,
+          "output_truncated": false
+        },
+        {
+          "id": "G05",
+          "path": "research/root-guidance/beacon/CLAUDE.md",
+          "first_line": 73,
+          "last_line": 138,
+          "characters": 13969,
+          "completed": true,
+          "output_truncated": false
+        },
+        {
+          "id": "G06",
+          "path": "research/root-guidance/beacon/CLAUDE.md",
+          "first_line": 139,
+          "last_line": 443,
+          "characters": 13938,
+          "completed": true,
+          "output_truncated": false
+        },
+        {
+          "id": "G07",
+          "path": "research/root-guidance/beacon/CLAUDE.md",
+          "first_line": 444,
+          "last_line": 577,
+          "characters": 12734,
+          "completed": true,
+          "output_truncated": false
+        },
+        {
+          "id": "G08",
+          "path": "research/root-guidance/beacon/CLAUDE.md",
+          "first_line": 578,
+          "last_line": 600,
+          "characters": 7313,
+          "completed": true,
+          "output_truncated": false
+        }
+      ],
+      "fully_read": true,
+      "cache_representation": "Exact regular repository file bytes",
+      "repository_blob_sha256": "6b9d7bb8908a86ab27048e2d0b6b21a1632001848798c4d44ede7b84eb7944db",
+      "computed_git_blob_sha1": "63cfaf4747447f180c687efb5529ed9547af75fe",
+      "repository_blob_identity_verified": true
+    },
+    {
+      "repository": "Asymptote-Labs/agent-beacon",
+      "revision": "cfbd7b1d721664e3b1b5ca2fca5eac4327532c07",
+      "repository_path": "CONTRIBUTING.md",
+      "source_url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CONTRIBUTING.md",
+      "git_mode": "100644",
+      "git_blob_sha1": "e352d17131c5abfcacb832ddbbee12e5767bc704",
+      "repository_blob_bytes": 10586,
+      "blob_url": "https://api.github.com/repos/Asymptote-Labs/agent-beacon/git/blobs/e352d17131c5abfcacb832ddbbee12e5767bc704",
+      "symlink_target": null,
+      "retrieved_body_bytes": 10586,
+      "retrieved_body_sha256": "fdbe7ce01d894870f6b1ddfa29e589b89efb2a0dc95d47d6dd0a7aeeeceec6d1",
+      "retrieved_body_line_count": 262,
+      "read_chunks": [
+        {
+          "id": "G09",
+          "path": "research/root-guidance/beacon/CONTRIBUTING.md",
+          "first_line": 1,
+          "last_line": 262,
+          "characters": 10582,
+          "completed": true,
+          "output_truncated": false
+        }
+      ],
+      "fully_read": true,
+      "cache_representation": "Exact regular repository file bytes",
+      "repository_blob_sha256": "fdbe7ce01d894870f6b1ddfa29e589b89efb2a0dc95d47d6dd0a7aeeeceec6d1",
+      "computed_git_blob_sha1": "e352d17131c5abfcacb832ddbbee12e5767bc704",
+      "repository_blob_identity_verified": true
+    },
+    {
+      "repository": "entireio/cli",
+      "revision": "ee57ff55142e5078b625dd963fc398d49a8ddda1",
+      "repository_path": "AGENTS.md",
+      "source_url": "https://github.com/entireio/cli/blob/ee57ff55142e5078b625dd963fc398d49a8ddda1/AGENTS.md",
+      "git_mode": "120000",
+      "git_blob_sha1": "681311eb9cf453d0faddf3aacaec7357e97ba8e9",
+      "repository_blob_bytes": 9,
+      "blob_url": "https://api.github.com/repos/entireio/cli/git/blobs/681311eb9cf453d0faddf3aacaec7357e97ba8e9",
+      "symlink_target": "CLAUDE.md",
+      "retrieved_body_bytes": 13485,
+      "retrieved_body_sha256": "669ce309073b12d7ed3d10072c7734537f5d19615ff2cd57257107be362f509f",
+      "retrieved_body_line_count": 206,
+      "read_chunks": [
+        {
+          "id": "G10",
+          "path": "research/root-guidance/entire/AGENTS.md",
+          "first_line": 1,
+          "last_line": 206,
+          "characters": 13479,
+          "completed": true,
+          "output_truncated": false
+        }
+      ],
+      "fully_read": true,
+      "cache_representation": "Resolved target guidance text in a regular local file",
+      "resolved_target_cached_body_matches": true,
+      "repository_blob_sha256": "6ebdb617a8104a7756d0cf36578ab01103dc9f07e4dc6feb751296b9c402faf7",
+      "computed_git_blob_sha1": "681311eb9cf453d0faddf3aacaec7357e97ba8e9",
+      "repository_blob_identity_verified": true
+    },
+    {
+      "repository": "entireio/cli",
+      "revision": "ee57ff55142e5078b625dd963fc398d49a8ddda1",
+      "repository_path": "CLAUDE.md",
+      "source_url": "https://github.com/entireio/cli/blob/ee57ff55142e5078b625dd963fc398d49a8ddda1/CLAUDE.md",
+      "git_mode": "100644",
+      "git_blob_sha1": "02994909fa36d9d5bce62f39bbb640bbe442f120",
+      "repository_blob_bytes": 13485,
+      "blob_url": "https://api.github.com/repos/entireio/cli/git/blobs/02994909fa36d9d5bce62f39bbb640bbe442f120",
+      "symlink_target": null,
+      "retrieved_body_bytes": 13485,
+      "retrieved_body_sha256": "669ce309073b12d7ed3d10072c7734537f5d19615ff2cd57257107be362f509f",
+      "retrieved_body_line_count": 206,
+      "read_chunks": [
+        {
+          "id": "G11",
+          "path": "research/root-guidance/entire/CLAUDE.md",
+          "first_line": 1,
+          "last_line": 206,
+          "characters": 13479,
+          "completed": true,
+          "output_truncated": false
+        }
+      ],
+      "fully_read": true,
+      "cache_representation": "Exact regular repository file bytes",
+      "repository_blob_sha256": "669ce309073b12d7ed3d10072c7734537f5d19615ff2cd57257107be362f509f",
+      "computed_git_blob_sha1": "02994909fa36d9d5bce62f39bbb640bbe442f120",
+      "repository_blob_identity_verified": true
+    },
+    {
+      "repository": "entireio/cli",
+      "revision": "ee57ff55142e5078b625dd963fc398d49a8ddda1",
+      "repository_path": "CONTRIBUTING.md",
+      "source_url": "https://github.com/entireio/cli/blob/ee57ff55142e5078b625dd963fc398d49a8ddda1/CONTRIBUTING.md",
+      "git_mode": "100644",
+      "git_blob_sha1": "cb266bb59e2243e445cadfc5b66fafe567b383d5",
+      "repository_blob_bytes": 13097,
+      "blob_url": "https://api.github.com/repos/entireio/cli/git/blobs/cb266bb59e2243e445cadfc5b66fafe567b383d5",
+      "symlink_target": null,
+      "retrieved_body_bytes": 13097,
+      "retrieved_body_sha256": "a69fdbb26178472524342dbeb7b9746807cab70f6f75bcdf84dfdbc02fb086de",
+      "retrieved_body_line_count": 354,
+      "read_chunks": [
+        {
+          "id": "G12",
+          "path": "research/root-guidance/entire/CONTRIBUTING.md",
+          "first_line": 1,
+          "last_line": 354,
+          "characters": 13097,
+          "completed": true,
+          "output_truncated": false
+        }
+      ],
+      "fully_read": true,
+      "cache_representation": "Exact regular repository file bytes",
+      "repository_blob_sha256": "a69fdbb26178472524342dbeb7b9746807cab70f6f75bcdf84dfdbc02fb086de",
+      "computed_git_blob_sha1": "cb266bb59e2243e445cadfc5b66fafe567b383d5",
+      "repository_blob_identity_verified": true
+    },
+    {
+      "repository": "zilliztech/mfs",
+      "revision": "78352894a0a826ee24db852411bf9a3c49884922",
+      "repository_path": "AGENTS.md",
+      "source_url": "https://github.com/zilliztech/mfs/blob/78352894a0a826ee24db852411bf9a3c49884922/AGENTS.md",
+      "git_mode": "120000",
+      "git_blob_sha1": "681311eb9cf453d0faddf3aacaec7357e97ba8e9",
+      "repository_blob_bytes": 9,
+      "blob_url": "https://api.github.com/repos/zilliztech/mfs/git/blobs/681311eb9cf453d0faddf3aacaec7357e97ba8e9",
+      "symlink_target": "CLAUDE.md",
+      "retrieved_body_bytes": 7020,
+      "retrieved_body_sha256": "36752ae1b448ecd687cdd94d35620b9c2ad17a8c059c3758c4cd4553c0ae1117",
+      "retrieved_body_line_count": 129,
+      "read_chunks": [
+        {
+          "id": "G13",
+          "path": "research/root-guidance/mfs/AGENTS.md",
+          "first_line": 1,
+          "last_line": 129,
+          "characters": 6966,
+          "completed": true,
+          "output_truncated": false
+        }
+      ],
+      "fully_read": true,
+      "cache_representation": "Resolved target guidance text in a regular local file",
+      "resolved_target_cached_body_matches": true,
+      "repository_blob_sha256": "6ebdb617a8104a7756d0cf36578ab01103dc9f07e4dc6feb751296b9c402faf7",
+      "computed_git_blob_sha1": "681311eb9cf453d0faddf3aacaec7357e97ba8e9",
+      "repository_blob_identity_verified": true
+    },
+    {
+      "repository": "zilliztech/mfs",
+      "revision": "78352894a0a826ee24db852411bf9a3c49884922",
+      "repository_path": "CLAUDE.md",
+      "source_url": "https://github.com/zilliztech/mfs/blob/78352894a0a826ee24db852411bf9a3c49884922/CLAUDE.md",
+      "git_mode": "100644",
+      "git_blob_sha1": "5b7311bafe0d45fc6aac4a4f9ba4b49052da4b0b",
+      "repository_blob_bytes": 7020,
+      "blob_url": "https://api.github.com/repos/zilliztech/mfs/git/blobs/5b7311bafe0d45fc6aac4a4f9ba4b49052da4b0b",
+      "symlink_target": null,
+      "retrieved_body_bytes": 7020,
+      "retrieved_body_sha256": "36752ae1b448ecd687cdd94d35620b9c2ad17a8c059c3758c4cd4553c0ae1117",
+      "retrieved_body_line_count": 129,
+      "read_chunks": [
+        {
+          "id": "G14",
+          "path": "research/root-guidance/mfs/CLAUDE.md",
+          "first_line": 1,
+          "last_line": 129,
+          "characters": 6966,
+          "completed": true,
+          "output_truncated": false
+        }
+      ],
+      "fully_read": true,
+      "cache_representation": "Exact regular repository file bytes",
+      "repository_blob_sha256": "36752ae1b448ecd687cdd94d35620b9c2ad17a8c059c3758c4cd4553c0ae1117",
+      "computed_git_blob_sha1": "5b7311bafe0d45fc6aac4a4f9ba4b49052da4b0b",
+      "repository_blob_identity_verified": true
+    },
+    {
+      "repository": "zilliztech/mfs",
+      "revision": "78352894a0a826ee24db852411bf9a3c49884922",
+      "repository_path": "CONTRIBUTING.md",
+      "source_url": "https://github.com/zilliztech/mfs/blob/78352894a0a826ee24db852411bf9a3c49884922/CONTRIBUTING.md",
+      "git_mode": "100644",
+      "git_blob_sha1": "6614bab21af6a365ed1c9dd0b8b664306b42711b",
+      "repository_blob_bytes": 16897,
+      "blob_url": "https://api.github.com/repos/zilliztech/mfs/git/blobs/6614bab21af6a365ed1c9dd0b8b664306b42711b",
+      "symlink_target": null,
+      "retrieved_body_bytes": 16897,
+      "retrieved_body_sha256": "c5cba003d749501edb510019525fcefd2a843eb4521497e0aef68ed76711c39a",
+      "retrieved_body_line_count": 382,
+      "read_chunks": [
+        {
+          "id": "G15",
+          "path": "research/root-guidance/mfs/CONTRIBUTING.md",
+          "first_line": 1,
+          "last_line": 317,
+          "characters": 13965,
+          "completed": true,
+          "output_truncated": false
+        },
+        {
+          "id": "G16",
+          "path": "research/root-guidance/mfs/CONTRIBUTING.md",
+          "first_line": 318,
+          "last_line": 382,
+          "characters": 2744,
+          "completed": true,
+          "output_truncated": false
+        }
+      ],
+      "fully_read": true,
+      "cache_representation": "Exact regular repository file bytes",
+      "repository_blob_sha256": "c5cba003d749501edb510019525fcefd2a843eb4521497e0aef68ed76711c39a",
+      "computed_git_blob_sha1": "6614bab21af6a365ed1c9dd0b8b664306b42711b",
+      "repository_blob_identity_verified": true
+    }
+  ],
+  "repositories": [
+    {
+      "repository": "Asymptote-Labs/agent-beacon",
+      "revision": "cfbd7b1d721664e3b1b5ca2fca5eac4327532c07",
+      "extends_evidence_id": "SRC-R01",
+      "key": "beacon",
+      "guidance_constraints": [
+        {
+          "id": "GUID-R01-01",
+          "title": "Telemetry scope and explicit network exceptions",
+          "status": "Verified guidance content, runtime behavior unexecuted",
+          "statement": "Normal hook execution must remain local and avoid network calls. The interactive installation wizard nevertheless requires account sign-in and can enable explicitly confirmed cloud forwarding. Signing in alone does not forward telemetry.",
+          "reuse_boundary": "Reuse provenance and review invariants. Do not import Beacon onboarding, account requirements, forwarding or external-harness launch behavior into the independent HOI4 runtime.",
+          "sources": [
+            {
+              "path": "CLAUDE.md",
+              "first_line": 26,
+              "last_line": 39,
+              "url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CLAUDE.md#L26-L39"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "first_line": 7,
+              "last_line": 10,
+              "url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CONTRIBUTING.md#L7-L10"
+            }
+          ]
+        },
+        {
+          "id": "GUID-R01-02",
+          "title": "Privacy and credential boundaries",
+          "status": "Verified guidance content, runtime behavior unexecuted",
+          "statement": "Guidance separates account and device credentials, limits where each can be stored, requires sanitization and field classification, and requires explicit sharing choices. The browser collector retains full content by default and has narrow site scope.",
+          "reuse_boundary": "Telemetry retention is not project canon. Design the factory's own minimal retention and outbound-data grants. A local-first description does not prove that every optional workflow stays offline.",
+          "sources": [
+            {
+              "path": "CLAUDE.md",
+              "first_line": 30,
+              "last_line": 33,
+              "url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CLAUDE.md#L30-L33"
+            },
+            {
+              "path": "CLAUDE.md",
+              "first_line": 63,
+              "last_line": 66,
+              "url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CLAUDE.md#L63-L66"
+            },
+            {
+              "path": "CLAUDE.md",
+              "first_line": 73,
+              "last_line": 75,
+              "url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CLAUDE.md#L73-L75"
+            },
+            {
+              "path": "CLAUDE.md",
+              "first_line": 576,
+              "last_line": 580,
+              "url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CLAUDE.md#L576-L580"
+            }
+          ]
+        },
+        {
+          "id": "GUID-R01-03",
+          "title": "Observed evidence and stable identities",
+          "status": "Verified guidance content, runtime behavior unexecuted",
+          "statement": "Collection method and observed-versus-inferred fidelity are distinct markers. Runtime events, tool-call IDs and prompt IDs must retain source provenance. Deterministic event-ID derivation is a compatibility contract. Missing approval signals must not become observed approvals.",
+          "reuse_boundary": "Adapt the evidence distinctions and stable identity tests. Do not use telemetry-derived attribution as authorization or proof that a mod mutation settled.",
+          "sources": [
+            {
+              "path": "CLAUDE.md",
+              "first_line": 45,
+              "last_line": 56,
+              "url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CLAUDE.md#L45-L56"
+            },
+            {
+              "path": "CLAUDE.md",
+              "first_line": 571,
+              "last_line": 574,
+              "url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CLAUDE.md#L571-L574"
+            }
+          ]
+        },
+        {
+          "id": "GUID-R01-04",
+          "title": "Cost provenance",
+          "status": "Verified guidance content, runtime behavior unexecuted",
+          "statement": "Reported costs stay separate from catalog estimates. Pricing is computed offline for reports, ambiguous models remain unpriced, and catalog or override provenance is retained.",
+          "reuse_boundary": "Use unknown-versus-estimated-versus-reported accounting. Do not copy Beacon's price catalog or claim actual billed costs from local estimates.",
+          "sources": [
+            {
+              "path": "CLAUDE.md",
+              "first_line": 70,
+              "last_line": 70,
+              "url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CLAUDE.md#L70-L70"
+            },
+            {
+              "path": "CLAUDE.md",
+              "first_line": 574,
+              "last_line": 575,
+              "url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CLAUDE.md#L574-L575"
+            }
+          ]
+        },
+        {
+          "id": "GUID-R01-05",
+          "title": "Derived history and readonly views",
+          "status": "Verified guidance content, runtime behavior unexecuted",
+          "statement": "The local dashboard is read-only. Optional history must answer like the JSONL source scan, with derivation-version changes rebuilding projections. Handoff markers are observed claims rather than verified identity.",
+          "reuse_boundary": "Supports rebuilding indexes from authoritative source. The history database and session handoff cannot replace factory grants, canon ownership or mutation receipts.",
+          "sources": [
+            {
+              "path": "CLAUDE.md",
+              "first_line": 72,
+              "last_line": 72,
+              "url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CLAUDE.md#L72-L72"
+            },
+            {
+              "path": "CLAUDE.md",
+              "first_line": 577,
+              "last_line": 579,
+              "url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CLAUDE.md#L577-L579"
+            }
+          ]
+        },
+        {
+          "id": "GUID-R01-06",
+          "title": "Security limits are explicit",
+          "status": "Verified guidance content, runtime behavior unexecuted",
+          "statement": "Lens guidance says browser sandbox and CSP hardening do not make trace exfiltration impossible. The optional hook policy seam is off by default and fails open on errors.",
+          "reuse_boundary": "Neither a lens sandbox nor the Beacon policy seam is an adequate authoritative enforcement boundary for factory writes or untrusted executable extensions.",
+          "sources": [
+            {
+              "path": "CLAUDE.md",
+              "first_line": 18,
+              "last_line": 18,
+              "url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CLAUDE.md#L18-L18"
+            },
+            {
+              "path": "CLAUDE.md",
+              "first_line": 76,
+              "last_line": 76,
+              "url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CLAUDE.md#L76-L76"
+            }
+          ]
+        },
+        {
+          "id": "GUID-R01-07",
+          "title": "Canonical generated mirrors",
+          "status": "Verified guidance content, runtime behavior unexecuted",
+          "statement": "Agent skills, embedded runtime plugins, shared serializers, rule baselines and lens examples have canonical sources and equality tests. A changed command requires corresponding skill changes.",
+          "reuse_boundary": "Adapt canonical-source plus generated-mirror checks. Do not copy the complete upstream role or command inventory into factory instructions.",
+          "sources": [
+            {
+              "path": "CLAUDE.md",
+              "first_line": 15,
+              "last_line": 18,
+              "url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CLAUDE.md#L15-L18"
+            },
+            {
+              "path": "CLAUDE.md",
+              "first_line": 142,
+              "last_line": 165,
+              "url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CLAUDE.md#L142-L165"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "first_line": 164,
+              "last_line": 171,
+              "url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CONTRIBUTING.md#L164-L171"
+            }
+          ]
+        },
+        {
+          "id": "GUID-R01-08",
+          "title": "Verification and platform claims",
+          "status": "Verified guidance content, runtime behavior unexecuted",
+          "statement": "Go, npm and bun components have separate checks. The CLI test path requires building real embedded hooks first. Paid real-Claude verification requires the sandbox manual, is Linux-only and is distinct from hermetic tests. Guidance forbids claiming unsupported platforms as tested.",
+          "reuse_boundary": "Any later reuse probe must isolate local settings and record the exact module/platform. No repository command, paid sandbox, service installation or test was run in this audit.",
+          "sources": [
+            {
+              "path": "AGENTS.md",
+              "first_line": 7,
+              "last_line": 57,
+              "url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/AGENTS.md#L7-L57"
+            },
+            {
+              "path": "CLAUDE.md",
+              "first_line": 84,
+              "last_line": 94,
+              "url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CLAUDE.md#L84-L94"
+            },
+            {
+              "path": "CLAUDE.md",
+              "first_line": 564,
+              "last_line": 568,
+              "url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CLAUDE.md#L564-L568"
+            },
+            {
+              "path": "CLAUDE.md",
+              "first_line": 583,
+              "last_line": 600,
+              "url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CLAUDE.md#L583-L600"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "first_line": 173,
+              "last_line": 193,
+              "url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CONTRIBUTING.md#L173-L193"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "first_line": 224,
+              "last_line": 227,
+              "url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CONTRIBUTING.md#L224-L227"
+            }
+          ]
+        },
+        {
+          "id": "GUID-R01-09",
+          "title": "Release and contribution boundaries",
+          "status": "Verified guidance content, runtime behavior unexecuted",
+          "statement": "Guidance requires focused changes, explicit validation limits, pinned release actions, separation of untrusted PR code from signing, exact released-byte verification and maintainer approval before replacing a published tag.",
+          "reuse_boundary": "These are upstream contribution and release rules, not authority to publish, modify global settings or contact maintainers during factory planning.",
+          "sources": [
+            {
+              "path": "CLAUDE.md",
+              "first_line": 261,
+              "last_line": 302,
+              "url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CLAUDE.md#L261-L302"
+            },
+            {
+              "path": "CLAUDE.md",
+              "first_line": 427,
+              "last_line": 430,
+              "url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CLAUDE.md#L427-L430"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "first_line": 229,
+              "last_line": 262,
+              "url": "https://github.com/Asymptote-Labs/agent-beacon/blob/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07/CONTRIBUTING.md#L229-L262"
+            }
+          ]
+        }
+      ],
+      "guidance_tensions": [
+        {
+          "description": "CONTRIBUTING.md suggests t.Setenv(\"HOME\", ...) for tests while CLAUDE.md specifies testenv.SetHome and explains that bare HOME changes do not move os.UserHomeDir on Windows.",
+          "resolution": "For future upstream tests use the platform-aware helper after inspecting the target test contract. No tests were run here.",
+          "sources": [
+            "CONTRIBUTING.md:211-219",
+            "CLAUDE.md:566-568"
+          ]
+        },
+        {
+          "description": "Short test command lists omit build-hooks-current, while CLAUDE.md says the CLI tests fail against the checked-in placeholder.",
+          "resolution": "Include the real embedded-hook build prerequisite in any future relevant test plan.",
+          "sources": [
+            "AGENTS.md:27-39",
+            "CLAUDE.md:84-94",
+            "CLAUDE.md:599-600"
+          ]
+        }
+      ]
+    },
+    {
+      "repository": "entireio/cli",
+      "revision": "ee57ff55142e5078b625dd963fc398d49a8ddda1",
+      "extends_evidence_id": "SRC-R02",
+      "key": "entire",
+      "guidance_constraints": [
+        {
+          "id": "GUID-R02-01",
+          "title": "Root guidance is a bounded router",
+          "status": "Verified guidance content, runtime behavior unexecuted",
+          "statement": "AGENTS.md is a symlink to CLAUDE.md. The root entry routes to task-specific references and has a 20 KiB budget with link checks. It should not accumulate command catalogs or subsystem histories.",
+          "reuse_boundary": "Adapt short shared guidance and targeted references. Retain the factory's portable file projections rather than introducing required symlinks.",
+          "sources": [
+            {
+              "path": "CLAUDE.md",
+              "first_line": 1,
+              "last_line": 5,
+              "url": "https://github.com/entireio/cli/blob/ee57ff55142e5078b625dd963fc398d49a8ddda1/CLAUDE.md#L1-L5"
+            },
+            {
+              "path": "CLAUDE.md",
+              "first_line": 24,
+              "last_line": 44,
+              "url": "https://github.com/entireio/cli/blob/ee57ff55142e5078b625dd963fc398d49a8ddda1/CLAUDE.md#L24-L44"
+            },
+            {
+              "path": "CLAUDE.md",
+              "first_line": 196,
+              "last_line": 206,
+              "url": "https://github.com/entireio/cli/blob/ee57ff55142e5078b625dd963fc398d49a8ddda1/CLAUDE.md#L196-L206"
+            }
+          ]
+        },
+        {
+          "id": "GUID-R02-02",
+          "title": "Checkpoint metadata is not workspace restore",
+          "status": "Verified guidance content, runtime behavior unexecuted",
+          "statement": "ManualCommitStrategy is the only strategy. Turn ends write session state and commits create checkpoint metadata refs. Guidance explicitly distinguishes log resume from restoring working files.",
+          "reuse_boundary": "Reuse checkpoint metadata, attribution and compare-and-swap patterns. Entire does not provide the factory's full worktree rollback or transactional mod restoration.",
+          "sources": [
+            {
+              "path": "CLAUDE.md",
+              "first_line": 178,
+              "last_line": 189,
+              "url": "https://github.com/entireio/cli/blob/ee57ff55142e5078b625dd963fc398d49a8ddda1/CLAUDE.md#L178-L189"
+            }
+          ]
+        },
+        {
+          "id": "GUID-R02-03",
+          "title": "Trusted roots and local settings provenance",
+          "status": "Verified guidance content, runtime behavior unexecuted",
+          "statement": "Filesystem work must use canonical anchored owners. Deriving a root from the requested target proves no confinement. Settings and readonly paths retain symlink policy. Repository-controlled settings cannot authorize executable discovery or permission-bypassed agents.",
+          "reuse_boundary": "Adapt trusted-root handles and local-provenance rejection tests. Imported mod instructions remain data and cannot grant filesystem or executable authority.",
+          "sources": [
+            {
+              "path": "CLAUDE.md",
+              "first_line": 92,
+              "last_line": 129,
+              "url": "https://github.com/entireio/cli/blob/ee57ff55142e5078b625dd963fc398d49a8ddda1/CLAUDE.md#L92-L129"
+            }
+          ]
+        },
+        {
+          "id": "GUID-R02-04",
+          "title": "Git environment and preservation",
+          "status": "Verified guidance content, runtime behavior unexecuted",
+          "statement": "Repository operations use the repository abstraction, budgeted status and no-optional-locks where required. Inherited Git selectors and temporary hook indexes need different treatment depending on the query. Guidance warns that go-git checkout/reset can lose ignored or untracked directories.",
+          "reuse_boundary": "Use isolated Git fixtures and preserve index semantics. Naming a Git operation in guidance is not authorization for destructive commands.",
+          "sources": [
+            {
+              "path": "CLAUDE.md",
+              "first_line": 131,
+              "last_line": 157,
+              "url": "https://github.com/entireio/cli/blob/ee57ff55142e5078b625dd963fc398d49a8ddda1/CLAUDE.md#L131-L157"
+            }
+          ]
+        },
+        {
+          "id": "GUID-R02-05",
+          "title": "Identity, redaction and nonvisual access",
+          "status": "Verified guidance content, runtime behavior unexecuted",
+          "statement": "Caller resolution must retain provenance and avoid newest-session guesses. Transcript handling preserves sanitization, image externalization and redaction order. Readonly workflows require complete text or JSON access. Operational logs must omit prompts, file contents and commit messages.",
+          "reuse_boundary": "Adapt identity provenance and nonvisual parity. Do not treat a session guess or imported transcript as project authority.",
+          "sources": [
+            {
+              "path": "CLAUDE.md",
+              "first_line": 159,
+              "last_line": 194,
+              "url": "https://github.com/entireio/cli/blob/ee57ff55142e5078b625dd963fc398d49a8ddda1/CLAUDE.md#L159-L194"
+            }
+          ]
+        },
+        {
+          "id": "GUID-R02-06",
+          "title": "Tests isolate real user state",
+          "status": "Verified guidance content, runtime behavior unexecuted",
+          "statement": "Tests must use temporary repositories and isolated config, caches, keyrings and spawned-process environments. Current-tree lint and the complete check task are required at commit/push boundaries. Real-agent E2E requires explicit user request because it incurs cost, with a deterministic canary as the free exception.",
+          "reuse_boundary": "A future upstream contribution needs these gates. This read-only audit executed neither the canary nor real-agent tests and made no commits or pushes.",
+          "sources": [
+            {
+              "path": "CLAUDE.md",
+              "first_line": 46,
+              "last_line": 90,
+              "url": "https://github.com/entireio/cli/blob/ee57ff55142e5078b625dd963fc398d49a8ddda1/CLAUDE.md#L46-L90"
+            }
+          ]
+        },
+        {
+          "id": "GUID-R02-07",
+          "title": "Upstream contribution and sharing expectations",
+          "status": "Verified guidance content, runtime behavior unexecuted",
+          "statement": "CONTRIBUTING asks for maintainer-aligned issues before ordinary implementation, review of automated feedback and self-review of AI changes. Its dogfooding workflow includes checkpoint trailers and optional session-branch publication.",
+          "reuse_boundary": "These expectations apply to contributing upstream. They do not authorize publishing private factory development sessions, installing Entire, opening issues or sending messages during this planning task.",
+          "sources": [
+            {
+              "path": "CONTRIBUTING.md",
+              "first_line": 11,
+              "last_line": 22,
+              "url": "https://github.com/entireio/cli/blob/ee57ff55142e5078b625dd963fc398d49a8ddda1/CONTRIBUTING.md#L11-L22"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "first_line": 235,
+              "last_line": 300,
+              "url": "https://github.com/entireio/cli/blob/ee57ff55142e5078b625dd963fc398d49a8ddda1/CONTRIBUTING.md#L235-L300"
+            }
+          ]
+        }
+      ],
+      "guidance_tensions": [
+        {
+          "description": "CONTRIBUTING describes the entire/checkpoints/v1 branch for session sharing, while CLAUDE describes the current commit-time metadata-ref contract and explicitly excludes worktree restoration.",
+          "resolution": "Treat the exact inspected implementation as authoritative for storage layout. Neither wording establishes a worktree restore API or permission to share session content.",
+          "sources": [
+            "CONTRIBUTING.md:294-300",
+            "CLAUDE.md:178-189"
+          ]
+        }
+      ]
+    },
+    {
+      "repository": "zilliztech/mfs",
+      "revision": "78352894a0a826ee24db852411bf9a3c49884922",
+      "extends_evidence_id": "SRC-R04",
+      "key": "mfs",
+      "guidance_constraints": [
+        {
+          "id": "GUID-R04-01",
+          "title": "Server owns retrieval behavior",
+          "status": "Verified guidance content, runtime behavior unexecuted",
+          "statement": "The Rust CLI is only an HTTP client. The Python FastAPI server owns connectors, ingest, vector indexing and storage. SDKs are generated from OpenAPI. The Rust acceleration wheel has a Python fallback and is optional.",
+          "reuse_boundary": "Full MFS adoption adds a service and storage boundary. Do not treat its Rust CLI as an embeddable standalone memory engine.",
+          "sources": [
+            {
+              "path": "CLAUDE.md",
+              "first_line": 5,
+              "last_line": 22,
+              "url": "https://github.com/zilliztech/mfs/blob/78352894a0a826ee24db852411bf9a3c49884922/CLAUDE.md#L5-L22"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "first_line": 18,
+              "last_line": 27,
+              "url": "https://github.com/zilliztech/mfs/blob/78352894a0a826ee24db852411bf9a3c49884922/CONTRIBUTING.md#L18-L27"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "first_line": 54,
+              "last_line": 73,
+              "url": "https://github.com/zilliztech/mfs/blob/78352894a0a826ee24db852411bf9a3c49884922/CONTRIBUTING.md#L54-L73"
+            }
+          ]
+        },
+        {
+          "id": "GUID-R04-02",
+          "title": "Thin connector contract",
+          "status": "Verified guidance content, runtime behavior unexecuted",
+          "statement": "Connectors expose path trees, read or read_records, fingerprints, sync and fixed object classification. They must not write vectors, embeddings or caches directly. New object_kind or chunk_kind values require a framework change.",
+          "reuse_boundary": "Adapt capability and change-detection contracts. A HOI4-specific adapter must preserve framework boundaries rather than bypassing them to update indexes.",
+          "sources": [
+            {
+              "path": "CLAUDE.md",
+              "first_line": 56,
+              "last_line": 68,
+              "url": "https://github.com/zilliztech/mfs/blob/78352894a0a826ee24db852411bf9a3c49884922/CLAUDE.md#L56-L68"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "first_line": 170,
+              "last_line": 241,
+              "url": "https://github.com/zilliztech/mfs/blob/78352894a0a826ee24db852411bf9a3c49884922/CONTRIBUTING.md#L170-L241"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "first_line": 287,
+              "last_line": 296,
+              "url": "https://github.com/zilliztech/mfs/blob/78352894a0a826ee24db852411bf9a3c49884922/CONTRIBUTING.md#L287-L296"
+            }
+          ]
+        },
+        {
+          "id": "GUID-R04-03",
+          "title": "Index and metadata reconciliation",
+          "status": "Verified guidance content, runtime behavior unexecuted",
+          "statement": "Guidance declares correspondence between committed object metadata and vector chunks, with a directory-summary exception. Cancellation, removal and startup cleanup must reconcile the shared embed consumer. Metadata, vectors, artifacts and transformation cache are distinct stores.",
+          "reuse_boundary": "Supports explicit reconciliation and derived-index ownership. The declared invariant is not proof of one atomic transaction across these stores or a completed correctness test.",
+          "sources": [
+            {
+              "path": "CLAUDE.md",
+              "first_line": 70,
+              "last_line": 85,
+              "url": "https://github.com/zilliztech/mfs/blob/78352894a0a826ee24db852411bf9a3c49884922/CLAUDE.md#L70-L85"
+            }
+          ]
+        },
+        {
+          "id": "GUID-R04-04",
+          "title": "Code is the configuration authority",
+          "status": "Verified guidance content, runtime behavior unexecuted",
+          "statement": "Connector implementation, wizard subset, agent skill and human documentation must agree, with code authoritative. Credentials use env or file references resolved by the framework and are not plaintext TOML values.",
+          "reuse_boundary": "Adapt code-to-guidance drift checks and secret references. Do not copy a connector's local environment or grant its source implied access to private mod content.",
+          "sources": [
+            {
+              "path": "CLAUDE.md",
+              "first_line": 87,
+              "last_line": 102,
+              "url": "https://github.com/zilliztech/mfs/blob/78352894a0a826ee24db852411bf9a3c49884922/CLAUDE.md#L87-L102"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "first_line": 298,
+              "last_line": 318,
+              "url": "https://github.com/zilliztech/mfs/blob/78352894a0a826ee24db852411bf9a3c49884922/CONTRIBUTING.md#L298-L318"
+            }
+          ]
+        },
+        {
+          "id": "GUID-R04-05",
+          "title": "Capability and deletion claims must be honest",
+          "status": "Verified guidance content, runtime behavior unexecuted",
+          "statement": "Advertised pushdown and cursor capabilities must reflect implemented behavior. Connector design must name listing cost, fingerprints, indexed fields, delete-detection tier and minimum credential scope. Search hits retain locators and stable path conventions.",
+          "reuse_boundary": "Use measured connector coverage and source freshness. Do not treat an absent search hit as proof that source content was deleted or never existed.",
+          "sources": [
+            {
+              "path": "CONTRIBUTING.md",
+              "first_line": 232,
+              "last_line": 241,
+              "url": "https://github.com/zilliztech/mfs/blob/78352894a0a826ee24db852411bf9a3c49884922/CONTRIBUTING.md#L232-L241"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "first_line": 267,
+              "last_line": 285,
+              "url": "https://github.com/zilliztech/mfs/blob/78352894a0a826ee24db852411bf9a3c49884922/CONTRIBUTING.md#L267-L285"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "first_line": 320,
+              "last_line": 340,
+              "url": "https://github.com/zilliztech/mfs/blob/78352894a0a826ee24db852411bf9a3c49884922/CONTRIBUTING.md#L320-L340"
+            }
+          ]
+        },
+        {
+          "id": "GUID-R04-06",
+          "title": "Guidance does not claim test-gated CI",
+          "status": "Verified guidance content, runtime behavior unexecuted",
+          "statement": "Python tests require the dev extra, optional connector dependencies can prevent collection, and live API tests are explicitly marked. Guidance says CI enforces formatting and does not gate tests. It separately describes a version-lockstep CI job.",
+          "reuse_boundary": "Green formatting or version checks cannot establish retrieval or cancellation correctness. No MFS tests or live connectors were executed in this audit.",
+          "sources": [
+            {
+              "path": "CLAUDE.md",
+              "first_line": 24,
+              "last_line": 49,
+              "url": "https://github.com/zilliztech/mfs/blob/78352894a0a826ee24db852411bf9a3c49884922/CLAUDE.md#L24-L49"
+            },
+            {
+              "path": "CLAUDE.md",
+              "first_line": 104,
+              "last_line": 118,
+              "url": "https://github.com/zilliztech/mfs/blob/78352894a0a826ee24db852411bf9a3c49884922/CLAUDE.md#L104-L118"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "first_line": 130,
+              "last_line": 168,
+              "url": "https://github.com/zilliztech/mfs/blob/78352894a0a826ee24db852411bf9a3c49884922/CONTRIBUTING.md#L130-L168"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "first_line": 335,
+              "last_line": 340,
+              "url": "https://github.com/zilliztech/mfs/blob/78352894a0a826ee24db852411bf9a3c49884922/CONTRIBUTING.md#L335-L340"
+            }
+          ]
+        },
+        {
+          "id": "GUID-R04-07",
+          "title": "Agent-agnostic skill surface",
+          "status": "Verified guidance content, runtime behavior unexecuted",
+          "statement": "The ingestion and search skills describe intent and the MFS CLI/API rather than coupling to a particular agent UI.",
+          "reuse_boundary": "Reuse the provider-neutral workflow principle. The factory remains independent from MFS and from any developer coding CLI.",
+          "sources": [
+            {
+              "path": "CLAUDE.md",
+              "first_line": 125,
+              "last_line": 129,
+              "url": "https://github.com/zilliztech/mfs/blob/78352894a0a826ee24db852411bf9a3c49884922/CLAUDE.md#L125-L129"
+            }
+          ]
+        },
+        {
+          "id": "GUID-R04-08",
+          "title": "Lockstep release and upstream contribution",
+          "status": "Verified guidance content, runtime behavior unexecuted",
+          "statement": "Versions across client, server, SDKs, acceleration package and deployment tags are manually changed and checked together. A version tag triggers publication. CONTRIBUTING states submitted contributions use Apache-2.0.",
+          "reuse_boundary": "Any eventual dependency update needs a pinned closure and migration evidence. Guidance does not authorize releases or expand the prior dependency-license audit.",
+          "sources": [
+            {
+              "path": "CLAUDE.md",
+              "first_line": 104,
+              "last_line": 123,
+              "url": "https://github.com/zilliztech/mfs/blob/78352894a0a826ee24db852411bf9a3c49884922/CLAUDE.md#L104-L123"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "first_line": 70,
+              "last_line": 73,
+              "url": "https://github.com/zilliztech/mfs/blob/78352894a0a826ee24db852411bf9a3c49884922/CONTRIBUTING.md#L70-L73"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "first_line": 342,
+              "last_line": 382,
+              "url": "https://github.com/zilliztech/mfs/blob/78352894a0a826ee24db852411bf9a3c49884922/CONTRIBUTING.md#L342-L382"
+            }
+          ]
+        }
+      ],
+      "guidance_tensions": []
+    }
+  ],
+  "absence": {
+    "repository": "BjoernSchotte/agentglass",
+    "revision": "3fdd14eafdc873f23b009a273580b4a0ff9b5ca0",
+    "extends_evidence_id": "SRC-R03",
+    "root_paths": [
+      "AGENTS.md",
+      "CLAUDE.md",
+      "CONTRIBUTING.md"
+    ],
+    "status": "Verified absent at pinned tree",
+    "tree_url": "https://api.github.com/repos/BjoernSchotte/agentglass/git/trees/3fdd14eafdc873f23b009a273580b4a0ff9b5ca0?recursive=1",
+    "tree_truncated": false,
+    "tree_entry_count": 1089,
+    "matching_paths_anywhere": [],
+    "root_inventory": [
+      {
+        "path": ".bun-version",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "085c0f2666ace5b88d67bf565bbe30fbe054e551",
+        "size": 7,
+        "url": "https://api.github.com/repos/BjoernSchotte/agentglass/git/blobs/085c0f2666ace5b88d67bf565bbe30fbe054e551"
+      },
+      {
+        "path": ".github",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "1000dfd16c521545958ceda5fa0178be4f564700",
+        "url": "https://api.github.com/repos/BjoernSchotte/agentglass/git/trees/1000dfd16c521545958ceda5fa0178be4f564700"
+      },
+      {
+        "path": ".gitignore",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a7a7815a4d3d42cc7a062a402b04c2a774130cca",
+        "size": 203,
+        "url": "https://api.github.com/repos/BjoernSchotte/agentglass/git/blobs/a7a7815a4d3d42cc7a062a402b04c2a774130cca"
+      },
+      {
+        "path": ".npmrc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b6f27f135954640c8cc5bfd7b8c9922ca6eb2aad",
+        "size": 19,
+        "url": "https://api.github.com/repos/BjoernSchotte/agentglass/git/blobs/b6f27f135954640c8cc5bfd7b8c9922ca6eb2aad"
+      },
+      {
+        "path": "CHANGELOG.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "c1eefdf5d9b692f07d5796e179ec3d4789038c13",
+        "size": 27856,
+        "url": "https://api.github.com/repos/BjoernSchotte/agentglass/git/blobs/c1eefdf5d9b692f07d5796e179ec3d4789038c13"
+      },
+      {
+        "path": "LICENSE",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "d645695673349e3947e8e5ae42332d0ac3164cd7",
+        "size": 11358,
+        "url": "https://api.github.com/repos/BjoernSchotte/agentglass/git/blobs/d645695673349e3947e8e5ae42332d0ac3164cd7"
+      },
+      {
+        "path": "README.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "86e14612191673be7fa8bc098f5ae4b491c29b81",
+        "size": 141268,
+        "url": "https://api.github.com/repos/BjoernSchotte/agentglass/git/blobs/86e14612191673be7fa8bc098f5ae4b491c29b81"
+      },
+      {
+        "path": "SECURITY.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "6d5d62e9b17d7e5dbb4479f55e84e79a48888007",
+        "size": 1248,
+        "url": "https://api.github.com/repos/BjoernSchotte/agentglass/git/blobs/6d5d62e9b17d7e5dbb4479f55e84e79a48888007"
+      },
+      {
+        "path": "build.sh",
+        "mode": "100755",
+        "type": "blob",
+        "sha": "72cc436da6d08d8b3ac80cf04b1053fa9595034b",
+        "size": 1463,
+        "url": "https://api.github.com/repos/BjoernSchotte/agentglass/git/blobs/72cc436da6d08d8b3ac80cf04b1053fa9595034b"
+      },
+      {
+        "path": "docs",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "93b41e0da3a90fd77dbc9b1333cdefaa16e75399",
+        "url": "https://api.github.com/repos/BjoernSchotte/agentglass/git/trees/93b41e0da3a90fd77dbc9b1333cdefaa16e75399"
+      },
+      {
+        "path": "install.sh",
+        "mode": "100755",
+        "type": "blob",
+        "sha": "d7701307368aac1df2683d5edd8d1dc570d2cc50",
+        "size": 7144,
+        "url": "https://api.github.com/repos/BjoernSchotte/agentglass/git/blobs/d7701307368aac1df2683d5edd8d1dc570d2cc50"
+      },
+      {
+        "path": "npm",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "d381e353eea8078c022c2180722263d79b299099",
+        "url": "https://api.github.com/repos/BjoernSchotte/agentglass/git/trees/d381e353eea8078c022c2180722263d79b299099"
+      },
+      {
+        "path": "package.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "3518fda01665e4fa5351747ad471a701da84351b",
+        "size": 340,
+        "url": "https://api.github.com/repos/BjoernSchotte/agentglass/git/blobs/3518fda01665e4fa5351747ad471a701da84351b"
+      },
+      {
+        "path": "packages",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "a43d11b28e6ffab2564c7c0d61c1242cbd918925",
+        "url": "https://api.github.com/repos/BjoernSchotte/agentglass/git/trees/a43d11b28e6ffab2564c7c0d61c1242cbd918925"
+      },
+      {
+        "path": "pnpm-lock.yaml",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "82afd3aaa0ec1ca391369ad2b64530f3d1cb9cd9",
+        "size": 153937,
+        "url": "https://api.github.com/repos/BjoernSchotte/agentglass/git/blobs/82afd3aaa0ec1ca391369ad2b64530f3d1cb9cd9"
+      },
+      {
+        "path": "pnpm-workspace.yaml",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "924b55f42e98721620a2206ca848eab030e6d887",
+        "size": 25,
+        "url": "https://api.github.com/repos/BjoernSchotte/agentglass/git/blobs/924b55f42e98721620a2206ca848eab030e6d887"
+      },
+      {
+        "path": "scripts",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "4a85aad874db0a6025af208ca90bd4f4b760af58",
+        "url": "https://api.github.com/repos/BjoernSchotte/agentglass/git/trees/4a85aad874db0a6025af208ca90bd4f4b760af58"
+      },
+      {
+        "path": "specs",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "e120be1fc0f9ed1a5e6a50690db30262eebc28bc",
+        "url": "https://api.github.com/repos/BjoernSchotte/agentglass/git/trees/e120be1fc0f9ed1a5e6a50690db30262eebc28bc"
+      },
+      {
+        "path": "src",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "68aeae70f5ca19d6389e8023188df579806b4077",
+        "url": "https://api.github.com/repos/BjoernSchotte/agentglass/git/trees/68aeae70f5ca19d6389e8023188df579806b4077"
+      },
+      {
+        "path": "testdata",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "9d1acb37b38bf955507bce04b35a54f3fc12fed3",
+        "url": "https://api.github.com/repos/BjoernSchotte/agentglass/git/trees/9d1acb37b38bf955507bce04b35a54f3fc12fed3"
+      }
+    ],
+    "limitation": "Absence of these filenames does not imply the repository has no useful README, security policy or subsystem documentation",
+    "local_inventory_sha256": "3115b1bd7f473fe692cbfd8d51441913e2093d5a0aa5400624db2a7bfd7e38ca"
+  },
+  "operational_notes": [
+    "All nine requested guidance bodies were retrieved and read in full in 16 nontruncated chunks, including the two resolved duplicate bodies.",
+    "The connector resolves AGENTS.md symlinks for file fetches. Git tree modes and separately retrieved symlink blobs establish the original repository entries. Cached AGENTS.md bodies are regular files containing resolved guidance, not recreated symlinks.",
+    "The first aggregate save exceeded the process argument limit before writes. Saving one file per invocation succeeded without truncation.",
+    "Git blob retrieval returned decoded text rather than a JSON envelope. The initial JSON parse assumption was corrected, and both complete 9-byte targets were read.",
+    "No source repository commands, tests, installs, API model calls, services, publication or messages to upstream maintainers were executed.",
+    "No evidence-root or final planning documents were edited."
+  ],
+  "exact_retrieved_body_duplicate_groups": [
+    [
+      "research/root-guidance/entire/AGENTS.md",
+      "research/root-guidance/entire/CLAUDE.md"
+    ],
+    [
+      "research/root-guidance/mfs/AGENTS.md",
+      "research/root-guidance/mfs/CLAUDE.md"
+    ]
+  ],
+  "summary": {
+    "repositories": 4,
+    "requested_root_guidance_entries": 12,
+    "present_entries": 9,
+    "regular_repository_files": 7,
+    "repository_symlinks": 2,
+    "absent_agentglass_root_entries": 3,
+    "unique_resolved_guidance_bodies": 7,
+    "retrieved_guidance_bytes_read": 171849,
+    "repository_entry_bytes_including_symlink_targets": 151362,
+    "read_chunks_completed": 16,
+    "guidance_constraints": 24,
+    "all_present_entry_git_blob_identities_verified": true,
+    "repository_commands_executed": 0
+  }
+}

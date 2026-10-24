@@ -1,0 +1,22 @@
+{
+  "version": "0.1.1",
+  "invocation": "explicit",
+  "skills": [
+    {
+      "name": "start-implementation-stage",
+      "description": "Use on explicit invocation to prepare and execute exactly one user-authorized HOI4 Factory implementation stage. Read the stage packet, prior evidence, instructions and config, define scope, and stop at that stage handoff. Do not use a roadmap reference as implementation authority."
+    },
+    {
+      "name": "validate-stage",
+      "description": "Use on explicit invocation to review one HOI4 Factory stage against its acceptance rows, changed artifacts and actual evidence. Distinguish pass, fail, unavailable and not applicable. Do not claim game behavior from source checks or authorize the next stage."
+    },
+    {
+      "name": "capture-engineering-lessons",
+      "description": "Use on explicit invocation at a substantive engineering handoff or after a repeatable tooling failure to capture, test and propose reusable guidance. Keep candidates separate from accepted policy, product runtime memory and game design canon."
+    },
+    {
+      "name": "audit-hoi4-integrations",
+      "description": "Use on explicit invocation for a bounded source, configuration or capability audit of HOI4 Mod Setup, Agentic HOI4 Modding and domain tools. Pin sources and classify evidence. Do not install, enable remote services or run paid or effectful tools by implication."
+    }
+  ]
+}

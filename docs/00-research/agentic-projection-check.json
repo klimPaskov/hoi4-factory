@@ -1,0 +1,11 @@
+{
+  "audit": "isolated static source comparison only",
+  "canonical_agents": 23,
+  "generated_codex_outputs": 24,
+  "differing_generated_outputs": [],
+  "unresolved_role_paths": [],
+  "root_config_sha256": "cd1746b7ef551d361c8c34d872a13e3c91b0f920941adca9c2f16e4008a59e8f",
+  "clients_installed": false,
+  "mcp_connected": false,
+  "upstream_test_suite_run": false
+}

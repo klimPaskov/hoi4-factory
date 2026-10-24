@@ -1,0 +1,2814 @@
+{
+  "date": "2026-10-23",
+  "labelPolicy": {
+    "Verified": "Selected source or test code inspected. Does not mean build or tests ran.",
+    "Documented only": "Primary author description without runtime verification.",
+    "Proposed": "Future implementation decision or experiment.",
+    "Unknown": "Evidence not yet available."
+  },
+  "method": "GitHub connector pinned-file retrieval and web article inspection. Direct git clone failed because network proxy was unavailable. No repository build, package install or test execution.",
+  "records": [
+    {
+      "id": "SRC-B01",
+      "name": "earendil-works/pi",
+      "url": "https://github.com/earendil-works/pi",
+      "commit": "8a2ebd38549c3521a02db0e5d758a24320e97f94",
+      "retrieved": "2026-10-23",
+      "license": "MIT",
+      "status": "Verified",
+      "qualification": "Selective source and test inspection only. No build or test execution.",
+      "paths": [
+        "LICENSE",
+        "packages/agent/package.json",
+        "packages/ai/package.json",
+        "packages/agent/src/agent-loop.ts",
+        "packages/agent/src/types.ts",
+        "packages/coding-agent/src/core/sdk.ts",
+        "packages/coding-agent/src/core/session-manager.ts",
+        "packages/durable/package.json",
+        "packages/durable/src/index.ts",
+        "packages/agent/src/agent.ts",
+        "packages/durable/src/harness/harness.ts",
+        "packages/durable/src/harness/tool.ts",
+        "packages/durable/src/storage/sqlite/node.ts",
+        "packages/durable/src/storage/sqlite/storage.ts",
+        "packages/durable/test/harness-tools-recovery.test.ts",
+        "packages/durable/test/harness-cancellation-barrier.test.ts",
+        "packages/durable/test/harness-storage-failure.test.ts",
+        "packages/durable/test/sqlite-storage.test.ts",
+        "packages/agent/test/agent-loop.test.ts",
+        "packages/ai/src/api/transform-messages.ts",
+        "packages/ai/src/api/constrained-sampling.ts",
+        "packages/ai/test/cross-provider-handoff.test.ts",
+        "packages/coding-agent/src/extensions/mcp/runtime.ts",
+        "packages/ai/test/constrained-sampling.test.ts",
+        "packages/mcp/package.json",
+        "packages/durable/src/harness/generation.ts",
+        "packages/ai/src/api/openai-completions.ts",
+        "AGENTS.md",
+        "CONTRIBUTING.md"
+      ],
+      "inspected": [
+        {
+          "path": "packages/agent/package.json",
+          "ranges": "full",
+          "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/agent/package.json",
+          "observation": "Version 1.4.0. Node >=22.19.0. Agent core depends on pi-ai and TypeBox."
+        },
+        {
+          "path": "packages/ai/package.json",
+          "ranges": "full",
+          "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/ai/package.json",
+          "observation": "Version 1.4.0. Provider SDK and protocol dependencies are distinct from coding-agent CLI."
+        },
+        {
+          "path": "packages/agent/src/agent.ts",
+          "ranges": "full",
+          "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/agent/src/agent.ts",
+          "observation": "Agent options support injected stream function, auth, context transforms, hooks, subscriptions, abort and waitForIdle. State is in memory."
+        },
+        {
+          "path": "packages/agent/src/agent-loop.ts",
+          "ranges": "718-787",
+          "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/agent/src/agent-loop.ts",
+          "observation": "Arguments validated before mutable beforeToolCall hook and not revalidated by this path afterward."
+        },
+        {
+          "path": "packages/agent/test/agent-loop.test.ts",
+          "ranges": "456-586,668-807,867-1000",
+          "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/agent/test/agent-loop.test.ts",
+          "observation": "Contains truncated-tool-call suppression, deliberate mutated-hook-without-revalidation behavior and execution ordering cases."
+        },
+        {
+          "path": "packages/ai/src/api/openai-completions.ts",
+          "ranges": "309-355,780-825,1665-1720",
+          "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/ai/src/api/openai-completions.ts",
+          "observation": "Streaming API uses model.baseUrl. OpenAI-compatible routing alone defaults supportsStrictMode false."
+        },
+        {
+          "path": "packages/ai/src/api/constrained-sampling.ts",
+          "ranges": "1-74,126-149,222-284",
+          "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/ai/src/api/constrained-sampling.ts",
+          "observation": "Strict JSON Schema conversion has prefer or require behavior. Unsupported required constraints reject before generation."
+        },
+        {
+          "path": "packages/ai/test/constrained-sampling.test.ts",
+          "ranges": "90-200",
+          "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/ai/test/constrained-sampling.test.ts",
+          "observation": "Tests unsupported schemas and capability fallback rather than assuming strict output everywhere."
+        },
+        {
+          "path": "packages/ai/src/api/transform-messages.ts",
+          "ranges": "62-235",
+          "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/ai/src/api/transform-messages.ts",
+          "observation": "Cross-model preparation drops incompatible thought/signature artifacts, normalizes tool IDs and emits error results for missing tool outcomes."
+        },
+        {
+          "path": "packages/ai/test/cross-provider-handoff.test.ts",
+          "ranges": "1-90,270-340,400-440",
+          "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/ai/test/cross-provider-handoff.test.ts",
+          "observation": "Live handoff test has auth and insufficient-fixture skips. No live result measured in this audit."
+        },
+        {
+          "path": "packages/coding-agent/src/core/sdk.ts",
+          "ranges": "1-80,191-235",
+          "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/coding-agent/src/core/sdk.ts",
+          "observation": "createAgentSession is an embedding API with noTools and tool selection. Broad coding-agent defaults require deliberate removal."
+        },
+        {
+          "path": "packages/coding-agent/src/core/session-manager.ts",
+          "ranges": "1124-1195",
+          "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/coding-agent/src/core/session-manager.ts",
+          "observation": "Inspected rewrite truncates directly and append uses file append. This path is transcript persistence rather than an artifact transaction journal."
+        },
+        {
+          "path": "packages/durable/package.json",
+          "ranges": "full",
+          "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/durable/package.json",
+          "observation": "Separate pi-durable package offers storage-backed task and harness surfaces."
+        },
+        {
+          "path": "packages/durable/src/index.ts",
+          "ranges": "full",
+          "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/durable/src/index.ts",
+          "observation": "Exports Task, Session, Harness, model providers and multiple storage adapters."
+        },
+        {
+          "path": "packages/durable/src/harness/tool.ts",
+          "ranges": "74-77,135-210,303-315,425-445,637-697",
+          "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/durable/src/harness/tool.ts",
+          "observation": "Final hook arguments are revalidated, exact JSON intent recorded, unsafe replay denied, safe replay requires both historical and current tool policy. Result and task settlement share a storage commit."
+        },
+        {
+          "path": "packages/durable/src/storage/sqlite/storage.ts",
+          "ranges": "187-211",
+          "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/durable/src/storage/sqlite/storage.ts",
+          "observation": "Batch changes and sequence update execute in one SQLite transaction. In-memory adoption follows successful commit."
+        },
+        {
+          "path": "packages/durable/src/harness/generation.ts",
+          "ranges": "446-550",
+          "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/durable/src/harness/generation.ts",
+          "observation": "Partial generation snapshots are persisted on an interval. Terminal classification, continuation and retry remain separate decisions."
+        },
+        {
+          "path": "packages/durable/test/harness-tools-recovery.test.ts",
+          "ranges": "109-331",
+          "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/durable/test/harness-tools-recovery.test.ts",
+          "observation": "Tests unsafe interruption, two-sided replay policy, changed-cwd replay for safe tools, nested memo decisions and invalid strict JSON output."
+        },
+        {
+          "path": "packages/durable/test/harness-cancellation-barrier.test.ts",
+          "ranges": "full",
+          "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/durable/test/harness-cancellation-barrier.test.ts",
+          "observation": "MemoryStorage failure scheduling tests cancellation marks and barriers. Not hard-process-kill evidence."
+        },
+        {
+          "path": "packages/durable/test/sqlite-storage.test.ts",
+          "ranges": "362-396",
+          "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/durable/test/sqlite-storage.test.ts",
+          "observation": "Cyclic JSON error rolls back entry, task and sequence within SQLite commit test."
+        },
+        {
+          "path": "packages/coding-agent/src/extensions/mcp/runtime.ts",
+          "ranges": "1-105",
+          "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/coding-agent/src/extensions/mcp/runtime.ts",
+          "observation": "Separate pi-mcp transports support stdio and Streamable HTTP with reconnect and bounded transient retry."
+        },
+        {
+          "path": "AGENTS.md",
+          "ranges": "full",
+          "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/AGENTS.md",
+          "evidence_kind": "repository engineering guidance",
+          "observation": "Root engineering guidance inspected fully. Requires full-file reading for audits, exact dependency pins, explicit install-script review and focused tests that do not accidentally enable paid endpoint tests. It does not promise backward compatibility by default."
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "ranges": "full",
+          "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/CONTRIBUTING.md",
+          "evidence_kind": "repository engineering guidance",
+          "observation": "Core is deliberately minimal and extension-first. New contributors face a maintainer approval gate. Changes that expand core or hook complexity require discussion."
+        }
+      ],
+      "finding": "Best initial library candidate when native host owns workspace, policy, events and effect receipts. pi-durable has materially stronger recovery than coding-agent transcript persistence.",
+      "reuse": "Embed pi-ai plus pi-agent-core behind a bundled worker. Evaluate pi-durable in S01 without introducing a second authoritative task database. Borrow replay and cancellation test shapes.",
+      "limits": "No installation, packaging, provider calls or tests executed. Local endpoint conformance, Windows process termination, disk durability and dual-process fencing remain experiments. Changed cwd replay is tested upstream and must be constrained by the host.",
+      "maintenance": {
+        "observed_at": "2026-10-23",
+        "updated_at": "2026-10-23 13:32:53 UTC",
+        "scope": "Repository metadata, pinned manifests, root and selected referenced engineering guidance, latest stable release endpoint and first release-list entry. No build, package installation, live runtime, CI-result audit, release-history census or support-response study.",
+        "default_branch": "main",
+        "audited_commit": "8a2ebd38549c3521a02db0e5d758a24320e97f94",
+        "audited_commit_date": "2026-10-23T10:46:03Z",
+        "audited_commit_date_kind": "GitHub commit committer timestamp",
+        "archived": false,
+        "disabled": false,
+        "repository_created_at": "2025-08-09T14:03:50Z",
+        "repository_pushed_at": "2026-10-23T10:46:06Z",
+        "repository_updated_at": "2026-10-23T12:29:42Z",
+        "metadata_source_url": "https://api.github.com/repos/earendil-works/pi",
+        "metadata_cache": "research/metadata-b.json",
+        "commit_source_url": "https://api.github.com/repos/earendil-works/pi/commits/8a2ebd38549c3521a02db0e5d758a24320e97f94",
+        "activity_interpretation": "Recent repository push metadata is an activity signal only. It can reflect another branch and does not establish that the audited commit is the newest commit, that CI passed or that a released artifact is compatible.",
+        "releases": {
+          "latest_stable_endpoint": "https://api.github.com/repos/earendil-works/pi/releases/latest",
+          "latest_stable_status": "Observed",
+          "latest_stable_release": {
+            "tag": "v1.4.0",
+            "name": "v1.4.0",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-10-21T22:49:48Z",
+            "updated_at": "2026-10-21T22:49:48Z",
+            "created_at": "2026-10-21T22:29:13Z",
+            "target_commitish": "main",
+            "url": "https://github.com/earendil-works/pi/releases/tag/v1.4.0"
+          },
+          "collection_endpoint": "https://api.github.com/repos/earendil-works/pi/releases?per_page=1",
+          "collection_status": "Observed first returned entry",
+          "first_collection_entry": {
+            "tag": "v1.4.0",
+            "name": "v1.4.0",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-10-21T22:49:48Z",
+            "updated_at": "2026-10-21T22:49:48Z",
+            "created_at": "2026-10-21T22:29:13Z",
+            "target_commitish": "main",
+            "url": "https://github.com/earendil-works/pi/releases/tag/v1.4.0"
+          },
+          "most_recent_published_release_among_observations": {
+            "tag": "v1.4.0",
+            "name": "v1.4.0",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-10-21T22:49:48Z",
+            "updated_at": "2026-10-21T22:49:48Z",
+            "created_at": "2026-10-21T22:29:13Z",
+            "target_commitish": "main",
+            "url": "https://github.com/earendil-works/pi/releases/tag/v1.4.0"
+          },
+          "exhaustive_tag_history": "Unknown",
+          "limits": "Only the latest-stable result and first release collection entry were inspected. No assertion that a release tag resolves to the audited source commit."
+        },
+        "package_runtime_versions": [
+          {
+            "path": "packages/agent/package.json",
+            "name": "@earendil-works/pi-agent-core",
+            "version": "1.4.0",
+            "private": "Unknown",
+            "engines": {
+              "node": ">=22.19.0"
+            },
+            "config": {},
+            "relevant_dependencies": {
+              "@earendil-works/pi-ai": "1.4.0"
+            },
+            "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/agent/package.json"
+          },
+          {
+            "path": "packages/ai/package.json",
+            "name": "@earendil-works/pi-ai",
+            "version": "1.4.0",
+            "private": "Unknown",
+            "engines": {
+              "node": ">=22.19.0"
+            },
+            "config": {},
+            "relevant_dependencies": {},
+            "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/ai/package.json"
+          },
+          {
+            "path": "packages/durable/package.json",
+            "name": "@earendil-works/pi-durable",
+            "version": "1.4.0",
+            "private": "Unknown",
+            "engines": {
+              "node": ">=22.19.0"
+            },
+            "config": {},
+            "relevant_dependencies": {
+              "@earendil-works/pi-ai": "1.4.0"
+            },
+            "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/durable/package.json"
+          },
+          {
+            "path": "packages/mcp/package.json",
+            "name": "@earendil-works/pi-mcp",
+            "version": "1.4.0",
+            "private": "Unknown",
+            "engines": {
+              "node": ">=22.19.0"
+            },
+            "config": {},
+            "relevant_dependencies": {},
+            "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/mcp/package.json"
+          }
+        ],
+        "additional_runtime_guidance": {
+          "status": "No additional runtime version inferred beyond inspected manifests"
+        },
+        "repository_guidance": {
+          "inspected": true,
+          "status": "All present named root guidance inspected",
+          "root_files_present": [
+            "AGENTS.md",
+            "CONTRIBUTING.md"
+          ],
+          "root_files_absent": [
+            "CLAUDE.md"
+          ],
+          "source_tree_url": "https://api.github.com/repos/earendil-works/pi/git/trees/8a2ebd38549c3521a02db0e5d758a24320e97f94?recursive=1",
+          "tree_truncated": false,
+          "inspected_paths": [
+            "AGENTS.md",
+            "CONTRIBUTING.md"
+          ],
+          "read_coverage": [
+            {
+              "path": "AGENTS.md",
+              "ranges": "full"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "ranges": "full"
+            }
+          ],
+          "limitations": [
+            "All present root AGENTS.md, CLAUDE.md and CONTRIBUTING.md were inspected, plus only the relevant referenced boundary documents listed here. This is not an exhaustive review of all repository documentation or package guidance."
+          ]
+        },
+        "maturity": {
+          "assessment": "Active toolkit with a deliberately small extension-oriented core. Stable release metadata and pinned package versions are observed. Embedding reliability and API compatibility at the selected pin remain experimental for this product.",
+          "signals": [
+            "Observed stable v1.4.0 release",
+            "Minimal-core contribution policy",
+            "Pinned dependencies and explicit install-script policy"
+          ],
+          "production_readiness": "Unknown"
+        },
+        "recommendation_after_guidance_review": "Leading bounded embedding experiment remains conditional on S01. No default compatibility or production-readiness guarantee is inferred."
+      }
+    },
+    {
+      "id": "SRC-B02",
+      "name": "anomalyco/opencode",
+      "url": "https://github.com/anomalyco/opencode",
+      "commit": "02671e66454260d77fe04d63cf5eb94e76921dee",
+      "retrieved": "2026-10-23",
+      "license": "MIT",
+      "status": "Verified",
+      "qualification": "Selective source and test inspection only. No build or test execution.",
+      "paths": [
+        "LICENSE",
+        "packages/sdk/package.json",
+        "packages/sdk/src/index.ts",
+        "packages/sdk/src/opencode.ts",
+        "packages/sdk/src/internal/host.ts",
+        "packages/core/package.json",
+        "packages/core/src/session/run-coordinator.ts",
+        "packages/core/src/session/store.ts",
+        "packages/sdk/src/promise.ts",
+        "packages/sdk/test/embedded.test.ts",
+        "packages/core/src/session/execution/restart.ts",
+        "packages/core/test/session-run-coordinator.test.ts",
+        "packages/core/test/session-store.test.ts",
+        "packages/core/src/mcp/client.ts",
+        "packages/ai/src/providers/openai-compatible.ts",
+        "packages/core/src/session/model-transport.ts",
+        "packages/core/test/session-execution.test.ts",
+        "packages/ai/test/provider/openai-compatible-chat.test.ts",
+        "packages/core/src/session/runner/step.ts",
+        "packages/core/src/tool/runtime.ts",
+        "packages/core/src/tool.ts",
+        "AGENTS.md",
+        "CONTRIBUTING.md",
+        "packages/ai/AGENTS.md",
+        "packages/core/src/tool/AGENTS.md"
+      ],
+      "inspected": [
+        {
+          "path": "packages/sdk/package.json",
+          "ranges": "full",
+          "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/sdk/package.json",
+          "observation": "Version 2.1.4, embedded SDK package."
+        },
+        {
+          "path": "packages/sdk/src/index.ts",
+          "ranges": "full",
+          "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/sdk/src/index.ts",
+          "observation": "Exports OpenCode, Tool and typed client events and contracts."
+        },
+        {
+          "path": "packages/sdk/src/opencode.ts",
+          "ranges": "full",
+          "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/sdk/src/opencode.ts",
+          "observation": "OpenCode entry delegates to Promise SDK create."
+        },
+        {
+          "path": "packages/sdk/src/internal/host.ts",
+          "ranges": "full",
+          "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/sdk/src/internal/host.ts",
+          "observation": "Creates ManagedRuntime and in-process route handler. Default database path is :memory:. Starts suspended-session recovery automatically."
+        },
+        {
+          "path": "packages/core/package.json",
+          "ranges": "full",
+          "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/package.json",
+          "observation": "Node, Bun and workerd conditional adapters and native PTY, SQLite, filesystem and parser dependencies."
+        },
+        {
+          "path": "packages/sdk/test/embedded.test.ts",
+          "ranges": "40-84,198-275",
+          "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/sdk/test/embedded.test.ts",
+          "observation": "Uses TestLLM injection and embedded session routes including switchModel and prompt. No CLI spawning required for this surface."
+        },
+        {
+          "path": "packages/ai/src/providers/openai-compatible.ts",
+          "ranges": "full",
+          "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/ai/src/providers/openai-compatible.ts",
+          "observation": "Generic configurable baseURL and optional bearer credentials route."
+        },
+        {
+          "path": "packages/ai/test/provider/openai-compatible-chat.test.ts",
+          "ranges": "43-100,440-525",
+          "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/ai/test/provider/openai-compatible-chat.test.ts",
+          "observation": "Fixture tests cover request shape, sparse parallel tool chunks and rejection of missing required finish reason."
+        },
+        {
+          "path": "packages/core/src/tool/runtime.ts",
+          "ranges": "1-135",
+          "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/src/tool/runtime.ts",
+          "observation": "Input decoded before execution. Raw JSON Schema conversion failure returns input unchanged. Raw JSON output schema path checks JSON serializability rather than schema semantics."
+        },
+        {
+          "path": "packages/core/src/tool.ts",
+          "ranges": "95-158,260-284",
+          "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/src/tool.ts",
+          "observation": "Before hook runs before input decoding. After hook can alter result after output validation."
+        },
+        {
+          "path": "packages/core/src/session/runner/step.ts",
+          "ranges": "82-160,170-220",
+          "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/src/session/runner/step.ts",
+          "observation": "Tool call publication precedes local execution. Tools start during stream and final settlement is protected against interruption."
+        },
+        {
+          "path": "packages/core/src/session/execution/restart.ts",
+          "ranges": "full",
+          "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/src/session/execution/restart.ts",
+          "observation": "Explicit at-least-once recovery, durable resume counter and assumption prior claim owner is dead. Background shell jobs marked cancelled during restart."
+        },
+        {
+          "path": "packages/core/src/session/run-coordinator.ts",
+          "ranges": "full",
+          "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/src/session/run-coordinator.ts",
+          "observation": "Process-local keyed serialization. Interrupt accepts request before cleanup completes. awaitIdle waits settlement."
+        },
+        {
+          "path": "packages/core/src/session/store.ts",
+          "ranges": "1-143",
+          "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/src/session/store.ts",
+          "observation": "Durable claim, release, countResume and ordered event persistence contracts."
+        },
+        {
+          "path": "packages/core/test/session-execution.test.ts",
+          "ranges": "244-344",
+          "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/test/session-execution.test.ts",
+          "observation": "Tests single local admission, exhausted resume budget and durable counting before resumed work."
+        },
+        {
+          "path": "packages/core/src/mcp/client.ts",
+          "ranges": "115-150,248-322",
+          "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/src/mcp/client.ts",
+          "observation": "Local stdio through Environment, Streamable HTTP, lifecycle cleanup and explicit remote session termination attempt."
+        },
+        {
+          "path": "AGENTS.md",
+          "ranges": "full",
+          "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/AGENTS.md",
+          "evidence_kind": "repository engineering guidance",
+          "observation": "Root engineering guidance inspected fully. The default branch is dev. Session execution claims are process-local restart markers, not clustered ownership, fencing or exactly-once guarantees. Durable prompt admission precedes execution. SDK composes Client, Core and Server."
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "ranges": "full",
+          "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/CONTRIBUTING.md",
+          "evidence_kind": "repository engineering guidance",
+          "observation": "Development requires Bun 1.3 or newer. UI/core product features require design review. Tests run from package directories and public protocol changes require regenerated clients."
+        },
+        {
+          "path": "packages/ai/AGENTS.md",
+          "ranges": "full",
+          "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/ai/AGENTS.md",
+          "evidence_kind": "repository engineering guidance",
+          "observation": "AI transport performs one model call and is independent of Session. Auth, permission, plugin and orchestration policy belong in Core. Provider cassette replay is the default test mode."
+        },
+        {
+          "path": "packages/core/src/tool/AGENTS.md",
+          "ranges": "full",
+          "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/src/tool/AGENTS.md",
+          "evidence_kind": "repository engineering guidance",
+          "observation": "Tool catalog filtering is not execution authorization. Leaves own permission checks and effect ordering. Registrations and captured executors are Location-scoped, and tool reload does not itself revoke an already captured executor."
+        }
+      ],
+      "finding": "Current source supports real in-process embedding. It is a coherent alternative, not merely a CLI wrapper. More lifecycle infrastructure comes with greater coupling and native packaging surface.",
+      "reuse": "Keep an Electron/TypeScript embedded-SDK alternative with explicit persistent database and Rust workspace authority. Reuse host-side schemas and effect controls even if choosing this SDK.",
+      "limits": "No runtime executed. Embedded host must enforce exclusive recovery ownership. At-least-once resumption is not external-effect exactly-once. Raw schema fallback and post-hook mutation require host validation.",
+      "maintenance": {
+        "observed_at": "2026-10-23",
+        "updated_at": "2026-10-23 13:32:53 UTC",
+        "scope": "Repository metadata, pinned manifests, root and selected referenced engineering guidance, latest stable release endpoint and first release-list entry. No build, package installation, live runtime, CI-result audit, release-history census or support-response study.",
+        "default_branch": "dev",
+        "audited_commit": "02671e66454260d77fe04d63cf5eb94e76921dee",
+        "audited_commit_date": "2026-10-23T12:37:34Z",
+        "audited_commit_date_kind": "GitHub commit committer timestamp",
+        "archived": false,
+        "disabled": false,
+        "repository_created_at": "2025-04-30T20:08:00Z",
+        "repository_pushed_at": "2026-10-23T12:37:37Z",
+        "repository_updated_at": "2026-10-23T12:42:03Z",
+        "metadata_source_url": "https://api.github.com/repos/anomalyco/opencode",
+        "metadata_cache": "research/metadata-b.json",
+        "commit_source_url": "https://api.github.com/repos/anomalyco/opencode/commits/02671e66454260d77fe04d63cf5eb94e76921dee",
+        "activity_interpretation": "Recent repository push metadata is an activity signal only. It can reflect another branch and does not establish that the audited commit is the newest commit, that CI passed or that a released artifact is compatible.",
+        "releases": {
+          "latest_stable_endpoint": "https://api.github.com/repos/anomalyco/opencode/releases/latest",
+          "latest_stable_status": "Observed",
+          "latest_stable_release": {
+            "tag": "v1.19.4",
+            "name": "v1.19.4",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-10-22T13:03:41Z",
+            "updated_at": "2026-10-22T13:03:41Z",
+            "created_at": "2026-10-22T13:03:27Z",
+            "target_commitish": "c0c7bae726798d02592f8d3305891ba2f0cd880a",
+            "url": "https://github.com/anomalyco/opencode/releases/tag/v1.19.4"
+          },
+          "collection_endpoint": "https://api.github.com/repos/anomalyco/opencode/releases?per_page=1",
+          "collection_status": "Observed first returned entry",
+          "first_collection_entry": {
+            "tag": "v1.19.4",
+            "name": "v1.19.4",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-10-22T13:03:41Z",
+            "updated_at": "2026-10-22T13:03:41Z",
+            "created_at": "2026-10-22T13:03:27Z",
+            "target_commitish": "c0c7bae726798d02592f8d3305891ba2f0cd880a",
+            "url": "https://github.com/anomalyco/opencode/releases/tag/v1.19.4"
+          },
+          "most_recent_published_release_among_observations": {
+            "tag": "v1.19.4",
+            "name": "v1.19.4",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-10-22T13:03:41Z",
+            "updated_at": "2026-10-22T13:03:41Z",
+            "created_at": "2026-10-22T13:03:27Z",
+            "target_commitish": "c0c7bae726798d02592f8d3305891ba2f0cd880a",
+            "url": "https://github.com/anomalyco/opencode/releases/tag/v1.19.4"
+          },
+          "exhaustive_tag_history": "Unknown",
+          "limits": "Only the latest-stable result and first release collection entry were inspected. No assertion that a release tag resolves to the audited source commit."
+        },
+        "package_runtime_versions": [
+          {
+            "path": "packages/core/package.json",
+            "name": "@opencode/core",
+            "version": "2.1.4",
+            "private": "Unknown",
+            "engines": "Unknown",
+            "config": {},
+            "relevant_dependencies": {},
+            "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/package.json"
+          },
+          {
+            "path": "packages/sdk/package.json",
+            "name": "@opencode/sdk",
+            "version": "2.1.4",
+            "private": "Unknown",
+            "engines": "Unknown",
+            "config": {},
+            "relevant_dependencies": {},
+            "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/sdk/package.json"
+          }
+        ],
+        "additional_runtime_guidance": {
+          "development_bun_minimum": "1.3",
+          "source_path": "CONTRIBUTING.md",
+          "embedded_node_minimum": "Unknown",
+          "limitation": "Development tooling requirement is not asserted to be the minimum runtime requirement of every SDK embedding."
+        },
+        "repository_guidance": {
+          "inspected": true,
+          "status": "All present named root guidance inspected",
+          "root_files_present": [
+            "AGENTS.md",
+            "CONTRIBUTING.md"
+          ],
+          "root_files_absent": [
+            "CLAUDE.md"
+          ],
+          "source_tree_url": "https://api.github.com/repos/anomalyco/opencode/git/trees/02671e66454260d77fe04d63cf5eb94e76921dee?recursive=1",
+          "tree_truncated": false,
+          "inspected_paths": [
+            "AGENTS.md",
+            "CONTRIBUTING.md",
+            "packages/ai/AGENTS.md",
+            "packages/core/src/tool/AGENTS.md"
+          ],
+          "read_coverage": [
+            {
+              "path": "AGENTS.md",
+              "ranges": "full"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "ranges": "full"
+            },
+            {
+              "path": "packages/ai/AGENTS.md",
+              "ranges": "full"
+            },
+            {
+              "path": "packages/core/src/tool/AGENTS.md",
+              "ranges": "full"
+            }
+          ],
+          "limitations": [
+            "All present root AGENTS.md, CLAUDE.md and CONTRIBUTING.md were inspected, plus only the relevant referenced boundary documents listed here. This is not an exhaustive review of all repository documentation or package guidance."
+          ]
+        },
+        "maturity": {
+          "assessment": "Actively developed application and SDK on dev. The audited SDK/core manifests are 2.1.4, while the observed latest stable repository release is v1.19.4. Do not attribute the audited embedding APIs to that stable release or assume the audited package was published.",
+          "signals": [
+            "Observed stable v1.19.4 release",
+            "Audited development SDK/core 2.1.4",
+            "Documented process-local restart ownership boundary"
+          ],
+          "production_readiness": "Unknown",
+          "audited_sdk_published_artifact": "Unknown"
+        },
+        "recommendation_after_guidance_review": "Keep embedded OpenCode as the coherent alternative at the exact audited dev pin. Separate stable release identity from SDK/core manifest identity and enforce host-owned effects outside catalog filtering."
+      }
+    },
+    {
+      "id": "SRC-B03",
+      "name": "OpenHands/software-agent-sdk",
+      "url": "https://github.com/OpenHands/software-agent-sdk",
+      "commit": "87bec04de8e08117399d5cab68042cc794bc2199",
+      "retrieved": "2026-10-23",
+      "license": "MIT",
+      "status": "Verified",
+      "qualification": "Selective source and test inspection only. No build or test execution.",
+      "paths": [
+        "LICENSE",
+        "openhands-sdk/pyproject.toml",
+        "openhands-sdk/openhands/sdk/conversation/cancellation.py",
+        "openhands-sdk/openhands/sdk/conversation/event_store.py",
+        "openhands-sdk/openhands/sdk/conversation/impl/local_conversation.py",
+        "clients/typescript/package.json",
+        "tests/sdk/conversation/test_event_store.py",
+        "tests/sdk/conversation/test_interrupt.py",
+        "openhands-sdk/openhands/sdk/tool/schema.py",
+        "openhands-sdk/openhands/sdk/tool/builtins/switch_llm.py",
+        "clients/typescript/src/conversation/local-conversation.ts",
+        "openhands-sdk/openhands/sdk/io/local.py",
+        "openhands-sdk/openhands/sdk/llm/llm.py",
+        "openhands-sdk/openhands/sdk/agent/response_dispatch.py",
+        "openhands-sdk/openhands/sdk/mcp/config.py",
+        "openhands-sdk/openhands/sdk/utils/files.py",
+        "tests/sdk/llm/test_litellm_provider.py",
+        "openhands-sdk/openhands/sdk/agent/agent.py",
+        "tests/sdk/agent/test_tool_validation_error_message.py",
+        "AGENTS.md",
+        "CONTRIBUTING.md",
+        "openhands-sdk/openhands/sdk/AGENTS.md",
+        "clients/typescript/AGENTS.md",
+        ".agents/skills/custom-codereview-guide.md"
+      ],
+      "inspected": [
+        {
+          "path": "openhands-sdk/pyproject.toml",
+          "ranges": "full",
+          "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/openhands-sdk/pyproject.toml",
+          "observation": "Version 1.58.1, Python >=3.12, LiteLLM and FastMCP dependency ranges."
+        },
+        {
+          "path": "clients/typescript/package.json",
+          "ranges": "full",
+          "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/clients/typescript/package.json",
+          "observation": "TypeScript client also present with OpenRouter SDK dependency."
+        },
+        {
+          "path": "clients/typescript/src/conversation/local-conversation.ts",
+          "ranges": "1-150 and persistenceDir occurrences",
+          "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/clients/typescript/src/conversation/local-conversation.ts",
+          "observation": "A local TypeScript agent loop exists. persistenceDir is declared and assigned, with no usage beyond those locations in this inspected file."
+        },
+        {
+          "path": "openhands-sdk/openhands/sdk/conversation/cancellation.py",
+          "ranges": "full",
+          "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/openhands-sdk/openhands/sdk/conversation/cancellation.py",
+          "observation": "CancellationToken uses threading.Event. Tool cooperation is required."
+        },
+        {
+          "path": "openhands-sdk/openhands/sdk/conversation/impl/local_conversation.py",
+          "ranges": "433-476,1680-1775,2720-2835",
+          "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/openhands-sdk/openhands/sdk/conversation/impl/local_conversation.py",
+          "observation": "Persist callback precedes subscribers. switch_llm preserves registry metrics. interrupt cancels active async task and signals tools. Sync fallback pauses at boundary."
+        },
+        {
+          "path": "openhands-sdk/openhands/sdk/conversation/event_store.py",
+          "ranges": "1-195,225-339",
+          "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/openhands-sdk/openhands/sdk/conversation/event_store.py",
+          "observation": "Per-event JSON store, locking, event ID indexing and count-marker recovery. Local locking assumptions are explicit."
+        },
+        {
+          "path": "openhands-sdk/openhands/sdk/io/local.py",
+          "ranges": "20-85,129-145",
+          "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/openhands-sdk/openhands/sdk/io/local.py",
+          "observation": "Text writes call atomic helper. Cache assumes exclusive file access. Local file lock has timeout."
+        },
+        {
+          "path": "openhands-sdk/openhands/sdk/utils/files.py",
+          "ranges": "full",
+          "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/openhands-sdk/openhands/sdk/utils/files.py",
+          "observation": "Temporary file, flush, fsync and os.replace for atomic text replacement. Directory fsync is not present in inspected helper."
+        },
+        {
+          "path": "tests/sdk/conversation/test_event_store.py",
+          "ranges": "164-203,374-432",
+          "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/tests/sdk/conversation/test_event_store.py",
+          "observation": "Tests missing/corrupt data and thread concurrency. Corrupt JSON can be omitted from rebuilt index. Two-instance test is serial interleaving, not concurrent processes."
+        },
+        {
+          "path": "tests/sdk/conversation/test_interrupt.py",
+          "ranges": "35-103,291-341,359-426",
+          "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/tests/sdk/conversation/test_interrupt.py",
+          "observation": "Mock slow async LLM interrupted, cancelled token retained for outliving tool threads, not-started tools skipped."
+        },
+        {
+          "path": "openhands-sdk/openhands/sdk/llm/llm.py",
+          "ranges": "324-339,379-407,500-517",
+          "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/openhands-sdk/openhands/sdk/llm/llm.py",
+          "observation": "Custom base URL, Ollama URL, streaming callbacks and retry/timeout controls. Default drop_params true."
+        },
+        {
+          "path": "tests/sdk/llm/test_litellm_provider.py",
+          "ranges": "full",
+          "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/tests/sdk/llm/test_litellm_provider.py",
+          "observation": "Provider parsing includes localhost OpenAI-compatible case. Does not connect to local inference."
+        },
+        {
+          "path": "openhands-sdk/openhands/sdk/agent/agent.py",
+          "ranges": "1338-1445",
+          "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/openhands-sdk/openhands/sdk/agent/agent.py",
+          "observation": "Normalizes and repairs tool arguments, constructs validated actions and emits structured error events."
+        },
+        {
+          "path": "tests/sdk/agent/test_tool_validation_error_message.py",
+          "ranges": "80-150",
+          "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/tests/sdk/agent/test_tool_validation_error_message.py",
+          "observation": "Mock invalid arguments produce error and omit large raw argument value from test message."
+        },
+        {
+          "path": "openhands-sdk/openhands/sdk/mcp/config.py",
+          "ranges": "494-578",
+          "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/openhands-sdk/openhands/sdk/mcp/config.py",
+          "observation": "Typed stdio, HTTP, Streamable HTTP and SSE config with secret fields and transport-specific validation."
+        },
+        {
+          "path": "AGENTS.md",
+          "ranges": "full",
+          "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/AGENTS.md",
+          "evidence_kind": "repository engineering guidance",
+          "observation": "Root engineering guidance inspected fully. Python SDK and Agent Server own canonical behavior. Resource ownership, cancellation, persisted settings migrations, secret serialization and packaged-runtime parity are explicit engineering boundaries."
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "ranges": "full",
+          "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/CONTRIBUTING.md",
+          "evidence_kind": "repository engineering guidance",
+          "observation": "SDK is a reusable foundation rather than a client-specific application. Workspace assumptions must remain explicit and confined to workspace implementations. Long-tail provider behavior should use generic interfaces."
+        },
+        {
+          "path": "openhands-sdk/openhands/sdk/AGENTS.md",
+          "ranges": "full",
+          "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/openhands-sdk/openhands/sdk/AGENTS.md",
+          "evidence_kind": "repository engineering guidance",
+          "observation": "Supports Python 3.12 and later while repository tooling targets 3.13. Public removals require at least five minor releases of deprecation. Deprecated event-field loading handlers are permanent, and persisted settings changes require schema migrations and golden fixtures."
+        },
+        {
+          "path": "clients/typescript/AGENTS.md",
+          "ranges": "full",
+          "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/clients/typescript/AGENTS.md",
+          "evidence_kind": "repository engineering guidance",
+          "observation": "Browser-compatible client forbids Node filesystem/process APIs. It documents LocalWorkspace as a stub despite a LocalConversation loop and an example constructing LocalWorkspace. The guide says package.json config.agentServerImage is authoritative, but its prose examples still name 1.51.0 while the inspected manifest pins 1.58.1."
+        },
+        {
+          "path": ".agents/skills/custom-codereview-guide.md",
+          "ranges": "full",
+          "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/.agents/skills/custom-codereview-guide.md",
+          "evidence_kind": "repository engineering guidance",
+          "observation": "Review guidance requires tracing create/run/interrupt/close/resume/fork, underlying task and process settlement, production packaging, and exact pinned consumer/server versions. ACP tool visibility alone is not proof of execution restriction."
+        }
+      ],
+      "finding": "Credible Python SDK alternative for tool ecosystems, with local persistence and interruption surfaces. Packaging a Python stack beside Rust/React is a higher initial burden for this product.",
+      "reuse": "Retain as measured alternative if Python tool integration clearly wins. Do not assume its TypeScript local loop has persistence parity with Python.",
+      "limits": "Tests not run. No hard kill, server sandbox, cross-provider quality or remote durability measured. Tool thread cancellation is cooperative. Local EventLog is not the product transaction authority.",
+      "maintenance": {
+        "observed_at": "2026-10-23",
+        "updated_at": "2026-10-23 13:32:53 UTC",
+        "scope": "Repository metadata, pinned manifests, root and selected referenced engineering guidance, latest stable release endpoint and first release-list entry. No build, package installation, live runtime, CI-result audit, release-history census or support-response study.",
+        "default_branch": "main",
+        "audited_commit": "87bec04de8e08117399d5cab68042cc794bc2199",
+        "audited_commit_date": "2026-10-23T10:25:38Z",
+        "audited_commit_date_kind": "GitHub commit committer timestamp",
+        "archived": false,
+        "disabled": false,
+        "repository_created_at": "2025-08-23T20:34:39Z",
+        "repository_pushed_at": "2026-10-23T10:25:41Z",
+        "repository_updated_at": "2026-10-23T10:25:45Z",
+        "metadata_source_url": "https://api.github.com/repos/OpenHands/software-agent-sdk",
+        "metadata_cache": "research/metadata-b.json",
+        "commit_source_url": "https://api.github.com/repos/OpenHands/software-agent-sdk/commits/87bec04de8e08117399d5cab68042cc794bc2199",
+        "activity_interpretation": "Recent repository push metadata is an activity signal only. It can reflect another branch and does not establish that the audited commit is the newest commit, that CI passed or that a released artifact is compatible.",
+        "releases": {
+          "latest_stable_endpoint": "https://api.github.com/repos/OpenHands/software-agent-sdk/releases/latest",
+          "latest_stable_status": "Observed",
+          "latest_stable_release": {
+            "tag": "v1.58.1",
+            "name": "v1.58.1",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-10-23T00:44:35Z",
+            "updated_at": "2026-10-23T01:00:24Z",
+            "created_at": "2026-10-23T00:44:24Z",
+            "target_commitish": "60192ed54db73ac658ac1a07462916126c32d3a0",
+            "url": "https://github.com/OpenHands/software-agent-sdk/releases/tag/v1.58.1"
+          },
+          "collection_endpoint": "https://api.github.com/repos/OpenHands/software-agent-sdk/releases?per_page=1",
+          "collection_status": "Observed first returned entry",
+          "first_collection_entry": {
+            "tag": "v1.58.1",
+            "name": "v1.58.1",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-10-23T00:44:35Z",
+            "updated_at": "2026-10-23T01:00:24Z",
+            "created_at": "2026-10-23T00:44:24Z",
+            "target_commitish": "60192ed54db73ac658ac1a07462916126c32d3a0",
+            "url": "https://github.com/OpenHands/software-agent-sdk/releases/tag/v1.58.1"
+          },
+          "most_recent_published_release_among_observations": {
+            "tag": "v1.58.1",
+            "name": "v1.58.1",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-10-23T00:44:35Z",
+            "updated_at": "2026-10-23T01:00:24Z",
+            "created_at": "2026-10-23T00:44:24Z",
+            "target_commitish": "60192ed54db73ac658ac1a07462916126c32d3a0",
+            "url": "https://github.com/OpenHands/software-agent-sdk/releases/tag/v1.58.1"
+          },
+          "exhaustive_tag_history": "Unknown",
+          "limits": "Only the latest-stable result and first release collection entry were inspected. No assertion that a release tag resolves to the audited source commit."
+        },
+        "package_runtime_versions": [
+          {
+            "path": "clients/typescript/package.json",
+            "name": "@openhands/typescript-client",
+            "version": "1.58.1",
+            "private": "Unknown",
+            "engines": "Unknown",
+            "config": {
+              "agentServerImage": "ghcr.io/openhands/agent-server:1.58.1-python"
+            },
+            "relevant_dependencies": {},
+            "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/clients/typescript/package.json"
+          },
+          {
+            "path": "openhands-sdk/pyproject.toml",
+            "name": "openhands-sdk",
+            "version": "1.58.1",
+            "runtime": {
+              "python": ">=3.12"
+            },
+            "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/openhands-sdk/pyproject.toml"
+          }
+        ],
+        "additional_runtime_guidance": {
+          "development_python_target": "3.13",
+          "supported_python_minimum": "3.12",
+          "source_path": "openhands-sdk/openhands/sdk/AGENTS.md"
+        },
+        "repository_guidance": {
+          "inspected": true,
+          "status": "All present named root guidance inspected",
+          "root_files_present": [
+            "AGENTS.md",
+            "CONTRIBUTING.md"
+          ],
+          "root_files_absent": [
+            "CLAUDE.md"
+          ],
+          "source_tree_url": "https://api.github.com/repos/OpenHands/software-agent-sdk/git/trees/87bec04de8e08117399d5cab68042cc794bc2199?recursive=1",
+          "tree_truncated": false,
+          "inspected_paths": [
+            "AGENTS.md",
+            "CONTRIBUTING.md",
+            "openhands-sdk/openhands/sdk/AGENTS.md",
+            "clients/typescript/AGENTS.md",
+            ".agents/skills/custom-codereview-guide.md"
+          ],
+          "read_coverage": [
+            {
+              "path": "AGENTS.md",
+              "ranges": "full"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "ranges": "full"
+            },
+            {
+              "path": "openhands-sdk/openhands/sdk/AGENTS.md",
+              "ranges": "full"
+            },
+            {
+              "path": "clients/typescript/AGENTS.md",
+              "ranges": "full"
+            },
+            {
+              "path": ".agents/skills/custom-codereview-guide.md",
+              "ranges": "full"
+            }
+          ],
+          "limitations": [
+            "All present root AGENTS.md, CLAUDE.md and CONTRIBUTING.md were inspected, plus only the relevant referenced boundary documents listed here. This is not an exhaustive review of all repository documentation or package guidance."
+          ]
+        },
+        "maturity": {
+          "assessment": "Explicit SDK/API and persisted-data compatibility policies provide useful maturity signals. Python and TypeScript manifests and stable release are 1.58.1. Packaging and runtime behavior were not executed, and TypeScript guidance contains stale server-version examples.",
+          "signals": [
+            "Observed stable v1.58.1 release",
+            "Five-minor-release public API deprecation runway",
+            "Versioned persisted settings and permanent old-event loading policy"
+          ],
+          "production_readiness": "Unknown"
+        },
+        "recommendation_after_guidance_review": "Keep the Python SDK as a conditional alternative. Do not promote the browser-compatible TypeScript client to a proven native persistent runtime."
+      }
+    },
+    {
+      "id": "SRC-B04",
+      "name": "gastownhall/gascity",
+      "url": "https://github.com/gastownhall/gascity",
+      "commit": "87a47634d0cebe611874df321c723bba95dcffea",
+      "retrieved": "2026-10-23",
+      "license": "MIT",
+      "status": "Verified",
+      "qualification": "Selective source and test inspection only. No build or test execution.",
+      "paths": [
+        "LICENSE",
+        "go.mod",
+        "internal/runtime/provider_core.go",
+        "internal/runtime/protocol.go",
+        "cmd/gc/reconcile_effect_fence.go",
+        "cmd/gc/reconcile_effect_lease_test.go",
+        "internal/runtime/worker.go",
+        "AGENTS.md",
+        "CLAUDE.md",
+        "CONTRIBUTING.md",
+        "engdocs/contributors/primitive-test.md"
+      ],
+      "inspected": [
+        {
+          "path": "go.mod",
+          "ranges": "1-50",
+          "url": "https://github.com/gastownhall/gascity/blob/87a47634d0cebe611874df321c723bba95dcffea/go.mod",
+          "observation": "Go 1.26.10 with Beads, database, Kubernetes and operational dependencies."
+        },
+        {
+          "path": "internal/runtime/provider_core.go",
+          "ranges": "full",
+          "url": "https://github.com/gastownhall/gascity/blob/87a47634d0cebe611874df321c723bba95dcffea/internal/runtime/provider_core.go",
+          "observation": "Partial listing and absence do not prove a session dead. Explicit listing attestation and positive death proof for cleanup."
+        },
+        {
+          "path": "internal/runtime/protocol.go",
+          "ranges": "full",
+          "url": "https://github.com/gastownhall/gascity/blob/87a47634d0cebe611874df321c723bba95dcffea/internal/runtime/protocol.go",
+          "observation": "Versioned out-of-process runtime protocol, optional capabilities and separate exec/stream/provision/TTY concepts."
+        },
+        {
+          "path": "cmd/gc/reconcile_effect_fence.go",
+          "ranges": "full",
+          "url": "https://github.com/gastownhall/gascity/blob/87a47634d0cebe611874df321c723bba95dcffea/cmd/gc/reconcile_effect_fence.go",
+          "observation": "Fresh bounded observations precede destructive actions. Unknown work or idle proof holds the action."
+        },
+        {
+          "path": "cmd/gc/reconcile_effect_lease_test.go",
+          "ranges": "58-167,358-379",
+          "url": "https://github.com/gastownhall/gascity/blob/87a47634d0cebe611874df321c723bba95dcffea/cmd/gc/reconcile_effect_lease_test.go",
+          "observation": "Lease takeover prevents following write/commit. Lost lease cancels call context. Deadlines bounded by safe lease horizon."
+        },
+        {
+          "path": "AGENTS.md",
+          "ranges": "full",
+          "url": "https://github.com/gastownhall/gascity/blob/87a47634d0cebe611874df321c723bba95dcffea/AGENTS.md",
+          "evidence_kind": "repository engineering guidance",
+          "observation": "Root guidance describes a configurable orchestration builder with no hardcoded roles. It explicitly states that current internal packages remain private to gc and public SDK exports are future work. Bazel tests, not plain go test, are the authoritative agent/CI path."
+        },
+        {
+          "path": "CLAUDE.md",
+          "ranges": "full",
+          "url": "https://github.com/gastownhall/gascity/blob/87a47634d0cebe611874df321c723bba95dcffea/CLAUDE.md",
+          "evidence_kind": "repository engineering guidance",
+          "observation": "Imports AGENTS.md and keeps only Claude-specific guidance locally. The imported root guidance was read in full."
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "ranges": "full",
+          "url": "https://github.com/gastownhall/gascity/blob/87a47634d0cebe611874df321c723bba95dcffea/CONTRIBUTING.md",
+          "evidence_kind": "repository engineering guidance",
+          "observation": "Explicitly calls Gas City experimental. It documents Bazel/build-system obligations and git-hook ownership hazards. No documented test pass or production maturity claim was treated as executed evidence."
+        },
+        {
+          "path": "engdocs/contributors/primitive-test.md",
+          "ranges": "full",
+          "url": "https://github.com/gastownhall/gascity/blob/87a47634d0cebe611874df321c723bba95dcffea/engdocs/contributors/primitive-test.md",
+          "evidence_kind": "repository engineering guidance",
+          "observation": "Defines atomicity and transport boundaries for primitives. Fix dependency-level atomicity defects upstream and wrap only when composing otherwise correct operations. Judgment and role policy remain consumer concerns."
+        }
+      ],
+      "finding": "Useful reconciliation and fencing reference. Current code has capability-aware runtime backends and should not be reduced to a tmux-only label.",
+      "reuse": "Adapt observed-state uncertainty, owner incarnation and fencing test invariants. Defer whole Go controller and deployment topology.",
+      "limits": "Selected runtime and reconciliation files only. No operational deployment, test execution or all-backend audit.",
+      "maintenance": {
+        "observed_at": "2026-10-23",
+        "updated_at": "2026-10-23 13:32:53 UTC",
+        "scope": "Repository metadata, pinned manifests, root and selected referenced engineering guidance, latest stable release endpoint and first release-list entry. No build, package installation, live runtime, CI-result audit, release-history census or support-response study.",
+        "default_branch": "main",
+        "audited_commit": "87a47634d0cebe611874df321c723bba95dcffea",
+        "audited_commit_date": "2026-10-23T10:26:55Z",
+        "audited_commit_date_kind": "GitHub commit committer timestamp",
+        "archived": false,
+        "disabled": false,
+        "repository_created_at": "2026-02-22T01:40:16Z",
+        "repository_pushed_at": "2026-10-23T12:39:48Z",
+        "repository_updated_at": "2026-10-23T10:32:23Z",
+        "metadata_source_url": "https://api.github.com/repos/gastownhall/gascity",
+        "metadata_cache": "research/metadata-b.json",
+        "commit_source_url": "https://api.github.com/repos/gastownhall/gascity/commits/87a47634d0cebe611874df321c723bba95dcffea",
+        "activity_interpretation": "Recent repository push metadata is an activity signal only. It can reflect another branch and does not establish that the audited commit is the newest commit, that CI passed or that a released artifact is compatible.",
+        "releases": {
+          "latest_stable_endpoint": "https://api.github.com/repos/gastownhall/gascity/releases/latest",
+          "latest_stable_status": "Observed",
+          "latest_stable_release": {
+            "tag": "v1.5.0",
+            "name": "Gas City v1.5.0",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-10-05T04:42:49Z",
+            "updated_at": "2026-10-05T08:46:31Z",
+            "created_at": "2026-10-05T02:52:49Z",
+            "target_commitish": "main",
+            "url": "https://github.com/gastownhall/gascity/releases/tag/v1.5.0"
+          },
+          "collection_endpoint": "https://api.github.com/repos/gastownhall/gascity/releases?per_page=1",
+          "collection_status": "Observed first returned entry",
+          "first_collection_entry": {
+            "tag": "edge",
+            "name": "gascity edge (rolling main)",
+            "prerelease": true,
+            "draft": false,
+            "published_at": "2026-06-27T17:42:08Z",
+            "updated_at": "2026-10-23T10:38:45Z",
+            "created_at": "2026-10-23T10:26:55Z",
+            "target_commitish": "main",
+            "url": "https://github.com/gastownhall/gascity/releases/tag/edge"
+          },
+          "most_recent_published_release_among_observations": {
+            "tag": "v1.5.0",
+            "name": "Gas City v1.5.0",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-10-05T04:42:49Z",
+            "updated_at": "2026-10-05T08:46:31Z",
+            "created_at": "2026-10-05T02:52:49Z",
+            "target_commitish": "main",
+            "url": "https://github.com/gastownhall/gascity/releases/tag/v1.5.0"
+          },
+          "exhaustive_tag_history": "Unknown",
+          "limits": "Only the latest-stable result and first release collection entry were inspected. No assertion that a release tag resolves to the audited source commit."
+        },
+        "package_runtime_versions": [
+          {
+            "path": "go.mod",
+            "name": "github.com/gastownhall/gascity",
+            "version": "Unknown",
+            "runtime": {
+              "go_directive": "1.26.10",
+              "toolchain": "Not declared in inspected go.mod"
+            },
+            "url": "https://github.com/gastownhall/gascity/blob/87a47634d0cebe611874df321c723bba95dcffea/go.mod"
+          }
+        ],
+        "additional_runtime_guidance": {
+          "canonical_agent_test_system": "Bazel through Bazelisk",
+          "bazel_version": "Unknown",
+          "source_path": "AGENTS.md"
+        },
+        "repository_guidance": {
+          "inspected": true,
+          "status": "All present named root guidance inspected",
+          "root_files_present": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "CONTRIBUTING.md"
+          ],
+          "root_files_absent": [],
+          "source_tree_url": "https://api.github.com/repos/gastownhall/gascity/git/trees/87a47634d0cebe611874df321c723bba95dcffea?recursive=1",
+          "tree_truncated": false,
+          "inspected_paths": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "CONTRIBUTING.md",
+            "engdocs/contributors/primitive-test.md"
+          ],
+          "read_coverage": [
+            {
+              "path": "AGENTS.md",
+              "ranges": "full"
+            },
+            {
+              "path": "CLAUDE.md",
+              "ranges": "full"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "ranges": "full"
+            },
+            {
+              "path": "engdocs/contributors/primitive-test.md",
+              "ranges": "full"
+            }
+          ],
+          "limitations": [
+            "All present root AGENTS.md, CLAUDE.md and CONTRIBUTING.md were inspected, plus only the relevant referenced boundary documents listed here. This is not an exhaustive review of all repository documentation or package guidance."
+          ]
+        },
+        "maturity": {
+          "assessment": "Experimental by its own contributor guide. The current code is private to the gc binary and public SDK exports are future work. Use source patterns, not an assumed stable embeddable SDK.",
+          "signals": [
+            "Observed stable v1.5.0 release",
+            "Mutable edge prerelease entry also observed",
+            "Explicit experimental status and internal-package boundary"
+          ],
+          "production_readiness": "Unknown"
+        },
+        "recommendation_after_guidance_review": "Pattern-level reuse remains the recommendation. The additional guidance strengthens the reason to avoid wholesale runtime/backend or workflow-policy adoption."
+      }
+    },
+    {
+      "id": "SRC-B05",
+      "name": "gastownhall/gastown",
+      "url": "https://github.com/gastownhall/gastown",
+      "commit": "ef70b0bf9e588dce00708e36564bfc06b51fac2c",
+      "retrieved": "2026-10-23",
+      "license": "MIT",
+      "status": "Verified",
+      "qualification": "Selective source and test inspection only. No build or test execution.",
+      "paths": [
+        "LICENSE",
+        "go.mod",
+        "internal/agent/provider/provider.go",
+        "internal/runtime/runtime.go",
+        "internal/checkpoint/checkpoint.go",
+        "internal/checkpoint/checkpoint_test.go",
+        "AGENTS.md",
+        "CONTRIBUTING.md",
+        "internal/templates/townroot/claude.md"
+      ],
+      "inspected": [
+        {
+          "path": "go.mod",
+          "ranges": "1-50",
+          "url": "https://github.com/gastownhall/gastown/blob/ef70b0bf9e588dce00708e36564bfc06b51fac2c/go.mod",
+          "observation": "Go 1.26.2 with toolchain 1.26.10 and Beads/TUI/database dependencies."
+        },
+        {
+          "path": "internal/agent/provider/provider.go",
+          "ranges": "full",
+          "url": "https://github.com/gastownhall/gastown/blob/ef70b0bf9e588dce00708e36564bfc06b51fac2c/internal/agent/provider/provider.go",
+          "observation": "Provider callbacks and tool API exist. LocalProvider.CreateMessage explicitly returns unsupported."
+        },
+        {
+          "path": "internal/runtime/runtime.go",
+          "ranges": "1-75,189-232",
+          "url": "https://github.com/gastownhall/gastown/blob/ef70b0bf9e588dce00708e36564bfc06b51fac2c/internal/runtime/runtime.go",
+          "observation": "Provisions agent-specific settings and startup fallback via tmux and gt prime."
+        },
+        {
+          "path": "internal/checkpoint/checkpoint.go",
+          "ranges": "full",
+          "url": "https://github.com/gastownhall/gastown/blob/ef70b0bf9e588dce00708e36564bfc06b51fac2c/internal/checkpoint/checkpoint.go",
+          "observation": "Recovery checkpoint holds task step, modified paths, Git ref and notes. Write uses direct os.WriteFile. Capture ignores failed Git subcommands and can return partial record."
+        },
+        {
+          "path": "internal/checkpoint/checkpoint_test.go",
+          "ranges": "20-96,122-135,168-207",
+          "url": "https://github.com/gastownhall/gastown/blob/ef70b0bf9e588dce00708e36564bfc06b51fac2c/internal/checkpoint/checkpoint_test.go",
+          "observation": "Roundtrip, corrupt JSON and Git capture tests. Capture test skips outside Git repository."
+        },
+        {
+          "path": "AGENTS.md",
+          "ranges": "full",
+          "url": "https://github.com/gastownhall/gastown/blob/ef70b0bf9e588dce00708e36564bfc06b51fac2c/AGENTS.md",
+          "evidence_kind": "repository engineering guidance",
+          "observation": "Root compatibility guidance points to CLAUDE.md and gt prime for dynamic role context, then describes Beads and Gas Town operational workflows. No root CLAUDE.md is present in the complete pinned tree, and gt prime was not executed."
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "ranges": "full",
+          "url": "https://github.com/gastownhall/gastown/blob/ef70b0bf9e588dce00708e36564bfc06b51fac2c/CONTRIBUTING.md",
+          "evidence_kind": "repository engineering guidance",
+          "observation": "Explicitly calls Gas Town experimental. Documents fork routing and a current refinery limitation that can integrate polecat branches into a fork's main even with fork routing configured. This is a reason not to adopt automatic merge policy wholesale."
+        },
+        {
+          "path": "internal/templates/townroot/claude.md",
+          "ranges": "full",
+          "url": "https://github.com/gastownhall/gastown/blob/ef70b0bf9e588dce00708e36564bfc06b51fac2c/internal/templates/townroot/claude.md",
+          "evidence_kind": "repository engineering guidance",
+          "observation": "Tracked template describes role context supplied by gt prime, a shared Dolt data plane and careful operational diagnostics. It is template evidence, not the missing instantiated root CLAUDE.md or a live role context."
+        }
+      ],
+      "finding": "Useful task handoff and worker-role concepts. Inspected checkpoint is context metadata, not durable proof of tool effects or multi-file commit.",
+      "reuse": "Borrow checkpoint fields and human-readable recovery handoff. Do not transplant CLI, tmux role provisioning or checkpoint writer as native durability.",
+      "limits": "No tests run, no whole-project security review, no proof of atomic filesystem recovery.",
+      "maintenance": {
+        "observed_at": "2026-10-23",
+        "updated_at": "2026-10-23 13:32:53 UTC",
+        "scope": "Repository metadata, pinned manifests, root and selected referenced engineering guidance, latest stable release endpoint and first release-list entry. No build, package installation, live runtime, CI-result audit, release-history census or support-response study.",
+        "default_branch": "main",
+        "audited_commit": "ef70b0bf9e588dce00708e36564bfc06b51fac2c",
+        "audited_commit_date": "2026-10-20T18:12:00Z",
+        "audited_commit_date_kind": "GitHub commit committer timestamp",
+        "archived": false,
+        "disabled": false,
+        "repository_created_at": "2025-12-16T00:33:33Z",
+        "repository_pushed_at": "2026-10-21T02:45:42Z",
+        "repository_updated_at": "2026-10-23T11:12:29Z",
+        "metadata_source_url": "https://api.github.com/repos/gastownhall/gastown",
+        "metadata_cache": "research/metadata-b.json",
+        "commit_source_url": "https://api.github.com/repos/gastownhall/gastown/commits/ef70b0bf9e588dce00708e36564bfc06b51fac2c",
+        "activity_interpretation": "Recent repository push metadata is an activity signal only. It can reflect another branch and does not establish that the audited commit is the newest commit, that CI passed or that a released artifact is compatible.",
+        "releases": {
+          "latest_stable_endpoint": "https://api.github.com/repos/gastownhall/gastown/releases/latest",
+          "latest_stable_status": "Observed",
+          "latest_stable_release": {
+            "tag": "v1.2.1",
+            "name": "v1.2.1",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-06-06T17:17:53Z",
+            "updated_at": "2026-06-06T17:18:28Z",
+            "created_at": "2026-06-06T17:13:16Z",
+            "target_commitish": "main",
+            "url": "https://github.com/gastownhall/gastown/releases/tag/v1.2.1"
+          },
+          "collection_endpoint": "https://api.github.com/repos/gastownhall/gastown/releases?per_page=1",
+          "collection_status": "Observed first returned entry",
+          "first_collection_entry": {
+            "tag": "v1.2.1",
+            "name": "v1.2.1",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-06-06T17:17:53Z",
+            "updated_at": "2026-06-06T17:18:28Z",
+            "created_at": "2026-06-06T17:13:16Z",
+            "target_commitish": "main",
+            "url": "https://github.com/gastownhall/gastown/releases/tag/v1.2.1"
+          },
+          "most_recent_published_release_among_observations": {
+            "tag": "v1.2.1",
+            "name": "v1.2.1",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-06-06T17:17:53Z",
+            "updated_at": "2026-06-06T17:18:28Z",
+            "created_at": "2026-06-06T17:13:16Z",
+            "target_commitish": "main",
+            "url": "https://github.com/gastownhall/gastown/releases/tag/v1.2.1"
+          },
+          "exhaustive_tag_history": "Unknown",
+          "limits": "Only the latest-stable result and first release collection entry were inspected. No assertion that a release tag resolves to the audited source commit."
+        },
+        "package_runtime_versions": [
+          {
+            "path": "go.mod",
+            "name": "github.com/steveyegge/gastown",
+            "version": "Unknown",
+            "runtime": {
+              "go_directive": "1.26.2",
+              "toolchain": "go1.26.10"
+            },
+            "url": "https://github.com/gastownhall/gastown/blob/ef70b0bf9e588dce00708e36564bfc06b51fac2c/go.mod"
+          }
+        ],
+        "additional_runtime_guidance": {
+          "status": "No additional runtime version inferred beyond inspected manifests"
+        },
+        "repository_guidance": {
+          "inspected": true,
+          "status": "All present named root guidance inspected",
+          "root_files_present": [
+            "AGENTS.md",
+            "CONTRIBUTING.md"
+          ],
+          "root_files_absent": [
+            "CLAUDE.md"
+          ],
+          "source_tree_url": "https://api.github.com/repos/gastownhall/gastown/git/trees/ef70b0bf9e588dce00708e36564bfc06b51fac2c?recursive=1",
+          "tree_truncated": false,
+          "inspected_paths": [
+            "AGENTS.md",
+            "CONTRIBUTING.md",
+            "internal/templates/townroot/claude.md"
+          ],
+          "read_coverage": [
+            {
+              "path": "AGENTS.md",
+              "ranges": "full"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "ranges": "full"
+            },
+            {
+              "path": "internal/templates/townroot/claude.md",
+              "ranges": "full"
+            }
+          ],
+          "limitations": [
+            "All present root AGENTS.md, CLAUDE.md and CONTRIBUTING.md were inspected, plus only the relevant referenced boundary documents listed here. This is not an exhaustive review of all repository documentation or package guidance.",
+            "Referenced root CLAUDE.md is absent from the complete pinned tree. Dynamic gt prime context was not generated or inspected. The tracked townroot template is not equivalent to an instantiated runtime context."
+          ]
+        },
+        "maturity": {
+          "assessment": "Experimental by its own contributor guide, with recent repository activity but the observed latest stable release dated June 2026. Its role/CLI/Dolt and refinery assumptions remain inappropriate as the required local product runtime.",
+          "signals": [
+            "Observed stable v1.2.1 release",
+            "Recent repository push metadata",
+            "Documented fork-refinery limitation"
+          ],
+          "production_readiness": "Unknown"
+        },
+        "recommendation_after_guidance_review": "Pattern-level reuse remains the recommendation. The additional guidance strengthens the reason to avoid wholesale runtime/backend or workflow-policy adoption."
+      }
+    },
+    {
+      "id": "SRC-B06",
+      "name": "gastownhall/beads",
+      "url": "https://github.com/gastownhall/beads",
+      "commit": "bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb",
+      "retrieved": "2026-10-23",
+      "license": "MIT with Apache-2.0 third-party notices",
+      "status": "Verified",
+      "qualification": "Selective source and test inspection only. No build or test execution.",
+      "paths": [
+        "LICENSE",
+        "THIRD_PARTY_LICENSES",
+        "go.mod",
+        "backend/backend.go",
+        "backend/conformance/claim.go",
+        "internal/storage/embeddeddolt/issue_operations.go",
+        "internal/storage/embeddeddolt/transaction_wisp_lifecycle_persistence_test.go",
+        "AGENTS.md",
+        "CLAUDE.md",
+        "CONTRIBUTING.md",
+        "engdocs/PROJECT_CHARTER.md",
+        "engdocs/design/dolt-concurrency.md"
+      ],
+      "inspected": [
+        {
+          "path": "LICENSE",
+          "ranges": "full",
+          "url": "https://github.com/gastownhall/beads/blob/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb/LICENSE",
+          "observation": "MIT root license."
+        },
+        {
+          "path": "THIRD_PARTY_LICENSES",
+          "ranges": "full",
+          "url": "https://github.com/gastownhall/beads/blob/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb/THIRD_PARTY_LICENSES",
+          "observation": "Includes Dolt components under Apache-2.0 and complete license notice."
+        },
+        {
+          "path": "go.mod",
+          "ranges": "1-50",
+          "url": "https://github.com/gastownhall/beads/blob/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb/go.mod",
+          "observation": "Go 1.26.5, toolchain 1.26.10 and Dolt/database dependencies."
+        },
+        {
+          "path": "backend/backend.go",
+          "ranges": "20-166",
+          "url": "https://github.com/gastownhall/beads/blob/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb/backend/backend.go",
+          "observation": "Exported backend surface experimental. Conformance covers only a subset, while unsupported capability declarations are separate."
+        },
+        {
+          "path": "backend/conformance/claim.go",
+          "ranges": "157-278",
+          "url": "https://github.com/gastownhall/beads/blob/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb/backend/conformance/claim.go",
+          "observation": "Expired claim reclaim, fresh claim preservation and stale-assignee conditional-release tests."
+        },
+        {
+          "path": "internal/storage/embeddeddolt/issue_operations.go",
+          "ranges": "full",
+          "url": "https://github.com/gastownhall/beads/blob/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb/internal/storage/embeddeddolt/issue_operations.go",
+          "observation": "Guarded issue lifecycle snapshots requests and executes via transactional helper, cgo build."
+        },
+        {
+          "path": "internal/storage/embeddeddolt/transaction_wisp_lifecycle_persistence_test.go",
+          "ranges": "1-172",
+          "url": "https://github.com/gastownhall/beads/blob/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb/internal/storage/embeddeddolt/transaction_wisp_lifecycle_persistence_test.go",
+          "observation": "Tests dependent blocked-state propagation to versioned history and standalone ephemeral state without Dolt commit."
+        },
+        {
+          "path": "AGENTS.md",
+          "ranges": "full",
+          "url": "https://github.com/gastownhall/beads/blob/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb/AGENTS.md",
+          "evidence_kind": "repository engineering guidance",
+          "observation": "Root guidance distinguishes contributor rules from end-user integration. Beads owns issue primitives and delegates storage-engine recovery to its driver. Agents use Bazel gates. CLAUDE files are documented symlinks to AGENTS."
+        },
+        {
+          "path": "CLAUDE.md",
+          "ranges": "full",
+          "url": "https://github.com/gastownhall/beads/blob/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb/CLAUDE.md",
+          "evidence_kind": "repository engineering guidance",
+          "observation": "Pinned tree records a symlink to AGENTS.md. The raw fetch returned the resolved target content, which exactly matches the fully inspected AGENTS.md. No independent additional instructions are claimed."
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "ranges": "full",
+          "url": "https://github.com/gastownhall/beads/blob/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb/CONTRIBUTING.md",
+          "evidence_kind": "repository engineering guidance",
+          "observation": "Documents Bazel, CGO and embedded-Dolt prerequisites, contributor protection and storage boundaries. Canonical test lane claims were read, not executed."
+        },
+        {
+          "path": "engdocs/PROJECT_CHARTER.md",
+          "ranges": "full",
+          "url": "https://github.com/gastownhall/beads/blob/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb/engdocs/PROJECT_CHARTER.md",
+          "evidence_kind": "repository engineering guidance",
+          "observation": "Issue tracking primitives belong in Beads, orchestration policy belongs above it, and Dolt/driver owns storage, merge/concurrency and crash-safety mechanisms. A Beads store is not the product's artifact transaction journal."
+        },
+        {
+          "path": "engdocs/design/dolt-concurrency.md",
+          "ranges": "full",
+          "url": "https://github.com/gastownhall/beads/blob/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb/engdocs/design/dolt-concurrency.md",
+          "evidence_kind": "repository engineering guidance",
+          "observation": "Historical implemented design explains transaction-wrapped shared-main coordination and distinguishes server from embedded mode. It retains proposal-era prose and open questions, so current source remains the behavior authority."
+        }
+      ],
+      "finding": "Useful dependency DAG, guarded task transition, claim ownership and event provenance patterns. Durable database commits are distinct from external tool effects.",
+      "reuse": "Implement a smaller local task model with these invariants. Defer wholesale Dolt backend, CLI and experimental extension interface.",
+      "limits": "No tests executed. Read tests include cgo and environment skip. Backend conformance itself warns about partial coverage.",
+      "maintenance": {
+        "observed_at": "2026-10-23",
+        "updated_at": "2026-10-23 13:32:53 UTC",
+        "scope": "Repository metadata, pinned manifests, root and selected referenced engineering guidance, latest stable release endpoint and first release-list entry. No build, package installation, live runtime, CI-result audit, release-history census or support-response study.",
+        "default_branch": "main",
+        "audited_commit": "bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb",
+        "audited_commit_date": "2026-10-23T02:44:36Z",
+        "audited_commit_date_kind": "GitHub commit committer timestamp",
+        "archived": false,
+        "disabled": false,
+        "repository_created_at": "2025-10-12T03:09:46Z",
+        "repository_pushed_at": "2026-10-23T02:50:09Z",
+        "repository_updated_at": "2026-10-23T12:19:26Z",
+        "metadata_source_url": "https://api.github.com/repos/gastownhall/beads",
+        "metadata_cache": "research/metadata-b.json",
+        "commit_source_url": "https://api.github.com/repos/gastownhall/beads/commits/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb",
+        "activity_interpretation": "Recent repository push metadata is an activity signal only. It can reflect another branch and does not establish that the audited commit is the newest commit, that CI passed or that a released artifact is compatible.",
+        "releases": {
+          "latest_stable_endpoint": "https://api.github.com/repos/gastownhall/beads/releases/latest",
+          "latest_stable_status": "Observed",
+          "latest_stable_release": {
+            "tag": "v1.3.1",
+            "name": "v1.3.1",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-09-30T23:37:36Z",
+            "updated_at": "2026-10-01T03:44:44Z",
+            "created_at": "2026-09-30T20:48:08Z",
+            "target_commitish": "main",
+            "url": "https://github.com/gastownhall/beads/releases/tag/v1.3.1"
+          },
+          "collection_endpoint": "https://api.github.com/repos/gastownhall/beads/releases?per_page=1",
+          "collection_status": "Observed first returned entry",
+          "first_collection_entry": {
+            "tag": "v1.3.2-rc.3",
+            "name": "v1.3.2-rc.3",
+            "prerelease": true,
+            "draft": false,
+            "published_at": "2026-10-23T02:50:11Z",
+            "updated_at": "2026-10-23T02:58:37Z",
+            "created_at": "2026-10-23T02:09:51Z",
+            "target_commitish": "main",
+            "url": "https://github.com/gastownhall/beads/releases/tag/v1.3.2-rc.3"
+          },
+          "most_recent_published_release_among_observations": {
+            "tag": "v1.3.2-rc.3",
+            "name": "v1.3.2-rc.3",
+            "prerelease": true,
+            "draft": false,
+            "published_at": "2026-10-23T02:50:11Z",
+            "updated_at": "2026-10-23T02:58:37Z",
+            "created_at": "2026-10-23T02:09:51Z",
+            "target_commitish": "main",
+            "url": "https://github.com/gastownhall/beads/releases/tag/v1.3.2-rc.3"
+          },
+          "exhaustive_tag_history": "Unknown",
+          "limits": "Only the latest-stable result and first release collection entry were inspected. No assertion that a release tag resolves to the audited source commit."
+        },
+        "package_runtime_versions": [
+          {
+            "path": "go.mod",
+            "name": "github.com/steveyegge/beads",
+            "version": "Unknown",
+            "runtime": {
+              "go_directive": "1.26.5",
+              "toolchain": "go1.26.10"
+            },
+            "url": "https://github.com/gastownhall/beads/blob/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb/go.mod"
+          }
+        ],
+        "additional_runtime_guidance": {
+          "canonical_agent_test_system": "Bazel through Bazelisk",
+          "bazel_version": "Unknown",
+          "source_path": "AGENTS.md"
+        },
+        "repository_guidance": {
+          "inspected": true,
+          "status": "All present named root guidance inspected",
+          "root_files_present": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "CONTRIBUTING.md"
+          ],
+          "root_files_absent": [],
+          "source_tree_url": "https://api.github.com/repos/gastownhall/beads/git/trees/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb?recursive=1",
+          "tree_truncated": false,
+          "inspected_paths": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "CONTRIBUTING.md",
+            "engdocs/PROJECT_CHARTER.md",
+            "engdocs/design/dolt-concurrency.md"
+          ],
+          "read_coverage": [
+            {
+              "path": "AGENTS.md",
+              "ranges": "full"
+            },
+            {
+              "path": "CLAUDE.md",
+              "ranges": "full",
+              "representation": "Raw endpoint resolved the symlink to AGENTS.md. Identical target content was fully inspected."
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "ranges": "full"
+            },
+            {
+              "path": "engdocs/PROJECT_CHARTER.md",
+              "ranges": "full"
+            },
+            {
+              "path": "engdocs/design/dolt-concurrency.md",
+              "ranges": "full"
+            }
+          ],
+          "limitations": [
+            "All present root AGENTS.md, CLAUDE.md and CONTRIBUTING.md were inspected, plus only the relevant referenced boundary documents listed here. This is not an exhaustive review of all repository documentation or package guidance."
+          ]
+        },
+        "maturity": {
+          "assessment": "Issue tracker with an observed stable release and newer release candidate, plus explicit storage and orchestration boundaries. Its backend/concurrency test patterns are useful, while whole-system embedding and operational maturity remain unproven here.",
+          "signals": [
+            "Observed stable v1.3.1 and v1.3.2-rc.3 prerelease",
+            "Explicit issue-tracker and storage-driver boundaries",
+            "Bazel/CGO/Dolt operational requirements"
+          ],
+          "production_readiness": "Unknown"
+        },
+        "recommendation_after_guidance_review": "Pattern-level reuse remains the recommendation. The additional guidance strengthens the reason to avoid wholesale runtime/backend or workflow-policy adoption."
+      }
+    },
+    {
+      "id": "SRC-B07",
+      "name": "Runfusion/Fusion",
+      "url": "https://github.com/Runfusion/Fusion",
+      "commit": "5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3",
+      "retrieved": "2026-10-23",
+      "license": "MIT",
+      "status": "Verified",
+      "qualification": "Selective source and test inspection only. No build or test execution.",
+      "paths": [
+        "LICENSE",
+        "packages/core/package.json",
+        "packages/engine/package.json",
+        "packages/engine/src/agents/agent-runtime.ts",
+        "packages/engine/src/runtimes/child-process-runtime.ts",
+        "packages/core/src/task-store/workspace-leases.ts",
+        "packages/core/src/__tests__/postgres/handoff-to-review-atomicity.pg.test.ts",
+        "AGENTS.md",
+        "CLAUDE.md",
+        "docs/contributing.md"
+      ],
+      "inspected": [
+        {
+          "path": "packages/core/package.json",
+          "ranges": "full",
+          "url": "https://github.com/Runfusion/Fusion/blob/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3/packages/core/package.json",
+          "observation": "0.78.0-beta.9. Embedded Postgres, Drizzle, Docker and operational dependencies."
+        },
+        {
+          "path": "packages/engine/package.json",
+          "ranges": "full",
+          "url": "https://github.com/Runfusion/Fusion/blob/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3/packages/engine/package.json",
+          "observation": "Pi 1.1.0 libraries plus optional CLI adapters and MCP. Node >=22.19.0."
+        },
+        {
+          "path": "packages/engine/src/agents/agent-runtime.ts",
+          "ranges": "1-260",
+          "url": "https://github.com/Runfusion/Fusion/blob/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3/packages/engine/src/agents/agent-runtime.ts",
+          "observation": "Native Pi session adapter, explicit writable boundary, resolved credentials and pre-spawn policy hook."
+        },
+        {
+          "path": "packages/engine/src/runtimes/child-process-runtime.ts",
+          "ranges": "1-400,430-550",
+          "url": "https://github.com/Runfusion/Fusion/blob/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3/packages/engine/src/runtimes/child-process-runtime.ts",
+          "observation": "Forked worker lifecycle with generation counters and retries. killChild clears child reference after scheduling fallback that reads that reference."
+        },
+        {
+          "path": "packages/core/src/task-store/workspace-leases.ts",
+          "ranges": "1-210",
+          "url": "https://github.com/Runfusion/Fusion/blob/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3/packages/core/src/task-store/workspace-leases.ts",
+          "observation": "PostgreSQL advisory lock, monotonic fence tokens, conditional renew/release and land intent."
+        },
+        {
+          "path": "packages/core/src/__tests__/postgres/handoff-to-review-atomicity.pg.test.ts",
+          "ranges": "full",
+          "url": "https://github.com/Runfusion/Fusion/blob/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3/packages/core/src/__tests__/postgres/handoff-to-review-atomicity.pg.test.ts",
+          "observation": "Tests handoff state, queue, workflow and audit atomicity, idempotent retry and forced outer rollback."
+        },
+        {
+          "path": "AGENTS.md",
+          "ranges": "1-320,321-492",
+          "url": "https://github.com/Runfusion/Fusion/blob/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3/AGENTS.md",
+          "evidence_kind": "repository engineering guidance",
+          "observation": "Full 492-line root guidance inspected in two contiguous ranges. Core and engine packages are private and bundled into the published CLI/pi extension. It separates bounded best-effort telemetry from awaited transactional durability, requires lifecycle containment and treats publication as operator-owned. The documented merge gate is curated and the full suite is non-blocking."
+        },
+        {
+          "path": "CLAUDE.md",
+          "ranges": "full",
+          "url": "https://github.com/Runfusion/Fusion/blob/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3/CLAUDE.md",
+          "evidence_kind": "repository engineering guidance",
+          "observation": "Imports AGENTS.md. The complete imported guidance was inspected."
+        },
+        {
+          "path": "docs/contributing.md",
+          "ranges": "full",
+          "url": "https://github.com/Runfusion/Fusion/blob/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3/docs/contributing.md",
+          "evidence_kind": "repository engineering guidance",
+          "observation": "Documents private workspace package architecture, disposable test-data isolation, host/project state collision hazards and narrow versus full verification lanes. It confirms that non-test boot/type/build checks do not substitute for the test gate."
+        }
+      ],
+      "finding": "Strong factory pattern reference with actual native library integration and transactional handoff tests. Substantial operational system exceeds initial product needs.",
+      "reuse": "Adapt monotonic ownership fencing, intent-before-publish and transactional review handoff tests. Keep application-specific runtime and database authority independent.",
+      "limits": "Tests not run. Suspected SIGKILL fallback reference bug is source inference only. PostgreSQL test skips when unavailable. No blanket safety claim from project scale.",
+      "maintenance": {
+        "observed_at": "2026-10-23",
+        "updated_at": "2026-10-23 13:32:53 UTC",
+        "scope": "Repository metadata, pinned manifests, root and selected referenced engineering guidance, latest stable release endpoint and first release-list entry. No build, package installation, live runtime, CI-result audit, release-history census or support-response study.",
+        "default_branch": "main",
+        "audited_commit": "5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3",
+        "audited_commit_date": "2026-10-23T11:05:32Z",
+        "audited_commit_date_kind": "GitHub commit committer timestamp",
+        "archived": false,
+        "disabled": false,
+        "repository_created_at": "2026-04-13T01:43:26Z",
+        "repository_pushed_at": "2026-10-23T11:07:24Z",
+        "repository_updated_at": "2026-10-23T11:47:51Z",
+        "metadata_source_url": "https://api.github.com/repos/Runfusion/Fusion",
+        "metadata_cache": "research/metadata-b.json",
+        "commit_source_url": "https://api.github.com/repos/Runfusion/Fusion/commits/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3",
+        "activity_interpretation": "Recent repository push metadata is an activity signal only. It can reflect another branch and does not establish that the audited commit is the newest commit, that CI passed or that a released artifact is compatible.",
+        "releases": {
+          "latest_stable_endpoint": "https://api.github.com/repos/Runfusion/Fusion/releases/latest",
+          "latest_stable_status": "Observed",
+          "latest_stable_release": {
+            "tag": "v0.77.0",
+            "name": "v0.77.0",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-09-02T00:49:01Z",
+            "updated_at": "2026-09-02T01:14:24Z",
+            "created_at": "2026-09-02T00:48:24Z",
+            "target_commitish": "main",
+            "url": "https://github.com/Runfusion/Fusion/releases/tag/v0.77.0"
+          },
+          "collection_endpoint": "https://api.github.com/repos/Runfusion/Fusion/releases?per_page=1",
+          "collection_status": "Observed first returned entry",
+          "first_collection_entry": {
+            "tag": "v0.78.0-beta.9",
+            "name": "v0.78.0-beta.9",
+            "prerelease": true,
+            "draft": false,
+            "published_at": "2026-10-23T05:39:49Z",
+            "updated_at": "2026-10-23T06:02:51Z",
+            "created_at": "2026-10-23T05:37:53Z",
+            "target_commitish": "main",
+            "url": "https://github.com/Runfusion/Fusion/releases/tag/v0.78.0-beta.9"
+          },
+          "most_recent_published_release_among_observations": {
+            "tag": "v0.78.0-beta.9",
+            "name": "v0.78.0-beta.9",
+            "prerelease": true,
+            "draft": false,
+            "published_at": "2026-10-23T05:39:49Z",
+            "updated_at": "2026-10-23T06:02:51Z",
+            "created_at": "2026-10-23T05:37:53Z",
+            "target_commitish": "main",
+            "url": "https://github.com/Runfusion/Fusion/releases/tag/v0.78.0-beta.9"
+          },
+          "exhaustive_tag_history": "Unknown",
+          "limits": "Only the latest-stable result and first release collection entry were inspected. No assertion that a release tag resolves to the audited source commit."
+        },
+        "package_runtime_versions": [
+          {
+            "path": "packages/core/package.json",
+            "name": "@fusion/core",
+            "version": "0.78.0-beta.9",
+            "private": true,
+            "engines": {
+              "node": ">=22.19.0"
+            },
+            "config": {},
+            "relevant_dependencies": {},
+            "url": "https://github.com/Runfusion/Fusion/blob/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3/packages/core/package.json"
+          },
+          {
+            "path": "packages/engine/package.json",
+            "name": "@fusion/engine",
+            "version": "0.78.0-beta.9",
+            "private": true,
+            "engines": "Unknown",
+            "config": {},
+            "relevant_dependencies": {
+              "@earendil-works/pi-ai": "1.1.0",
+              "@earendil-works/pi-coding-agent": "1.1.0"
+            },
+            "url": "https://github.com/Runfusion/Fusion/blob/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3/packages/engine/package.json"
+          }
+        ],
+        "additional_runtime_guidance": {
+          "status": "No additional runtime version inferred beyond inspected manifests"
+        },
+        "repository_guidance": {
+          "inspected": true,
+          "status": "All present named root guidance inspected",
+          "root_files_present": [
+            "AGENTS.md",
+            "CLAUDE.md"
+          ],
+          "root_files_absent": [
+            "CONTRIBUTING.md"
+          ],
+          "source_tree_url": "https://api.github.com/repos/Runfusion/Fusion/git/trees/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3?recursive=1",
+          "tree_truncated": false,
+          "inspected_paths": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "docs/contributing.md"
+          ],
+          "read_coverage": [
+            {
+              "path": "AGENTS.md",
+              "ranges": "1-320 and 321-492, complete"
+            },
+            {
+              "path": "CLAUDE.md",
+              "ranges": "full"
+            },
+            {
+              "path": "docs/contributing.md",
+              "ranges": "full"
+            }
+          ],
+          "limitations": [
+            "All present root AGENTS.md, CLAUDE.md and CONTRIBUTING.md were inspected, plus only the relevant referenced boundary documents listed here. This is not an exhaustive review of all repository documentation or package guidance."
+          ]
+        },
+        "maturity": {
+          "assessment": "The inspected private packages match a beta prerelease, while the observed stable release is older. The published unit is the CLI/pi extension, not independently published core/engine libraries. Extensive lifecycle guidance shows operational concerns but is not evidence that inspected tests passed or every test gates a release.",
+          "signals": [
+            "Observed stable v0.77.0 and v0.78.0-beta.9 prerelease",
+            "Private core and engine package declarations",
+            "Curated merge gate and separately non-blocking full suite"
+          ],
+          "production_readiness": "Unknown"
+        },
+        "recommendation_after_guidance_review": "Pattern-level reuse remains the recommendation. The additional guidance strengthens the reason to avoid wholesale runtime/backend or workflow-policy adoption."
+      }
+    },
+    {
+      "id": "SRC-B08",
+      "name": "mastra-ai/softwarefactory-template",
+      "url": "https://github.com/mastra-ai/softwarefactory-template",
+      "commit": "ebde794a8656278cf26bbb2b8764be7070b325d9",
+      "retrieved": "2026-10-23",
+      "license": "Apache-2.0 declared in package.json. No LICENSE file in complete tree.",
+      "status": "Verified",
+      "qualification": "Selective source and test inspection only. No build or test execution.",
+      "paths": [
+        "package.json",
+        "docker-compose.yml",
+        "src/mastra/index.ts",
+        ".env.schema"
+      ],
+      "inspected": [
+        {
+          "path": "package.json",
+          "ranges": "full",
+          "url": "https://github.com/mastra-ai/softwarefactory-template/blob/ebde794a8656278cf26bbb2b8764be7070b325d9/package.json",
+          "observation": "Private template 0.1.0, Apache-2.0 declaration and pinned Mastra factory/DB/sandbox dependencies."
+        },
+        {
+          "path": "docker-compose.yml",
+          "ranges": "full",
+          "url": "https://github.com/mastra-ai/softwarefactory-template/blob/ebde794a8656278cf26bbb2b8764be7070b325d9/docker-compose.yml",
+          "observation": "Postgres18 with pgvector and Redis8 development services."
+        },
+        {
+          "path": "src/mastra/index.ts",
+          "ranges": "1-234,290-420",
+          "url": "https://github.com/mastra-ai/softwarefactory-template/blob/ebde794a8656278cf26bbb2b8764be7070b325d9/src/mastra/index.ts",
+          "observation": "Credential and auth configuration, unified factory storage, production DATABASE_URL requirement and explicit sandbox provider requirement."
+        },
+        {
+          "path": ".env.schema",
+          "ranges": "selected configuration declarations",
+          "url": "https://github.com/mastra-ai/softwarefactory-template/blob/ebde794a8656278cf26bbb2b8764be7070b325d9/.env.schema",
+          "observation": "Local sandbox runs with server-user access. Redis event bus and provider configuration available."
+        },
+        {
+          "path": "repository recursive tree metadata",
+          "ranges": "complete metadata",
+          "url": "https://api.github.com/repos/mastra-ai/softwarefactory-template/git/trees/ebde794a8656278cf26bbb2b8764be7070b325d9?recursive=1",
+          "observation": "28 entries. No test files and no LICENSE file found. Factory implementation is dependency rather than included source."
+        }
+      ],
+      "finding": "Configuration template is useful to understand operational requirements but does not establish factory engine durability.",
+      "reuse": "Borrow per-stage controls and visible task/session views. Defer Mastra server, Postgres/Redis and hosted-sandbox architecture for local MVP. Confirm distribution notices for exact dependencies before copying.",
+      "limits": "No engine implementation or dependency test audit. Manifest license is declared, full root license text absent. No running stack or authentication flow verified.",
+      "maintenance": {
+        "observed_at": "2026-10-23",
+        "updated_at": "2026-10-23 13:32:53 UTC",
+        "scope": "Repository metadata, pinned manifests, root and selected referenced engineering guidance, latest stable release endpoint and first release-list entry. No build, package installation, live runtime, CI-result audit, release-history census or support-response study.",
+        "default_branch": "main",
+        "audited_commit": "ebde794a8656278cf26bbb2b8764be7070b325d9",
+        "audited_commit_date": "2026-10-22T12:35:16Z",
+        "audited_commit_date_kind": "GitHub commit committer timestamp",
+        "archived": false,
+        "disabled": false,
+        "repository_created_at": "2026-07-16T03:31:21Z",
+        "repository_pushed_at": "2026-10-22T12:35:18Z",
+        "repository_updated_at": "2026-10-22T13:27:25Z",
+        "metadata_source_url": "https://api.github.com/repos/mastra-ai/softwarefactory-template",
+        "metadata_cache": "research/metadata-b.json",
+        "commit_source_url": "https://api.github.com/repos/mastra-ai/softwarefactory-template/commits/ebde794a8656278cf26bbb2b8764be7070b325d9",
+        "activity_interpretation": "Recent repository push metadata is an activity signal only. It can reflect another branch and does not establish that the audited commit is the newest commit, that CI passed or that a released artifact is compatible.",
+        "releases": {
+          "latest_stable_endpoint": "https://api.github.com/repos/mastra-ai/softwarefactory-template/releases/latest",
+          "latest_stable_status": "No latest stable release returned",
+          "latest_stable_release": "Unknown",
+          "collection_endpoint": "https://api.github.com/repos/mastra-ai/softwarefactory-template/releases?per_page=1",
+          "collection_status": "Empty release collection observed",
+          "first_collection_entry": "Unknown",
+          "most_recent_published_release_among_observations": "No release observed",
+          "exhaustive_tag_history": "Unknown",
+          "limits": "Only the latest-stable result and first release collection entry were inspected. No assertion that a release tag resolves to the audited source commit.",
+          "latest_endpoint_error": "404 Not Found. A successful empty release collection corroborates no GitHub releases observed.",
+          "tag_lookup_status": "Unknown",
+          "tag_lookup_limit": "The tags collection request was rejected by the connector URL allowlist. No tag absence is inferred."
+        },
+        "package_runtime_versions": [
+          {
+            "path": "package.json",
+            "name": "mastra-factory",
+            "version": "0.1.0",
+            "private": true,
+            "engines": {
+              "node": ">=22.19.0"
+            },
+            "config": {},
+            "relevant_dependencies": {
+              "@mastra/factory": "0.24.0"
+            },
+            "url": "https://github.com/mastra-ai/softwarefactory-template/blob/ebde794a8656278cf26bbb2b8764be7070b325d9/package.json"
+          }
+        ],
+        "additional_runtime_guidance": {
+          "status": "No additional runtime version inferred beyond inspected manifests"
+        },
+        "repository_guidance": {
+          "inspected": false,
+          "status": "Named root guidance absent at inspected revision",
+          "root_files_present": [],
+          "root_files_absent": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "CONTRIBUTING.md"
+          ],
+          "source_tree_url": "https://api.github.com/repos/mastra-ai/softwarefactory-template/git/trees/ebde794a8656278cf26bbb2b8764be7070b325d9?recursive=1",
+          "tree_truncated": false,
+          "inspected_paths": [],
+          "read_coverage": [],
+          "limitations": [
+            "No root AGENTS.md, CLAUDE.md or CONTRIBUTING.md exists in the complete pinned tree. Absence applies to these named files, not a claim that no instructions occur anywhere."
+          ]
+        },
+        "maturity": {
+          "assessment": "Private 0.1.0 application template with no observed GitHub release and an external @mastra/factory 0.24.0 dependency. No root AGENTS, CLAUDE or CONTRIBUTING guidance is present in the complete pinned tree. Template configuration is not proof of the dependency engine's durability or maturity.",
+          "signals": [
+            "Manifest private=true and version 0.1.0",
+            "Empty GitHub release collection",
+            "Factory engine supplied by external dependency"
+          ],
+          "production_readiness": "Unknown"
+        },
+        "recommendation_after_guidance_review": "Use template configuration ideas only. Engine durability, release maturity and missing license-file evidence remain separate unresolved questions."
+      }
+    },
+    {
+      "id": "SRC-B09",
+      "name": "Announcing Mastra Factory Beta",
+      "url": "https://mastra.ai/blog/announcing-mastra-factory-beta",
+      "retrieved": "2026-10-23",
+      "published": "2026-09-08",
+      "status": "Documented only",
+      "qualification": "Author report, not independent benchmark",
+      "inspected": "Article body lines43-118",
+      "finding": "Configurable manual and automatic stages, visible task sessions and upstream-assumption review are useful product ideas. Author reports that automatic backlog processing created infrastructure and review pressure.",
+      "reuse": "Adopt stage-specific policy and queue limits as design ideas.",
+      "limits": "No controlled comparison. Narrative productivity percentages and chart totals use unclear differing windows. No numerical performance claim adopted."
+    },
+    {
+      "id": "SRC-B10",
+      "name": "Welcome to Glass Town: building a software factory with a paper trail",
+      "url": "https://aaif.io/blog/welcome-to-glass-town-building-a-software-factory-with-a-paper-trail",
+      "retrieved": "2026-10-23",
+      "published": "2026-10-14",
+      "status": "Documented only",
+      "qualification": "Personal demonstration report",
+      "inspected": "Article body lines21-106",
+      "finding": "Explicit role outputs, finite budgets, deterministic preview actions and commit-linked session evidence are useful patterns.",
+      "reuse": "Use bounded roles and traceable evidence. Do not adopt automatic per-file push as product workflow.",
+      "limits": "No complete factory source or durability tests linked in article. Sprites deployment and Entire behavior not verified by this article audit."
+    }
+  ],
+  "fetchedFiles": [
+    {
+      "repo": "earendil-works/pi",
+      "path": "LICENSE",
+      "sha": "b0a8e9b81083294360c69b4ec45d3d39a2b28197",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/LICENSE"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/agent/package.json",
+      "sha": "d1231d95df683a382b5abb32a51fee02d1f08d03",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/agent/package.json"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/ai/package.json",
+      "sha": "ac6f865c6f5ee8be1d9d4a7e9070ced977612ae1",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/ai/package.json"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/agent/src/agent-loop.ts",
+      "sha": "cfc9401e5581847f6d5a9bb1815ab0f0e663f2e5",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/agent/src/agent-loop.ts"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/agent/src/types.ts",
+      "sha": "dbfba74a084f71951e48285869730b70a405ba3a",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/agent/src/types.ts"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/coding-agent/src/core/sdk.ts",
+      "sha": "0bf874fff7817d1e13e93d6af53285b019ba19c5",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/coding-agent/src/core/sdk.ts"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/coding-agent/src/core/session-manager.ts",
+      "sha": "df5281a0a4258462b14faa7d055efa09783ea6aa",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/coding-agent/src/core/session-manager.ts"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/durable/package.json",
+      "sha": "d40ddfbd8da2a9033c65a8c7b4a2110e3e80e009",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/durable/package.json"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/durable/src/index.ts",
+      "sha": "60dad5337e6fbd14a524f30d1714ae3ea0fc8194",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/durable/src/index.ts"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "path": "LICENSE",
+      "sha": "6439474beed8e0271df9862eff97ffd70ec2464c",
+      "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/LICENSE"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "path": "packages/sdk/package.json",
+      "sha": "8db27b686a61fcb87308877c77de63656c814d46",
+      "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/sdk/package.json"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "path": "packages/sdk/src/index.ts",
+      "sha": "937560cf47985585580a76963dcb76e5bc9563c1",
+      "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/sdk/src/index.ts"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "path": "packages/sdk/src/opencode.ts",
+      "sha": "409feb1c7957f583852155223f6a8baeae1af79f",
+      "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/sdk/src/opencode.ts"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "path": "packages/sdk/src/internal/host.ts",
+      "sha": "35b5911f0206b643461b391220b99db50c29f5b3",
+      "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/sdk/src/internal/host.ts"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "path": "packages/core/package.json",
+      "sha": "03725c1f283f38a2f7f083c3c62f95083b1ec888",
+      "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/package.json"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "path": "packages/core/src/session/run-coordinator.ts",
+      "sha": "a8e75319f1f1f6eb6b8980a230d2b5072c2bbfe5",
+      "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/src/session/run-coordinator.ts"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "path": "packages/core/src/session/store.ts",
+      "sha": "c9698231bbcf89cd6c41506ff2f6652f47c29b47",
+      "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/src/session/store.ts"
+    },
+    {
+      "repo": "OpenHands/software-agent-sdk",
+      "path": "LICENSE",
+      "sha": "b0bd86a6335a564bd3766666bebbf014fd6a8013",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/LICENSE"
+    },
+    {
+      "repo": "OpenHands/software-agent-sdk",
+      "path": "openhands-sdk/pyproject.toml",
+      "sha": "9de3ff9a3f657e417779f9a969f6b5f3dcd350cd",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/openhands-sdk/pyproject.toml"
+    },
+    {
+      "repo": "OpenHands/software-agent-sdk",
+      "path": "openhands-sdk/openhands/sdk/conversation/cancellation.py",
+      "sha": "8d1c4fea3f4b82e908f3b2b211fabcade84715d4",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/openhands-sdk/openhands/sdk/conversation/cancellation.py"
+    },
+    {
+      "repo": "OpenHands/software-agent-sdk",
+      "path": "openhands-sdk/openhands/sdk/conversation/event_store.py",
+      "sha": "ddfd38f13662ddb7c28e4d5142862e91d05716ca",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/openhands-sdk/openhands/sdk/conversation/event_store.py"
+    },
+    {
+      "repo": "OpenHands/software-agent-sdk",
+      "path": "openhands-sdk/openhands/sdk/conversation/impl/local_conversation.py",
+      "sha": "067674a68389b1fb3b5e98a1888d3d08b4730e5a",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/openhands-sdk/openhands/sdk/conversation/impl/local_conversation.py"
+    },
+    {
+      "repo": "OpenHands/software-agent-sdk",
+      "path": "clients/typescript/package.json",
+      "sha": "f32751f0e83bc7d8b403f30343573a268414a05e",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/clients/typescript/package.json"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/agent/src/agent.ts",
+      "sha": "c0a482d3a499b6baabd61cd1c4eed3f93cb2a9a6",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/agent/src/agent.ts"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/durable/src/harness/harness.ts",
+      "sha": "d22f368cc2b669c9103a46cc6ae986995267aa27",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/durable/src/harness/harness.ts"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/durable/src/harness/tool.ts",
+      "sha": "52bc4a3ada1892645aca5a35f4d90b875edda4ca",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/durable/src/harness/tool.ts"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/durable/src/storage/sqlite/node.ts",
+      "sha": "210478ae58d23e3b97acb48029295b325332a7cd",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/durable/src/storage/sqlite/node.ts"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/durable/src/storage/sqlite/storage.ts",
+      "sha": "5576363ed6789bd4ba41404db58011b3bcf4a560",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/durable/src/storage/sqlite/storage.ts"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/durable/test/harness-tools-recovery.test.ts",
+      "sha": "226bade8155d791e76ab355a17d39e77ccae99ed",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/durable/test/harness-tools-recovery.test.ts"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/durable/test/harness-cancellation-barrier.test.ts",
+      "sha": "086787e430551471a62ff27c65beaeceb9a6b72d",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/durable/test/harness-cancellation-barrier.test.ts"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/durable/test/harness-storage-failure.test.ts",
+      "sha": "9169e62c70a8691b61f3b674eabe96f6df29303b",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/durable/test/harness-storage-failure.test.ts"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/durable/test/sqlite-storage.test.ts",
+      "sha": "811862decd14e610cfaff39e2bd42090743a8a52",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/durable/test/sqlite-storage.test.ts"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/agent/test/agent-loop.test.ts",
+      "sha": "4a9386a131db7f24b3f309d4b9b2e545277a3fbc",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/agent/test/agent-loop.test.ts"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/ai/src/api/transform-messages.ts",
+      "sha": "d6bbba5051021de0651d13c4c009a6bed5928685",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/ai/src/api/transform-messages.ts"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/ai/src/api/constrained-sampling.ts",
+      "sha": "3f1cb262ed38db4fe257b4b21e5154be7e9ba8fe",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/ai/src/api/constrained-sampling.ts"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/ai/test/cross-provider-handoff.test.ts",
+      "sha": "a15f683d5a3e5dc5c78b54c5555a047d582715bd",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/ai/test/cross-provider-handoff.test.ts"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/coding-agent/src/extensions/mcp/runtime.ts",
+      "sha": "f13d21b1273ababa7f2cdabe31bd25bba6d2fb3d",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/coding-agent/src/extensions/mcp/runtime.ts"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "path": "packages/sdk/src/promise.ts",
+      "sha": "ea74552c98dfa7b6b100799be12ce440c5e60fb8",
+      "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/sdk/src/promise.ts"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "path": "packages/sdk/test/embedded.test.ts",
+      "sha": "4d3acb58341b0c5cef5d7f9c74c2f65ef93a5469",
+      "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/sdk/test/embedded.test.ts"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "path": "packages/core/src/session/execution/restart.ts",
+      "sha": "dde339301837fe7e7244dcc8ac4d2fc617f850b6",
+      "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/src/session/execution/restart.ts"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "path": "packages/core/test/session-run-coordinator.test.ts",
+      "sha": "e02a84511d5261ad8f8a5630ee907c5b88202864",
+      "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/test/session-run-coordinator.test.ts"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "path": "packages/core/test/session-store.test.ts",
+      "sha": "19292795d1465a72022214f881f7993ee06e8c6a",
+      "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/test/session-store.test.ts"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "path": "packages/core/src/mcp/client.ts",
+      "sha": "55ef10dd207cb992a81e87e33cdb7b965b240128",
+      "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/src/mcp/client.ts"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "path": "packages/ai/src/providers/openai-compatible.ts",
+      "sha": "40fa5d50848f87a7fd874316be427cbfe5ac52fb",
+      "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/ai/src/providers/openai-compatible.ts"
+    },
+    {
+      "repo": "OpenHands/software-agent-sdk",
+      "path": "tests/sdk/conversation/test_event_store.py",
+      "sha": "e7fc158ffb39375b6b89fd274914c9ad730009b4",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/tests/sdk/conversation/test_event_store.py"
+    },
+    {
+      "repo": "OpenHands/software-agent-sdk",
+      "path": "tests/sdk/conversation/test_interrupt.py",
+      "sha": "b60511f9b5a013f31f58c240c093541e5cace313",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/tests/sdk/conversation/test_interrupt.py"
+    },
+    {
+      "repo": "OpenHands/software-agent-sdk",
+      "path": "openhands-sdk/openhands/sdk/tool/schema.py",
+      "sha": "8ffb1ecb0ee3ebcc7cec2bbbea11c7359fe0bd05",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/openhands-sdk/openhands/sdk/tool/schema.py"
+    },
+    {
+      "repo": "OpenHands/software-agent-sdk",
+      "path": "openhands-sdk/openhands/sdk/tool/builtins/switch_llm.py",
+      "sha": "4a33f0b7b2b1a39df704c9f51903b91cc399e7d9",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/openhands-sdk/openhands/sdk/tool/builtins/switch_llm.py"
+    },
+    {
+      "repo": "OpenHands/software-agent-sdk",
+      "path": "clients/typescript/src/conversation/local-conversation.ts",
+      "sha": "c38b9e46e30467b2bcadcffab61ef0188e8f7cbc",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/clients/typescript/src/conversation/local-conversation.ts"
+    },
+    {
+      "repo": "gastownhall/gascity",
+      "path": "LICENSE",
+      "sha": "8c700075d94c4d4a4494dc096c745bdf7a36e9b4",
+      "url": "https://github.com/gastownhall/gascity/blob/87a47634d0cebe611874df321c723bba95dcffea/LICENSE"
+    },
+    {
+      "repo": "gastownhall/gascity",
+      "path": "go.mod",
+      "sha": "e6f969c77045aabee3635e345953b925273d5e96",
+      "url": "https://github.com/gastownhall/gascity/blob/87a47634d0cebe611874df321c723bba95dcffea/go.mod"
+    },
+    {
+      "repo": "gastownhall/gascity",
+      "path": "internal/runtime/provider_core.go",
+      "sha": "f1a3df5d6a3cf98016ea3d1bde0fc2d5e20bbb15",
+      "url": "https://github.com/gastownhall/gascity/blob/87a47634d0cebe611874df321c723bba95dcffea/internal/runtime/provider_core.go"
+    },
+    {
+      "repo": "gastownhall/gascity",
+      "path": "internal/runtime/protocol.go",
+      "sha": "4de9848fb2b76f575ddf3e7fb29e70e716542dfc",
+      "url": "https://github.com/gastownhall/gascity/blob/87a47634d0cebe611874df321c723bba95dcffea/internal/runtime/protocol.go"
+    },
+    {
+      "repo": "gastownhall/gascity",
+      "path": "cmd/gc/reconcile_effect_fence.go",
+      "sha": "fc041151e9908443de6fbe4a2c3bb1ade25b66cd",
+      "url": "https://github.com/gastownhall/gascity/blob/87a47634d0cebe611874df321c723bba95dcffea/cmd/gc/reconcile_effect_fence.go"
+    },
+    {
+      "repo": "gastownhall/gascity",
+      "path": "cmd/gc/reconcile_effect_lease_test.go",
+      "sha": "85496f88a2d0d74065df3ac968d277b9fdae0ec4",
+      "url": "https://github.com/gastownhall/gascity/blob/87a47634d0cebe611874df321c723bba95dcffea/cmd/gc/reconcile_effect_lease_test.go"
+    },
+    {
+      "repo": "gastownhall/gascity",
+      "path": "internal/runtime/worker.go",
+      "sha": "ee32166348d2d53feab6ee78bdbaee9dd5c07279",
+      "url": "https://github.com/gastownhall/gascity/blob/87a47634d0cebe611874df321c723bba95dcffea/internal/runtime/worker.go"
+    },
+    {
+      "repo": "gastownhall/gastown",
+      "path": "LICENSE",
+      "sha": "c0d951df3042183c501ab0b9ab99037bd9c01302",
+      "url": "https://github.com/gastownhall/gastown/blob/ef70b0bf9e588dce00708e36564bfc06b51fac2c/LICENSE"
+    },
+    {
+      "repo": "gastownhall/gastown",
+      "path": "go.mod",
+      "sha": "3562b746b5851c369f19f3e6540b8eba240a518e",
+      "url": "https://github.com/gastownhall/gastown/blob/ef70b0bf9e588dce00708e36564bfc06b51fac2c/go.mod"
+    },
+    {
+      "repo": "gastownhall/gastown",
+      "path": "internal/agent/provider/provider.go",
+      "sha": "490dbf1e2e68fe3cdacdcae1514c951a6c090af8",
+      "url": "https://github.com/gastownhall/gastown/blob/ef70b0bf9e588dce00708e36564bfc06b51fac2c/internal/agent/provider/provider.go"
+    },
+    {
+      "repo": "gastownhall/gastown",
+      "path": "internal/runtime/runtime.go",
+      "sha": "609ad1fbd6ec921b66b73d45b7d2c6a551bae240",
+      "url": "https://github.com/gastownhall/gastown/blob/ef70b0bf9e588dce00708e36564bfc06b51fac2c/internal/runtime/runtime.go"
+    },
+    {
+      "repo": "gastownhall/gastown",
+      "path": "internal/checkpoint/checkpoint.go",
+      "sha": "6900a1175dbecbc46164e6e391ccf60fba2bacba",
+      "url": "https://github.com/gastownhall/gastown/blob/ef70b0bf9e588dce00708e36564bfc06b51fac2c/internal/checkpoint/checkpoint.go"
+    },
+    {
+      "repo": "gastownhall/gastown",
+      "path": "internal/checkpoint/checkpoint_test.go",
+      "sha": "cf49d486dbfc681689f01f7e48b7b3d0eb562dfe",
+      "url": "https://github.com/gastownhall/gastown/blob/ef70b0bf9e588dce00708e36564bfc06b51fac2c/internal/checkpoint/checkpoint_test.go"
+    },
+    {
+      "repo": "gastownhall/beads",
+      "path": "LICENSE",
+      "sha": "2a187917a0b9e8ea3ab3db2d9e60649f0e2e4ea5",
+      "url": "https://github.com/gastownhall/beads/blob/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb/LICENSE"
+    },
+    {
+      "repo": "gastownhall/beads",
+      "path": "THIRD_PARTY_LICENSES",
+      "sha": "21a0eeff52af3ac9e41a449cc69c4d2d2a060089",
+      "url": "https://github.com/gastownhall/beads/blob/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb/THIRD_PARTY_LICENSES"
+    },
+    {
+      "repo": "gastownhall/beads",
+      "path": "go.mod",
+      "sha": "4f7096574d70400db3ce4bdb7e700baee55bc444",
+      "url": "https://github.com/gastownhall/beads/blob/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb/go.mod"
+    },
+    {
+      "repo": "gastownhall/beads",
+      "path": "backend/backend.go",
+      "sha": "2981739aaf859eef82a41ea170b189228c56dbc6",
+      "url": "https://github.com/gastownhall/beads/blob/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb/backend/backend.go"
+    },
+    {
+      "repo": "gastownhall/beads",
+      "path": "backend/conformance/claim.go",
+      "sha": "dd400f8fede22ecca3840bc4539808e8cf3be493",
+      "url": "https://github.com/gastownhall/beads/blob/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb/backend/conformance/claim.go"
+    },
+    {
+      "repo": "gastownhall/beads",
+      "path": "internal/storage/embeddeddolt/issue_operations.go",
+      "sha": "7b51fa4ea62369eb03c14405cc297b680051ffbf",
+      "url": "https://github.com/gastownhall/beads/blob/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb/internal/storage/embeddeddolt/issue_operations.go"
+    },
+    {
+      "repo": "gastownhall/beads",
+      "path": "internal/storage/embeddeddolt/transaction_wisp_lifecycle_persistence_test.go",
+      "sha": "1d3b37f0a8e3359cd24adc80c34add01175fc557",
+      "url": "https://github.com/gastownhall/beads/blob/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb/internal/storage/embeddeddolt/transaction_wisp_lifecycle_persistence_test.go"
+    },
+    {
+      "repo": "Runfusion/Fusion",
+      "path": "LICENSE",
+      "sha": "2725bd5cea92fcd35ee7e343e5df3a241c65f1de",
+      "url": "https://github.com/Runfusion/Fusion/blob/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3/LICENSE"
+    },
+    {
+      "repo": "Runfusion/Fusion",
+      "path": "packages/core/package.json",
+      "sha": "cc9ab6f9fee67c8bce4ef118ca87db2b44a179fb",
+      "url": "https://github.com/Runfusion/Fusion/blob/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3/packages/core/package.json"
+    },
+    {
+      "repo": "Runfusion/Fusion",
+      "path": "packages/engine/package.json",
+      "sha": "92d0b10533949f642c8d5e48ce3e020fb4a2d93b",
+      "url": "https://github.com/Runfusion/Fusion/blob/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3/packages/engine/package.json"
+    },
+    {
+      "repo": "Runfusion/Fusion",
+      "path": "packages/engine/src/agents/agent-runtime.ts",
+      "sha": "ed970de0c2c628345fdc578d03e8a08132402d4d",
+      "url": "https://github.com/Runfusion/Fusion/blob/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3/packages/engine/src/agents/agent-runtime.ts"
+    },
+    {
+      "repo": "Runfusion/Fusion",
+      "path": "packages/engine/src/runtimes/child-process-runtime.ts",
+      "sha": "82e812c29fb0ea32523d575637c88341a2511372",
+      "url": "https://github.com/Runfusion/Fusion/blob/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3/packages/engine/src/runtimes/child-process-runtime.ts"
+    },
+    {
+      "repo": "Runfusion/Fusion",
+      "path": "packages/core/src/task-store/workspace-leases.ts",
+      "sha": "a9d7448c160e91b434645da067613bab20b13e43",
+      "url": "https://github.com/Runfusion/Fusion/blob/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3/packages/core/src/task-store/workspace-leases.ts"
+    },
+    {
+      "repo": "Runfusion/Fusion",
+      "path": "packages/core/src/__tests__/postgres/handoff-to-review-atomicity.pg.test.ts",
+      "sha": "4bbbc0632e453dfc02c03916566c70aeeb7b22e6",
+      "url": "https://github.com/Runfusion/Fusion/blob/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3/packages/core/src/__tests__/postgres/handoff-to-review-atomicity.pg.test.ts"
+    },
+    {
+      "repo": "mastra-ai/softwarefactory-template",
+      "path": "package.json",
+      "sha": "20786809b907d673be0274a642144a9d7e9c68ee",
+      "url": "https://github.com/mastra-ai/softwarefactory-template/blob/ebde794a8656278cf26bbb2b8764be7070b325d9/package.json"
+    },
+    {
+      "repo": "mastra-ai/softwarefactory-template",
+      "path": "docker-compose.yml",
+      "sha": "9d43c40ac4bc09251cfb1d184ecb6f38c051f949",
+      "url": "https://github.com/mastra-ai/softwarefactory-template/blob/ebde794a8656278cf26bbb2b8764be7070b325d9/docker-compose.yml"
+    },
+    {
+      "repo": "mastra-ai/softwarefactory-template",
+      "path": "src/mastra/index.ts",
+      "sha": "0ed58029e62c0444643255a92857f7207cd94a1e",
+      "url": "https://github.com/mastra-ai/softwarefactory-template/blob/ebde794a8656278cf26bbb2b8764be7070b325d9/src/mastra/index.ts"
+    },
+    {
+      "repo": "mastra-ai/softwarefactory-template",
+      "path": ".env.schema",
+      "sha": "a31cf0c53a215f42e8a5eb87ebbd76b05f0e5259",
+      "url": "https://github.com/mastra-ai/softwarefactory-template/blob/ebde794a8656278cf26bbb2b8764be7070b325d9/.env.schema"
+    },
+    {
+      "repo": "OpenHands/software-agent-sdk",
+      "path": "openhands-sdk/openhands/sdk/io/local.py",
+      "sha": "b31d270068557f125b45e48095c7ebbc3c0825fc",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/openhands-sdk/openhands/sdk/io/local.py"
+    },
+    {
+      "repo": "OpenHands/software-agent-sdk",
+      "path": "openhands-sdk/openhands/sdk/llm/llm.py",
+      "sha": "3e304d2eef6c7968878b50d692f8a87cd5937cd3",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/openhands-sdk/openhands/sdk/llm/llm.py"
+    },
+    {
+      "repo": "OpenHands/software-agent-sdk",
+      "path": "openhands-sdk/openhands/sdk/agent/response_dispatch.py",
+      "sha": "9796c7b6c151e3a71ff168faf43613a94e668405",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/openhands-sdk/openhands/sdk/agent/response_dispatch.py"
+    },
+    {
+      "repo": "OpenHands/software-agent-sdk",
+      "path": "openhands-sdk/openhands/sdk/mcp/config.py",
+      "sha": "0fe8d582088547353a1b255e880607411da28f09",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/openhands-sdk/openhands/sdk/mcp/config.py"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/ai/test/constrained-sampling.test.ts",
+      "sha": "8eb9ea8daf109c98b64b686cb37f6dfd5258b0a5",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/ai/test/constrained-sampling.test.ts"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/mcp/package.json",
+      "sha": "b016e80671ffdee17e2370a5c403d4290fafc023",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/mcp/package.json"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/durable/src/harness/generation.ts",
+      "sha": "c8d26791cd5a2e26287f73255b75f65ec21c3f22",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/durable/src/harness/generation.ts"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "path": "packages/core/src/session/model-transport.ts",
+      "sha": "29ca97246d5c99c14416945de3f132f3697f0817",
+      "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/src/session/model-transport.ts"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "path": "packages/core/test/session-execution.test.ts",
+      "sha": "d6cafcf7b5b1628c71fc4465a14f489f6d8990e9",
+      "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/test/session-execution.test.ts"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "path": "packages/ai/test/provider/openai-compatible-chat.test.ts",
+      "sha": "2f26ae52af16131df45c81682825d7bbc3a7929d",
+      "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/ai/test/provider/openai-compatible-chat.test.ts"
+    },
+    {
+      "repo": "OpenHands/software-agent-sdk",
+      "path": "openhands-sdk/openhands/sdk/utils/files.py",
+      "sha": "cdf2b7e6807d135d6386270e1988467009543701",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/openhands-sdk/openhands/sdk/utils/files.py"
+    },
+    {
+      "repo": "OpenHands/software-agent-sdk",
+      "path": "tests/sdk/llm/test_litellm_provider.py",
+      "sha": "6ddffe0a62d004a0bb1ff150b79efe42939abd17",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/tests/sdk/llm/test_litellm_provider.py"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/ai/src/api/openai-completions.ts",
+      "sha": "a752d304e7465128a59c92af0443c9d8a46d9c77",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/ai/src/api/openai-completions.ts"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "path": "packages/core/src/session/runner/step.ts",
+      "sha": "e3500d893084981236e9c0c08d1c7d88e7f6bce8",
+      "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/src/session/runner/step.ts"
+    },
+    {
+      "repo": "OpenHands/software-agent-sdk",
+      "path": "openhands-sdk/openhands/sdk/agent/agent.py",
+      "sha": "86570898f76ced3b7b2dbbfe02713d6e101be641",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/openhands-sdk/openhands/sdk/agent/agent.py"
+    },
+    {
+      "repo": "OpenHands/software-agent-sdk",
+      "path": "tests/sdk/agent/test_tool_validation_error_message.py",
+      "sha": "408266ffe875c730a921d61fdb641c1d8833200e",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/tests/sdk/agent/test_tool_validation_error_message.py"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "path": "packages/core/src/tool/runtime.ts",
+      "sha": "da38823c44c7c75943ca1b4b127f66417e23e182",
+      "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/src/tool/runtime.ts"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "path": "packages/core/src/tool.ts",
+      "sha": "e637b8aa9cdb70924b0935f24f16067e6dde986c",
+      "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/src/tool.ts"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "AGENTS.md",
+      "sha": "c7c87429474218d9f18b0e4880140855c4eb8d15",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/AGENTS.md",
+      "retrieved": "2026-10-23",
+      "purpose": "repository guidance coverage"
+    },
+    {
+      "repo": "earendil-works/pi",
+      "path": "CONTRIBUTING.md",
+      "sha": "c6d76f1c574c1c85cb2bb519ef4d21cb8e34623e",
+      "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/CONTRIBUTING.md",
+      "retrieved": "2026-10-23",
+      "purpose": "repository guidance coverage"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "path": "AGENTS.md",
+      "sha": "58b85ffb06ea197135e26593f46d0721b2f57d44",
+      "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/AGENTS.md",
+      "retrieved": "2026-10-23",
+      "purpose": "repository guidance coverage"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "path": "CONTRIBUTING.md",
+      "sha": "1795a8eab0335e911d40265bc2409a88c7c23dab",
+      "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/CONTRIBUTING.md",
+      "retrieved": "2026-10-23",
+      "purpose": "repository guidance coverage"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "path": "packages/ai/AGENTS.md",
+      "sha": "d5a33c4875e048081b04332d9e02dd47d13d0426",
+      "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/ai/AGENTS.md",
+      "retrieved": "2026-10-23",
+      "purpose": "repository guidance coverage"
+    },
+    {
+      "repo": "anomalyco/opencode",
+      "path": "packages/core/src/tool/AGENTS.md",
+      "sha": "0a4dbd1bf81a8551f3f683cea1904392b2c5f292",
+      "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/src/tool/AGENTS.md",
+      "retrieved": "2026-10-23",
+      "purpose": "repository guidance coverage"
+    },
+    {
+      "repo": "OpenHands/software-agent-sdk",
+      "path": "AGENTS.md",
+      "sha": "a1f9aa1426b4e92a6aeae3815ad49f6466eaa45b",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/AGENTS.md",
+      "retrieved": "2026-10-23",
+      "purpose": "repository guidance coverage"
+    },
+    {
+      "repo": "OpenHands/software-agent-sdk",
+      "path": "CONTRIBUTING.md",
+      "sha": "5ed9ee633dd96dd101b13017ae229cb04f025b11",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/CONTRIBUTING.md",
+      "retrieved": "2026-10-23",
+      "purpose": "repository guidance coverage"
+    },
+    {
+      "repo": "OpenHands/software-agent-sdk",
+      "path": "openhands-sdk/openhands/sdk/AGENTS.md",
+      "sha": "c81e58bd5e2244294ce357b9f977e6b38cdd0ac2",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/openhands-sdk/openhands/sdk/AGENTS.md",
+      "retrieved": "2026-10-23",
+      "purpose": "repository guidance coverage"
+    },
+    {
+      "repo": "OpenHands/software-agent-sdk",
+      "path": "clients/typescript/AGENTS.md",
+      "sha": "7861e5c48552d910823d3d3901a575488d7aa471",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/clients/typescript/AGENTS.md",
+      "retrieved": "2026-10-23",
+      "purpose": "repository guidance coverage"
+    },
+    {
+      "repo": "OpenHands/software-agent-sdk",
+      "path": ".agents/skills/custom-codereview-guide.md",
+      "sha": "30044393ec5cd98e6e93f1579071ae4556bbf2ff",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/.agents/skills/custom-codereview-guide.md",
+      "retrieved": "2026-10-23",
+      "purpose": "repository guidance coverage"
+    },
+    {
+      "repo": "gastownhall/gascity",
+      "path": "AGENTS.md",
+      "sha": "af36dd6c8c6083f4567c229fb327a85856080dc1",
+      "url": "https://github.com/gastownhall/gascity/blob/87a47634d0cebe611874df321c723bba95dcffea/AGENTS.md",
+      "retrieved": "2026-10-23",
+      "purpose": "repository guidance coverage"
+    },
+    {
+      "repo": "gastownhall/gascity",
+      "path": "CLAUDE.md",
+      "sha": "78c88c4e038d6fe51df8abbfbf6764332c36c2d3",
+      "url": "https://github.com/gastownhall/gascity/blob/87a47634d0cebe611874df321c723bba95dcffea/CLAUDE.md",
+      "retrieved": "2026-10-23",
+      "purpose": "repository guidance coverage"
+    },
+    {
+      "repo": "gastownhall/gascity",
+      "path": "CONTRIBUTING.md",
+      "sha": "0a16e0be22666775ec9974f8f04ecb7e15fc1f99",
+      "url": "https://github.com/gastownhall/gascity/blob/87a47634d0cebe611874df321c723bba95dcffea/CONTRIBUTING.md",
+      "retrieved": "2026-10-23",
+      "purpose": "repository guidance coverage"
+    },
+    {
+      "repo": "gastownhall/gascity",
+      "path": "engdocs/contributors/primitive-test.md",
+      "sha": "49b1660ba23b10f6840df3ca8580a1fe1540ba2a",
+      "url": "https://github.com/gastownhall/gascity/blob/87a47634d0cebe611874df321c723bba95dcffea/engdocs/contributors/primitive-test.md",
+      "retrieved": "2026-10-23",
+      "purpose": "repository guidance coverage"
+    },
+    {
+      "repo": "gastownhall/gastown",
+      "path": "AGENTS.md",
+      "sha": "dd8dd12339f39aee9ed54a9c282d0a5a028d0c8c",
+      "url": "https://github.com/gastownhall/gastown/blob/ef70b0bf9e588dce00708e36564bfc06b51fac2c/AGENTS.md",
+      "retrieved": "2026-10-23",
+      "purpose": "repository guidance coverage"
+    },
+    {
+      "repo": "gastownhall/gastown",
+      "path": "CONTRIBUTING.md",
+      "sha": "a7a3056e920fc61b0d65ea780db78a30e772ed4c",
+      "url": "https://github.com/gastownhall/gastown/blob/ef70b0bf9e588dce00708e36564bfc06b51fac2c/CONTRIBUTING.md",
+      "retrieved": "2026-10-23",
+      "purpose": "repository guidance coverage"
+    },
+    {
+      "repo": "gastownhall/gastown",
+      "path": "internal/templates/townroot/claude.md",
+      "sha": "bed9dcee1226480db593a840ab7de82912d37ffb",
+      "url": "https://github.com/gastownhall/gastown/blob/ef70b0bf9e588dce00708e36564bfc06b51fac2c/internal/templates/townroot/claude.md",
+      "retrieved": "2026-10-23",
+      "purpose": "repository guidance coverage"
+    },
+    {
+      "repo": "gastownhall/beads",
+      "path": "AGENTS.md",
+      "sha": "e908a507058943c04f540a8f22b4e8cabb449a5d",
+      "url": "https://github.com/gastownhall/beads/blob/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb/AGENTS.md",
+      "retrieved": "2026-10-23",
+      "purpose": "repository guidance coverage"
+    },
+    {
+      "repo": "gastownhall/beads",
+      "path": "CLAUDE.md",
+      "sha": "47dc3e3d863cfb5727b87d785d09abf9743c0a72",
+      "url": "https://github.com/gastownhall/beads/blob/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb/CLAUDE.md",
+      "retrieved": "2026-10-23",
+      "purpose": "repository guidance coverage",
+      "source_tree_mode": "120000",
+      "retrieval_representation": "resolved symlink target",
+      "resolved_target": "AGENTS.md",
+      "resolved_target_sha": "e908a507058943c04f540a8f22b4e8cabb449a5d"
+    },
+    {
+      "repo": "gastownhall/beads",
+      "path": "CONTRIBUTING.md",
+      "sha": "daca0d8abd6f9f38f0f67395393dae1700f04383",
+      "url": "https://github.com/gastownhall/beads/blob/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb/CONTRIBUTING.md",
+      "retrieved": "2026-10-23",
+      "purpose": "repository guidance coverage"
+    },
+    {
+      "repo": "gastownhall/beads",
+      "path": "engdocs/PROJECT_CHARTER.md",
+      "sha": "7dcc70175afe68141e4ee1c18f95c8f8c2e79345",
+      "url": "https://github.com/gastownhall/beads/blob/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb/engdocs/PROJECT_CHARTER.md",
+      "retrieved": "2026-10-23",
+      "purpose": "repository guidance coverage"
+    },
+    {
+      "repo": "gastownhall/beads",
+      "path": "engdocs/design/dolt-concurrency.md",
+      "sha": "15f86ab2d8578a9973ea224574583794f282402f",
+      "url": "https://github.com/gastownhall/beads/blob/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb/engdocs/design/dolt-concurrency.md",
+      "retrieved": "2026-10-23",
+      "purpose": "repository guidance coverage"
+    },
+    {
+      "repo": "Runfusion/Fusion",
+      "path": "AGENTS.md",
+      "sha": "c1e419cd35af575b206cb05e49111d0d4c6c2a87",
+      "url": "https://github.com/Runfusion/Fusion/blob/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3/AGENTS.md",
+      "retrieved": "2026-10-23",
+      "purpose": "repository guidance coverage"
+    },
+    {
+      "repo": "Runfusion/Fusion",
+      "path": "CLAUDE.md",
+      "sha": "43c994c2d3617f947bcb5adf1933e21dabe46bb5",
+      "url": "https://github.com/Runfusion/Fusion/blob/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3/CLAUDE.md",
+      "retrieved": "2026-10-23",
+      "purpose": "repository guidance coverage"
+    },
+    {
+      "repo": "Runfusion/Fusion",
+      "path": "docs/contributing.md",
+      "sha": "3119904eeb25304464ff98218b8a3cec90696941",
+      "url": "https://github.com/Runfusion/Fusion/blob/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3/docs/contributing.md",
+      "retrieved": "2026-10-23",
+      "purpose": "repository guidance coverage"
+    }
+  ],
+  "failedFetches": [
+    {
+      "repo": "earendil-works/pi",
+      "path": "packages/ai/src/providers/openai-completions.ts",
+      "result": "404. Correct path packages/ai/src/api/openai-completions.ts subsequently fetched and inspected."
+    },
+    {
+      "repo": "mastra-ai/softwarefactory-template",
+      "url": "https://api.github.com/repos/mastra-ai/softwarefactory-template/releases/latest",
+      "result": "404 Not Found. Subsequent successful releases?per_page=1 returned an empty array, so no GitHub release was observed."
+    },
+    {
+      "repo": "mastra-ai/softwarefactory-template",
+      "url": "https://api.github.com/repos/mastra-ai/softwarefactory-template/tags?per_page=1",
+      "result": "Connector rejected endpoint with INVALID_ARGUMENT. Tag history remains Unknown."
+    }
+  ],
+  "maintenanceCoverage": {
+    "updated_at": "2026-10-23 13:32:53 UTC",
+    "repository_records": 8,
+    "guidance_files_retrieved_and_inspected": 26,
+    "root_guidance_files": 16,
+    "referenced_boundary_guidance_files": 10,
+    "release_metadata_queries": 16,
+    "additional_tag_query": "Mastra tags lookup rejected by connector URL allowlist, retained as Unknown.",
+    "limitation": "The original selective code audit preceded this targeted guidance closeout. Recommendations were reassessed after the guidance review. No repository command, build, test, native agent or paid provider call was executed.",
+    "changed_recommendation": "No leading runtime change. Stronger qualification of experimental/internal factory surfaces, OpenCode development-versus-stable identity, OpenHands TypeScript client limits, and beta release maturity."
+  }
+}

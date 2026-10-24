@@ -1,0 +1,342 @@
+{
+  "date": "2026-10-23",
+  "labelPolicy": {
+    "Verified": "Inspected source, configuration or executed package check. Qualification is mandatory. Does not imply runtime execution.",
+    "Documented only": "Official documentation or author description without execution or code verification for that claim.",
+    "Proposed": "Design or acceptance target for future implementation.",
+    "Unknown": "Evidence or experiment missing."
+  },
+  "records": [
+    {
+      "id": "SRC-R01",
+      "name": "Agent Beacon",
+      "url": "https://github.com/Asymptote-Labs/agent-beacon",
+      "commit": "cfbd7b1d721664e3b1b5ca2fca5eac4327532c07",
+      "license": "MIT",
+      "status": "Verified",
+      "qualification": "Source inspection only",
+      "paths": [
+        "LICENSE",
+        "cli/beacon/internal/learning/store.go",
+        "cli/beacon/internal/learning/store_test.go",
+        "cli/beacon/internal/learning/candidate.go",
+        "cli/beacon/internal/learning/candidate_transaction_test.go",
+        "docs/cli/memory.mdx",
+        "AGENTS.md",
+        "CLAUDE.md",
+        "CONTRIBUTING.md"
+      ],
+      "inspected": "Store schema, project scoping, insert preserving review state, superseded exclusion. Candidate approval transaction lines 100-184. Failure and concurrent review tests lines 13-156. Skill installation and network boundary docs lines 261-316.",
+      "finding": "Useful reviewed-memory state machine and provenance. Atomic review writes and failure-injection tests are present. No automatic promotion of inferred lessons is required for the proposed product.",
+      "reuse": "Adapt design and tests as patterns. Do not require Beacon Cloud or evaluator service. Native product should own canon and policy decisions.",
+      "limits": "Tests not run. External evaluator accuracy and all adapters unmeasured.",
+      "maintenance": {
+        "observed_date": "2026-10-23",
+        "default_branch": "main",
+        "repository_owner": "Asymptote-Labs",
+        "archived": false,
+        "last_push_observed": "2026-10-22T20:47:09Z",
+        "audited_commit_date": "2026-10-22T20:43:17Z",
+        "latest_release_observed": {
+          "tag": "ext-v0.1.0",
+          "published_at": "2026-10-22T19:39:43Z",
+          "url": "https://github.com/Asymptote-Labs/agent-beacon/releases/tag/ext-v0.1.0"
+        },
+        "qualification": "Repository activity and releases are metadata observations, not an assessment of maintainer capacity or production reliability.",
+        "sources": [
+          "https://api.github.com/repos/Asymptote-Labs/agent-beacon",
+          "https://api.github.com/repos/Asymptote-Labs/agent-beacon/commits/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07",
+          "https://api.github.com/repos/Asymptote-Labs/agent-beacon/releases/latest"
+        ]
+      },
+      "guidance_audit": {
+        "status": "Root guidance fully inspected, declared runtime behavior not executed",
+        "paths": [
+          "AGENTS.md",
+          "CLAUDE.md",
+          "CONTRIBUTING.md"
+        ],
+        "detailed_evidence": "context-guidance-audit.json",
+        "symlink_note": "Original Git blob identity and resolved guidance body identity are recorded separately."
+      }
+    },
+    {
+      "id": "SRC-R02",
+      "name": "Entire CLI",
+      "url": "https://github.com/entireio/cli",
+      "commit": "ee57ff55142e5078b625dd963fc398d49a8ddda1",
+      "license": "MIT",
+      "status": "Verified",
+      "qualification": "Source inspection only",
+      "paths": [
+        "LICENSE",
+        "api/checkpoint/interfaces.go",
+        "cmd/entire/cli/checkpoint/persistent_ref_update.go",
+        "cmd/entire/cli/checkpoint/persistent_ref_update_test.go",
+        "AGENTS.md",
+        "CLAUDE.md",
+        "CONTRIBUTING.md"
+      ],
+      "inspected": "Full public checkpoint interface and ref-update implementation. Tests lines 1-190 plus function inventory for later CAS rebuild cases.",
+      "finding": "Separates checkpoint, session and task readers. Reserved IDs support readable retries when backend changes. Native Git compare-and-swap, bounded lock retries and context cancellation are explicit.",
+      "reuse": "Adapt checkpoint provenance and guarded Git update patterns. Keep full run database outside normal mod history, publish redacted evidence references.",
+      "limits": "Tests not run. No claim that Entire is a model-agnostic embedded runtime. Metadata branch growth, redaction completeness and restore UX need experiments.",
+      "maintenance": {
+        "observed_date": "2026-10-23",
+        "default_branch": "main",
+        "repository_owner": "entireio",
+        "archived": false,
+        "last_push_observed": "2026-10-23T13:19:16Z",
+        "audited_commit_date": "2026-10-23T12:30:46Z",
+        "latest_release_observed": {
+          "tag": "v0.12.0",
+          "published_at": "2026-10-21T16:54:51Z",
+          "url": "https://github.com/entireio/cli/releases/tag/v0.12.0"
+        },
+        "qualification": "Repository activity and releases are metadata observations, not an assessment of maintainer capacity or production reliability.",
+        "sources": [
+          "https://api.github.com/repos/entireio/cli",
+          "https://api.github.com/repos/entireio/cli/commits/ee57ff55142e5078b625dd963fc398d49a8ddda1",
+          "https://api.github.com/repos/entireio/cli/releases/latest"
+        ]
+      },
+      "guidance_audit": {
+        "status": "Root guidance fully inspected, declared runtime behavior not executed",
+        "paths": [
+          "AGENTS.md",
+          "CLAUDE.md",
+          "CONTRIBUTING.md"
+        ],
+        "detailed_evidence": "context-guidance-audit.json",
+        "symlink_note": "Original Git blob identity and resolved guidance body identity are recorded separately."
+      }
+    },
+    {
+      "id": "SRC-R03",
+      "name": "agentglass",
+      "url": "https://github.com/BjoernSchotte/agentglass",
+      "commit": "3fdd14eafdc873f23b009a273580b4a0ff9b5ca0",
+      "license": "Apache-2.0",
+      "status": "Verified",
+      "qualification": "Source inspection only",
+      "paths": [
+        "LICENSE",
+        "src/model/types.ts",
+        "src/read/sessions.ts",
+        "src/read/sessions.check.ts"
+      ],
+      "inspected": "Full selected types, session read model and corresponding checks. Apache license header inspected.",
+      "finding": "Read models carry harness/session/parent/model/branch and usage data, distinguish unknown cost, paginate sessions and support redaction. Checks exercise cursor errors, generation changes and redacted output.",
+      "reuse": "Adapt observability vocabulary and unknown-cost handling. Optional export integration after native traces are stable.",
+      "limits": "Not a durable task engine or approved-canon store. Current checkout not built. Glass Town is a different project.",
+      "maintenance": {
+        "observed_date": "2026-10-23",
+        "default_branch": "main",
+        "repository_owner": "BjoernSchotte",
+        "archived": false,
+        "last_push_observed": "2026-10-20T15:46:03Z",
+        "audited_commit_date": "2026-10-19T05:51:52Z",
+        "latest_release_observed": {
+          "tag": "v2026.10.13",
+          "published_at": "2026-10-10T22:37:38Z",
+          "url": "https://github.com/BjoernSchotte/agentglass/releases/tag/v2026.10.13"
+        },
+        "qualification": "Repository activity and releases are metadata observations, not an assessment of maintainer capacity or production reliability.",
+        "sources": [
+          "https://api.github.com/repos/BjoernSchotte/agentglass",
+          "https://api.github.com/repos/BjoernSchotte/agentglass/commits/3fdd14eafdc873f23b009a273580b4a0ff9b5ca0",
+          "https://api.github.com/repos/BjoernSchotte/agentglass/releases/latest"
+        ]
+      },
+      "guidance_audit": {
+        "status": "AGENTS.md, CLAUDE.md and CONTRIBUTING.md absent in complete untruncated pinned tree",
+        "tree_entries": 1089,
+        "detailed_evidence": "context-guidance-audit.json"
+      }
+    },
+    {
+      "id": "SRC-R04",
+      "name": "MFS",
+      "url": "https://github.com/zilliztech/mfs",
+      "commit": "78352894a0a826ee24db852411bf9a3c49884922",
+      "license": "Apache-2.0",
+      "status": "Verified",
+      "qualification": "Source and selected documentation inspection",
+      "paths": [
+        "LICENSE",
+        "server/python/src/mfs_server/storage/file_state.py",
+        "server/python/tests/test_engine_cancel_reconcile.py",
+        "docs/schema.md",
+        "docs/storage-and-backup.md",
+        "AGENTS.md",
+        "CLAUDE.md",
+        "CONTRIBUTING.md"
+      ],
+      "inspected": "Full file manifest DAO and cancel-reconcile tests. Schema and backup boundary sections selected by heading and storage terms. Apache license header inspected.",
+      "finding": "Derived search spans relational metadata, Milvus and artifact caches. Cancellation test checks orphan vector cleanup after a lost completion claim. Fingerprints and scoped connector manifests support invalidation.",
+      "reuse": "Borrow fingerprint, locator and reconciliation concepts. Defer MFS service or vector stack until exact search and domain indexes fail measured retrieval tasks.",
+      "limits": "Tests not run. Backups need consistent related stores. Do not treat derived index as original source or an approval record.",
+      "maintenance": {
+        "observed_date": "2026-10-23",
+        "default_branch": "main",
+        "repository_owner": "zilliztech",
+        "archived": false,
+        "last_push_observed": "2026-07-31T06:49:03Z",
+        "audited_commit_date": "2026-07-31T06:48:14Z",
+        "latest_release_observed": {
+          "tag": "v0.4.6",
+          "published_at": "2026-07-31T06:52:47Z",
+          "url": "https://github.com/zilliztech/mfs/releases/tag/v0.4.6"
+        },
+        "qualification": "Repository activity and releases are metadata observations, not an assessment of maintainer capacity or production reliability.",
+        "sources": [
+          "https://api.github.com/repos/zilliztech/mfs",
+          "https://api.github.com/repos/zilliztech/mfs/commits/78352894a0a826ee24db852411bf9a3c49884922",
+          "https://api.github.com/repos/zilliztech/mfs/releases/latest"
+        ]
+      },
+      "guidance_audit": {
+        "status": "Root guidance fully inspected, declared runtime behavior not executed",
+        "paths": [
+          "AGENTS.md",
+          "CLAUDE.md",
+          "CONTRIBUTING.md"
+        ],
+        "detailed_evidence": "context-guidance-audit.json",
+        "symlink_note": "Original Git blob identity and resolved guidance body identity are recorded separately."
+      }
+    },
+    {
+      "id": "SRC-R05",
+      "name": "MCP specification and Tasks extension",
+      "url": "https://modelcontextprotocol.io/specification/2026-07-28",
+      "status": "Documented only",
+      "qualification": "Official documentation read",
+      "paths": [
+        "https://modelcontextprotocol.io/extensions/tasks/overview"
+      ],
+      "finding": "Latest specification redirect observed to 2026-07-28. Core documentation now describes stateless requests and per-request capabilities. Tasks is opt-in with durable handles.",
+      "reuse": "Negotiate actual server version and capabilities. Support existing HOI4 server versions through adapters. Do not assume a session-based handshake or task support universally.",
+      "limits": "No HOI4 MCP tools exposed in this session. No server connectivity or protocol conformance run."
+    },
+    {
+      "id": "SRC-R06",
+      "name": "Agent Skills specification",
+      "url": "https://agentskills.io/specification",
+      "status": "Documented only",
+      "qualification": "Official specification read",
+      "finding": "SKILL.md has name and description frontmatter with naming and size constraints. Optional metadata does not establish runtime authorization.",
+      "reuse": "Portable workflow body and explicit client-specific discovery mirrors. Validate metadata, paths and cross-client drift.",
+      "limits": "Client discovery and invocation depend on client version and are not proven by metadata validation."
+    },
+    {
+      "id": "SRC-R07",
+      "name": "Agent Client Protocol",
+      "url": "https://agentclientprotocol.com/protocol/v1/overview",
+      "status": "Documented only",
+      "qualification": "Official overview and initialization read",
+      "paths": [
+        "https://agentclientprotocol.com/protocol/v1/initialization"
+      ],
+      "finding": "v1 is latest on inspected docs, v2 marked draft. Initialization negotiates version/capabilities, session load is optional, omitted capabilities are unsupported.",
+      "reuse": "Optional external editor interoperability after native product works. Do not put ACP between every internal module or depend on an external agent executable.",
+      "limits": "No implementation tested. ACP does not itself supply the native runtime, durable canon or safe side effects."
+    },
+    {
+      "id": "SRC-R08",
+      "name": "LiteLLM",
+      "url": "https://docs.litellm.ai/docs/",
+      "status": "Documented only",
+      "qualification": "Official getting-started and routing docs read",
+      "paths": [
+        "https://docs.litellm.ai/docs/routing"
+      ],
+      "finding": "Python SDK and gateway provide provider normalization, retry/fallback and cost features. Documentation presents local provider examples.",
+      "reuse": "Optional user-managed gateway or Python alternative. Avoid adding a gateway service solely to obtain a uniform API if the selected runtime already has tested adapters.",
+      "limits": "No source audit of LiteLLM internals or live provider compatibility performed. Provider normalization does not prove feature parity or billing entitlement."
+    },
+    {
+      "id": "SRC-R09",
+      "name": "Harness Engineering source-code study",
+      "url": "https://arxiv.org/html/2609.00006v1",
+      "status": "Documented only",
+      "qualification": "Research paper sections 4, 15, 16 inspected",
+      "finding": "Source anatomy motivates narrow loops and explicit subsystem boundaries. It states comparisons are source reading, not shared runtime measurements, and identifies a weaker reproducibility basis for its Claude Code analysis.",
+      "reuse": "Use taxonomy as a research checklist. Recheck candidate implementations at current pins. Do not repeat its benchmark numbers as HOI4 evidence.",
+      "limits": "Not an empirical HOI4 comparison. Fetched metadata pairs September-style identifier with July submission date, preserved as source metadata discrepancy. No leaked code retrieved."
+    },
+    {
+      "id": "SRC-R10",
+      "name": "AI Harness Engineering runtime substrate",
+      "url": "https://arxiv.org/html/2605.13357v1",
+      "status": "Documented only",
+      "qualification": "Methods, evidence ladder, controlled case and outlook inspected",
+      "finding": "Connects task requirements, context use, failures and verification in episode records. The controlled example is a constructed login task, not a broad performance demonstration.",
+      "reuse": "Adapt requirement-linked evidence and intervention metrics into proposed HOI4 evaluation. Separate behavioral correctness from evidence completeness.",
+      "limits": "Does not validate the proposed architecture or demonstrate measured gains on HOI4. Quantitative generalization remains future work."
+    },
+    {
+      "id": "SRC-R11",
+      "name": "byProduct lifecycle",
+      "url": "https://byproduct.ai/docs/how-it-works",
+      "status": "Documented only",
+      "qualification": "Vendor operating-model documentation",
+      "finding": "Describes goal, context, rules, blueprint, jobs, tests and feedback with visible approval ownership.",
+      "reuse": "Use a compact goal-to-evidence trace for stage packets. No dependency on its service.",
+      "limits": "Marketing and workflow description, no inspected implementation or execution evidence."
+    },
+    {
+      "id": "SRC-R12",
+      "name": "Warp software factory article",
+      "url": "https://www.warp.dev/articles/coding-agents-to-software-factory",
+      "status": "Documented only",
+      "qualification": "Vendor article dated 2026-08-25",
+      "finding": "Suggests moving bounded checkable workflows first and measuring acceptance, cost and intervention as automation expands.",
+      "reuse": "Adopt bounded workflow rollout as a hypothesis. Keep local-first deployment because the user's game and files are local.",
+      "limits": "No verified performance transfer from Warp's reported adoption. Cloud-first recommendation is not assumed appropriate for HOI4."
+    },
+    {
+      "id": "SRC-R13",
+      "name": "Paradox Interactive User Agreement",
+      "url": "https://store.steampowered.com/eula/3493540_eula_0",
+      "status": "Documented only",
+      "qualification": "User-supplied publisher agreement read, legal applicability not adjudicated",
+      "finding": "Sections 1 and 5 describe noncommercial service and UGC use, free UGC and limits on third-party rights. Section 6 has separate streaming and soundtrack terms.",
+      "reuse": "Keep game/DLC bytes local and out of distribution, record asset provenance, and make commercial product/UGC licensing review a release gate.",
+      "limits": "This URL is a publisher agreement hosted under a particular Steam item. Verify applicability to the user's HOI4 distribution and planned business model. It does not settle whether every independent tool business model is permitted."
+    },
+    {
+      "id": "SRC-R14",
+      "name": "Tauri v2 capabilities and external binaries",
+      "url": "https://v2.tauri.app/security/capabilities/",
+      "status": "Documented only",
+      "qualification": "Official capability and sidecar documentation inspected on 2026-10-23",
+      "paths": [
+        "https://v2.tauri.app/develop/sidecar/"
+      ],
+      "finding": "Tauri documents capability-based frontend permissions and packaged external binaries. These facilities do not establish arbitrary child-process containment.",
+      "reuse": "Candidate A uses documented packaging and host APIs, with explicit separate worker containment experiments.",
+      "limits": "No application build, sidecar packaging or OS sandbox enforcement was tested."
+    },
+    {
+      "id": "SRC-R15",
+      "name": "Electron security",
+      "url": "https://www.electronjs.org/docs/latest/tutorial/security",
+      "status": "Documented only",
+      "qualification": "Official renderer security guidance inspected on 2026-10-23",
+      "finding": "Security guidance covers context isolation, sandboxing, constrained IPC and remote-content risks.",
+      "reuse": "Candidate B keeps the renderer isolated and puts privileged operations behind the same host authority contract.",
+      "limits": "No Electron package or exploit test was executed. Documentation does not prove a proposed application is secure."
+    },
+    {
+      "id": "SRC-R16",
+      "name": "SQLite atomic commit",
+      "url": "https://www.sqlite.org/atomiccommit.html",
+      "status": "Documented only",
+      "qualification": "Official transaction and filesystem-assumption discussion inspected on 2026-10-23",
+      "finding": "Atomic commit depends on declared storage/OS behavior and covers the database transaction boundary, not arbitrary Git and artifact-store side effects.",
+      "reuse": "Use a transactional operational store with explicit multi-store intent, receipts, reconciliation and backup tests.",
+      "limits": "No power-loss, filesystem or platform durability benchmark was run."
+    }
+  ]
+}

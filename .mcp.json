@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "hoi4_agent_tools": {
+      "type": "stdio",
+      "command": "hoi4-agent-tools.cmd",
+      "args": [],
+      "env": {
+        "HOI4_AGENT_STDIO_IDLE_EXIT_MINUTES": "30"
+      },
+      "timeout": 600000
+    },
+    "comfy_cloud_portraits": {
+      "type": "http",
+      "url": "https://cloud.comfy.org/mcp"
+    }
+  }
+}

@@ -1,0 +1,1315 @@
+{
+  "schema_version": 1,
+  "requirements": [
+    {
+      "requirement": "REQ-001",
+      "title": "Independent native product",
+      "spec": "SPEC-002",
+      "spec_file": "../03-subsystem-specs/002-native-runtime-and-models.md",
+      "stage": "S03",
+      "stage_file": "../04-implementation-stages/stage-03-native-agent-and-durability.md",
+      "acceptance": "AC-001",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-002",
+        "ADR-003"
+      ],
+      "tests": [
+        "T-RUN-01",
+        "T-RELEASE-01"
+      ],
+      "oracle": "Clean packaged task succeeds with no coding CLI installed or spawned.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-002",
+      "title": "Provider capability negotiation",
+      "spec": "SPEC-002",
+      "spec_file": "../03-subsystem-specs/002-native-runtime-and-models.md",
+      "stage": "S03",
+      "stage_file": "../04-implementation-stages/stage-03-native-agent-and-durability.md",
+      "acceptance": "AC-002",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-002"
+      ],
+      "tests": [
+        "T-RUN-05"
+      ],
+      "oracle": "Each of three profiles has an actual capability receipt and explicit unsupported-feature behavior.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-003",
+      "title": "Authentication, cost and fallback",
+      "spec": "SPEC-002",
+      "spec_file": "../03-subsystem-specs/002-native-runtime-and-models.md",
+      "stage": "S03",
+      "stage_file": "../04-implementation-stages/stage-03-native-agent-and-durability.md",
+      "acceptance": "AC-003",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-003"
+      ],
+      "tests": [
+        "T-RUN-06",
+        "T-SEC-01"
+      ],
+      "oracle": "Credentials remain outside artifacts, budget stops dispatch and fallback obeys destination authority.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-004",
+      "title": "Create through Mod Setup",
+      "spec": "SPEC-001",
+      "spec_file": "../03-subsystem-specs/001-onboarding-and-mod-setup.md",
+      "stage": "S02",
+      "stage_file": "../04-implementation-stages/stage-02-onboarding-and-workspaces.md",
+      "acceptance": "AC-004",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-001"
+      ],
+      "tests": [
+        "T-SETUP-01"
+      ],
+      "oracle": "New mod uses actual Setup analysis, planning and apply, producing native files and C-01.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-005",
+      "title": "Import through Mod Setup",
+      "spec": "SPEC-001",
+      "spec_file": "../03-subsystem-specs/001-onboarding-and-mod-setup.md",
+      "stage": "S02",
+      "stage_file": "../04-implementation-stages/stage-02-onboarding-and-workspaces.md",
+      "acceptance": "AC-005",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-001"
+      ],
+      "tests": [
+        "T-SETUP-02",
+        "T-SETUP-03"
+      ],
+      "oracle": "Existing and partial mod imports preserve unapproved files and use supported recovery variants.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-006",
+      "title": "Preserve existing content",
+      "spec": "SPEC-001",
+      "spec_file": "../03-subsystem-specs/001-onboarding-and-mod-setup.md",
+      "stage": "S02",
+      "stage_file": "../04-implementation-stages/stage-02-onboarding-and-workspaces.md",
+      "acceptance": "AC-006",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-001",
+        "ADR-003"
+      ],
+      "tests": [
+        "T-SETUP-02",
+        "T-GIT-01"
+      ],
+      "oracle": "Exact protected-byte inventory and unrelated Git index state match the baseline.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-007",
+      "title": "Validated workspace handoff",
+      "spec": "SPEC-001",
+      "spec_file": "../03-subsystem-specs/001-onboarding-and-mod-setup.md",
+      "stage": "S02",
+      "stage_file": "../04-implementation-stages/stage-02-onboarding-and-workspaces.md",
+      "acceptance": "AC-007",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-001",
+        "ADR-004"
+      ],
+      "tests": [
+        "T-SETUP-04"
+      ],
+      "oracle": "C-01 carries root identity, resolved manifest/tool closure, receipt and unresolved checks.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-008",
+      "title": "Intent and approved canon",
+      "spec": "SPEC-004",
+      "spec_file": "../03-subsystem-specs/004-context-memory-and-runtime-learning.md",
+      "stage": "S05",
+      "stage_file": "../04-implementation-stages/stage-05-context-and-recovery-hardening.md",
+      "acceptance": "AC-008",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-004",
+        "ADR-009"
+      ],
+      "tests": [
+        "T-CTX-01"
+      ],
+      "oracle": "Approved lore and unresolved questions retain ownership and trace to the accepted source change.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-009",
+      "title": "Optional visual workflow",
+      "spec": "SPEC-007",
+      "spec_file": "../03-subsystem-specs/007-visual-state-synchronization.md",
+      "stage": "S04",
+      "stage_file": "../04-implementation-stages/stage-04-focus-vertical-slice.md",
+      "acceptance": "AC-009",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-005"
+      ],
+      "tests": [
+        "T-VIS-02"
+      ],
+      "oracle": "Visual, hybrid and autonomous paths share proposal, grant, source and evidence contracts.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-010",
+      "title": "Progressive interface",
+      "spec": "SPEC-007",
+      "spec_file": "../03-subsystem-specs/007-visual-state-synchronization.md",
+      "stage": "S04",
+      "stage_file": "../04-implementation-stages/stage-04-focus-vertical-slice.md",
+      "acceptance": "AC-010",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-005"
+      ],
+      "tests": [
+        "T-RELEASE-04"
+      ],
+      "oracle": "Pilot contributors find source, status and evidence limits without traversing every advanced control.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-011",
+      "title": "Source and preview integrity",
+      "spec": "SPEC-007",
+      "spec_file": "../03-subsystem-specs/007-visual-state-synchronization.md",
+      "stage": "S04",
+      "stage_file": "../04-implementation-stages/stage-04-focus-vertical-slice.md",
+      "acceptance": "AC-011",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-003",
+        "ADR-005"
+      ],
+      "tests": [
+        "T-VIS-01",
+        "T-VIS-03"
+      ],
+      "oracle": "No-op is byte-identical, supported writes preserve untouched spans and stale updates cannot overwrite.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-012",
+      "title": "Useful focus preview",
+      "spec": "SPEC-009",
+      "spec_file": "../03-subsystem-specs/009-focus-and-other-editors.md",
+      "stage": "S04",
+      "stage_file": "../04-implementation-stages/stage-04-focus-vertical-slice.md",
+      "acceptance": "AC-012",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-005"
+      ],
+      "tests": [
+        "T-VIS-02",
+        "T-HOI-02"
+      ],
+      "oracle": "Focus preview exposes supported relationships, source revision, icons and explicit fidelity diagnostics.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-013",
+      "title": "Bounded focus editing",
+      "spec": "SPEC-009",
+      "spec_file": "../03-subsystem-specs/009-focus-and-other-editors.md",
+      "stage": "S04",
+      "stage_file": "../04-implementation-stages/stage-04-focus-vertical-slice.md",
+      "acceptance": "AC-013",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-005"
+      ],
+      "tests": [
+        "T-VIS-01",
+        "T-VIS-03"
+      ],
+      "oracle": "Supported move/property edits, undo and redo preserve unrelated bytes, unsupported edits refuse safely.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-014",
+      "title": "Bounded autonomous work",
+      "spec": "SPEC-003",
+      "spec_file": "../03-subsystem-specs/003-orchestration-and-recovery.md",
+      "stage": "S04",
+      "stage_file": "../04-implementation-stages/stage-04-focus-vertical-slice.md",
+      "acceptance": "AC-014",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-003",
+        "ADR-007"
+      ],
+      "tests": [
+        "T-VIS-02",
+        "T-RUN-06"
+      ],
+      "oracle": "Bounded focus task completes with canvas closed and stops at the approved limits.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-015",
+      "title": "Human intervention and approval",
+      "spec": "SPEC-011",
+      "spec_file": "../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md",
+      "stage": "S03",
+      "stage_file": "../04-implementation-stages/stage-03-native-agent-and-durability.md",
+      "acceptance": "AC-015",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-003"
+      ],
+      "tests": [
+        "T-RUN-03",
+        "T-SEC-01"
+      ],
+      "oracle": "Durable pause/revocation stops new effects, in-flight work settles or remains explicitly uncertain.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-016",
+      "title": "Durable recovery",
+      "spec": "SPEC-003",
+      "spec_file": "../03-subsystem-specs/003-orchestration-and-recovery.md",
+      "stage": "S03",
+      "stage_file": "../04-implementation-stages/stage-03-native-agent-and-durability.md",
+      "acceptance": "AC-016",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-003",
+        "ADR-004"
+      ],
+      "tests": [
+        "T-RUN-04",
+        "T-RELEASE-02"
+      ],
+      "oracle": "Restart restores task, grant and receipt identity without duplicate unsafe effects.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-017",
+      "title": "Task dependencies and retries",
+      "spec": "SPEC-003",
+      "spec_file": "../03-subsystem-specs/003-orchestration-and-recovery.md",
+      "stage": "S06",
+      "stage_file": "../04-implementation-stages/stage-06-collaboration-and-content.md",
+      "acceptance": "AC-017",
+      "scope": "Later",
+      "decisions": [
+        "ADR-007"
+      ],
+      "tests": [
+        "T-DAG-01"
+      ],
+      "oracle": "Cycles, stale claims and exhausted retries block work with an attributable reason.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-018",
+      "title": "Context and model handoff",
+      "spec": "SPEC-004",
+      "spec_file": "../03-subsystem-specs/004-context-memory-and-runtime-learning.md",
+      "stage": "S05",
+      "stage_file": "../04-implementation-stages/stage-05-context-and-recovery-hardening.md",
+      "acceptance": "AC-018",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-002",
+        "ADR-004"
+      ],
+      "tests": [
+        "T-CTX-03"
+      ],
+      "oracle": "Different provider resumes from canonical context with no unsafe replay or hidden capability substitution.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-019",
+      "title": "Memory freshness",
+      "spec": "SPEC-004",
+      "spec_file": "../03-subsystem-specs/004-context-memory-and-runtime-learning.md",
+      "stage": "S05",
+      "stage_file": "../04-implementation-stages/stage-05-context-and-recovery-hardening.md",
+      "acceptance": "AC-019",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-004",
+        "ADR-009"
+      ],
+      "tests": [
+        "T-CTX-02"
+      ],
+      "oracle": "Changed source/tool profile invalidates affected facts, evidence and projections.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-020",
+      "title": "Reviewable runtime learning",
+      "spec": "SPEC-004",
+      "spec_file": "../03-subsystem-specs/004-context-memory-and-runtime-learning.md",
+      "stage": "S05",
+      "stage_file": "../04-implementation-stages/stage-05-context-and-recovery-hardening.md",
+      "acceptance": "AC-020",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-004"
+      ],
+      "tests": [
+        "T-CTX-04"
+      ],
+      "oracle": "Lesson review supports approval, rejection, supersession and rollback without changing canon.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-021",
+      "title": "Git isolation",
+      "spec": "SPEC-005",
+      "spec_file": "../03-subsystem-specs/005-git-collaboration-and-review.md",
+      "stage": "S02",
+      "stage_file": "../04-implementation-stages/stage-02-onboarding-and-workspaces.md",
+      "acceptance": "AC-021",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-003",
+        "ADR-004"
+      ],
+      "tests": [
+        "T-GIT-01"
+      ],
+      "oracle": "Owned worktrees and expected-HEAD commits preserve the user's real index and unrelated files.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-022",
+      "title": "Concurrent edit reconciliation",
+      "spec": "SPEC-005",
+      "spec_file": "../03-subsystem-specs/005-git-collaboration-and-review.md",
+      "stage": "S06",
+      "stage_file": "../04-implementation-stages/stage-06-collaboration-and-content.md",
+      "acceptance": "AC-022",
+      "scope": "Later",
+      "decisions": [
+        "ADR-007"
+      ],
+      "tests": [
+        "T-GIT-02"
+      ],
+      "oracle": "Required semantic and binary collisions are detected before integration and both edits survive.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-023",
+      "title": "Review and attribution",
+      "spec": "SPEC-005",
+      "spec_file": "../03-subsystem-specs/005-git-collaboration-and-review.md",
+      "stage": "S04",
+      "stage_file": "../04-implementation-stages/stage-04-focus-vertical-slice.md",
+      "acceptance": "AC-023",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-004"
+      ],
+      "tests": [
+        "T-GIT-02",
+        "T-HOI-02"
+      ],
+      "oracle": "Review binds intent, raw and semantic diff, evidence and actor to the exact source result.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-024",
+      "title": "Restore and rollback",
+      "spec": "SPEC-005",
+      "spec_file": "../03-subsystem-specs/005-git-collaboration-and-review.md",
+      "stage": "S04",
+      "stage_file": "../04-implementation-stages/stage-04-focus-vertical-slice.md",
+      "acceptance": "AC-024",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-004"
+      ],
+      "tests": [
+        "T-GIT-03"
+      ],
+      "oracle": "Restore or reviewed revert recovers the accepted state while preserving later unrelated work.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-025",
+      "title": "Layered HOI4 validation",
+      "spec": "SPEC-006",
+      "spec_file": "../03-subsystem-specs/006-hoi4-tools-and-validation.md",
+      "stage": "S04",
+      "stage_file": "../04-implementation-stages/stage-04-focus-vertical-slice.md",
+      "acceptance": "AC-025",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-003"
+      ],
+      "tests": [
+        "T-HOI-01",
+        "T-HOI-02"
+      ],
+      "oracle": "Known bad fixtures fail appropriate checks and no render/simulation is called actual game evidence.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-026",
+      "title": "HOI4 integration adapters",
+      "spec": "SPEC-006",
+      "spec_file": "../03-subsystem-specs/006-hoi4-tools-and-validation.md",
+      "stage": "S03",
+      "stage_file": "../04-implementation-stages/stage-03-native-agent-and-durability.md",
+      "acceptance": "AC-026",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-001",
+        "ADR-003"
+      ],
+      "tests": [
+        "T-SETUP-04",
+        "T-RUN-02"
+      ],
+      "oracle": "Adapter schema/version/health, timeout, cancellation and retry limits are observable and tested.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-027",
+      "title": "Game and DLC compatibility",
+      "spec": "SPEC-006",
+      "spec_file": "../03-subsystem-specs/006-hoi4-tools-and-validation.md",
+      "stage": "S02",
+      "stage_file": "../04-implementation-stages/stage-02-onboarding-and-workspaces.md",
+      "acceptance": "AC-027",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-001"
+      ],
+      "tests": [
+        "T-SETUP-04",
+        "T-HOI-02"
+      ],
+      "oracle": "Game, DLC and load order are recorded or explicitly unknown, with invalidation on change.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-028",
+      "title": "Assets and localization",
+      "spec": "SPEC-010",
+      "spec_file": "../03-subsystem-specs/010-assets-localization-and-content.md",
+      "stage": "S06",
+      "stage_file": "../04-implementation-stages/stage-06-collaboration-and-content.md",
+      "acceptance": "AC-028",
+      "scope": "Later",
+      "decisions": [
+        "ADR-010"
+      ],
+      "tests": [
+        "T-CONTENT-01",
+        "T-CONTENT-02"
+      ],
+      "oracle": "Assets retain rights/hash/recipe/consumer provenance and localization preserves encoding and keys.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-029",
+      "title": "Existing map inspection",
+      "spec": "SPEC-008",
+      "spec_file": "../03-subsystem-specs/008-maps.md",
+      "stage": "S07",
+      "stage_file": "../04-implementation-stages/stage-07-maps-and-structured-import.md",
+      "acceptance": "AC-029",
+      "scope": "Later",
+      "decisions": [
+        "ADR-006"
+      ],
+      "tests": [
+        "T-MAP-01"
+      ],
+      "oracle": "Existing structured layers are source-linked and inspectable without destructive conversion.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-030",
+      "title": "Structured map import",
+      "spec": "SPEC-008",
+      "spec_file": "../03-subsystem-specs/008-maps.md",
+      "stage": "S07",
+      "stage_file": "../04-implementation-stages/stage-07-maps-and-structured-import.md",
+      "acceptance": "AC-030",
+      "scope": "Later",
+      "decisions": [
+        "ADR-006"
+      ],
+      "tests": [
+        "T-MAP-01",
+        "T-MAP-02"
+      ],
+      "oracle": "Import plan identifies exact closure, conflicts and remapping, and invalid inputs cause no apply.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-031",
+      "title": "Reference image handling",
+      "spec": "SPEC-008",
+      "spec_file": "../03-subsystem-specs/008-maps.md",
+      "stage": "S07",
+      "stage_file": "../04-implementation-stages/stage-07-maps-and-structured-import.md",
+      "acceptance": "AC-031",
+      "scope": "Later",
+      "decisions": [
+        "ADR-006",
+        "ADR-010"
+      ],
+      "tests": [
+        "T-MAP-03"
+      ],
+      "oracle": "Reference remains attributed intent until separately modeled and validated topology exists.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-032",
+      "title": "Map creation and editing roadmap",
+      "spec": "SPEC-008",
+      "spec_file": "../03-subsystem-specs/008-maps.md",
+      "stage": "S07",
+      "stage_file": "../04-implementation-stages/stage-07-maps-and-structured-import.md",
+      "acceptance": "AC-032",
+      "scope": "Research needed",
+      "decisions": [
+        "ADR-006"
+      ],
+      "tests": [
+        "T-MAP-02",
+        "T-MAP-03",
+        "T-PERF-02"
+      ],
+      "oracle": "S07 demonstrates one bounded edit and a reviewed future drawing/generation contract. Full-world synthesis remains deferred until its independent gates pass.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-033",
+      "title": "Security and extensions",
+      "spec": "SPEC-011",
+      "spec_file": "../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md",
+      "stage": "S03",
+      "stage_file": "../04-implementation-stages/stage-03-native-agent-and-durability.md",
+      "acceptance": "AC-033",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-003"
+      ],
+      "tests": [
+        "T-SEC-01",
+        "T-SEC-02",
+        "T-RUN-02"
+      ],
+      "oracle": "Host/OS boundaries reject malicious input and unauthorized effects, unsafe executables remain disabled.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-034",
+      "title": "Licensing and distribution",
+      "spec": "SPEC-011",
+      "spec_file": "../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md",
+      "stage": "S08",
+      "stage_file": "../04-implementation-stages/stage-08-packaging-and-pilot.md",
+      "acceptance": "AC-034",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-010"
+      ],
+      "tests": [
+        "T-RELEASE-01",
+        "T-RELEASE-03"
+      ],
+      "oracle": "Package has reproducible dependencies and a reviewed distribution basis excluding restricted code and game files.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-035",
+      "title": "Contributor collaboration",
+      "spec": "SPEC-005",
+      "spec_file": "../03-subsystem-specs/005-git-collaboration-and-review.md",
+      "stage": "S06",
+      "stage_file": "../04-implementation-stages/stage-06-collaboration-and-content.md",
+      "acceptance": "AC-035",
+      "scope": "Later",
+      "decisions": [
+        "ADR-007"
+      ],
+      "tests": [
+        "T-GIT-02",
+        "T-RELEASE-04"
+      ],
+      "oracle": "Each contributor role has attributable intent and source-linked review, conflict and restore paths.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-036",
+      "title": "Continuous engineering learning",
+      "spec": "SPEC-012",
+      "spec_file": "../03-subsystem-specs/012-engineering-guidance-skills-and-learning.md",
+      "stage": "S01",
+      "stage_file": "../04-implementation-stages/stage-01-bootstrap-and-probes.md",
+      "acceptance": "AC-036",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-008"
+      ],
+      "tests": [
+        "T-DEV-04"
+      ],
+      "oracle": "Every substantive handoff records an evidenced minimal learning update or justified no-change result.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-037",
+      "title": "Claude-first portable guidance",
+      "spec": "SPEC-012",
+      "spec_file": "../03-subsystem-specs/012-engineering-guidance-skills-and-learning.md",
+      "stage": "S01",
+      "stage_file": "../04-implementation-stages/stage-01-bootstrap-and-probes.md",
+      "acceptance": "AC-037",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-008"
+      ],
+      "tests": [
+        "T-DEV-01",
+        "T-DEV-02",
+        "T-PKG-01"
+      ],
+      "oracle": "Real starter files parse and match now. Actual target-client instruction loading and trigger behavior pass later in S01.",
+      "execution_status": "Planning artifact checks completed separately. Product or live-client checks remain planned."
+    },
+    {
+      "requirement": "REQ-038",
+      "title": "Source-audited configuration migration",
+      "spec": "SPEC-013",
+      "spec_file": "../03-subsystem-specs/013-config-reuse-and-developer-environment.md",
+      "stage": "S01",
+      "stage_file": "../04-implementation-stages/stage-01-bootstrap-and-probes.md",
+      "acceptance": "AC-038",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-008"
+      ],
+      "tests": [
+        "T-DEV-03",
+        "T-PKG-01"
+      ],
+      "oracle": "All 196 actual source leaves have explicit dispositions. Starter parse/shape passes now, live-client/MCP checks remain S01 work.",
+      "execution_status": "Planning artifact checks completed separately. Product or live-client checks remain planned."
+    },
+    {
+      "requirement": "REQ-039",
+      "title": "One-stage handoffs",
+      "spec": "SPEC-012",
+      "spec_file": "../03-subsystem-specs/012-engineering-guidance-skills-and-learning.md",
+      "stage": "S01",
+      "stage_file": "../04-implementation-stages/stage-01-bootstrap-and-probes.md",
+      "acceptance": "AC-039",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-008"
+      ],
+      "tests": [
+        "T-DEV-01",
+        "T-PKG-01"
+      ],
+      "oracle": "Every stage has read-first scope, packet dependencies, gates and a self-contained stop-before-next-stage handoff.",
+      "execution_status": "Planning artifact checks completed separately. Product or live-client checks remain planned."
+    },
+    {
+      "requirement": "REQ-040",
+      "title": "Research evidence",
+      "spec": "SPEC-006",
+      "spec_file": "../03-subsystem-specs/006-hoi4-tools-and-validation.md",
+      "stage": "S01",
+      "stage_file": "../04-implementation-stages/stage-01-bootstrap-and-probes.md",
+      "acceptance": "AC-040",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-001",
+        "ADR-002"
+      ],
+      "tests": [
+        "T-RESEARCH-01"
+      ],
+      "oracle": "Requested sources and supplied-file coverage are accounted for with pins, inspection scope, licenses and limitations.",
+      "execution_status": "Planning artifact checks completed separately. Product or live-client checks remain planned."
+    },
+    {
+      "requirement": "REQ-041",
+      "title": "Evaluation matrix",
+      "spec": "SPEC-002",
+      "spec_file": "../03-subsystem-specs/002-native-runtime-and-models.md",
+      "stage": "S08",
+      "stage_file": "../04-implementation-stages/stage-08-packaging-and-pilot.md",
+      "acceptance": "AC-041",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-002"
+      ],
+      "tests": [
+        "T-RUN-05",
+        "T-RELEASE-04"
+      ],
+      "oracle": "All required scenarios have three-profile planned cells and truthful results when run, including failures, cost and rework.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-042",
+      "title": "Interoperable extension surfaces",
+      "spec": "SPEC-011",
+      "spec_file": "../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md",
+      "stage": "S05",
+      "stage_file": "../04-implementation-stages/stage-05-context-and-recovery-hardening.md",
+      "acceptance": "AC-042",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-003"
+      ],
+      "tests": [
+        "T-SEC-02"
+      ],
+      "oracle": "MCP/skills are bounded adapters, optional ACP unsupported states are explicit and runtime replacement preserves host authority.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-043",
+      "title": "Versioned maintenance",
+      "spec": "SPEC-013",
+      "spec_file": "../03-subsystem-specs/013-config-reuse-and-developer-environment.md",
+      "stage": "S08",
+      "stage_file": "../04-implementation-stages/stage-08-packaging-and-pilot.md",
+      "acceptance": "AC-043",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-001",
+        "ADR-008"
+      ],
+      "tests": [
+        "T-DEV-03",
+        "T-RELEASE-01"
+      ],
+      "oracle": "Upgrade checks validate exact schema/tool closure, preserve prior guidance and record migrations or intentional omission.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-044",
+      "title": "Editable export and escape hatch",
+      "spec": "SPEC-007",
+      "spec_file": "../03-subsystem-specs/007-visual-state-synchronization.md",
+      "stage": "S04",
+      "stage_file": "../04-implementation-stages/stage-04-focus-vertical-slice.md",
+      "acceptance": "AC-044",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-004",
+        "ADR-005"
+      ],
+      "tests": [
+        "T-VIS-03",
+        "T-RELEASE-01"
+      ],
+      "oracle": "Native source opens and remains editable outside the app, with external changes detected on reopen.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-045",
+      "title": "Complete planning archive",
+      "spec": "SPEC-012",
+      "spec_file": "../03-subsystem-specs/012-engineering-guidance-skills-and-learning.md",
+      "stage": "S01",
+      "stage_file": "../04-implementation-stages/stage-01-bootstrap-and-probes.md",
+      "acceptance": "AC-045",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-008"
+      ],
+      "tests": [
+        "T-PKG-01"
+      ],
+      "oracle": "Actual ZIP includes substantive linked requirements, specs, stages, tests, starter assets, source evidence and passed artifact QA.",
+      "execution_status": "Planning artifact checks completed separately. Product or live-client checks remain planned."
+    }
+  ],
+  "stage_gates": [
+    {
+      "id": "S01-G1",
+      "stage": "S01",
+      "ordinal": 1,
+      "tests": [
+        "T-DEV-01",
+        "T-DEV-02",
+        "T-DEV-03"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S01-G2",
+      "stage": "S01",
+      "ordinal": 2,
+      "tests": [
+        "T-SETUP-01",
+        "T-SETUP-02",
+        "T-SETUP-03"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S01-G3",
+      "stage": "S01",
+      "ordinal": 3,
+      "tests": [
+        "T-RUN-02",
+        "T-RUN-04"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S01-G4",
+      "stage": "S01",
+      "ordinal": 4,
+      "tests": [
+        "T-RUN-01"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S01-G5",
+      "stage": "S01",
+      "ordinal": 5,
+      "tests": [
+        "T-RESEARCH-01",
+        "T-DEV-04"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S02-G1",
+      "stage": "S02",
+      "ordinal": 1,
+      "tests": [
+        "T-SETUP-01",
+        "T-SETUP-02"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S02-G2",
+      "stage": "S02",
+      "ordinal": 2,
+      "tests": [
+        "T-SETUP-02",
+        "T-GIT-01"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S02-G3",
+      "stage": "S02",
+      "ordinal": 3,
+      "tests": [
+        "T-SETUP-02"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S02-G4",
+      "stage": "S02",
+      "ordinal": 4,
+      "tests": [
+        "T-SETUP-03"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S02-G5",
+      "stage": "S02",
+      "ordinal": 5,
+      "tests": [
+        "T-SETUP-04"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S03-G1",
+      "stage": "S03",
+      "ordinal": 1,
+      "tests": [
+        "T-RUN-01",
+        "T-CTX-01"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S03-G2",
+      "stage": "S03",
+      "ordinal": 2,
+      "tests": [
+        "T-RUN-02",
+        "T-SEC-01"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S03-G3",
+      "stage": "S03",
+      "ordinal": 3,
+      "tests": [
+        "T-RUN-04"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S03-G4",
+      "stage": "S03",
+      "ordinal": 4,
+      "tests": [
+        "T-RUN-03"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S03-G5",
+      "stage": "S03",
+      "ordinal": 5,
+      "tests": [
+        "T-RUN-06",
+        "T-RUN-04"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S03-G6",
+      "stage": "S03",
+      "ordinal": 6,
+      "tests": [
+        "T-RUN-05"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S04-G1",
+      "stage": "S04",
+      "ordinal": 1,
+      "tests": [
+        "T-SETUP-01",
+        "T-SETUP-02",
+        "T-VIS-02"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S04-G2",
+      "stage": "S04",
+      "ordinal": 2,
+      "tests": [
+        "T-VIS-02"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S04-G3",
+      "stage": "S04",
+      "ordinal": 3,
+      "tests": [
+        "T-VIS-01",
+        "T-VIS-03"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S04-G4",
+      "stage": "S04",
+      "ordinal": 4,
+      "tests": [
+        "T-HOI-01",
+        "T-HOI-02"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S04-G5",
+      "stage": "S04",
+      "ordinal": 5,
+      "tests": [
+        "T-GIT-01",
+        "T-GIT-03"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S04-G6",
+      "stage": "S04",
+      "ordinal": 6,
+      "tests": [
+        "T-VIS-03",
+        "T-RELEASE-01"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S04-G7",
+      "stage": "S04",
+      "ordinal": 7,
+      "tests": [
+        "T-PERF-01"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S05-G1",
+      "stage": "S05",
+      "ordinal": 1,
+      "tests": [
+        "T-CTX-01",
+        "T-DEV-04"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S05-G2",
+      "stage": "S05",
+      "ordinal": 2,
+      "tests": [
+        "T-CTX-02"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S05-G3",
+      "stage": "S05",
+      "ordinal": 3,
+      "tests": [
+        "T-CTX-03"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S05-G4",
+      "stage": "S05",
+      "ordinal": 4,
+      "tests": [
+        "T-CTX-04"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S05-G5",
+      "stage": "S05",
+      "ordinal": 5,
+      "tests": [
+        "T-CTX-02"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S05-G6",
+      "stage": "S05",
+      "ordinal": 6,
+      "tests": [
+        "T-RUN-04",
+        "T-RELEASE-02",
+        "T-PERF-03"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S06-G1",
+      "stage": "S06",
+      "ordinal": 1,
+      "tests": [
+        "T-DAG-01"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S06-G2",
+      "stage": "S06",
+      "ordinal": 2,
+      "tests": [
+        "T-GIT-02"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S06-G3",
+      "stage": "S06",
+      "ordinal": 3,
+      "tests": [
+        "T-CONTENT-01",
+        "T-CONTENT-02"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S06-G4",
+      "stage": "S06",
+      "ordinal": 4,
+      "tests": [
+        "T-RELEASE-04"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S06-G5",
+      "stage": "S06",
+      "ordinal": 5,
+      "tests": [
+        "T-DAG-01",
+        "T-GIT-02"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S06-G6",
+      "stage": "S06",
+      "ordinal": 6,
+      "tests": [
+        "T-GIT-02",
+        "T-RUN-04"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S07-G1",
+      "stage": "S07",
+      "ordinal": 1,
+      "tests": [
+        "T-MAP-01"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S07-G2",
+      "stage": "S07",
+      "ordinal": 2,
+      "tests": [
+        "T-MAP-01"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S07-G3",
+      "stage": "S07",
+      "ordinal": 3,
+      "tests": [
+        "T-MAP-02"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S07-G4",
+      "stage": "S07",
+      "ordinal": 4,
+      "tests": [
+        "T-MAP-03"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S07-G5",
+      "stage": "S07",
+      "ordinal": 5,
+      "tests": [
+        "T-MAP-03"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S07-G6",
+      "stage": "S07",
+      "ordinal": 6,
+      "tests": [
+        "T-MAP-02",
+        "T-PERF-02",
+        "T-HOI-02"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S08-G1",
+      "stage": "S08",
+      "ordinal": 1,
+      "tests": [
+        "T-SEC-01",
+        "T-VIS-01",
+        "T-SETUP-03"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S08-G2",
+      "stage": "S08",
+      "ordinal": 2,
+      "tests": [
+        "T-RUN-01",
+        "T-RELEASE-01"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S08-G3",
+      "stage": "S08",
+      "ordinal": 3,
+      "tests": [
+        "T-RUN-05",
+        "T-CTX-03"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S08-G4",
+      "stage": "S08",
+      "ordinal": 4,
+      "tests": [
+        "T-RELEASE-02"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S08-G5",
+      "stage": "S08",
+      "ordinal": 5,
+      "tests": [
+        "T-RELEASE-03"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S08-G6",
+      "stage": "S08",
+      "ordinal": 6,
+      "tests": [
+        "T-RELEASE-04",
+        "T-RUN-06"
+      ],
+      "status": "Planned, not executed"
+    }
+  ]
+}
+

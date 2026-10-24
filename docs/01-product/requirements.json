@@ -1,0 +1,452 @@
+[
+  {
+    "id": "REQ-001",
+    "title": "Independent native product",
+    "requirement": "End users run the factory without Claude Code, Codex or another coding CLI.",
+    "spec": "SPEC-002",
+    "spec_file": "../03-subsystem-specs/002-native-runtime-and-models.md",
+    "stage": "S03",
+    "stage_file": "../04-implementation-stages/stage-03-native-agent-and-durability.md",
+    "acceptance": "AC-001"
+  },
+  {
+    "id": "REQ-002",
+    "title": "Provider capability negotiation",
+    "requirement": "API and local profiles declare and probe streaming, tools, structured output, images, context and cancellation.",
+    "spec": "SPEC-002",
+    "spec_file": "../03-subsystem-specs/002-native-runtime-and-models.md",
+    "stage": "S03",
+    "stage_file": "../04-implementation-stages/stage-03-native-agent-and-durability.md",
+    "acceptance": "AC-002"
+  },
+  {
+    "id": "REQ-003",
+    "title": "Authentication, cost and fallback",
+    "requirement": "Credentials stay local, subscription access is not assumed, budgets stop new work and fallback respects data destinations.",
+    "spec": "SPEC-002",
+    "spec_file": "../03-subsystem-specs/002-native-runtime-and-models.md",
+    "stage": "S03",
+    "stage_file": "../04-implementation-stages/stage-03-native-agent-and-durability.md",
+    "acceptance": "AC-003"
+  },
+  {
+    "id": "REQ-004",
+    "title": "Create through Mod Setup",
+    "requirement": "Reuse actual new-mod planning, validation, generated files and apply flow.",
+    "spec": "SPEC-001",
+    "spec_file": "../03-subsystem-specs/001-onboarding-and-mod-setup.md",
+    "stage": "S02",
+    "stage_file": "../04-implementation-stages/stage-02-onboarding-and-workspaces.md",
+    "acceptance": "AC-004"
+  },
+  {
+    "id": "REQ-005",
+    "title": "Import through Mod Setup",
+    "requirement": "Reuse inspection and preparation of an existing mod, including valid and partial setups.",
+    "spec": "SPEC-001",
+    "spec_file": "../03-subsystem-specs/001-onboarding-and-mod-setup.md",
+    "stage": "S02",
+    "stage_file": "../04-implementation-stages/stage-02-onboarding-and-workspaces.md",
+    "acceptance": "AC-005"
+  },
+  {
+    "id": "REQ-006",
+    "title": "Preserve existing content",
+    "requirement": "Keep source, binary assets, Git state and existing instruction files unless an exact reviewed change authorizes replacement.",
+    "spec": "SPEC-001",
+    "spec_file": "../03-subsystem-specs/001-onboarding-and-mod-setup.md",
+    "stage": "S02",
+    "stage_file": "../04-implementation-stages/stage-02-onboarding-and-workspaces.md",
+    "acceptance": "AC-006"
+  },
+  {
+    "id": "REQ-007",
+    "title": "Validated workspace handoff",
+    "requirement": "Pass resolved roots, version closure, capabilities, setup receipt and unresolved checks into the editor and native agent.",
+    "spec": "SPEC-001",
+    "spec_file": "../03-subsystem-specs/001-onboarding-and-mod-setup.md",
+    "stage": "S02",
+    "stage_file": "../04-implementation-stages/stage-02-onboarding-and-workspaces.md",
+    "acceptance": "AC-007"
+  },
+  {
+    "id": "REQ-008",
+    "title": "Intent and approved canon",
+    "requirement": "Capture lore and constraints with ownership, approval and links to resulting tasks and changes.",
+    "spec": "SPEC-004",
+    "spec_file": "../03-subsystem-specs/004-context-memory-and-runtime-learning.md",
+    "stage": "S05",
+    "stage_file": "../04-implementation-stages/stage-05-context-and-recovery-hardening.md",
+    "acceptance": "AC-008"
+  },
+  {
+    "id": "REQ-009",
+    "title": "Optional visual workflow",
+    "requirement": "Visual, hybrid and autonomous paths operate on the same source and proposal contracts.",
+    "spec": "SPEC-007",
+    "spec_file": "../03-subsystem-specs/007-visual-state-synchronization.md",
+    "stage": "S04",
+    "stage_file": "../04-implementation-stages/stage-04-focus-vertical-slice.md",
+    "acceptance": "AC-009"
+  },
+  {
+    "id": "REQ-010",
+    "title": "Progressive interface",
+    "requirement": "Expose intent, preview, status and meaningful review first, with source and advanced controls available on demand.",
+    "spec": "SPEC-007",
+    "spec_file": "../03-subsystem-specs/007-visual-state-synchronization.md",
+    "stage": "S04",
+    "stage_file": "../04-implementation-stages/stage-04-focus-vertical-slice.md",
+    "acceptance": "AC-010"
+  },
+  {
+    "id": "REQ-011",
+    "title": "Source and preview integrity",
+    "requirement": "Index exact source snapshots and preserve unsupported syntax, comments, ordering and encodings outside approved spans.",
+    "spec": "SPEC-007",
+    "spec_file": "../03-subsystem-specs/007-visual-state-synchronization.md",
+    "stage": "S04",
+    "stage_file": "../04-implementation-stages/stage-04-focus-vertical-slice.md",
+    "acceptance": "AC-011"
+  },
+  {
+    "id": "REQ-012",
+    "title": "Useful focus preview",
+    "requirement": "Render nodes, prerequisites, exclusion, identifiers and diagnostics with explicit fidelity and source revision.",
+    "spec": "SPEC-009",
+    "spec_file": "../03-subsystem-specs/009-focus-and-other-editors.md",
+    "stage": "S04",
+    "stage_file": "../04-implementation-stages/stage-04-focus-vertical-slice.md",
+    "acceptance": "AC-012"
+  },
+  {
+    "id": "REQ-013",
+    "title": "Bounded focus editing",
+    "requirement": "Support source-safe node moves and supported property edits, with explicit refusal for ambiguous or unsupported constructs.",
+    "spec": "SPEC-009",
+    "spec_file": "../03-subsystem-specs/009-focus-and-other-editors.md",
+    "stage": "S04",
+    "stage_file": "../04-implementation-stages/stage-04-focus-vertical-slice.md",
+    "acceptance": "AC-013"
+  },
+  {
+    "id": "REQ-014",
+    "title": "Bounded autonomous work",
+    "requirement": "Run an approved task without canvas supervision, within tool, path, time, cost and change limits.",
+    "spec": "SPEC-003",
+    "spec_file": "../03-subsystem-specs/003-orchestration-and-recovery.md",
+    "stage": "S04",
+    "stage_file": "../04-implementation-stages/stage-04-focus-vertical-slice.md",
+    "acceptance": "AC-014"
+  },
+  {
+    "id": "REQ-015",
+    "title": "Human intervention and approval",
+    "requirement": "Pause, revoke or narrow a grant, inspect pending changes and resume safely at a valid boundary.",
+    "spec": "SPEC-011",
+    "spec_file": "../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md",
+    "stage": "S03",
+    "stage_file": "../04-implementation-stages/stage-03-native-agent-and-durability.md",
+    "acceptance": "AC-015"
+  },
+  {
+    "id": "REQ-016",
+    "title": "Durable recovery",
+    "requirement": "Restore tasks, runs, attempts, approvals, evidence and interrupted outcomes after process death.",
+    "spec": "SPEC-003",
+    "spec_file": "../03-subsystem-specs/003-orchestration-and-recovery.md",
+    "stage": "S03",
+    "stage_file": "../04-implementation-stages/stage-03-native-agent-and-durability.md",
+    "acceptance": "AC-016"
+  },
+  {
+    "id": "REQ-017",
+    "title": "Task dependencies and retries",
+    "requirement": "Track dependency readiness, ownership, bounded attempts, blocked states and side-effect reconciliation before adding workers.",
+    "spec": "SPEC-003",
+    "spec_file": "../03-subsystem-specs/003-orchestration-and-recovery.md",
+    "stage": "S06",
+    "stage_file": "../04-implementation-stages/stage-06-collaboration-and-content.md",
+    "acceptance": "AC-017"
+  },
+  {
+    "id": "REQ-018",
+    "title": "Context and model handoff",
+    "requirement": "Rebuild a bounded context bundle with provenance and unresolved work when a session or model changes.",
+    "spec": "SPEC-004",
+    "spec_file": "../03-subsystem-specs/004-context-memory-and-runtime-learning.md",
+    "stage": "S05",
+    "stage_file": "../04-implementation-stages/stage-05-context-and-recovery-hardening.md",
+    "acceptance": "AC-018"
+  },
+  {
+    "id": "REQ-019",
+    "title": "Memory freshness",
+    "requirement": "Separate approved canon, accepted project rules, inferred memories and caches, invalidating affected evidence after source or version changes.",
+    "spec": "SPEC-004",
+    "spec_file": "../03-subsystem-specs/004-context-memory-and-runtime-learning.md",
+    "stage": "S05",
+    "stage_file": "../04-implementation-stages/stage-05-context-and-recovery-hardening.md",
+    "acceptance": "AC-019"
+  },
+  {
+    "id": "REQ-020",
+    "title": "Reviewable runtime learning",
+    "requirement": "Capture candidate lessons with evidence and applicability, allowing approval, rejection and supersession without self-granted authority.",
+    "spec": "SPEC-004",
+    "spec_file": "../03-subsystem-specs/004-context-memory-and-runtime-learning.md",
+    "stage": "S05",
+    "stage_file": "../04-implementation-stages/stage-05-context-and-recovery-hardening.md",
+    "acceptance": "AC-020"
+  },
+  {
+    "id": "REQ-021",
+    "title": "Git isolation",
+    "requirement": "Give write tasks owned worktrees or branches and preserve the user's staged and unstaged work.",
+    "spec": "SPEC-005",
+    "spec_file": "../03-subsystem-specs/005-git-collaboration-and-review.md",
+    "stage": "S02",
+    "stage_file": "../04-implementation-stages/stage-02-onboarding-and-workspaces.md",
+    "acceptance": "AC-021"
+  },
+  {
+    "id": "REQ-022",
+    "title": "Concurrent edit reconciliation",
+    "requirement": "Detect textual, semantic identifier and binary asset collisions between humans and agents before merge.",
+    "spec": "SPEC-005",
+    "spec_file": "../03-subsystem-specs/005-git-collaboration-and-review.md",
+    "stage": "S06",
+    "stage_file": "../04-implementation-stages/stage-06-collaboration-and-content.md",
+    "acceptance": "AC-022"
+  },
+  {
+    "id": "REQ-023",
+    "title": "Review and attribution",
+    "requirement": "Offer semantic summary, raw diff, provenance, validation and preview tied to the exact proposed commit.",
+    "spec": "SPEC-005",
+    "spec_file": "../03-subsystem-specs/005-git-collaboration-and-review.md",
+    "stage": "S04",
+    "stage_file": "../04-implementation-stages/stage-04-focus-vertical-slice.md",
+    "acceptance": "AC-023"
+  },
+  {
+    "id": "REQ-024",
+    "title": "Restore and rollback",
+    "requirement": "Restore a prior accepted state through an owned reversible operation without discarding unrelated edits.",
+    "spec": "SPEC-005",
+    "spec_file": "../03-subsystem-specs/005-git-collaboration-and-review.md",
+    "stage": "S04",
+    "stage_file": "../04-implementation-stages/stage-04-focus-vertical-slice.md",
+    "acceptance": "AC-024"
+  },
+  {
+    "id": "REQ-025",
+    "title": "Layered HOI4 validation",
+    "requirement": "Distinguish syntax, semantics, source render, simulation and actual game observations, with unresolved checks visible.",
+    "spec": "SPEC-006",
+    "spec_file": "../03-subsystem-specs/006-hoi4-tools-and-validation.md",
+    "stage": "S04",
+    "stage_file": "../04-implementation-stages/stage-04-focus-vertical-slice.md",
+    "acceptance": "AC-025"
+  },
+  {
+    "id": "REQ-026",
+    "title": "HOI4 integration adapters",
+    "requirement": "Use versioned tool schemas, health checks, timeouts, cancellation and limited retries for available HOI4 tools.",
+    "spec": "SPEC-006",
+    "spec_file": "../03-subsystem-specs/006-hoi4-tools-and-validation.md",
+    "stage": "S03",
+    "stage_file": "../04-implementation-stages/stage-03-native-agent-and-durability.md",
+    "acceptance": "AC-026"
+  },
+  {
+    "id": "REQ-027",
+    "title": "Game and DLC compatibility",
+    "requirement": "Record local game build, DLC and ordered content roots, with unknown compatibility and stale caches visible.",
+    "spec": "SPEC-006",
+    "spec_file": "../03-subsystem-specs/006-hoi4-tools-and-validation.md",
+    "stage": "S02",
+    "stage_file": "../04-implementation-stages/stage-02-onboarding-and-workspaces.md",
+    "acceptance": "AC-027"
+  },
+  {
+    "id": "REQ-028",
+    "title": "Assets and localization",
+    "requirement": "Track original assets, rights, transformations, localization keys, consumer wiring and hash-specific review.",
+    "spec": "SPEC-010",
+    "spec_file": "../03-subsystem-specs/010-assets-localization-and-content.md",
+    "stage": "S06",
+    "stage_file": "../04-implementation-stages/stage-06-collaboration-and-content.md",
+    "acceptance": "AC-028"
+  },
+  {
+    "id": "REQ-029",
+    "title": "Existing map inspection",
+    "requirement": "Inspect layered map data, source relationships and validation without destructive conversion.",
+    "spec": "SPEC-008",
+    "spec_file": "../03-subsystem-specs/008-maps.md",
+    "stage": "S07",
+    "stage_file": "../04-implementation-stages/stage-07-maps-and-structured-import.md",
+    "acceptance": "AC-029"
+  },
+  {
+    "id": "REQ-030",
+    "title": "Structured map import",
+    "requirement": "Plan and validate an exact structured map import with dependency closure, ID preservation or explicit remapping.",
+    "spec": "SPEC-008",
+    "spec_file": "../03-subsystem-specs/008-maps.md",
+    "stage": "S07",
+    "stage_file": "../04-implementation-stages/stage-07-maps-and-structured-import.md",
+    "acceptance": "AC-030"
+  },
+  {
+    "id": "REQ-031",
+    "title": "Reference image handling",
+    "requirement": "Keep a map image as attributed design reference until a human reviews a separately validated proposed topology.",
+    "spec": "SPEC-008",
+    "spec_file": "../03-subsystem-specs/008-maps.md",
+    "stage": "S07",
+    "stage_file": "../04-implementation-stages/stage-07-maps-and-structured-import.md",
+    "acceptance": "AC-031"
+  },
+  {
+    "id": "REQ-032",
+    "title": "Map creation and editing roadmap",
+    "requirement": "Specify bounded painting and later creation or generation with topology, performance, source fidelity and game validation gates.",
+    "spec": "SPEC-008",
+    "spec_file": "../03-subsystem-specs/008-maps.md",
+    "stage": "S07",
+    "stage_file": "../04-implementation-stages/stage-07-maps-and-structured-import.md",
+    "acceptance": "AC-032"
+  },
+  {
+    "id": "REQ-033",
+    "title": "Security and extensions",
+    "requirement": "Enforce file, process and network authority outside model prose, validate final tool arguments, and treat plugins as untrusted code.",
+    "spec": "SPEC-011",
+    "spec_file": "../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md",
+    "stage": "S03",
+    "stage_file": "../04-implementation-stages/stage-03-native-agent-and-durability.md",
+    "acceptance": "AC-033"
+  },
+  {
+    "id": "REQ-034",
+    "title": "Licensing and distribution",
+    "requirement": "Separate code licensing, game rights, provider terms, private data and redistribution decisions, with a reproducible local deployment.",
+    "spec": "SPEC-011",
+    "spec_file": "../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md",
+    "stage": "S08",
+    "stage_file": "../04-implementation-stages/stage-08-packaging-and-pilot.md",
+    "acceptance": "AC-034"
+  },
+  {
+    "id": "REQ-035",
+    "title": "Contributor collaboration",
+    "requirement": "Support attributable lore, art, maps and scripting contributions with Git review first and explicit later hosted collaboration.",
+    "spec": "SPEC-005",
+    "spec_file": "../03-subsystem-specs/005-git-collaboration-and-review.md",
+    "stage": "S06",
+    "stage_file": "../04-implementation-stages/stage-06-collaboration-and-content.md",
+    "acceptance": "AC-035"
+  },
+  {
+    "id": "REQ-036",
+    "title": "Continuous engineering learning",
+    "requirement": "Require evidence-based learning reviews after meaningful development, with the smallest useful versioned change or a justified no-change result.",
+    "spec": "SPEC-012",
+    "spec_file": "../03-subsystem-specs/012-engineering-guidance-skills-and-learning.md",
+    "stage": "S01",
+    "stage_file": "../04-implementation-stages/stage-01-bootstrap-and-probes.md",
+    "acceptance": "AC-036"
+  },
+  {
+    "id": "REQ-037",
+    "title": "Claude-first portable guidance",
+    "requirement": "Ship AGENTS, importing CLAUDE, real Claude and Codex starter skills, verified discovery paths and no permission escalation by instructions.",
+    "spec": "SPEC-012",
+    "spec_file": "../03-subsystem-specs/012-engineering-guidance-skills-and-learning.md",
+    "stage": "S01",
+    "stage_file": "../04-implementation-stages/stage-01-bootstrap-and-probes.md",
+    "acceptance": "AC-037"
+  },
+  {
+    "id": "REQ-038",
+    "title": "Source-audited configuration migration",
+    "requirement": "Map every nonsecret field of the actual Agentic config to verified safe client settings or explicit intentional omission.",
+    "spec": "SPEC-013",
+    "spec_file": "../03-subsystem-specs/013-config-reuse-and-developer-environment.md",
+    "stage": "S01",
+    "stage_file": "../04-implementation-stages/stage-01-bootstrap-and-probes.md",
+    "acceptance": "AC-038"
+  },
+  {
+    "id": "REQ-039",
+    "title": "One-stage handoffs",
+    "requirement": "Provide self-contained entry, work packets, tests, gates and continuation prompts that stop before the next stage.",
+    "spec": "SPEC-012",
+    "spec_file": "../03-subsystem-specs/012-engineering-guidance-skills-and-learning.md",
+    "stage": "S01",
+    "stage_file": "../04-implementation-stages/stage-01-bootstrap-and-probes.md",
+    "acceptance": "AC-039"
+  },
+  {
+    "id": "REQ-040",
+    "title": "Research evidence",
+    "requirement": "Record requested sources, commits, source paths, licenses, inspection scope, factual status and unknowns.",
+    "spec": "SPEC-006",
+    "spec_file": "../03-subsystem-specs/006-hoi4-tools-and-validation.md",
+    "stage": "S01",
+    "stage_file": "../04-implementation-stages/stage-01-bootstrap-and-probes.md",
+    "acceptance": "AC-040"
+  },
+  {
+    "id": "REQ-041",
+    "title": "Evaluation matrix",
+    "requirement": "Plan all required scenarios across two API providers and one local configuration, measuring accepted output, rework, failures, time and cost.",
+    "spec": "SPEC-002",
+    "spec_file": "../03-subsystem-specs/002-native-runtime-and-models.md",
+    "stage": "S08",
+    "stage_file": "../04-implementation-stages/stage-08-packaging-and-pilot.md",
+    "acceptance": "AC-041"
+  },
+  {
+    "id": "REQ-042",
+    "title": "Interoperable extension surfaces",
+    "requirement": "Use MCP and skills appropriately, consider ACP as optional editor interoperability, and keep the native runtime replaceable.",
+    "spec": "SPEC-011",
+    "spec_file": "../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md",
+    "stage": "S05",
+    "stage_file": "../04-implementation-stages/stage-05-context-and-recovery-hardening.md",
+    "acceptance": "AC-042"
+  },
+  {
+    "id": "REQ-043",
+    "title": "Versioned maintenance",
+    "requirement": "Pin dependency closures and schemas, test upgrades, track source compatibility and retire stale guidance.",
+    "spec": "SPEC-013",
+    "spec_file": "../03-subsystem-specs/013-config-reuse-and-developer-environment.md",
+    "stage": "S08",
+    "stage_file": "../04-implementation-stages/stage-08-packaging-and-pilot.md",
+    "acceptance": "AC-043"
+  },
+  {
+    "id": "REQ-044",
+    "title": "Editable export and escape hatch",
+    "requirement": "Allow the mod to be edited and continued outside the factory, with valid native files and no proprietary source lock-in.",
+    "spec": "SPEC-007",
+    "spec_file": "../03-subsystem-specs/007-visual-state-synchronization.md",
+    "stage": "S04",
+    "stage_file": "../04-implementation-stages/stage-04-focus-vertical-slice.md",
+    "acceptance": "AC-044"
+  },
+  {
+    "id": "REQ-045",
+    "title": "Complete planning archive",
+    "requirement": "Deliver substantive specs, stages, evidence, starter files, traceability and actual package validation in the versioned ZIP.",
+    "spec": "SPEC-012",
+    "spec_file": "../03-subsystem-specs/012-engineering-guidance-skills-and-learning.md",
+    "stage": "S01",
+    "stage_file": "../04-implementation-stages/stage-01-bootstrap-and-probes.md",
+    "acceptance": "AC-045"
+  }
+]

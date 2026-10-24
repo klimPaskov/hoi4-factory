@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "package": "hoi4-factory",
+  "version": "v02",
+  "date": "2026-10-23",
+  "python_version": "3.12.14",
+  "scope": "Planning artifacts only",
+  "mode": "distribution",
+  "status": "pass",
+  "archive_checked": false,
+  "checks": [
+    {
+      "check": "required_content",
+      "passed": true,
+      "errors": [],
+      "required_paths": 51
+    },
+    {
+      "check": "json_toml_python_syntax",
+      "passed": true,
+      "errors": [],
+      "json_files": 21,
+      "toml_files": 1,
+      "python_files": 2
+    },
+    {
+      "check": "relative_markdown_links",
+      "passed": true,
+      "errors": [],
+      "checked_links": 1044
+    },
+    {
+      "check": "prose_and_fence_checks",
+      "passed": true,
+      "errors": [],
+      "markdown_files": 78,
+      "mermaid_blocks": 3,
+      "diagram_limit": "Fences and human structural review only, no Mermaid renderer executed"
+    },
+    {
+      "check": "specification_and_stage_structure",
+      "passed": true,
+      "errors": [],
+      "specifications": 13,
+      "stages": 8,
+      "unique_packets": 48,
+      "stage_exit_gates": 47
+    },
+    {
+      "check": "requirements_tests_and_gates",
+      "passed": true,
+      "errors": [],
+      "requirements": 45,
+      "tests": 43,
+      "gates": 47
+    },
+    {
+      "check": "skills_frontmatter_import_and_drift",
+      "passed": true,
+      "errors": [],
+      "real_skill_files": 12
+    },
+    {
+      "check": "starter_config_and_field_mapping",
+      "passed": true,
+      "errors": [],
+      "mapped_fields": 196,
+      "validation_scope": "Parse and explicit documented used-key checks. No exhaustive JSON Schema engine or live client invocation."
+    },
+    {
+      "check": "research_registry_and_source_coverage",
+      "passed": true,
+      "errors": [],
+      "records": 77,
+      "distinct_supplied_texts": 152,
+      "full_read_chunks": 250
+    },
+    {
+      "check": "artifact_hygiene",
+      "passed": true,
+      "errors": [],
+      "file_count": 111,
+      "limitation": "Pattern-based credential scan, not a guarantee that arbitrary encoded secrets are detectable"
+    },
+    {
+      "check": "manifest_hashes",
+      "passed": true,
+      "errors": [],
+      "hashed_files": 109
+    }
+  ],
+  "not_executed": [
+    "Product runtime tests",
+    "Live Claude/Codex loading or invocation",
+    "MCP connectivity",
+    "Paid model/API trials",
+    "HOI4 game tests",
+    "OS sandbox enforcement",
+    "Mermaid renderer",
+    "Exhaustive JSON Schema validation"
+  ]
+}

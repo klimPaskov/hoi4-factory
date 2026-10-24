@@ -1,0 +1,577 @@
+{
+  "schema_version": 1,
+  "status": "Planned product tests with separately recorded planning QA",
+  "tests": [
+    {
+      "id": "T-SETUP-01",
+      "name": "New project through reused Setup",
+      "fixtures": [
+        "F-SETUP-NEW"
+      ],
+      "stages": [
+        "S01",
+        "S02",
+        "S04"
+      ],
+      "oracle": "Real Setup analysis, plan, dry-run and apply yield a descriptor with exact resolved closure and native files. No duplicate importer is used.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-SETUP-02",
+      "name": "Import and idempotent rerun",
+      "fixtures": [
+        "F-SETUP-IMPORT"
+      ],
+      "stages": [
+        "S01",
+        "S02",
+        "S04"
+      ],
+      "oracle": "All unapproved source, instructions, assets, dirty index and untracked files remain byte-identical. Rerun has no unexpected changes.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-SETUP-03",
+      "name": "Interrupted setup and recovery",
+      "fixtures": [
+        "F-SETUP-PARTIAL"
+      ],
+      "stages": [
+        "S01",
+        "S02"
+      ],
+      "oracle": "Kill at staging, each apply boundary and finalization. Resume only supported preapply states. Partial apply requires rollback. Before/after inventory agrees or apply remains blocked.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-SETUP-04",
+      "name": "Version and capability closure",
+      "fixtures": [
+        "F-SETUP-IMPORT"
+      ],
+      "stages": [
+        "S02",
+        "S03"
+      ],
+      "oracle": "Manifest, components, tool versions and unsupported capabilities are recorded. Upgrade is explicit and unsupported platform capabilities fail closed.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-RUN-01",
+      "name": "Independent packaged agent",
+      "fixtures": [
+        "F-RUNTIME-FAULT"
+      ],
+      "stages": [
+        "S01",
+        "S03",
+        "S08"
+      ],
+      "oracle": "On a clean installation the product performs a native request without spawning or requiring Claude Code, Codex or another coding CLI.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-RUN-02",
+      "name": "Final schema and tool input validation",
+      "fixtures": [
+        "F-RUNTIME-FAULT",
+        "F-AUTHORITY"
+      ],
+      "stages": [
+        "S01",
+        "S03"
+      ],
+      "oracle": "Malformed schemas, hook-mutated arguments and invalid results are rejected at the host after all hooks. Zero fixture effects occur for rejected calls.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-RUN-03",
+      "name": "Pause, revocation and stale ownership",
+      "fixtures": [
+        "F-RUNTIME-FAULT",
+        "F-AUTHORITY"
+      ],
+      "stages": [
+        "S03",
+        "S05"
+      ],
+      "oracle": "Pause survives restart, dispatch stops at revocation, stale fence results cannot publish, and UI pause waits for settlement.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-RUN-04",
+      "name": "Unknown effects and replay",
+      "fixtures": [
+        "F-RUNTIME-FAULT"
+      ],
+      "stages": [
+        "S01",
+        "S03",
+        "S05"
+      ],
+      "oracle": "Crash before intent, during effect and after success before reply. Unsafe uncertain operations remain blocked until reconciled. Changed workspace or tool identity invalidates replay.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-RUN-05",
+      "name": "Provider capabilities and graceful limits",
+      "fixtures": [
+        "F-RUNTIME-FAULT"
+      ],
+      "stages": [
+        "S01",
+        "S03",
+        "S08"
+      ],
+      "oracle": "Three distinct profiles report actual tool, schema, stream and context behavior. Unsupported features produce explicit narrowing or rejection, never silent equivalence.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-RUN-06",
+      "name": "Cost, timeout and destination limits",
+      "fixtures": [
+        "F-AUTHORITY"
+      ],
+      "stages": [
+        "S03",
+        "S08"
+      ],
+      "oracle": "Budget exhaustion stops dispatch, retries are finite, unknown usage stays unknown and fallback cannot cross an unapproved provider destination.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-VIS-01",
+      "name": "Lossless bounded edit",
+      "fixtures": [
+        "F-FOCUS-FIDELITY"
+      ],
+      "stages": [
+        "S01",
+        "S04"
+      ],
+      "oracle": "No-op is byte-identical. Supported edits change only approved spans. Comments, BOM, CRLF, unknown constructs and unrelated values survive. Unsupported edits fail without mutation.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-VIS-02",
+      "name": "Visual, hybrid and autonomous equivalence",
+      "fixtures": [
+        "F-FOCUS-SMALL"
+      ],
+      "stages": [
+        "S04",
+        "S08"
+      ],
+      "oracle": "All three paths produce reviewable native artifacts with comparable accepted semantics, source provenance and checks. Autonomous execution uses no canvas action.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-VIS-03",
+      "name": "External edit, stale preview and undo",
+      "fixtures": [
+        "F-FOCUS-FIDELITY",
+        "F-COLLAB"
+      ],
+      "stages": [
+        "S04",
+        "S05"
+      ],
+      "oracle": "An external change invalidates the projection. Stale gestures are rejected or explicitly rebased. Undo preserves intervening human work and updates agent context.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-GIT-01",
+      "name": "Owned worktree and index discipline",
+      "fixtures": [
+        "F-COLLAB"
+      ],
+      "stages": [
+        "S02",
+        "S04",
+        "S06"
+      ],
+      "oracle": "Only owned paths are committed under expected HEAD. Real index and unrelated dirty or untracked work remain intact.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-GIT-02",
+      "name": "Semantic collision and review race",
+      "fixtures": [
+        "F-COLLAB"
+      ],
+      "stages": [
+        "S06"
+      ],
+      "oracle": "Detect overlapping focus logic, duplicate symbols, localization keys and binary destinations even when Git merges text. Concurrent approval and integration have one authoritative winner.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-GIT-03",
+      "name": "Commit reconciliation and restore",
+      "fixtures": [
+        "F-COLLAB"
+      ],
+      "stages": [
+        "S04",
+        "S05",
+        "S08"
+      ],
+      "oracle": "Lost commit reply does not duplicate the commit. Restore or reviewed revert recovers the intended snapshot and preserves subsequent unrelated work.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-HOI-01",
+      "name": "Layered domain validation",
+      "fixtures": [
+        "F-FOCUS-FIDELITY",
+        "F-LOCALIZATION"
+      ],
+      "stages": [
+        "S03",
+        "S04",
+        "S06"
+      ],
+      "oracle": "Parser, rule, reference and dependency failures are separately recorded with exact source and tool profiles. Known invalid fixtures block completion.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-HOI-02",
+      "name": "Evidence fidelity and game scope",
+      "fixtures": [
+        "F-FOCUS-SMALL",
+        "F-MAP-STRUCTURED"
+      ],
+      "stages": [
+        "S04",
+        "S07",
+        "S08"
+      ],
+      "oracle": "Source preview, static check, simulation and actual game observations retain distinct labels. A game result records build, DLC, load order and scenario, with no unsupported generalization.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-CTX-01",
+      "name": "Canon, inference and context budget",
+      "fixtures": [
+        "F-CONTEXT"
+      ],
+      "stages": [
+        "S05"
+      ],
+      "oracle": "Only approved canon is authoritative. Bundle records omissions and source versions, fits the selected profile or requests narrowing, and contains no private cross-provider reasoning.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-CTX-02",
+      "name": "Retrieval and stale-index rebuilding",
+      "fixtures": [
+        "F-CONTEXT"
+      ],
+      "stages": [
+        "S05"
+      ],
+      "oracle": "Correct sources and stale facts are evaluated against a human-authored answer key. Cancellation cannot publish a partial generation. Changed dependencies invalidate affected recall.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-CTX-03",
+      "name": "Cross-model interruption and resume",
+      "fixtures": [
+        "F-RUNTIME-FAULT",
+        "F-CONTEXT"
+      ],
+      "stages": [
+        "S05",
+        "S08"
+      ],
+      "oracle": "New provider resumes the same task and receipts from canonical context, rechecks destination and capabilities, and repeats no unsafe effect.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-CTX-04",
+      "name": "Runtime lesson review and rollback",
+      "fixtures": [
+        "F-CONTEXT"
+      ],
+      "stages": [
+        "S05"
+      ],
+      "oracle": "Candidate review has explicit owner and evidence. Concurrent decisions have one winner, rejection is retained, supersession removes active recall and rollback does not alter approved canon.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-MAP-01",
+      "name": "Structured import dependency closure",
+      "fixtures": [
+        "F-MAP-STRUCTURED",
+        "F-MAP-BROKEN"
+      ],
+      "stages": [
+        "S07"
+      ],
+      "oracle": "Report exact import closure, remapping, missing inputs and conflicts before apply. Invalid dimensions, duplicate colors/IDs and broken references reject mutation.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-MAP-02",
+      "name": "Bounded map edit and recovery",
+      "fixtures": [
+        "F-MAP-STRUCTURED",
+        "F-MAP-BROKEN"
+      ],
+      "stages": [
+        "S07"
+      ],
+      "oracle": "Supported edit preserves unrelated files and passes named topology checks. Stale input and interrupted apply cannot silently publish a partial map.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-MAP-03",
+      "name": "Reference and deferred synthesis boundary",
+      "fixtures": [
+        "F-MAP-REFERENCE"
+      ],
+      "stages": [
+        "S07"
+      ],
+      "oracle": "Reference image remains attributed design input. Unsupported geography synthesis is disabled and the UI makes no game-ready output claim.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-CONTENT-01",
+      "name": "Asset provenance and wiring",
+      "fixtures": [
+        "F-ASSET"
+      ],
+      "stages": [
+        "S06"
+      ],
+      "oracle": "Track original and transformed hashes, rights, recipe and actual consumer. Missing rights, collision, bad format or unwired output is visible and blocks the affected acceptance.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-CONTENT-02",
+      "name": "Localization preservation and coverage",
+      "fixtures": [
+        "F-LOCALIZATION"
+      ],
+      "stages": [
+        "S06"
+      ],
+      "oracle": "BOM/encoding policy, duplicate keys, language coverage and references are checked. Untouched bytes survive and invalid encoding is not discarded.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-DAG-01",
+      "name": "Dependencies, leases and bounded retries",
+      "fixtures": [
+        "F-COLLAB",
+        "F-RUNTIME-FAULT"
+      ],
+      "stages": [
+        "S06"
+      ],
+      "oracle": "Reject cycles, stale claim release and invalid dependency completion. Retry budget stops repeated failure. At most the current fenced owner can publish.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-SEC-01",
+      "name": "Filesystem, IPC and injection boundary",
+      "fixtures": [
+        "F-AUTHORITY"
+      ],
+      "stages": [
+        "S03",
+        "S08"
+      ],
+      "oracle": "Path traversal, symlink/reparse escape, malicious repo instructions, credential exfiltration and stale grants cause no unauthorized write or disclosure.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-SEC-02",
+      "name": "Extension and protocol negotiation",
+      "fixtures": [
+        "F-AUTHORITY"
+      ],
+      "stages": [
+        "S05",
+        "S08"
+      ],
+      "oracle": "Unknown MCP/ACP capabilities fail explicitly, read-only grants reject writes, skill metadata grants no authority, and untrusted executables remain unavailable without a proven containment mode.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-DEV-01",
+      "name": "Clean-session guidance loading",
+      "fixtures": [
+        "F-DEVELOPER"
+      ],
+      "stages": [
+        "S01",
+        "S08"
+      ],
+      "oracle": "Actual target Claude version loads shared AGENTS through CLAUDE. A fresh session finds the authorized stage and known workflow without inventing missing rules. Optional Codex discovery is recorded separately.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-DEV-02",
+      "name": "Skills and trigger behavior",
+      "fixtures": [
+        "F-DEVELOPER"
+      ],
+      "stages": [
+        "S01",
+        "S08"
+      ],
+      "oracle": "Frontmatter and references validate, mirrors agree, positive and negative tasks invoke the appropriate workflow in an actual client. Static fixtures alone do not prove invocation.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-DEV-03",
+      "name": "Configuration migration and drift",
+      "fixtures": [
+        "F-DEVELOPER"
+      ],
+      "stages": [
+        "S01",
+        "S08"
+      ],
+      "oracle": "All 196 source leaves map to a disposition. Starter TOML/JSON parse, current schemas support active keys, disabled MCP stays disabled, secrets/global paths are absent and unavailable servers are reported truthfully.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-DEV-04",
+      "name": "Engineering learning lifecycle",
+      "fixtures": [
+        "F-DEVELOPER"
+      ],
+      "stages": [
+        "S01",
+        "S05",
+        "S08"
+      ],
+      "oracle": "An evidenced scoped lesson is proposed, tested, reviewed, promoted and reverted. A duplicate or unsupported lesson is rejected. A no-change review is accepted and no skill can enlarge authority.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-RELEASE-01",
+      "name": "Install, update and native export",
+      "fixtures": [
+        "F-RELEASE"
+      ],
+      "stages": [
+        "S08"
+      ],
+      "oracle": "Each advertised platform installs and performs the slice. Native files remain usable outside the app, update rollback preserves source and unsupported platforms remain explicit.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-RELEASE-02",
+      "name": "Backup, restore and store reconciliation",
+      "fixtures": [
+        "F-RELEASE",
+        "F-RUNTIME-FAULT"
+      ],
+      "stages": [
+        "S05",
+        "S08"
+      ],
+      "oracle": "Restore accepted source, canon and operation records after interruption. Reconcile database, artifact store and Git without treating them as one atomic transaction.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-RELEASE-03",
+      "name": "Dependency, license and asset inventory",
+      "fixtures": [
+        "F-RELEASE"
+      ],
+      "stages": [
+        "S08"
+      ],
+      "oracle": "Every bundled dependency and asset has an owner, version and distribution basis. Restricted comparison code and game files are excluded from packages.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-RELEASE-04",
+      "name": "Contributor usability pilot",
+      "fixtures": [
+        "F-FOCUS-SMALL",
+        "F-COLLAB"
+      ],
+      "stages": [
+        "S08"
+      ],
+      "oracle": "Observe non-scripter, technical contributor and maintainer completing bounded tasks, finding evidence limits and using restore. Record assistance and failures.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-PERF-01",
+      "name": "Focus responsiveness",
+      "fixtures": [
+        "F-FOCUS-SCALE"
+      ],
+      "stages": [
+        "S04",
+        "S08"
+      ],
+      "oracle": "Measure cached 500-node preview against 3 s and drag feedback against 100 ms p95 on declared hardware. Record 2,000-node scaling and justify any target revision.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-PERF-02",
+      "name": "Map and index responsiveness",
+      "fixtures": [
+        "F-MAP-SCALE"
+      ],
+      "stages": [
+        "S07",
+        "S08"
+      ],
+      "oracle": "Measure full import, cached viewport, local update and peak memory on fixed map fixtures. Compare incremental work with full rebuild and record bottlenecks.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-PERF-03",
+      "name": "Operational growth",
+      "fixtures": [
+        "F-RELEASE"
+      ],
+      "stages": [
+        "S05",
+        "S08"
+      ],
+      "oracle": "Run 100 synthetic task cycles, measure journal/artifact growth and retention, and prove cleanup preserves unresolved effects and evidence pinned by accepted results.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-PKG-01",
+      "name": "Planning archive integrity",
+      "fixtures": [
+        "Planning",
+        "package",
+        "itself"
+      ],
+      "stages": [
+        "Planning"
+      ],
+      "oracle": "Validate links, manifests, traceability, skills, configs and ZIP members with reproducible tooling. This check does not validate product behavior.",
+      "status": "Planning check, see actual QA report"
+    },
+    {
+      "id": "T-RESEARCH-01",
+      "name": "Research coverage and provenance",
+      "fixtures": [
+        "Source",
+        "inventory",
+        "and",
+        "registries"
+      ],
+      "stages": [
+        "Planning"
+      ],
+      "oracle": "Account for supplied sources and requested references, distinguish retrieval from inspection, record exact pins, limitations and actual investigation results.",
+      "status": "Planning check, see actual QA report"
+    }
+  ]
+}
+

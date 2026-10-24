@@ -1,0 +1,491 @@
+[
+  {
+    "id": "SRC-C01",
+    "title": "Agentic HOI4 Modding revision",
+    "url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/commit/856940f2a629e0e2f3e03fc484cb0c0309c96734",
+    "requested_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/commit/856940f2a629e0e2f3e03fc484cb0c0309c96734",
+    "retrieved_date": "2026-10-23",
+    "revision": "856940f2a629e0e2f3e03fc484cb0c0309c96734",
+    "evidence_kind": "repository_source",
+    "status": "Verified",
+    "key_evidence": [
+      "Commit dated 2026-10-18T19:35:06Z",
+      "Recursive tree contains 1103 blobs and was not truncated",
+      "32 canonical Claude skills and 23 canonical Claude agents",
+      "Repository metadata observed 2026-10-23: public main branch, archived false, disabled false",
+      "Latest published release package-2026-10-14.1, published 2026-10-14T16:15:32Z",
+      "pushed_at 2026-10-18T19:35:07Z is distinct from inspected commit date 2026-10-18T19:35:06Z"
+    ],
+    "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+    "maintenance_observations": {
+      "repository": "klimPaskov/Agentic-HOI4-Modding",
+      "observed_date": "2026-10-23",
+      "metadata_source_url": "https://api.github.com/repos/klimPaskov/Agentic-HOI4-Modding",
+      "default_branch": "main",
+      "archived": false,
+      "disabled": false,
+      "visibility": "public",
+      "created_at": "2026-04-09T06:49:03Z",
+      "updated_at": "2026-10-18T19:35:10Z",
+      "pushed_at": "2026-10-18T19:35:07Z",
+      "open_issues_count": 1,
+      "license_spdx": "Apache-2.0",
+      "inspected_commit": {
+        "sha": "856940f2a629e0e2f3e03fc484cb0c0309c96734",
+        "commit_date": "2026-10-18T19:35:06Z",
+        "url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/commit/856940f2a629e0e2f3e03fc484cb0c0309c96734"
+      },
+      "latest_release": {
+        "source_url": "https://api.github.com/repos/klimPaskov/Agentic-HOI4-Modding/releases/latest",
+        "tag_name": "package-2026-10-14.1",
+        "name": "Setup package 2026-10-14.1",
+        "published_at": "2026-10-14T16:15:32Z",
+        "created_at": "2026-10-14T16:14:58Z",
+        "draft": false,
+        "prerelease": false,
+        "url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/releases/tag/package-2026-10-14.1",
+        "target_commitish": "main",
+        "tag_commit": "Not separately resolved in this targeted metadata check"
+      },
+      "maintenance_observation": "Public, not archived or disabled. Default branch main. Latest published release precedes the inspected commit date. Metadata timestamps are observations, not a guarantee of maintenance or compatibility. pushed_at is not the inspected commit date."
+    },
+    "source_status_detail": "Verified source inspection"
+  },
+  {
+    "id": "SRC-C02",
+    "title": "Actual Agentic root Codex configuration",
+    "url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/config.toml",
+    "requested_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/config.toml",
+    "retrieved_date": "2026-10-23",
+    "revision": "856940f2a629e0e2f3e03fc484cb0c0309c96734",
+    "evidence_kind": "repository_source",
+    "status": "Verified",
+    "key_evidence": [
+      "58 scalar leaves including 46 role registry leaves",
+      "never approval and danger-full-access sandbox are source defaults, not starter defaults",
+      "184320 is instruction bytes",
+      "Two MCP definitions, no root model, provider, model context or compaction settings"
+    ],
+    "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+    "source_status_detail": "Verified source inspection"
+  },
+  {
+    "id": "SRC-C03",
+    "title": "Actual Agentic Codex role layers",
+    "url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/tree/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/agents",
+    "requested_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/tree/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/agents",
+    "retrieved_date": "2026-10-23",
+    "revision": "856940f2a629e0e2f3e03fc484cb0c0309c96734",
+    "evidence_kind": "repository_source",
+    "status": "Verified",
+    "key_evidence": [
+      "All 23 referenced files fetched and parsed",
+      "Each has name, description, model_reasoning_effort, sandbox_mode, nickname_candidates and developer_instructions",
+      "No role has a fixed model",
+      "Four read-only roles and nineteen workspace-write roles"
+    ],
+    "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+    "source_status_detail": "Verified source inspection"
+  },
+  {
+    "id": "SRC-C04",
+    "title": "Canonical Claude roles and settings",
+    "url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/tree/856940f2a629e0e2f3e03fc484cb0c0309c96734/.claude",
+    "requested_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/tree/856940f2a629e0e2f3e03fc484cb0c0309c96734/.claude",
+    "retrieved_date": "2026-10-23",
+    "revision": "856940f2a629e0e2f3e03fc484cb0c0309c96734",
+    "evidence_kind": "repository_source",
+    "status": "Verified",
+    "key_evidence": [
+      "23 Claude agents map Opus to xhigh, Sonnet to high, and Haiku to medium in Codex projections",
+      "Source Claude settings deny Read of root .env patterns",
+      "Source MCP JSON contains only HOI4 stdio connection"
+    ],
+    "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+    "source_status_detail": "Verified source inspection"
+  },
+  {
+    "id": "SRC-C05",
+    "title": "Agentic projection and synchronization",
+    "url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.tools/sync/README.md",
+    "requested_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.tools/sync/README.md",
+    "retrieved_date": "2026-10-23",
+    "revision": "856940f2a629e0e2f3e03fc484cb0c0309c96734",
+    "evidence_kind": "repository_source",
+    "status": "Verified",
+    "key_evidence": [
+      "Canonical source uses CLAUDE and .claude skills",
+      "Codex skills projection destination is .agents/skills",
+      "Check mode detects drift",
+      "Isolated pure source projection reproduced all 23 role files and root Codex registry without differences"
+    ],
+    "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+    "source_status_detail": "Verified source inspection"
+  },
+  {
+    "id": "SRC-C06",
+    "title": "Agentic setup manifest",
+    "url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/hoi4-mod-setup.manifest.json",
+    "requested_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/hoi4-mod-setup.manifest.json",
+    "retrieved_date": "2026-10-23",
+    "revision": "856940f2a629e0e2f3e03fc484cb0c0309c96734",
+    "evidence_kind": "repository_source",
+    "status": "Verified",
+    "key_evidence": [
+      "Schema version 5.0.0",
+      "generated_for_revision e814a581a121a3006c4a7085a8f3c4ef6e24ed58",
+      "Claude Code default primary with Codex, Cursor, Qoder and OpenCode supported",
+      "HOI4 Agent Tools 4.0.3 pin",
+      "No committed .codex/skills or .agents/skills in source tree"
+    ],
+    "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+    "source_status_detail": "Verified source inspection"
+  },
+  {
+    "id": "SRC-C07",
+    "title": "Agentic license and attribution",
+    "url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/NOTICE",
+    "requested_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/NOTICE",
+    "retrieved_date": "2026-10-23",
+    "revision": "856940f2a629e0e2f3e03fc484cb0c0309c96734",
+    "evidence_kind": "repository_source",
+    "status": "Verified",
+    "key_evidence": [
+      "Original code and guidance Apache-2.0",
+      "Third-party game and wiki material excluded",
+      "Inherited Super Events art has no separate verified license"
+    ],
+    "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+    "source_status_detail": "Verified source inspection"
+  },
+  {
+    "id": "SRC-C08",
+    "title": "Agentic test and CI contracts",
+    "url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/scripts/test_agent_sync_contract.py",
+    "requested_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/scripts/test_agent_sync_contract.py",
+    "retrieved_date": "2026-10-23",
+    "revision": "856940f2a629e0e2f3e03fc484cb0c0309c96734",
+    "evidence_kind": "repository_source",
+    "status": "Verified",
+    "key_evidence": [
+      "Source test checks 23 roles, tiers, generated registry and guidance drift",
+      "mcp-runtime workflow declares Ubuntu and Windows, Node 22 and 24, Python 3.13",
+      "Upstream test suite and CI runs were not executed or certified"
+    ],
+    "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+    "source_status_detail": "Verified source inspection"
+  },
+  {
+    "id": "SRC-C09",
+    "title": "Codex basic configuration",
+    "url": "https://learn.chatgpt.com/docs/config-file/config-basic",
+    "requested_url": "https://developers.openai.com/codex/config-basic",
+    "retrieved_date": "2026-10-23",
+    "revision": null,
+    "evidence_kind": "official_documentation",
+    "status": "Documented only",
+    "key_evidence": [
+      "Project settings are .codex/config.toml and require trusted project",
+      "Project configuration is distinct from user configuration"
+    ],
+    "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+    "source_status_detail": "Verified source inspection"
+  },
+  {
+    "id": "SRC-C10",
+    "title": "Codex configuration reference",
+    "url": "https://learn.chatgpt.com/docs/config-file/config-reference",
+    "requested_url": "https://developers.openai.com/codex/config-reference",
+    "retrieved_date": "2026-10-23",
+    "revision": null,
+    "evidence_kind": "official_documentation",
+    "status": "Documented only",
+    "key_evidence": [
+      "max_threads documented as legacy alias of max_concurrent_threads_per_session",
+      "MCP enabled and default_tools_approval_mode supported",
+      "Instruction byte budget is distinct from model context"
+    ],
+    "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+    "source_status_detail": "Verified source inspection"
+  },
+  {
+    "id": "SRC-C11",
+    "title": "Codex exact configuration schema",
+    "url": "https://github.com/openai/codex/blob/f71c6afc30031011fe0b4d757b981fd0301b2536/codex-rs/core/config.schema.json",
+    "requested_url": "https://developers.openai.com/codex/config-schema.json",
+    "retrieved_date": "2026-10-23",
+    "revision": "f71c6afc30031011fe0b4d757b981fd0301b2536",
+    "evidence_kind": "schema_source",
+    "status": "Verified",
+    "key_evidence": [
+      "Pinned schema fetched and compared equal to initial current fetch",
+      "max_concurrent_threads_per_session is canonical key",
+      "max_depth is V1 only and ignored by V2",
+      "Legacy max_threads alias omitted from JSON schema",
+      "Root additionalProperties false"
+    ],
+    "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+    "source_status_detail": "Verified source inspection"
+  },
+  {
+    "id": "SRC-C12",
+    "title": "Codex skill discovery and metadata",
+    "url": "https://learn.chatgpt.com/docs/build-skills",
+    "requested_url": "https://developers.openai.com/codex/skills",
+    "retrieved_date": "2026-10-23",
+    "revision": null,
+    "evidence_kind": "official_documentation",
+    "status": "Documented only",
+    "key_evidence": [
+      "Current repository discovery uses .agents/skills",
+      "Optional agents/openai.yaml policy.allow_implicit_invocation false supports explicit invocation",
+      ".codex copies are deliverable compatibility copies, not asserted automatic discovery"
+    ],
+    "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+    "source_status_detail": "Verified source inspection"
+  },
+  {
+    "id": "SRC-C13",
+    "title": "Codex AGENTS discovery",
+    "url": "https://learn.chatgpt.com/docs/agent-configuration/agents-md",
+    "requested_url": "https://developers.openai.com/codex/guides/agents-md",
+    "retrieved_date": "2026-10-23",
+    "revision": null,
+    "evidence_kind": "official_documentation",
+    "status": "Documented only",
+    "key_evidence": [
+      "Root-to-current-directory instruction chain",
+      "AGENTS.override takes precedence within a directory",
+      "Default instruction budget 32 KiB and configurable"
+    ],
+    "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+    "source_status_detail": "Verified source inspection"
+  },
+  {
+    "id": "SRC-C14",
+    "title": "Evaluating skills",
+    "url": "https://developers.openai.com/blog/eval-skills",
+    "requested_url": "https://developers.openai.com/blog/eval-skills",
+    "retrieved_date": "2026-10-23",
+    "revision": null,
+    "evidence_kind": "official_documentation",
+    "status": "Documented only",
+    "key_evidence": [
+      "Define outcome, process, style and efficiency success",
+      "Combine deterministic artifact checks and rubric review",
+      "Positive, negative and permission regression cases"
+    ],
+    "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+    "source_status_detail": "Verified source inspection"
+  },
+  {
+    "id": "SRC-C15",
+    "title": "Iterating engineering workflows",
+    "url": "https://developers.openai.com/cookbook/examples/codex/iterating-development-workflows-with-codex",
+    "requested_url": "https://developers.openai.com/cookbook/examples/codex/iterating-development-workflows-with-codex",
+    "retrieved_date": "2026-10-23",
+    "revision": null,
+    "evidence_kind": "official_documentation",
+    "status": "Documented only",
+    "key_evidence": [
+      "Published 2026-08-03 by Tony Alaniz",
+      "Small explicit phases with scope, outcome, criteria and evidence",
+      "GOALS, PLANS and PROMPTS are workflow conventions, not native mandatory filenames"
+    ],
+    "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+    "source_status_detail": "Verified source inspection"
+  },
+  {
+    "id": "SRC-C16",
+    "title": "Claude project memory and imports",
+    "url": "https://code.claude.com/docs/en/memory",
+    "requested_url": "https://code.claude.com/docs/en/memory",
+    "retrieved_date": "2026-10-23",
+    "revision": null,
+    "evidence_kind": "official_documentation",
+    "status": "Documented only",
+    "key_evidence": [
+      "@AGENTS.md import explicitly supported",
+      "Native AGENTS support added in v2.1.277 and depends on CLAUDE presence and settings",
+      "Instruction context is not an enforcement boundary",
+      "Project .claude/rules Markdown may use paths frontmatter. Missing or malformed path frontmatter can load rules without the intended scope."
+    ],
+    "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+    "source_status_detail": "Verified source inspection"
+  },
+  {
+    "id": "SRC-C17",
+    "title": "Claude skills",
+    "url": "https://code.claude.com/docs/en/skills",
+    "requested_url": "https://code.claude.com/docs/en/skills",
+    "retrieved_date": "2026-10-23",
+    "revision": null,
+    "evidence_kind": "official_documentation",
+    "status": "Documented only",
+    "key_evidence": [
+      "Project .claude/skills discovery",
+      "disable-model-invocation true makes invocation manual",
+      "allowed-tools preapproves tools rather than constraining all tools",
+      "Malformed frontmatter can lose field behavior, so package checker rejects it"
+    ],
+    "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+    "source_status_detail": "Verified source inspection"
+  },
+  {
+    "id": "SRC-C18",
+    "title": "Claude MCP",
+    "url": "https://code.claude.com/docs/en/mcp",
+    "requested_url": "https://code.claude.com/docs/en/mcp",
+    "retrieved_date": "2026-10-23",
+    "revision": null,
+    "evidence_kind": "official_documentation",
+    "status": "Documented only",
+    "key_evidence": [
+      "Project .mcp.json uses native JSON shape",
+      "disabledMcpjsonServers rejects listed project servers",
+      "Per-server timeout is milliseconds",
+      "MCP_TIMEOUT startup environment is client-wide, not exact per-server startup equivalent"
+    ],
+    "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+    "source_status_detail": "Verified source inspection"
+  },
+  {
+    "id": "SRC-C19",
+    "title": "Claude settings",
+    "url": "https://code.claude.com/docs/en/settings",
+    "requested_url": "https://code.claude.com/docs/en/settings",
+    "retrieved_date": "2026-10-23",
+    "revision": null,
+    "evidence_kind": "official_documentation",
+    "status": "Documented only",
+    "key_evidence": [
+      "Project .claude/settings.json is versionable",
+      "Local and user settings have separate scopes",
+      "No TOML configuration ingestion"
+    ],
+    "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+    "source_status_detail": "Verified source inspection"
+  },
+  {
+    "id": "SRC-C20",
+    "title": "Claude settings schema",
+    "url": "https://github.com/SchemaStore/schemastore/blob/bf7c6745505ccace5568dc0d7f4ae29647e9b41a/src/schemas/json/claude-code-settings.json",
+    "requested_url": "https://json.schemastore.org/claude-code-settings.json",
+    "retrieved_date": "2026-10-23",
+    "revision": "bf7c6745505ccace5568dc0d7f4ae29647e9b41a",
+    "evidence_kind": "schema_source",
+    "status": "Verified",
+    "key_evidence": [
+      "Pinned SchemaStore schema matches initial retrieval",
+      "permissions.defaultMode, disabledMcpjsonServers and enableAllProjectMcpServers present",
+      "Root additionalProperties true means schema acceptance alone cannot prove an unfamiliar key supported"
+    ],
+    "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+    "source_status_detail": "Verified source inspection"
+  },
+  {
+    "id": "SRC-C21",
+    "title": "Claude subagents",
+    "url": "https://code.claude.com/docs/en/sub-agents",
+    "requested_url": "https://code.claude.com/docs/en/sub-agents",
+    "retrieved_date": "2026-10-23",
+    "revision": null,
+    "evidence_kind": "official_documentation",
+    "status": "Documented only",
+    "key_evidence": [
+      "Project Markdown agent definitions",
+      "tools and disallowedTools are native fields",
+      "Subagents have separate context and require explicit skill preloading",
+      "Disallowing Write and Edit alone does not block Bash or MCP effects"
+    ],
+    "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+    "source_status_detail": "Verified source inspection"
+  },
+  {
+    "id": "SRC-C22",
+    "title": "Claude sessions",
+    "url": "https://code.claude.com/docs/en/sessions",
+    "requested_url": "https://code.claude.com/docs/en/sessions",
+    "retrieved_date": "2026-10-23",
+    "revision": null,
+    "evidence_kind": "official_documentation",
+    "status": "Documented only",
+    "key_evidence": [
+      "Continue uses recent current-directory session",
+      "Resume selects session",
+      "Client transcript continuity is distinct from durable product recovery"
+    ],
+    "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+    "source_status_detail": "Verified source inspection"
+  },
+  {
+    "id": "SRC-C23",
+    "title": "Claude worktrees",
+    "url": "https://code.claude.com/docs/en/worktrees",
+    "requested_url": "https://code.claude.com/docs/en/worktrees",
+    "retrieved_date": "2026-10-23",
+    "revision": null,
+    "evidence_kind": "official_documentation",
+    "status": "Documented only",
+    "key_evidence": [
+      "CLI worktree option uses Git isolation",
+      "Worktree creation needs committed Git history",
+      "Worktrees are not independent security sandboxes"
+    ],
+    "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+    "source_status_detail": "Verified source inspection"
+  },
+  {
+    "id": "SRC-C24",
+    "title": "Claude permissions",
+    "url": "https://code.claude.com/docs/en/permissions",
+    "requested_url": "https://code.claude.com/docs/en/permissions",
+    "retrieved_date": "2026-10-23",
+    "revision": null,
+    "evidence_kind": "official_documentation",
+    "status": "Documented only",
+    "key_evidence": [
+      "default mode prompts on first tool use",
+      "Permission rules and OS sandboxing are separate controls",
+      "Project-root launch matters for configuration discovery"
+    ],
+    "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+    "source_status_detail": "Verified source inspection"
+  },
+  {
+    "id": "SRC-C25",
+    "title": "Agent Skills standard",
+    "url": "https://agentskills.io/specification",
+    "requested_url": "https://agentskills.io/specification",
+    "retrieved_date": "2026-10-23",
+    "revision": null,
+    "evidence_kind": "official_documentation",
+    "status": "Documented only",
+    "key_evidence": [
+      "name and description frontmatter required",
+      "Name matches directory and uses lowercase kebab case",
+      "Description maximum 1024 characters"
+    ],
+    "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+    "source_status_detail": "Verified source inspection"
+  },
+  {
+    "id": "SRC-C26",
+    "title": "Agentic HOI4 Agent Tools bootstrap implementation and contract tests",
+    "url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.tools/mcp/bootstrap_hoi4_agent_tools.py",
+    "requested_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.tools/mcp/bootstrap_hoi4_agent_tools.py",
+    "retrieved_date": "2026-10-23",
+    "revision": "856940f2a629e0e2f3e03fc484cb0c0309c96734",
+    "evidence_kind": "repository_source",
+    "status": "Verified",
+    "key_evidence": [
+      "Complete bootstrap and scripts/test_mcp_bootstrap_contract.py inspected, neither executed",
+      "Pinned package 4.0.3 with platform tree hashes, runtime entry hash and registry integrity",
+      "Native Windows and Linux x64, Node 22.19+ in major 22 or 24",
+      "Bootstrap can install Node through Windows winget and install or remove user-prefix npm packages",
+      "Not a read-only environment diagnostic and not shipped or invoked by this starter"
+    ],
+    "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+    "source_status_detail": "Verified source inspection"
+  }
+]

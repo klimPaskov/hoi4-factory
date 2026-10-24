@@ -1,0 +1,273 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-23",
+  "status": "pass",
+  "scope": "Planning starter configuration, shared skills, handoffs and stage process consistency",
+  "source_repository": "klimPaskov/Agentic-HOI4-Modding",
+  "source_revision": "856940f2a629e0e2f3e03fc484cb0c0309c96734",
+  "verification_method": "Real Python JSON and TOML parsing, explicit used-key and value checks against inspected pinned schemas, exact source-field coverage, hashes, canonical projection equality, isolated negative fixtures and manual stage review. This is not a complete JSON Schema implementation.",
+  "limitations": [
+    "No full JSON Schema validator used",
+    "No installed Claude or Codex client loading",
+    "No model trigger trials",
+    "No connected MCP or game execution"
+  ],
+  "live_verification_status": "Unknown",
+  "live_status_reason": "Installed Claude and Codex clients were absent. Model trigger trials, MCP services and game execution were not exercised by this planning check.",
+  "schema_sources": {
+    "codex": {
+      "source_url": "https://github.com/openai/codex/blob/f71c6afc30031011fe0b4d757b981fd0301b2536/codex-rs/core/config.schema.json",
+      "revision": "f71c6afc30031011fe0b4d757b981fd0301b2536",
+      "commit_date": "2026-10-23T12:16:36Z",
+      "retrieved_date": "2026-10-23",
+      "inspected_snapshot_sha256": "4d6db279e23115b9e70516ee0b3c79bda5b677b8354ed22fc2d238b58dbee1b0",
+      "compatibility_note": "Canonical max_concurrent_threads_per_session used. Documented legacy max_threads alias is absent from this schema. max_depth is V1-only and ignored by V2."
+    },
+    "claude_settings": {
+      "source_url": "https://github.com/SchemaStore/schemastore/blob/bf7c6745505ccace5568dc0d7f4ae29647e9b41a/src/schemas/json/claude-code-settings.json",
+      "revision": "bf7c6745505ccace5568dc0d7f4ae29647e9b41a",
+      "commit_date": "2026-10-19T16:23:05Z",
+      "retrieved_date": "2026-10-23",
+      "inspected_snapshot_sha256": "2ea77d191dcf16e7ba10eb9d3c7cfa63bdba7ca3779614896da509094f1a2c21",
+      "compatibility_note": "Root additionalProperties is true. Used keys are also checked against official Claude documentation, not accepted solely because the schema permits unknown properties."
+    }
+  },
+  "checks": [
+    {
+      "name": "real_json_toml_parsing",
+      "status": "pass",
+      "details": null
+    },
+    {
+      "name": "codex_root_keys_in_pinned_schema",
+      "status": "pass",
+      "details": null
+    },
+    {
+      "name": "codex_agent_keys_in_pinned_schema",
+      "status": "pass",
+      "details": null
+    },
+    {
+      "name": "codex_concurrency_positive",
+      "status": "pass",
+      "details": null
+    },
+    {
+      "name": "codex_safe_approval_sandbox",
+      "status": "pass",
+      "details": null
+    },
+    {
+      "name": "codex_instruction_bytes",
+      "status": "pass",
+      "details": null
+    },
+    {
+      "name": "codex_mcp_keys_in_schema",
+      "status": "pass",
+      "details": null
+    },
+    {
+      "name": "codex_mcp_disabled",
+      "status": "pass",
+      "details": null
+    },
+    {
+      "name": "codex_mcp_prompt_enum",
+      "status": "pass",
+      "details": null
+    },
+    {
+      "name": "claude_root_keys_in_schema",
+      "status": "pass",
+      "details": null
+    },
+    {
+      "name": "claude_permission_keys_in_schema",
+      "status": "pass",
+      "details": null
+    },
+    {
+      "name": "claude_default_permission_enum",
+      "status": "pass",
+      "details": null
+    },
+    {
+      "name": "claude_mcp_rejected",
+      "status": "pass",
+      "details": null
+    },
+    {
+      "name": "claude_mcp_documented_shape",
+      "status": "pass",
+      "details": null
+    },
+    {
+      "name": "timeout_conversion",
+      "status": "pass",
+      "details": null
+    },
+    {
+      "name": "no_undocumented_claude_cwd",
+      "status": "pass",
+      "details": null
+    },
+    {
+      "name": "claude_import",
+      "status": "pass",
+      "details": null
+    },
+    {
+      "name": "mapping_all_196_actual_fields",
+      "status": "pass",
+      "details": {
+        "observed": 196,
+        "mapped": 196,
+        "missing": [],
+        "unexpected": []
+      }
+    },
+    {
+      "name": "mapping_required_columns",
+      "status": "pass",
+      "details": null
+    },
+    {
+      "name": "source_inventory_fields_and_role_hashes",
+      "status": "pass",
+      "details": {
+        "root_sha256_matches": true,
+        "actual_root_fields": 58,
+        "inventory_root_fields": 58,
+        "root_fields_missing": [],
+        "root_fields_unexpected": [],
+        "role_files": 23,
+        "role_fields": 138,
+        "role_field_mismatches": [],
+        "all_196_identities_match_actual_source_and_csv": true,
+        "mapping_source_revisions_match": true
+      }
+    },
+    {
+      "name": "skill_drift_checker",
+      "status": "pass",
+      "details": {
+        "mode": "check",
+        "status": "pass",
+        "skills": 4,
+        "generated_files": 21,
+        "drift": [],
+        "client_trials": "not performed by this checker"
+      }
+    },
+    {
+      "name": "all_12_skill_headers_and_bodies",
+      "status": "pass",
+      "details": null
+    },
+    {
+      "name": "deliberate_generated_drift_detected",
+      "status": "pass",
+      "details": {
+        "mode": "check",
+        "status": "fail",
+        "skills": 4,
+        "generated_files": 21,
+        "drift": [
+          ".codex/skills/start-implementation-stage/SKILL.md"
+        ],
+        "client_trials": "not performed by this checker"
+      }
+    },
+    {
+      "name": "missing_workflow_section_rejected",
+      "status": "pass",
+      "details": {
+        "status": "error",
+        "error": "Missing ## Stop and error paths in start-implementation-stage"
+      }
+    },
+    {
+      "name": "owned_prose_no_em_dash_or_semicolon",
+      "status": "pass",
+      "details": []
+    },
+    {
+      "name": "relative_links_snapshot",
+      "status": "pass",
+      "details": []
+    }
+  ],
+  "read_only_check": {
+    "check_mode_exit_code": 0,
+    "package_files_observed": 109,
+    "package_files_unchanged_during_checks": true,
+    "client_check": {
+      "mode": "check",
+      "status": "pass",
+      "skills": 4,
+      "generated_files": 21,
+      "drift": [],
+      "client_trials": "not performed by this checker"
+    }
+  },
+  "stage_packet_review": {
+    "status": "pass",
+    "method": "Complete read of all eight stage packets and the roadmap, compared with the shared guidance and handoff contracts",
+    "substantive_conflicts": [],
+    "observations": [
+      "All eight stages carry scope, environment, checks, config-review, learning-review and handoff evidence paths.",
+      "All stages require the applicable current authorization and stop before automatic progression.",
+      "Learning candidates require evidence and review, with a justified no-change outcome permitted.",
+      "S05 keeps runtime knowledge distinct from engineering policy and approved canon.",
+      "S08 revalidates client configuration, runtime profiles, optional integrations and version pins.",
+      "S01 preserves the Setup recovery uncertainty, exact source pins and unavailable-provider evidence boundaries."
+    ],
+    "artifacts": [
+      {
+        "path": "04-implementation-stages/stage-01-bootstrap-and-probes.md",
+        "sha256": "bf2246b99c9c5fa70f58f47cc772cc6907fff741e42f11194eb5d24540f696f7"
+      },
+      {
+        "path": "04-implementation-stages/stage-02-onboarding-and-workspaces.md",
+        "sha256": "5ec6b61b59393ec402773821bc101300efd50e522fd770ca734cdc7d9ed20634"
+      },
+      {
+        "path": "04-implementation-stages/stage-03-native-agent-and-durability.md",
+        "sha256": "a7344a76129e32062a3f3e4b8454196112ff1e34d1c392d0d89fd4c12a1f0eb8"
+      },
+      {
+        "path": "04-implementation-stages/stage-04-focus-vertical-slice.md",
+        "sha256": "6d7bcf5a2bdc3ff5a5c3f2d9725f6f8170e236424885700ff329ab3914289dc4"
+      },
+      {
+        "path": "04-implementation-stages/stage-05-context-and-recovery-hardening.md",
+        "sha256": "f64d57e46160572834067596078ac2c1282ac800fb5920d0870cc2598063c2eb"
+      },
+      {
+        "path": "04-implementation-stages/stage-06-collaboration-and-content.md",
+        "sha256": "6d467cc35782ed8532ab3345e68f9d19f719e8ac30b2fe598b7d5a7ed8098244"
+      },
+      {
+        "path": "04-implementation-stages/stage-07-maps-and-structured-import.md",
+        "sha256": "cc189d77cfd94ff7734395cd2046879b3b79253417c2964228909acbdea135df"
+      },
+      {
+        "path": "04-implementation-stages/stage-08-packaging-and-pilot.md",
+        "sha256": "8834d124348e5da1f624facdd73fad32cb434ad3bc775f3ed71c2d6086e026cd"
+      }
+    ]
+  },
+  "recheck_commands": [
+    "python 07-developer-workflow/sync_skills.py --check",
+    "python 05-verification/validate_package.py"
+  ],
+  "live_followup_stage": "S01",
+  "live_followup": [
+    "Installed-client loading and instruction inspection",
+    "Native skill invocation and model trigger trials",
+    "Effective target-OS permissions and sandbox checks",
+    "Explicitly approved MCP activation and capability checks"
+  ]
+}

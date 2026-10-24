@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "version": "0.1.1",
+  "generator": "scripts/sync_skills.py",
+  "metadata_sha256": "6e8d22f11bc3220e9110639f25c7375d90605a0c1eeea32f64bfb42a7656eeed",
+  "scope": "Only these repository projections. No personal installation.",
+  "skills": [
+    {
+      "name": "audit-hoi4-integrations",
+      "source": "docs/07-developer-workflow/skill-workflows/audit-hoi4-integrations/BODY.md",
+      "body_sha256": "7a783f998538920f16b938241c863c46fbbd39456231499020a6ea9b2e5421ff",
+      "generated": [
+        {
+          "path": ".claude/skills/audit-hoi4-integrations/SKILL.md",
+          "sha256": "af459f3dd49baafce381f8bb1a4c2d0afb9fbce32123279f1fc21f671f376dda"
+        },
+        {
+          "path": ".codex/skills/audit-hoi4-integrations/SKILL.md",
+          "sha256": "189e8ddb9f36f146f701bb57637860b2e9fbc0a3a792362feb83389055646897"
+        },
+        {
+          "path": ".codex/skills/audit-hoi4-integrations/agents/openai.yaml",
+          "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94"
+        },
+        {
+          "path": ".agents/skills/audit-hoi4-integrations/SKILL.md",
+          "sha256": "189e8ddb9f36f146f701bb57637860b2e9fbc0a3a792362feb83389055646897"
+        },
+        {
+          "path": ".agents/skills/audit-hoi4-integrations/agents/openai.yaml",
+          "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94"
+        }
+      ]
+    },
+    {
+      "name": "capture-engineering-lessons",
+      "source": "docs/07-developer-workflow/skill-workflows/capture-engineering-lessons/BODY.md",
+      "body_sha256": "9e268bb0c2a1ac6234851e29c29a69897e7ecddeeec811068d038405d7d4e884",
+      "generated": [
+        {
+          "path": ".claude/skills/capture-engineering-lessons/SKILL.md",
+          "sha256": "b733bccaddd43c8ca31c5521717077bd2dff3fc2b88da48ee3067ebe035743f2"
+        },
+        {
+          "path": ".codex/skills/capture-engineering-lessons/SKILL.md",
+          "sha256": "94a3e7eaeaabed18721bd58c76927b5ab41d49a7d54af6d6d80d9ba2899460f9"
+        },
+        {
+          "path": ".codex/skills/capture-engineering-lessons/agents/openai.yaml",
+          "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94"
+        },
+        {
+          "path": ".agents/skills/capture-engineering-lessons/SKILL.md",
+          "sha256": "94a3e7eaeaabed18721bd58c76927b5ab41d49a7d54af6d6d80d9ba2899460f9"
+        },
+        {
+          "path": ".agents/skills/capture-engineering-lessons/agents/openai.yaml",
+          "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94"
+        }
+      ]
+    },
+    {
+      "name": "start-implementation-stage",
+      "source": "docs/07-developer-workflow/skill-workflows/start-implementation-stage/BODY.md",
+      "body_sha256": "dd36cb0b2c0766da8addb0bb8b21faca6e2721596a4f1a585d32440d44ef9ea2",
+      "generated": [
+        {
+          "path": ".claude/skills/start-implementation-stage/SKILL.md",
+          "sha256": "19733fc2cf51b120deb9c9970e332893129a28b674407ca2c26ba66b69d3b159"
+        },
+        {
+          "path": ".codex/skills/start-implementation-stage/SKILL.md",
+          "sha256": "1a96032c088c578eb14d36eb817917bcef08dc2ea0fcc64860b00eeb1cc34152"
+        },
+        {
+          "path": ".codex/skills/start-implementation-stage/agents/openai.yaml",
+          "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94"
+        },
+        {
+          "path": ".agents/skills/start-implementation-stage/SKILL.md",
+          "sha256": "1a96032c088c578eb14d36eb817917bcef08dc2ea0fcc64860b00eeb1cc34152"
+        },
+        {
+          "path": ".agents/skills/start-implementation-stage/agents/openai.yaml",
+          "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94"
+        }
+      ]
+    },
+    {
+      "name": "validate-stage",
+      "source": "docs/07-developer-workflow/skill-workflows/validate-stage/BODY.md",
+      "body_sha256": "c3ad723ca921810de37b50f431b4f98cc496fbebde8aecca885b1e72f0dec775",
+      "generated": [
+        {
+          "path": ".claude/skills/validate-stage/SKILL.md",
+          "sha256": "9a44fadf6fd39b80b884a5c37371d2ce65e3848854003a4168a9a7f71031c000"
+        },
+        {
+          "path": ".codex/skills/validate-stage/SKILL.md",
+          "sha256": "9696e301d88ccab747c5040f58528cb88d8f169012b4a5079072e423afddaa1a"
+        },
+        {
+          "path": ".codex/skills/validate-stage/agents/openai.yaml",
+          "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94"
+        },
+        {
+          "path": ".agents/skills/validate-stage/SKILL.md",
+          "sha256": "9696e301d88ccab747c5040f58528cb88d8f169012b4a5079072e423afddaa1a"
+        },
+        {
+          "path": ".agents/skills/validate-stage/agents/openai.yaml",
+          "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94"
+        }
+      ]
+    }
+  ]
+}

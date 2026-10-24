@@ -1,0 +1,2311 @@
+{
+  "schema_version": 1,
+  "inspection_date": "2026-10-23",
+  "status_policy": {
+    "Verified": "Inspected implementation or reproducible check within explicit scope",
+    "Documented only": "Documentation or author claim without runtime demonstration",
+    "Proposed": "Future design or experiment",
+    "Unknown": "Evidence or decision unavailable"
+  },
+  "records": [
+    {
+      "id": "SRC-A01",
+      "title": "Setup architecture and license",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/AGENTS.md",
+      "revision": "4488a418cad56a158273cb66c4ce7794696b7ed1",
+      "license": "Apache-2.0",
+      "qualification": "Verified (source)",
+      "finding": "The desktop is Tauri with React and Rust. The portable Rust core exposes read-only ProjectFs and source adapters. Desktop scanner and transaction services remain outside that portable crate. Original source is Apache-2.0 and bundled dependencies retain their licenses.",
+      "architectural_consequence": "Reuse portable core and wrap desktop services behind C-09. Do not claim an existing general public onboarding API.",
+      "limitations": "S01 extraction and packaging probe. Preserve Apache notices and inspect dependency closure before distribution.",
+      "detail_file": "evidence-a.json"
+    },
+    {
+      "id": "SRC-A02",
+      "title": "Actual wizard routes and controls",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/src/App.tsx",
+      "revision": "4488a418cad56a158273cb66c4ce7794696b7ed1",
+      "license": "Apache-2.0",
+      "qualification": "Verified (source)",
+      "finding": "Create and import share the wizard after initial identity or scan review. Current route includes coding environments, image generation, components, workflows, conditional Live Tools and Meshy, conditional MCP, Git, dry run, install and ready. Identity and Git controls are concrete existing UI.",
+      "architectural_consequence": "Adapt the existing route and controls, with progressive disclosure. Preserve provider analysis and review invariants.",
+      "limitations": "Do not conflate source HEAD route with v0.6.3 released binary. Verify skipped optional routes and back navigation in native integration.",
+      "detail_file": "evidence-a.json"
+    },
+    {
+      "id": "SRC-A03",
+      "title": "Read-only import scanner",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/src-tauri/src/scanner.rs",
+      "revision": "4488a418cad56a158273cb66c4ce7794696b7ed1",
+      "license": "Apache-2.0",
+      "qualification": "Verified (source)",
+      "finding": "The scanner binds the chosen root identity, has bounded traversal and source retention, reports limits and supports cancellation. Parent-directory launcher descriptors are discovered within bounds and require explicit approval before use.",
+      "architectural_consequence": "Reuse scanner facts, coverage and root binding as C-01 inputs.",
+      "limitations": "S02 needs workshop-sized and dirty Git fixtures, cancellation, symlink/root swap, case collision and incomplete scan handling.",
+      "detail_file": "evidence-a.json"
+    },
+    {
+      "id": "SRC-A04",
+      "title": "Assistant analysis and source closure",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/AGENTS.md",
+      "revision": "4488a418cad56a158273cb66c4ce7794696b7ed1",
+      "license": "Apache-2.0",
+      "qualification": "Verified (source)",
+      "finding": "Setup requires a provider analysis session before building an install plan. Source files are selected from a resolved manifest dependency closure and verified by expected hashes. A provider proposal does not authorize filesystem mutations.",
+      "architectural_consequence": "Reuse exact-revision source resolution and schema-checked proposals. Supply an API or local provider without requiring a coding CLI.",
+      "limitations": "Bridge factory model/auth service through the existing bounded analysis contract. Current Agentic manifest may resolve older components than audited latest repository HEAD.",
+      "detail_file": "evidence-a.json"
+    },
+    {
+      "id": "SRC-A05",
+      "title": "Plan outputs and conflict ownership",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/src-tauri/src/commands.rs",
+      "revision": "4488a418cad56a158273cb66c4ce7794696b7ed1",
+      "license": "Apache-2.0",
+      "qualification": "Verified (source)",
+      "finding": "New plans generate descriptor.mod, a launcher .mod, thumbnail, README, setup state and merged ignore policy plus selected components. Existing modified paths are skipped or treated as conflicts. Core stores prepared plan bytes and application requires approval and dry-run review.",
+      "architectural_consequence": "Reuse exact plans and explicit conflict decisions. Adapt gitignore policy deliberately because generated guidance is currently ignored.",
+      "limitations": "No blanket overwrite. Verify existing descriptor, user AGENTS, changed managed skills, external launcher path and unsupported merge base cases.",
+      "detail_file": "evidence-a.json"
+    },
+    {
+      "id": "SRC-A06",
+      "title": "Desktop transaction and recovery states",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/src-tauri/src/transaction.rs",
+      "revision": "4488a418cad56a158273cb66c4ce7794696b7ed1",
+      "license": "Apache-2.0",
+      "qualification": "Verified (source)",
+      "finding": "The transaction validates root identity and source bytes, writes durable plan and journal state, stages and validates, applies, runs reviewed post-install work and readiness, then writes the success lock. Verified staging may resume before apply. Partial apply refuses resume and requires rollback. Finalizing state can reconcile.",
+      "architectural_consequence": "Wrap actual allowed recovery actions, do not invent universal resume.",
+      "limitations": "Resolve exact-head CI recovery failure in SRC-A09. Filesystem final_live_verification is not actual gameplay validation.",
+      "detail_file": "evidence-a.json"
+    },
+    {
+      "id": "SRC-A07",
+      "title": "Lifecycle tests and maintenance preservation",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/src-tauri/src/commands_lifecycle_tests.rs",
+      "revision": "4488a418cad56a158273cb66c4ce7794696b7ed1",
+      "license": "Apache-2.0",
+      "qualification": "Verified (source)",
+      "finding": "The inspected offline lifecycle test covers create, import, repair, managed removal and rollback. It preserves a user gameplay file, modified managed skill and explicitly retained AGENTS. Update requires fresh maintenance analysis. Repair does not unconditionally require that same update-only guard.",
+      "architectural_consequence": "Reuse maintenance lock and original-versus-installed hash distinction.",
+      "limitations": "Run lifecycle against the selected actual Agentic manifest closure and test interrupted native desktop recovery. Inspected tests are not proof of execution.",
+      "detail_file": "evidence-a.json"
+    },
+    {
+      "id": "SRC-A08",
+      "title": "Browser export differs from desktop transaction",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/crates/hoi4-setup-web/src/export.rs",
+      "revision": "4488a418cad56a158273cb66c4ce7794696b7ed1",
+      "license": "Apache-2.0",
+      "qualification": "Verified (source)",
+      "finding": "The web export creates a reviewed ZIP. It can validate verified merge-base bytes and perform structured JSON/TOML or text three-way merges. It reports remaining user actions. Export is not native in-place installation.",
+      "architectural_consequence": "Reuse portable planning and export as escape hatches, keep desktop effect ownership explicit.",
+      "limitations": "Test generated ZIP independently and preserve readiness actions. Do not advertise desktop credentials or installation guarantees for browser export.",
+      "detail_file": "evidence-a.json"
+    },
+    {
+      "id": "SRC-A09",
+      "title": "Exact-head CI recovery failure",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/scripts/run_released_e2e.mjs",
+      "revision": "4488a418cad56a158273cb66c4ce7794696b7ed1",
+      "license": "Apache-2.0",
+      "qualification": "Verified (repository CI and log)",
+      "finding": "GitHub CI run 39281117181 is failed. Candidate acceptance (recovery), Windows job 118160257466, reached recovery-without-provider and failed with 'The project was not restored exactly.' The log reports unequal actual and expected inventory hashes. Most other named CI jobs passed. Root cause has not been established.",
+      "architectural_consequence": "Treat preservation recovery as an unresolved S01/S02 acceptance risk.",
+      "limitations": "Reproduce exact candidate, recover failed artifact, compare path inventories, identify whether implementation or acceptance fixture caused mismatch, fix and rerun before declaring recovery accepted.",
+      "detail_file": "evidence-a.json"
+    },
+    {
+      "id": "SRC-A10",
+      "title": "MCP product boundary and tool surface",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/AGENTS.md",
+      "revision": "25f5641bbc07c65a822ef576ac6e92bd12666880",
+      "license": "Apache-2.0",
+      "qualification": "Verified (source)",
+      "finding": "Agent Tools 4.3.0 is a TypeScript MCP server with local stdio and authenticated HTTP. It supplies reference, source lookup, validation, focus, GUI, map, event, technology, probability, impact and mechanic surfaces. Event and technology tools are read-only. Mod mutations retain internal plan and atomic recovery rather than exposing apply tokens to agents.",
+      "architectural_consequence": "Wrap typed tools and reuse shared cores. Keep native factory UI outside this server's product boundary.",
+      "limitations": "Discover tools and schemas at runtime. Document capability gaps and protocol-version fallback rather than assume every client supports tasks.",
+      "detail_file": "evidence-a.json"
+    },
+    {
+      "id": "SRC-A11",
+      "title": "Source preservation and internal transaction execution",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/src/hoi4_agent_tools/core/source/encoding.ts",
+      "revision": "25f5641bbc07c65a822ef576ac6e92bd12666880",
+      "license": "Apache-2.0",
+      "qualification": "Verified (source)",
+      "finding": "Parser retains source bytes, token ranges and source hash. No-op serialization returns original bytes. Span rewrites preserve untouched source and original supported encoding. Unsafe syntax blocks rewrites. The transaction executor validates, binds a request to the prepared transaction, applies, validates after application and rolls back on failure.",
+      "architectural_consequence": "Preferred preservation foundation after adapter tests. Bind final normalized arguments and path hashes in C-02/C-04.",
+      "limitations": "Prove unsupported encoding refusal, duplicate keys, unknown raw blocks, concurrent edits and multi-file crash recovery on chosen host OS.",
+      "detail_file": "evidence-a.json"
+    },
+    {
+      "id": "SRC-A12",
+      "title": "Focus authoring and preview evidence",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/src/hoi4_agent_tools/mcp/tools/focus.ts",
+      "revision": "25f5641bbc07c65a822ef576ac6e92bd12666880",
+      "license": "Apache-2.0",
+      "qualification": "Verified (source)",
+      "finding": "Public focus inspect/render/rewrite tools have typed source and output contracts. Renders return linked PNG, SVG, HTML, JSON and source-map artifacts. Large-workflow test source creates 1024 focuses, compacts, repeats compaction unchanged, inspects and renders through an in-memory MCP client. This is test intent, not a measured benchmark in this audit.",
+      "architectural_consequence": "Reuse focus core and artifacts for S04. Stage changes in isolated proposal workspaces if previewing a mutation requires executing the upstream single-call writer.",
+      "limitations": "Benchmark actual project scale and validate source-map freshness. Preserve plan sidecar as derived planning data, with source authoritative.",
+      "detail_file": "evidence-a.json"
+    },
+    {
+      "id": "SRC-A13",
+      "title": "Map capabilities and structured geography limitation",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/src/hoi4_agent_tools/mcp/tools/map.ts",
+      "revision": "25f5641bbc07c65a822ef576ac6e92bd12666880",
+      "license": "Apache-2.0",
+      "qualification": "Verified (source)",
+      "finding": "Map service has hash-bound plans, semantic diffs, read-only previews, bounded geography input and linked artifacts. Geography-model preview exists but actual synthesis from that model is explicitly unavailable. Reference-image generation and procedural output tests are separate capabilities and do not establish game-ready worlds.",
+      "architectural_consequence": "Reuse inspection and bounded edit services. Structured geography is a reviewed intermediate representation, with conversion to complete playable map deferred.",
+      "limitations": "S07 tests complete load order, replace_path, IDs, raster palette, topology and dependent references. Full world generation requires additional separately scoped game validation.",
+      "detail_file": "evidence-a.json"
+    },
+    {
+      "id": "SRC-A14",
+      "title": "Source interpretation is not game simulation",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/docs/mechanics.md",
+      "revision": "25f5641bbc07c65a822ef576ac6e92bd12666880",
+      "license": "Apache-2.0",
+      "qualification": "Verified (source)",
+      "finding": "Mechanic and scenario tools interpret declared source steps. Unknown effects or unknown write sets leave assertions unresolved. Advancing modeled days only expires modeled timed flags. Package checks validate declarations and references, not execution of required cases.",
+      "architectural_consequence": "Use these as a distinct modeled validation layer. Retain unknown and unresolved coverage in C-05.",
+      "limitations": "Add tiny known scenarios and counterexamples against actual HOI4 observations before upgrading individual semantics.",
+      "detail_file": "evidence-a.json"
+    },
+    {
+      "id": "SRC-A15",
+      "title": "HTTP authorization and session boundaries",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/docs/http.md",
+      "revision": "25f5641bbc07c65a822ef576ac6e92bd12666880",
+      "license": "Apache-2.0",
+      "qualification": "Verified (source)",
+      "finding": "HTTP supports OAuth/OIDC principal and workspace grants with read and write scopes. Static bearer-token mode grants both read and write. Source contains host/origin checks and credential-bound sessions. Inspected integration test rejects writes for a read-only token and rejects session takeover with a replacement credential.",
+      "architectural_consequence": "Prefer local stdio for the first local app. Treat remote HTTP as a separate supported capability with explicit grant and origin configuration.",
+      "limitations": "This is a targeted source review, not a full security audit or penetration test. Test revocation, request normalization and task ownership through the factory.",
+      "detail_file": "evidence-a.json"
+    },
+    {
+      "id": "SRC-A16",
+      "title": "Agent Tools license, dependencies and CI",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/LICENSE",
+      "revision": "25f5641bbc07c65a822ef576ac6e92bd12666880",
+      "license": "Apache-2.0",
+      "qualification": "Verified (source and repository CI)",
+      "finding": "Original source is Apache-2.0. Notices separately identify Roboto OFL-1.1 and Tesseract engine/model licenses. Repository CI for the audited HEAD reports success.",
+      "architectural_consequence": "Pin the full installed dependency closure and retain notices. Load game assets from the user's installation.",
+      "limitations": "Do not claim a source license clears third-party artwork. No runtime package installation or game test performed here.",
+      "detail_file": "evidence-a.json"
+    },
+    {
+      "id": "SRC-A17",
+      "title": "Native Live Tools capability limits",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/HOI4-Live-Tools/blob/6b91a2a43edfeab60a415ec2ddd9b71d215b8a56/README.md",
+      "revision": "6b91a2a43edfeab60a415ec2ddd9b71d215b8a56",
+      "license": "Apache-2.0",
+      "qualification": "Verified (source)",
+      "finding": "Native Rust runtime is presently implemented for Linux and bound to an exact executable build ID and SHA-256. Unsupported builds and native Windows/macOS adapters fail closed. Protocol capability output reports explicit unavailable and unverified observations, FAIR default, no native mod-QA path and a quarantined native game-command posting path.",
+      "architectural_consequence": "Optional capability-gated observation adapter, not mandatory bootstrap dependency or general QA oracle.",
+      "limitations": "Run actual supported-build smoke tests in an owned isolated campaign. Published Python v1.1.0 does not establish current Rust HEAD behavior.",
+      "detail_file": "evidence-a.json"
+    },
+    {
+      "id": "SRC-A18",
+      "title": "Live action journal and uncertain effects",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/HOI4-Live-Tools/blob/6b91a2a43edfeab60a415ec2ddd9b71d215b8a56/native/src/actions.rs",
+      "revision": "6b91a2a43edfeab60a415ec2ddd9b71d215b8a56",
+      "license": "Apache-2.0",
+      "qualification": "Verified (source)",
+      "finding": "Ordinary pause/speed actions record dispatch durably before sending and need observed target state before verification. Verified receipts are historical and idempotent across restarts. Uncertain dispatch blocks replays and new IDs for the same game process. Bounded-wait tests reject observations arriving after the deadline.",
+      "architectural_consequence": "Adopt the receipt and no-replay semantics in C-04. Preserve upstream ownership and quarantine boundaries.",
+      "limitations": "Do not equate a previously verified receipt with fresh current state. Factory timeout must not infer that action had no effect.",
+      "detail_file": "evidence-a.json"
+    },
+    {
+      "id": "SRC-A19",
+      "title": "Live licensing, campaign policy and CI",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/HOI4-Live-Tools/blob/6b91a2a43edfeab60a415ec2ddd9b71d215b8a56/LICENSE",
+      "revision": "6b91a2a43edfeab60a415ec2ddd9b71d215b8a56",
+      "license": "Apache-2.0",
+      "qualification": "Verified (source and repository CI)",
+      "finding": "Original source is Apache-2.0 with MIT-derived Clausewitz provenance and dependency notices. Python campaign tests enforce owned FAIR campaign policy and refuse debug arguments before launching. GitHub Python and Rust workflows report success at the audited HEAD.",
+      "architectural_consequence": "Reuse narrow live adapter after source and platform qualification, do not bypass policy for factory convenience.",
+      "limitations": "No actual game or campaign run executed here. Repository documentation states no full-campaign acceptance for any runtime.",
+      "detail_file": "evidence-a.json"
+    },
+    {
+      "id": "SRC-A20",
+      "title": "CWTools HOI4 validation services",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/cwtools/cwtools/blob/b377453dee803f9258be92cfc49896d09039702d/README.md",
+      "revision": "b377453dee803f9258be92cfc49896d09039702d",
+      "license": "MIT",
+      "qualification": "Verified (source)",
+      "finding": "F# HOI4Game supplies parser, validation, localization, references, completion, scopes and config replacement through IGame. It initializes province enums and rule-backed effects, triggers and modifiers from project resources and rules.",
+      "architectural_consequence": "Wrap as an independent pinned static diagnostic engine, ideally isolated process or library adapter.",
+      "limitations": "Measure startup, memory, updates and diagnostic false positives on target fixture. Validation is not engine execution.",
+      "detail_file": "evidence-a.json"
+    },
+    {
+      "id": "SRC-A21",
+      "title": "CWTools printer normalizes output",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/cwtools/cwtools/blob/b377453dee803f9258be92cfc49896d09039702d/CWTools/Parser/Printer.fs",
+      "revision": "b377453dee803f9258be92cfc49896d09039702d",
+      "license": "MIT",
+      "qualification": "Verified (source)",
+      "finding": "CKPrinter generates tab indentation, operator spacing and newlines. Value serialization converts booleans and numbers. It is not a demonstrated byte-preserving patch engine for arbitrary imported mods.",
+      "architectural_consequence": "Avoid using printer as canonical mutation writer. Use parser/diagnostics with source-preserving patch layer.",
+      "limitations": "Run differential parser corpus and keep opaque unknown source spans if adapting.",
+      "detail_file": "evidence-a.json"
+    },
+    {
+      "id": "SRC-A22",
+      "title": "HOI4 rule pack and limits",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/cwtools/cwtools-hoi4-config/blob/297dd69c42aabe10078a8b7ab7f2d07ee631d4ef/README.md",
+      "revision": "297dd69c42aabe10078a8b7ab7f2d07ee631d4ef",
+      "license": "MIT",
+      "qualification": "Verified (source)",
+      "finding": "MIT CWT rule pack defines focus types, relationships, relative positions, trigger/effect scopes and localization. README acknowledges variable and array false positives. The inspected Python completeness helper compares effect names against bundled documentation. The visible workflow dispatches cache generation and is not a complete semantic test suite.",
+      "architectural_consequence": "Pin rule SHA separately from CWTools engine and game/DLC profile. Track baseline and newly introduced diagnostics.",
+      "limitations": "Refresh with game changes. Do not globally suppress or blindly fail on every rule warning. Inspect provenance of embedded documentation before redistribution.",
+      "detail_file": "evidence-a.json"
+    },
+    {
+      "id": "SRC-A23",
+      "title": "Modmaker editing and map comparison",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/Floxizdia/hoi4-modmaker/blob/a5c138ffacf4ed471769558f864cbe55ec5163fa/README.md",
+      "revision": "a5c138ffacf4ed471769558f864cbe55ec5163fa",
+      "license": "MIT",
+      "qualification": "Verified (source)",
+      "finding": "Python/Tkinter/Pillow desktop offers useful focus and map interaction examples. Data layer overlays mod files onto base files and discards stale asynchronous results. Targeted focus/state edits decode utf-8-sig with errors ignored and rewrite utf-8 through normal text I/O, so comments claiming byte preservation are broader than implementation guarantees. Backups are one-time .bak and writes are not a multi-file durable transaction.",
+      "architectural_consequence": "Adapt UX, source-discovery ideas and semantic fixtures. Do not transplant current writer into preservation-critical path.",
+      "limitations": "Need strict encoding, malformed input, comments with braces, same-prefix paths, dependencies and replace_path tests before any parser reuse.",
+      "detail_file": "evidence-a.json"
+    },
+    {
+      "id": "SRC-A24",
+      "title": "HOIIVUtils parser and province generation comparison",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/battleskorpion/HOIIVUtils/blob/0fe06450bf17c506485caf90fb5d52cf8a2e1b33/README.md",
+      "revision": "0fe06450bf17c506485caf90fb5d52cf8a2e1b33",
+      "license": "Apache-2.0",
+      "qualification": "Verified (source)",
+      "finding": "Apache-2.0 Java/Scala/JavaFX desktop targets Java24 and Scala3.7.3 at the inspected POM. README marks features WIP. NodeScripter regenerates spacing/newlines and strips tabs from trivia. ProvinceGeneration composes seeds and distance methods into a province bitmap, not a complete independently verified playable world pipeline. The inspected ParserTest file is entirely commented out, and the inspected focus integration test section is also commented.",
+      "architectural_consequence": "Use as design reference and candidate algorithms behind later benchmarks. Avoid additional runtime and writer adoption in first release.",
+      "limitations": "Establish active tests, preservation and asset provenance. GPU support and complete map generation remain unverified.",
+      "detail_file": "evidence-a.json"
+    },
+    {
+      "id": "SRC-A25",
+      "title": "Nova comparison-only license and absent public implementation",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/Ultra-XT/HOI4-Modding-Suite/blob/5e44bc4f483e504310a0d4bad6e5ecc3c1cd08a6/LICENSE",
+      "revision": "5e44bc4f483e504310a0d4bad6e5ecc3c1cd08a6",
+      "license": "CC-BY-NC-ND-4.0 with repository-specific explanatory restrictions",
+      "qualification": "Verified (license and tree), Documented (features)",
+      "finding": "The repository LICENSE states CC BY-NC-ND4.0 with restrictions on commercial bundling and distributing modified derivatives. The recursive tree has 16 entries with executable, documentation and images, but no public implementation or tests. Feature and atomic-save claims can only be treated as documented claims here.",
+      "architectural_consequence": "Comparison only. Do not fork, embed or copy implementation under this planning decision.",
+      "limitations": "No executable downloaded or run. Obtain permission and independently inspect code before any changed reuse decision.",
+      "detail_file": "evidence-a.json"
+    },
+    {
+      "id": "SRC-B01",
+      "title": "earendil-works/pi",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/earendil-works/pi",
+      "revision": "8a2ebd38549c3521a02db0e5d758a24320e97f94",
+      "license": "MIT",
+      "qualification": "Selective source and test inspection only. No build or test execution.",
+      "finding": "Best initial library candidate when native host owns workspace, policy, events and effect receipts. pi-durable has materially stronger recovery than coding-agent transcript persistence.",
+      "architectural_consequence": "Embed pi-ai plus pi-agent-core behind a bundled worker. Evaluate pi-durable in S01 without introducing a second authoritative task database. Borrow replay and cancellation test shapes.",
+      "limitations": "No installation, packaging, provider calls or tests executed. Local endpoint conformance, Windows process termination, disk durability and dual-process fencing remain experiments. Changed cwd replay is tested upstream and must be constrained by the host.",
+      "detail_file": "evidence-b.json",
+      "maintenance": {
+        "observed_at": "2026-10-23",
+        "updated_at": "2026-10-23 13:32:53 UTC",
+        "scope": "Repository metadata, pinned manifests, root and selected referenced engineering guidance, latest stable release endpoint and first release-list entry. No build, package installation, live runtime, CI-result audit, release-history census or support-response study.",
+        "default_branch": "main",
+        "audited_commit": "8a2ebd38549c3521a02db0e5d758a24320e97f94",
+        "audited_commit_date": "2026-10-23T10:46:03Z",
+        "audited_commit_date_kind": "GitHub commit committer timestamp",
+        "archived": false,
+        "disabled": false,
+        "repository_created_at": "2025-08-09T14:03:50Z",
+        "repository_pushed_at": "2026-10-23T10:46:06Z",
+        "repository_updated_at": "2026-10-23T12:29:42Z",
+        "metadata_source_url": "https://api.github.com/repos/earendil-works/pi",
+        "metadata_cache": "research/metadata-b.json",
+        "commit_source_url": "https://api.github.com/repos/earendil-works/pi/commits/8a2ebd38549c3521a02db0e5d758a24320e97f94",
+        "activity_interpretation": "Recent repository push metadata is an activity signal only. It can reflect another branch and does not establish that the audited commit is the newest commit, that CI passed or that a released artifact is compatible.",
+        "releases": {
+          "latest_stable_endpoint": "https://api.github.com/repos/earendil-works/pi/releases/latest",
+          "latest_stable_status": "Observed",
+          "latest_stable_release": {
+            "tag": "v1.4.0",
+            "name": "v1.4.0",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-10-21T22:49:48Z",
+            "updated_at": "2026-10-21T22:49:48Z",
+            "created_at": "2026-10-21T22:29:13Z",
+            "target_commitish": "main",
+            "url": "https://github.com/earendil-works/pi/releases/tag/v1.4.0"
+          },
+          "collection_endpoint": "https://api.github.com/repos/earendil-works/pi/releases?per_page=1",
+          "collection_status": "Observed first returned entry",
+          "first_collection_entry": {
+            "tag": "v1.4.0",
+            "name": "v1.4.0",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-10-21T22:49:48Z",
+            "updated_at": "2026-10-21T22:49:48Z",
+            "created_at": "2026-10-21T22:29:13Z",
+            "target_commitish": "main",
+            "url": "https://github.com/earendil-works/pi/releases/tag/v1.4.0"
+          },
+          "most_recent_published_release_among_observations": {
+            "tag": "v1.4.0",
+            "name": "v1.4.0",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-10-21T22:49:48Z",
+            "updated_at": "2026-10-21T22:49:48Z",
+            "created_at": "2026-10-21T22:29:13Z",
+            "target_commitish": "main",
+            "url": "https://github.com/earendil-works/pi/releases/tag/v1.4.0"
+          },
+          "exhaustive_tag_history": "Unknown",
+          "limits": "Only the latest-stable result and first release collection entry were inspected. No assertion that a release tag resolves to the audited source commit."
+        },
+        "package_runtime_versions": [
+          {
+            "path": "packages/agent/package.json",
+            "name": "@earendil-works/pi-agent-core",
+            "version": "1.4.0",
+            "private": "Unknown",
+            "engines": {
+              "node": ">=22.19.0"
+            },
+            "config": {},
+            "relevant_dependencies": {
+              "@earendil-works/pi-ai": "1.4.0"
+            },
+            "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/agent/package.json"
+          },
+          {
+            "path": "packages/ai/package.json",
+            "name": "@earendil-works/pi-ai",
+            "version": "1.4.0",
+            "private": "Unknown",
+            "engines": {
+              "node": ">=22.19.0"
+            },
+            "config": {},
+            "relevant_dependencies": {},
+            "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/ai/package.json"
+          },
+          {
+            "path": "packages/durable/package.json",
+            "name": "@earendil-works/pi-durable",
+            "version": "1.4.0",
+            "private": "Unknown",
+            "engines": {
+              "node": ">=22.19.0"
+            },
+            "config": {},
+            "relevant_dependencies": {
+              "@earendil-works/pi-ai": "1.4.0"
+            },
+            "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/durable/package.json"
+          },
+          {
+            "path": "packages/mcp/package.json",
+            "name": "@earendil-works/pi-mcp",
+            "version": "1.4.0",
+            "private": "Unknown",
+            "engines": {
+              "node": ">=22.19.0"
+            },
+            "config": {},
+            "relevant_dependencies": {},
+            "url": "https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/mcp/package.json"
+          }
+        ],
+        "additional_runtime_guidance": {
+          "status": "No additional runtime version inferred beyond inspected manifests"
+        },
+        "repository_guidance": {
+          "inspected": true,
+          "status": "All present named root guidance inspected",
+          "root_files_present": [
+            "AGENTS.md",
+            "CONTRIBUTING.md"
+          ],
+          "root_files_absent": [
+            "CLAUDE.md"
+          ],
+          "source_tree_url": "https://api.github.com/repos/earendil-works/pi/git/trees/8a2ebd38549c3521a02db0e5d758a24320e97f94?recursive=1",
+          "tree_truncated": false,
+          "inspected_paths": [
+            "AGENTS.md",
+            "CONTRIBUTING.md"
+          ],
+          "read_coverage": [
+            {
+              "path": "AGENTS.md",
+              "ranges": "full"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "ranges": "full"
+            }
+          ],
+          "limitations": [
+            "All present root AGENTS.md, CLAUDE.md and CONTRIBUTING.md were inspected, plus only the relevant referenced boundary documents listed here. This is not an exhaustive review of all repository documentation or package guidance."
+          ]
+        },
+        "maturity": {
+          "assessment": "Active toolkit with a deliberately small extension-oriented core. Stable release metadata and pinned package versions are observed. Embedding reliability and API compatibility at the selected pin remain experimental for this product.",
+          "signals": [
+            "Observed stable v1.4.0 release",
+            "Minimal-core contribution policy",
+            "Pinned dependencies and explicit install-script policy"
+          ],
+          "production_readiness": "Unknown"
+        },
+        "recommendation_after_guidance_review": "Leading bounded embedding experiment remains conditional on S01. No default compatibility or production-readiness guarantee is inferred."
+      }
+    },
+    {
+      "id": "SRC-B02",
+      "title": "anomalyco/opencode",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/anomalyco/opencode",
+      "revision": "02671e66454260d77fe04d63cf5eb94e76921dee",
+      "license": "MIT",
+      "qualification": "Selective source and test inspection only. No build or test execution.",
+      "finding": "Current source supports real in-process embedding. It is a coherent alternative, not merely a CLI wrapper. More lifecycle infrastructure comes with greater coupling and native packaging surface.",
+      "architectural_consequence": "Keep an Electron/TypeScript embedded-SDK alternative with explicit persistent database and Rust workspace authority. Reuse host-side schemas and effect controls even if choosing this SDK.",
+      "limitations": "No runtime executed. Embedded host must enforce exclusive recovery ownership. At-least-once resumption is not external-effect exactly-once. Raw schema fallback and post-hook mutation require host validation.",
+      "detail_file": "evidence-b.json",
+      "maintenance": {
+        "observed_at": "2026-10-23",
+        "updated_at": "2026-10-23 13:32:53 UTC",
+        "scope": "Repository metadata, pinned manifests, root and selected referenced engineering guidance, latest stable release endpoint and first release-list entry. No build, package installation, live runtime, CI-result audit, release-history census or support-response study.",
+        "default_branch": "dev",
+        "audited_commit": "02671e66454260d77fe04d63cf5eb94e76921dee",
+        "audited_commit_date": "2026-10-23T12:37:34Z",
+        "audited_commit_date_kind": "GitHub commit committer timestamp",
+        "archived": false,
+        "disabled": false,
+        "repository_created_at": "2025-04-30T20:08:00Z",
+        "repository_pushed_at": "2026-10-23T12:37:37Z",
+        "repository_updated_at": "2026-10-23T12:42:03Z",
+        "metadata_source_url": "https://api.github.com/repos/anomalyco/opencode",
+        "metadata_cache": "research/metadata-b.json",
+        "commit_source_url": "https://api.github.com/repos/anomalyco/opencode/commits/02671e66454260d77fe04d63cf5eb94e76921dee",
+        "activity_interpretation": "Recent repository push metadata is an activity signal only. It can reflect another branch and does not establish that the audited commit is the newest commit, that CI passed or that a released artifact is compatible.",
+        "releases": {
+          "latest_stable_endpoint": "https://api.github.com/repos/anomalyco/opencode/releases/latest",
+          "latest_stable_status": "Observed",
+          "latest_stable_release": {
+            "tag": "v1.19.4",
+            "name": "v1.19.4",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-10-22T13:03:41Z",
+            "updated_at": "2026-10-22T13:03:41Z",
+            "created_at": "2026-10-22T13:03:27Z",
+            "target_commitish": "c0c7bae726798d02592f8d3305891ba2f0cd880a",
+            "url": "https://github.com/anomalyco/opencode/releases/tag/v1.19.4"
+          },
+          "collection_endpoint": "https://api.github.com/repos/anomalyco/opencode/releases?per_page=1",
+          "collection_status": "Observed first returned entry",
+          "first_collection_entry": {
+            "tag": "v1.19.4",
+            "name": "v1.19.4",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-10-22T13:03:41Z",
+            "updated_at": "2026-10-22T13:03:41Z",
+            "created_at": "2026-10-22T13:03:27Z",
+            "target_commitish": "c0c7bae726798d02592f8d3305891ba2f0cd880a",
+            "url": "https://github.com/anomalyco/opencode/releases/tag/v1.19.4"
+          },
+          "most_recent_published_release_among_observations": {
+            "tag": "v1.19.4",
+            "name": "v1.19.4",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-10-22T13:03:41Z",
+            "updated_at": "2026-10-22T13:03:41Z",
+            "created_at": "2026-10-22T13:03:27Z",
+            "target_commitish": "c0c7bae726798d02592f8d3305891ba2f0cd880a",
+            "url": "https://github.com/anomalyco/opencode/releases/tag/v1.19.4"
+          },
+          "exhaustive_tag_history": "Unknown",
+          "limits": "Only the latest-stable result and first release collection entry were inspected. No assertion that a release tag resolves to the audited source commit."
+        },
+        "package_runtime_versions": [
+          {
+            "path": "packages/core/package.json",
+            "name": "@opencode/core",
+            "version": "2.1.4",
+            "private": "Unknown",
+            "engines": "Unknown",
+            "config": {},
+            "relevant_dependencies": {},
+            "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/package.json"
+          },
+          {
+            "path": "packages/sdk/package.json",
+            "name": "@opencode/sdk",
+            "version": "2.1.4",
+            "private": "Unknown",
+            "engines": "Unknown",
+            "config": {},
+            "relevant_dependencies": {},
+            "url": "https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/sdk/package.json"
+          }
+        ],
+        "additional_runtime_guidance": {
+          "development_bun_minimum": "1.3",
+          "source_path": "CONTRIBUTING.md",
+          "embedded_node_minimum": "Unknown",
+          "limitation": "Development tooling requirement is not asserted to be the minimum runtime requirement of every SDK embedding."
+        },
+        "repository_guidance": {
+          "inspected": true,
+          "status": "All present named root guidance inspected",
+          "root_files_present": [
+            "AGENTS.md",
+            "CONTRIBUTING.md"
+          ],
+          "root_files_absent": [
+            "CLAUDE.md"
+          ],
+          "source_tree_url": "https://api.github.com/repos/anomalyco/opencode/git/trees/02671e66454260d77fe04d63cf5eb94e76921dee?recursive=1",
+          "tree_truncated": false,
+          "inspected_paths": [
+            "AGENTS.md",
+            "CONTRIBUTING.md",
+            "packages/ai/AGENTS.md",
+            "packages/core/src/tool/AGENTS.md"
+          ],
+          "read_coverage": [
+            {
+              "path": "AGENTS.md",
+              "ranges": "full"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "ranges": "full"
+            },
+            {
+              "path": "packages/ai/AGENTS.md",
+              "ranges": "full"
+            },
+            {
+              "path": "packages/core/src/tool/AGENTS.md",
+              "ranges": "full"
+            }
+          ],
+          "limitations": [
+            "All present root AGENTS.md, CLAUDE.md and CONTRIBUTING.md were inspected, plus only the relevant referenced boundary documents listed here. This is not an exhaustive review of all repository documentation or package guidance."
+          ]
+        },
+        "maturity": {
+          "assessment": "Actively developed application and SDK on dev. The audited SDK/core manifests are 2.1.4, while the observed latest stable repository release is v1.19.4. Do not attribute the audited embedding APIs to that stable release or assume the audited package was published.",
+          "signals": [
+            "Observed stable v1.19.4 release",
+            "Audited development SDK/core 2.1.4",
+            "Documented process-local restart ownership boundary"
+          ],
+          "production_readiness": "Unknown",
+          "audited_sdk_published_artifact": "Unknown"
+        },
+        "recommendation_after_guidance_review": "Keep embedded OpenCode as the coherent alternative at the exact audited dev pin. Separate stable release identity from SDK/core manifest identity and enforce host-owned effects outside catalog filtering."
+      }
+    },
+    {
+      "id": "SRC-B03",
+      "title": "OpenHands/software-agent-sdk",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/OpenHands/software-agent-sdk",
+      "revision": "87bec04de8e08117399d5cab68042cc794bc2199",
+      "license": "MIT",
+      "qualification": "Selective source and test inspection only. No build or test execution.",
+      "finding": "Credible Python SDK alternative for tool ecosystems, with local persistence and interruption surfaces. Packaging a Python stack beside Rust/React is a higher initial burden for this product.",
+      "architectural_consequence": "Retain as measured alternative if Python tool integration clearly wins. Do not assume its TypeScript local loop has persistence parity with Python.",
+      "limitations": "Tests not run. No hard kill, server sandbox, cross-provider quality or remote durability measured. Tool thread cancellation is cooperative. Local EventLog is not the product transaction authority.",
+      "detail_file": "evidence-b.json",
+      "maintenance": {
+        "observed_at": "2026-10-23",
+        "updated_at": "2026-10-23 13:32:53 UTC",
+        "scope": "Repository metadata, pinned manifests, root and selected referenced engineering guidance, latest stable release endpoint and first release-list entry. No build, package installation, live runtime, CI-result audit, release-history census or support-response study.",
+        "default_branch": "main",
+        "audited_commit": "87bec04de8e08117399d5cab68042cc794bc2199",
+        "audited_commit_date": "2026-10-23T10:25:38Z",
+        "audited_commit_date_kind": "GitHub commit committer timestamp",
+        "archived": false,
+        "disabled": false,
+        "repository_created_at": "2025-08-23T20:34:39Z",
+        "repository_pushed_at": "2026-10-23T10:25:41Z",
+        "repository_updated_at": "2026-10-23T10:25:45Z",
+        "metadata_source_url": "https://api.github.com/repos/OpenHands/software-agent-sdk",
+        "metadata_cache": "research/metadata-b.json",
+        "commit_source_url": "https://api.github.com/repos/OpenHands/software-agent-sdk/commits/87bec04de8e08117399d5cab68042cc794bc2199",
+        "activity_interpretation": "Recent repository push metadata is an activity signal only. It can reflect another branch and does not establish that the audited commit is the newest commit, that CI passed or that a released artifact is compatible.",
+        "releases": {
+          "latest_stable_endpoint": "https://api.github.com/repos/OpenHands/software-agent-sdk/releases/latest",
+          "latest_stable_status": "Observed",
+          "latest_stable_release": {
+            "tag": "v1.58.1",
+            "name": "v1.58.1",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-10-23T00:44:35Z",
+            "updated_at": "2026-10-23T01:00:24Z",
+            "created_at": "2026-10-23T00:44:24Z",
+            "target_commitish": "60192ed54db73ac658ac1a07462916126c32d3a0",
+            "url": "https://github.com/OpenHands/software-agent-sdk/releases/tag/v1.58.1"
+          },
+          "collection_endpoint": "https://api.github.com/repos/OpenHands/software-agent-sdk/releases?per_page=1",
+          "collection_status": "Observed first returned entry",
+          "first_collection_entry": {
+            "tag": "v1.58.1",
+            "name": "v1.58.1",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-10-23T00:44:35Z",
+            "updated_at": "2026-10-23T01:00:24Z",
+            "created_at": "2026-10-23T00:44:24Z",
+            "target_commitish": "60192ed54db73ac658ac1a07462916126c32d3a0",
+            "url": "https://github.com/OpenHands/software-agent-sdk/releases/tag/v1.58.1"
+          },
+          "most_recent_published_release_among_observations": {
+            "tag": "v1.58.1",
+            "name": "v1.58.1",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-10-23T00:44:35Z",
+            "updated_at": "2026-10-23T01:00:24Z",
+            "created_at": "2026-10-23T00:44:24Z",
+            "target_commitish": "60192ed54db73ac658ac1a07462916126c32d3a0",
+            "url": "https://github.com/OpenHands/software-agent-sdk/releases/tag/v1.58.1"
+          },
+          "exhaustive_tag_history": "Unknown",
+          "limits": "Only the latest-stable result and first release collection entry were inspected. No assertion that a release tag resolves to the audited source commit."
+        },
+        "package_runtime_versions": [
+          {
+            "path": "clients/typescript/package.json",
+            "name": "@openhands/typescript-client",
+            "version": "1.58.1",
+            "private": "Unknown",
+            "engines": "Unknown",
+            "config": {
+              "agentServerImage": "ghcr.io/openhands/agent-server:1.58.1-python"
+            },
+            "relevant_dependencies": {},
+            "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/clients/typescript/package.json"
+          },
+          {
+            "path": "openhands-sdk/pyproject.toml",
+            "name": "openhands-sdk",
+            "version": "1.58.1",
+            "runtime": {
+              "python": ">=3.12"
+            },
+            "url": "https://github.com/OpenHands/software-agent-sdk/blob/87bec04de8e08117399d5cab68042cc794bc2199/openhands-sdk/pyproject.toml"
+          }
+        ],
+        "additional_runtime_guidance": {
+          "development_python_target": "3.13",
+          "supported_python_minimum": "3.12",
+          "source_path": "openhands-sdk/openhands/sdk/AGENTS.md"
+        },
+        "repository_guidance": {
+          "inspected": true,
+          "status": "All present named root guidance inspected",
+          "root_files_present": [
+            "AGENTS.md",
+            "CONTRIBUTING.md"
+          ],
+          "root_files_absent": [
+            "CLAUDE.md"
+          ],
+          "source_tree_url": "https://api.github.com/repos/OpenHands/software-agent-sdk/git/trees/87bec04de8e08117399d5cab68042cc794bc2199?recursive=1",
+          "tree_truncated": false,
+          "inspected_paths": [
+            "AGENTS.md",
+            "CONTRIBUTING.md",
+            "openhands-sdk/openhands/sdk/AGENTS.md",
+            "clients/typescript/AGENTS.md",
+            ".agents/skills/custom-codereview-guide.md"
+          ],
+          "read_coverage": [
+            {
+              "path": "AGENTS.md",
+              "ranges": "full"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "ranges": "full"
+            },
+            {
+              "path": "openhands-sdk/openhands/sdk/AGENTS.md",
+              "ranges": "full"
+            },
+            {
+              "path": "clients/typescript/AGENTS.md",
+              "ranges": "full"
+            },
+            {
+              "path": ".agents/skills/custom-codereview-guide.md",
+              "ranges": "full"
+            }
+          ],
+          "limitations": [
+            "All present root AGENTS.md, CLAUDE.md and CONTRIBUTING.md were inspected, plus only the relevant referenced boundary documents listed here. This is not an exhaustive review of all repository documentation or package guidance."
+          ]
+        },
+        "maturity": {
+          "assessment": "Explicit SDK/API and persisted-data compatibility policies provide useful maturity signals. Python and TypeScript manifests and stable release are 1.58.1. Packaging and runtime behavior were not executed, and TypeScript guidance contains stale server-version examples.",
+          "signals": [
+            "Observed stable v1.58.1 release",
+            "Five-minor-release public API deprecation runway",
+            "Versioned persisted settings and permanent old-event loading policy"
+          ],
+          "production_readiness": "Unknown"
+        },
+        "recommendation_after_guidance_review": "Keep the Python SDK as a conditional alternative. Do not promote the browser-compatible TypeScript client to a proven native persistent runtime."
+      }
+    },
+    {
+      "id": "SRC-B04",
+      "title": "gastownhall/gascity",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/gastownhall/gascity",
+      "revision": "87a47634d0cebe611874df321c723bba95dcffea",
+      "license": "MIT",
+      "qualification": "Selective source and test inspection only. No build or test execution.",
+      "finding": "Useful reconciliation and fencing reference. Current code has capability-aware runtime backends and should not be reduced to a tmux-only label.",
+      "architectural_consequence": "Adapt observed-state uncertainty, owner incarnation and fencing test invariants. Defer whole Go controller and deployment topology.",
+      "limitations": "Selected runtime and reconciliation files only. No operational deployment, test execution or all-backend audit.",
+      "detail_file": "evidence-b.json",
+      "maintenance": {
+        "observed_at": "2026-10-23",
+        "updated_at": "2026-10-23 13:32:53 UTC",
+        "scope": "Repository metadata, pinned manifests, root and selected referenced engineering guidance, latest stable release endpoint and first release-list entry. No build, package installation, live runtime, CI-result audit, release-history census or support-response study.",
+        "default_branch": "main",
+        "audited_commit": "87a47634d0cebe611874df321c723bba95dcffea",
+        "audited_commit_date": "2026-10-23T10:26:55Z",
+        "audited_commit_date_kind": "GitHub commit committer timestamp",
+        "archived": false,
+        "disabled": false,
+        "repository_created_at": "2026-02-22T01:40:16Z",
+        "repository_pushed_at": "2026-10-23T12:39:48Z",
+        "repository_updated_at": "2026-10-23T10:32:23Z",
+        "metadata_source_url": "https://api.github.com/repos/gastownhall/gascity",
+        "metadata_cache": "research/metadata-b.json",
+        "commit_source_url": "https://api.github.com/repos/gastownhall/gascity/commits/87a47634d0cebe611874df321c723bba95dcffea",
+        "activity_interpretation": "Recent repository push metadata is an activity signal only. It can reflect another branch and does not establish that the audited commit is the newest commit, that CI passed or that a released artifact is compatible.",
+        "releases": {
+          "latest_stable_endpoint": "https://api.github.com/repos/gastownhall/gascity/releases/latest",
+          "latest_stable_status": "Observed",
+          "latest_stable_release": {
+            "tag": "v1.5.0",
+            "name": "Gas City v1.5.0",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-10-05T04:42:49Z",
+            "updated_at": "2026-10-05T08:46:31Z",
+            "created_at": "2026-10-05T02:52:49Z",
+            "target_commitish": "main",
+            "url": "https://github.com/gastownhall/gascity/releases/tag/v1.5.0"
+          },
+          "collection_endpoint": "https://api.github.com/repos/gastownhall/gascity/releases?per_page=1",
+          "collection_status": "Observed first returned entry",
+          "first_collection_entry": {
+            "tag": "edge",
+            "name": "gascity edge (rolling main)",
+            "prerelease": true,
+            "draft": false,
+            "published_at": "2026-06-27T17:42:08Z",
+            "updated_at": "2026-10-23T10:38:45Z",
+            "created_at": "2026-10-23T10:26:55Z",
+            "target_commitish": "main",
+            "url": "https://github.com/gastownhall/gascity/releases/tag/edge"
+          },
+          "most_recent_published_release_among_observations": {
+            "tag": "v1.5.0",
+            "name": "Gas City v1.5.0",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-10-05T04:42:49Z",
+            "updated_at": "2026-10-05T08:46:31Z",
+            "created_at": "2026-10-05T02:52:49Z",
+            "target_commitish": "main",
+            "url": "https://github.com/gastownhall/gascity/releases/tag/v1.5.0"
+          },
+          "exhaustive_tag_history": "Unknown",
+          "limits": "Only the latest-stable result and first release collection entry were inspected. No assertion that a release tag resolves to the audited source commit."
+        },
+        "package_runtime_versions": [
+          {
+            "path": "go.mod",
+            "name": "github.com/gastownhall/gascity",
+            "version": "Unknown",
+            "runtime": {
+              "go_directive": "1.26.10",
+              "toolchain": "Not declared in inspected go.mod"
+            },
+            "url": "https://github.com/gastownhall/gascity/blob/87a47634d0cebe611874df321c723bba95dcffea/go.mod"
+          }
+        ],
+        "additional_runtime_guidance": {
+          "canonical_agent_test_system": "Bazel through Bazelisk",
+          "bazel_version": "Unknown",
+          "source_path": "AGENTS.md"
+        },
+        "repository_guidance": {
+          "inspected": true,
+          "status": "All present named root guidance inspected",
+          "root_files_present": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "CONTRIBUTING.md"
+          ],
+          "root_files_absent": [],
+          "source_tree_url": "https://api.github.com/repos/gastownhall/gascity/git/trees/87a47634d0cebe611874df321c723bba95dcffea?recursive=1",
+          "tree_truncated": false,
+          "inspected_paths": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "CONTRIBUTING.md",
+            "engdocs/contributors/primitive-test.md"
+          ],
+          "read_coverage": [
+            {
+              "path": "AGENTS.md",
+              "ranges": "full"
+            },
+            {
+              "path": "CLAUDE.md",
+              "ranges": "full"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "ranges": "full"
+            },
+            {
+              "path": "engdocs/contributors/primitive-test.md",
+              "ranges": "full"
+            }
+          ],
+          "limitations": [
+            "All present root AGENTS.md, CLAUDE.md and CONTRIBUTING.md were inspected, plus only the relevant referenced boundary documents listed here. This is not an exhaustive review of all repository documentation or package guidance."
+          ]
+        },
+        "maturity": {
+          "assessment": "Experimental by its own contributor guide. The current code is private to the gc binary and public SDK exports are future work. Use source patterns, not an assumed stable embeddable SDK.",
+          "signals": [
+            "Observed stable v1.5.0 release",
+            "Mutable edge prerelease entry also observed",
+            "Explicit experimental status and internal-package boundary"
+          ],
+          "production_readiness": "Unknown"
+        },
+        "recommendation_after_guidance_review": "Pattern-level reuse remains the recommendation. The additional guidance strengthens the reason to avoid wholesale runtime/backend or workflow-policy adoption."
+      }
+    },
+    {
+      "id": "SRC-B05",
+      "title": "gastownhall/gastown",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/gastownhall/gastown",
+      "revision": "ef70b0bf9e588dce00708e36564bfc06b51fac2c",
+      "license": "MIT",
+      "qualification": "Selective source and test inspection only. No build or test execution.",
+      "finding": "Useful task handoff and worker-role concepts. Inspected checkpoint is context metadata, not durable proof of tool effects or multi-file commit.",
+      "architectural_consequence": "Borrow checkpoint fields and human-readable recovery handoff. Do not transplant CLI, tmux role provisioning or checkpoint writer as native durability.",
+      "limitations": "No tests run, no whole-project security review, no proof of atomic filesystem recovery.",
+      "detail_file": "evidence-b.json",
+      "maintenance": {
+        "observed_at": "2026-10-23",
+        "updated_at": "2026-10-23 13:32:53 UTC",
+        "scope": "Repository metadata, pinned manifests, root and selected referenced engineering guidance, latest stable release endpoint and first release-list entry. No build, package installation, live runtime, CI-result audit, release-history census or support-response study.",
+        "default_branch": "main",
+        "audited_commit": "ef70b0bf9e588dce00708e36564bfc06b51fac2c",
+        "audited_commit_date": "2026-10-20T18:12:00Z",
+        "audited_commit_date_kind": "GitHub commit committer timestamp",
+        "archived": false,
+        "disabled": false,
+        "repository_created_at": "2025-12-16T00:33:33Z",
+        "repository_pushed_at": "2026-10-21T02:45:42Z",
+        "repository_updated_at": "2026-10-23T11:12:29Z",
+        "metadata_source_url": "https://api.github.com/repos/gastownhall/gastown",
+        "metadata_cache": "research/metadata-b.json",
+        "commit_source_url": "https://api.github.com/repos/gastownhall/gastown/commits/ef70b0bf9e588dce00708e36564bfc06b51fac2c",
+        "activity_interpretation": "Recent repository push metadata is an activity signal only. It can reflect another branch and does not establish that the audited commit is the newest commit, that CI passed or that a released artifact is compatible.",
+        "releases": {
+          "latest_stable_endpoint": "https://api.github.com/repos/gastownhall/gastown/releases/latest",
+          "latest_stable_status": "Observed",
+          "latest_stable_release": {
+            "tag": "v1.2.1",
+            "name": "v1.2.1",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-06-06T17:17:53Z",
+            "updated_at": "2026-06-06T17:18:28Z",
+            "created_at": "2026-06-06T17:13:16Z",
+            "target_commitish": "main",
+            "url": "https://github.com/gastownhall/gastown/releases/tag/v1.2.1"
+          },
+          "collection_endpoint": "https://api.github.com/repos/gastownhall/gastown/releases?per_page=1",
+          "collection_status": "Observed first returned entry",
+          "first_collection_entry": {
+            "tag": "v1.2.1",
+            "name": "v1.2.1",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-06-06T17:17:53Z",
+            "updated_at": "2026-06-06T17:18:28Z",
+            "created_at": "2026-06-06T17:13:16Z",
+            "target_commitish": "main",
+            "url": "https://github.com/gastownhall/gastown/releases/tag/v1.2.1"
+          },
+          "most_recent_published_release_among_observations": {
+            "tag": "v1.2.1",
+            "name": "v1.2.1",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-06-06T17:17:53Z",
+            "updated_at": "2026-06-06T17:18:28Z",
+            "created_at": "2026-06-06T17:13:16Z",
+            "target_commitish": "main",
+            "url": "https://github.com/gastownhall/gastown/releases/tag/v1.2.1"
+          },
+          "exhaustive_tag_history": "Unknown",
+          "limits": "Only the latest-stable result and first release collection entry were inspected. No assertion that a release tag resolves to the audited source commit."
+        },
+        "package_runtime_versions": [
+          {
+            "path": "go.mod",
+            "name": "github.com/steveyegge/gastown",
+            "version": "Unknown",
+            "runtime": {
+              "go_directive": "1.26.2",
+              "toolchain": "go1.26.10"
+            },
+            "url": "https://github.com/gastownhall/gastown/blob/ef70b0bf9e588dce00708e36564bfc06b51fac2c/go.mod"
+          }
+        ],
+        "additional_runtime_guidance": {
+          "status": "No additional runtime version inferred beyond inspected manifests"
+        },
+        "repository_guidance": {
+          "inspected": true,
+          "status": "All present named root guidance inspected",
+          "root_files_present": [
+            "AGENTS.md",
+            "CONTRIBUTING.md"
+          ],
+          "root_files_absent": [
+            "CLAUDE.md"
+          ],
+          "source_tree_url": "https://api.github.com/repos/gastownhall/gastown/git/trees/ef70b0bf9e588dce00708e36564bfc06b51fac2c?recursive=1",
+          "tree_truncated": false,
+          "inspected_paths": [
+            "AGENTS.md",
+            "CONTRIBUTING.md",
+            "internal/templates/townroot/claude.md"
+          ],
+          "read_coverage": [
+            {
+              "path": "AGENTS.md",
+              "ranges": "full"
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "ranges": "full"
+            },
+            {
+              "path": "internal/templates/townroot/claude.md",
+              "ranges": "full"
+            }
+          ],
+          "limitations": [
+            "All present root AGENTS.md, CLAUDE.md and CONTRIBUTING.md were inspected, plus only the relevant referenced boundary documents listed here. This is not an exhaustive review of all repository documentation or package guidance.",
+            "Referenced root CLAUDE.md is absent from the complete pinned tree. Dynamic gt prime context was not generated or inspected. The tracked townroot template is not equivalent to an instantiated runtime context."
+          ]
+        },
+        "maturity": {
+          "assessment": "Experimental by its own contributor guide, with recent repository activity but the observed latest stable release dated June 2026. Its role/CLI/Dolt and refinery assumptions remain inappropriate as the required local product runtime.",
+          "signals": [
+            "Observed stable v1.2.1 release",
+            "Recent repository push metadata",
+            "Documented fork-refinery limitation"
+          ],
+          "production_readiness": "Unknown"
+        },
+        "recommendation_after_guidance_review": "Pattern-level reuse remains the recommendation. The additional guidance strengthens the reason to avoid wholesale runtime/backend or workflow-policy adoption."
+      }
+    },
+    {
+      "id": "SRC-B06",
+      "title": "gastownhall/beads",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/gastownhall/beads",
+      "revision": "bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb",
+      "license": "MIT with Apache-2.0 third-party notices",
+      "qualification": "Selective source and test inspection only. No build or test execution.",
+      "finding": "Useful dependency DAG, guarded task transition, claim ownership and event provenance patterns. Durable database commits are distinct from external tool effects.",
+      "architectural_consequence": "Implement a smaller local task model with these invariants. Defer wholesale Dolt backend, CLI and experimental extension interface.",
+      "limitations": "No tests executed. Read tests include cgo and environment skip. Backend conformance itself warns about partial coverage.",
+      "detail_file": "evidence-b.json",
+      "maintenance": {
+        "observed_at": "2026-10-23",
+        "updated_at": "2026-10-23 13:32:53 UTC",
+        "scope": "Repository metadata, pinned manifests, root and selected referenced engineering guidance, latest stable release endpoint and first release-list entry. No build, package installation, live runtime, CI-result audit, release-history census or support-response study.",
+        "default_branch": "main",
+        "audited_commit": "bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb",
+        "audited_commit_date": "2026-10-23T02:44:36Z",
+        "audited_commit_date_kind": "GitHub commit committer timestamp",
+        "archived": false,
+        "disabled": false,
+        "repository_created_at": "2025-10-12T03:09:46Z",
+        "repository_pushed_at": "2026-10-23T02:50:09Z",
+        "repository_updated_at": "2026-10-23T12:19:26Z",
+        "metadata_source_url": "https://api.github.com/repos/gastownhall/beads",
+        "metadata_cache": "research/metadata-b.json",
+        "commit_source_url": "https://api.github.com/repos/gastownhall/beads/commits/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb",
+        "activity_interpretation": "Recent repository push metadata is an activity signal only. It can reflect another branch and does not establish that the audited commit is the newest commit, that CI passed or that a released artifact is compatible.",
+        "releases": {
+          "latest_stable_endpoint": "https://api.github.com/repos/gastownhall/beads/releases/latest",
+          "latest_stable_status": "Observed",
+          "latest_stable_release": {
+            "tag": "v1.3.1",
+            "name": "v1.3.1",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-09-30T23:37:36Z",
+            "updated_at": "2026-10-01T03:44:44Z",
+            "created_at": "2026-09-30T20:48:08Z",
+            "target_commitish": "main",
+            "url": "https://github.com/gastownhall/beads/releases/tag/v1.3.1"
+          },
+          "collection_endpoint": "https://api.github.com/repos/gastownhall/beads/releases?per_page=1",
+          "collection_status": "Observed first returned entry",
+          "first_collection_entry": {
+            "tag": "v1.3.2-rc.3",
+            "name": "v1.3.2-rc.3",
+            "prerelease": true,
+            "draft": false,
+            "published_at": "2026-10-23T02:50:11Z",
+            "updated_at": "2026-10-23T02:58:37Z",
+            "created_at": "2026-10-23T02:09:51Z",
+            "target_commitish": "main",
+            "url": "https://github.com/gastownhall/beads/releases/tag/v1.3.2-rc.3"
+          },
+          "most_recent_published_release_among_observations": {
+            "tag": "v1.3.2-rc.3",
+            "name": "v1.3.2-rc.3",
+            "prerelease": true,
+            "draft": false,
+            "published_at": "2026-10-23T02:50:11Z",
+            "updated_at": "2026-10-23T02:58:37Z",
+            "created_at": "2026-10-23T02:09:51Z",
+            "target_commitish": "main",
+            "url": "https://github.com/gastownhall/beads/releases/tag/v1.3.2-rc.3"
+          },
+          "exhaustive_tag_history": "Unknown",
+          "limits": "Only the latest-stable result and first release collection entry were inspected. No assertion that a release tag resolves to the audited source commit."
+        },
+        "package_runtime_versions": [
+          {
+            "path": "go.mod",
+            "name": "github.com/steveyegge/beads",
+            "version": "Unknown",
+            "runtime": {
+              "go_directive": "1.26.5",
+              "toolchain": "go1.26.10"
+            },
+            "url": "https://github.com/gastownhall/beads/blob/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb/go.mod"
+          }
+        ],
+        "additional_runtime_guidance": {
+          "canonical_agent_test_system": "Bazel through Bazelisk",
+          "bazel_version": "Unknown",
+          "source_path": "AGENTS.md"
+        },
+        "repository_guidance": {
+          "inspected": true,
+          "status": "All present named root guidance inspected",
+          "root_files_present": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "CONTRIBUTING.md"
+          ],
+          "root_files_absent": [],
+          "source_tree_url": "https://api.github.com/repos/gastownhall/beads/git/trees/bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb?recursive=1",
+          "tree_truncated": false,
+          "inspected_paths": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "CONTRIBUTING.md",
+            "engdocs/PROJECT_CHARTER.md",
+            "engdocs/design/dolt-concurrency.md"
+          ],
+          "read_coverage": [
+            {
+              "path": "AGENTS.md",
+              "ranges": "full"
+            },
+            {
+              "path": "CLAUDE.md",
+              "ranges": "full",
+              "representation": "Raw endpoint resolved the symlink to AGENTS.md. Identical target content was fully inspected."
+            },
+            {
+              "path": "CONTRIBUTING.md",
+              "ranges": "full"
+            },
+            {
+              "path": "engdocs/PROJECT_CHARTER.md",
+              "ranges": "full"
+            },
+            {
+              "path": "engdocs/design/dolt-concurrency.md",
+              "ranges": "full"
+            }
+          ],
+          "limitations": [
+            "All present root AGENTS.md, CLAUDE.md and CONTRIBUTING.md were inspected, plus only the relevant referenced boundary documents listed here. This is not an exhaustive review of all repository documentation or package guidance."
+          ]
+        },
+        "maturity": {
+          "assessment": "Issue tracker with an observed stable release and newer release candidate, plus explicit storage and orchestration boundaries. Its backend/concurrency test patterns are useful, while whole-system embedding and operational maturity remain unproven here.",
+          "signals": [
+            "Observed stable v1.3.1 and v1.3.2-rc.3 prerelease",
+            "Explicit issue-tracker and storage-driver boundaries",
+            "Bazel/CGO/Dolt operational requirements"
+          ],
+          "production_readiness": "Unknown"
+        },
+        "recommendation_after_guidance_review": "Pattern-level reuse remains the recommendation. The additional guidance strengthens the reason to avoid wholesale runtime/backend or workflow-policy adoption."
+      }
+    },
+    {
+      "id": "SRC-B07",
+      "title": "Runfusion/Fusion",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/Runfusion/Fusion",
+      "revision": "5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3",
+      "license": "MIT",
+      "qualification": "Selective source and test inspection only. No build or test execution.",
+      "finding": "Strong factory pattern reference with actual native library integration and transactional handoff tests. Substantial operational system exceeds initial product needs.",
+      "architectural_consequence": "Adapt monotonic ownership fencing, intent-before-publish and transactional review handoff tests. Keep application-specific runtime and database authority independent.",
+      "limitations": "Tests not run. Suspected SIGKILL fallback reference bug is source inference only. PostgreSQL test skips when unavailable. No blanket safety claim from project scale.",
+      "detail_file": "evidence-b.json",
+      "maintenance": {
+        "observed_at": "2026-10-23",
+        "updated_at": "2026-10-23 13:32:53 UTC",
+        "scope": "Repository metadata, pinned manifests, root and selected referenced engineering guidance, latest stable release endpoint and first release-list entry. No build, package installation, live runtime, CI-result audit, release-history census or support-response study.",
+        "default_branch": "main",
+        "audited_commit": "5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3",
+        "audited_commit_date": "2026-10-23T11:05:32Z",
+        "audited_commit_date_kind": "GitHub commit committer timestamp",
+        "archived": false,
+        "disabled": false,
+        "repository_created_at": "2026-04-13T01:43:26Z",
+        "repository_pushed_at": "2026-10-23T11:07:24Z",
+        "repository_updated_at": "2026-10-23T11:47:51Z",
+        "metadata_source_url": "https://api.github.com/repos/Runfusion/Fusion",
+        "metadata_cache": "research/metadata-b.json",
+        "commit_source_url": "https://api.github.com/repos/Runfusion/Fusion/commits/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3",
+        "activity_interpretation": "Recent repository push metadata is an activity signal only. It can reflect another branch and does not establish that the audited commit is the newest commit, that CI passed or that a released artifact is compatible.",
+        "releases": {
+          "latest_stable_endpoint": "https://api.github.com/repos/Runfusion/Fusion/releases/latest",
+          "latest_stable_status": "Observed",
+          "latest_stable_release": {
+            "tag": "v0.77.0",
+            "name": "v0.77.0",
+            "prerelease": false,
+            "draft": false,
+            "published_at": "2026-09-02T00:49:01Z",
+            "updated_at": "2026-09-02T01:14:24Z",
+            "created_at": "2026-09-02T00:48:24Z",
+            "target_commitish": "main",
+            "url": "https://github.com/Runfusion/Fusion/releases/tag/v0.77.0"
+          },
+          "collection_endpoint": "https://api.github.com/repos/Runfusion/Fusion/releases?per_page=1",
+          "collection_status": "Observed first returned entry",
+          "first_collection_entry": {
+            "tag": "v0.78.0-beta.9",
+            "name": "v0.78.0-beta.9",
+            "prerelease": true,
+            "draft": false,
+            "published_at": "2026-10-23T05:39:49Z",
+            "updated_at": "2026-10-23T06:02:51Z",
+            "created_at": "2026-10-23T05:37:53Z",
+            "target_commitish": "main",
+            "url": "https://github.com/Runfusion/Fusion/releases/tag/v0.78.0-beta.9"
+          },
+          "most_recent_published_release_among_observations": {
+            "tag": "v0.78.0-beta.9",
+            "name": "v0.78.0-beta.9",
+            "prerelease": true,
+            "draft": false,
+            "published_at": "2026-10-23T05:39:49Z",
+            "updated_at": "2026-10-23T06:02:51Z",
+            "created_at": "2026-10-23T05:37:53Z",
+            "target_commitish": "main",
+            "url": "https://github.com/Runfusion/Fusion/releases/tag/v0.78.0-beta.9"
+          },
+          "exhaustive_tag_history": "Unknown",
+          "limits": "Only the latest-stable result and first release collection entry were inspected. No assertion that a release tag resolves to the audited source commit."
+        },
+        "package_runtime_versions": [
+          {
+            "path": "packages/core/package.json",
+            "name": "@fusion/core",
+            "version": "0.78.0-beta.9",
+            "private": true,
+            "engines": {
+              "node": ">=22.19.0"
+            },
+            "config": {},
+            "relevant_dependencies": {},
+            "url": "https://github.com/Runfusion/Fusion/blob/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3/packages/core/package.json"
+          },
+          {
+            "path": "packages/engine/package.json",
+            "name": "@fusion/engine",
+            "version": "0.78.0-beta.9",
+            "private": true,
+            "engines": "Unknown",
+            "config": {},
+            "relevant_dependencies": {
+              "@earendil-works/pi-ai": "1.1.0",
+              "@earendil-works/pi-coding-agent": "1.1.0"
+            },
+            "url": "https://github.com/Runfusion/Fusion/blob/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3/packages/engine/package.json"
+          }
+        ],
+        "additional_runtime_guidance": {
+          "status": "No additional runtime version inferred beyond inspected manifests"
+        },
+        "repository_guidance": {
+          "inspected": true,
+          "status": "All present named root guidance inspected",
+          "root_files_present": [
+            "AGENTS.md",
+            "CLAUDE.md"
+          ],
+          "root_files_absent": [
+            "CONTRIBUTING.md"
+          ],
+          "source_tree_url": "https://api.github.com/repos/Runfusion/Fusion/git/trees/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3?recursive=1",
+          "tree_truncated": false,
+          "inspected_paths": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "docs/contributing.md"
+          ],
+          "read_coverage": [
+            {
+              "path": "AGENTS.md",
+              "ranges": "1-320 and 321-492, complete"
+            },
+            {
+              "path": "CLAUDE.md",
+              "ranges": "full"
+            },
+            {
+              "path": "docs/contributing.md",
+              "ranges": "full"
+            }
+          ],
+          "limitations": [
+            "All present root AGENTS.md, CLAUDE.md and CONTRIBUTING.md were inspected, plus only the relevant referenced boundary documents listed here. This is not an exhaustive review of all repository documentation or package guidance."
+          ]
+        },
+        "maturity": {
+          "assessment": "The inspected private packages match a beta prerelease, while the observed stable release is older. The published unit is the CLI/pi extension, not independently published core/engine libraries. Extensive lifecycle guidance shows operational concerns but is not evidence that inspected tests passed or every test gates a release.",
+          "signals": [
+            "Observed stable v0.77.0 and v0.78.0-beta.9 prerelease",
+            "Private core and engine package declarations",
+            "Curated merge gate and separately non-blocking full suite"
+          ],
+          "production_readiness": "Unknown"
+        },
+        "recommendation_after_guidance_review": "Pattern-level reuse remains the recommendation. The additional guidance strengthens the reason to avoid wholesale runtime/backend or workflow-policy adoption."
+      }
+    },
+    {
+      "id": "SRC-B08",
+      "title": "mastra-ai/softwarefactory-template",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/mastra-ai/softwarefactory-template",
+      "revision": "ebde794a8656278cf26bbb2b8764be7070b325d9",
+      "license": "Apache-2.0 declared in package.json. No LICENSE file in complete tree.",
+      "qualification": "Selective source and test inspection only. No build or test execution.",
+      "finding": "Configuration template is useful to understand operational requirements but does not establish factory engine durability.",
+      "architectural_consequence": "Borrow per-stage controls and visible task/session views. Defer Mastra server, Postgres/Redis and hosted-sandbox architecture for local MVP. Confirm distribution notices for exact dependencies before copying.",
+      "limitations": "No engine implementation or dependency test audit. Manifest license is declared, full root license text absent. No running stack or authentication flow verified.",
+      "detail_file": "evidence-b.json",
+      "maintenance": {
+        "observed_at": "2026-10-23",
+        "updated_at": "2026-10-23 13:32:53 UTC",
+        "scope": "Repository metadata, pinned manifests, root and selected referenced engineering guidance, latest stable release endpoint and first release-list entry. No build, package installation, live runtime, CI-result audit, release-history census or support-response study.",
+        "default_branch": "main",
+        "audited_commit": "ebde794a8656278cf26bbb2b8764be7070b325d9",
+        "audited_commit_date": "2026-10-22T12:35:16Z",
+        "audited_commit_date_kind": "GitHub commit committer timestamp",
+        "archived": false,
+        "disabled": false,
+        "repository_created_at": "2026-07-16T03:31:21Z",
+        "repository_pushed_at": "2026-10-22T12:35:18Z",
+        "repository_updated_at": "2026-10-22T13:27:25Z",
+        "metadata_source_url": "https://api.github.com/repos/mastra-ai/softwarefactory-template",
+        "metadata_cache": "research/metadata-b.json",
+        "commit_source_url": "https://api.github.com/repos/mastra-ai/softwarefactory-template/commits/ebde794a8656278cf26bbb2b8764be7070b325d9",
+        "activity_interpretation": "Recent repository push metadata is an activity signal only. It can reflect another branch and does not establish that the audited commit is the newest commit, that CI passed or that a released artifact is compatible.",
+        "releases": {
+          "latest_stable_endpoint": "https://api.github.com/repos/mastra-ai/softwarefactory-template/releases/latest",
+          "latest_stable_status": "No latest stable release returned",
+          "latest_stable_release": "Unknown",
+          "collection_endpoint": "https://api.github.com/repos/mastra-ai/softwarefactory-template/releases?per_page=1",
+          "collection_status": "Empty release collection observed",
+          "first_collection_entry": "Unknown",
+          "most_recent_published_release_among_observations": "No release observed",
+          "exhaustive_tag_history": "Unknown",
+          "limits": "Only the latest-stable result and first release collection entry were inspected. No assertion that a release tag resolves to the audited source commit.",
+          "latest_endpoint_error": "404 Not Found. A successful empty release collection corroborates no GitHub releases observed.",
+          "tag_lookup_status": "Unknown",
+          "tag_lookup_limit": "The tags collection request was rejected by the connector URL allowlist. No tag absence is inferred."
+        },
+        "package_runtime_versions": [
+          {
+            "path": "package.json",
+            "name": "mastra-factory",
+            "version": "0.1.0",
+            "private": true,
+            "engines": {
+              "node": ">=22.19.0"
+            },
+            "config": {},
+            "relevant_dependencies": {
+              "@mastra/factory": "0.24.0"
+            },
+            "url": "https://github.com/mastra-ai/softwarefactory-template/blob/ebde794a8656278cf26bbb2b8764be7070b325d9/package.json"
+          }
+        ],
+        "additional_runtime_guidance": {
+          "status": "No additional runtime version inferred beyond inspected manifests"
+        },
+        "repository_guidance": {
+          "inspected": false,
+          "status": "Named root guidance absent at inspected revision",
+          "root_files_present": [],
+          "root_files_absent": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            "CONTRIBUTING.md"
+          ],
+          "source_tree_url": "https://api.github.com/repos/mastra-ai/softwarefactory-template/git/trees/ebde794a8656278cf26bbb2b8764be7070b325d9?recursive=1",
+          "tree_truncated": false,
+          "inspected_paths": [],
+          "read_coverage": [],
+          "limitations": [
+            "No root AGENTS.md, CLAUDE.md or CONTRIBUTING.md exists in the complete pinned tree. Absence applies to these named files, not a claim that no instructions occur anywhere."
+          ]
+        },
+        "maturity": {
+          "assessment": "Private 0.1.0 application template with no observed GitHub release and an external @mastra/factory 0.24.0 dependency. No root AGENTS, CLAUDE or CONTRIBUTING guidance is present in the complete pinned tree. Template configuration is not proof of the dependency engine's durability or maturity.",
+          "signals": [
+            "Manifest private=true and version 0.1.0",
+            "Empty GitHub release collection",
+            "Factory engine supplied by external dependency"
+          ],
+          "production_readiness": "Unknown"
+        },
+        "recommendation_after_guidance_review": "Use template configuration ideas only. Engine durability, release maturity and missing license-file evidence remain separate unresolved questions."
+      }
+    },
+    {
+      "id": "SRC-B09",
+      "title": "Announcing Mastra Factory Beta",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://mastra.ai/blog/announcing-mastra-factory-beta",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Author report, not independent benchmark",
+      "finding": "Configurable manual and automatic stages, visible task sessions and upstream-assumption review are useful product ideas. Author reports that automatic backlog processing created infrastructure and review pressure.",
+      "architectural_consequence": "Adopt stage-specific policy and queue limits as design ideas.",
+      "limitations": "No controlled comparison. Narrative productivity percentages and chart totals use unclear differing windows. No numerical performance claim adopted.",
+      "detail_file": "evidence-b.json"
+    },
+    {
+      "id": "SRC-B10",
+      "title": "Welcome to Glass Town: building a software factory with a paper trail",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://aaif.io/blog/welcome-to-glass-town-building-a-software-factory-with-a-paper-trail",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Personal demonstration report",
+      "finding": "Explicit role outputs, finite budgets, deterministic preview actions and commit-linked session evidence are useful patterns.",
+      "architectural_consequence": "Use bounded roles and traceable evidence. Do not adopt automatic per-file push as product workflow.",
+      "limitations": "No complete factory source or durability tests linked in article. Sprites deployment and Entire behavior not verified by this article audit.",
+      "detail_file": "evidence-b.json"
+    },
+    {
+      "id": "SRC-C01",
+      "title": "Agentic HOI4 Modding revision",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/commit/856940f2a629e0e2f3e03fc484cb0c0309c96734",
+      "revision": "856940f2a629e0e2f3e03fc484cb0c0309c96734",
+      "license": "Apache-2.0 original content, with NOTICE exclusions and asset uncertainty",
+      "qualification": "Verified source inspection",
+      "finding": [
+        "Commit dated 2026-10-18T19:35:06Z",
+        "Recursive tree contains 1103 blobs and was not truncated",
+        "32 canonical Claude skills and 23 canonical Claude agents",
+        "Repository metadata observed 2026-10-23: public main branch, archived false, disabled false",
+        "Latest published release package-2026-10-14.1, published 2026-10-14T16:15:32Z",
+        "pushed_at 2026-10-18T19:35:07Z is distinct from inspected commit date 2026-10-18T19:35:06Z"
+      ],
+      "architectural_consequence": "See detailed source record and linked subsystem decisions.",
+      "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+      "detail_file": "evidence-c.json"
+    },
+    {
+      "id": "SRC-C02",
+      "title": "Actual Agentic root Codex configuration",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/config.toml",
+      "revision": "856940f2a629e0e2f3e03fc484cb0c0309c96734",
+      "license": "Apache-2.0 original content, with NOTICE exclusions and asset uncertainty",
+      "qualification": "Verified source inspection",
+      "finding": [
+        "58 scalar leaves including 46 role registry leaves",
+        "never approval and danger-full-access sandbox are source defaults, not starter defaults",
+        "184320 is instruction bytes",
+        "Two MCP definitions, no root model, provider, model context or compaction settings"
+      ],
+      "architectural_consequence": "See detailed source record and linked subsystem decisions.",
+      "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+      "detail_file": "evidence-c.json"
+    },
+    {
+      "id": "SRC-C03",
+      "title": "Actual Agentic Codex role layers",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/tree/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/agents",
+      "revision": "856940f2a629e0e2f3e03fc484cb0c0309c96734",
+      "license": "Apache-2.0 original content, with NOTICE exclusions and asset uncertainty",
+      "qualification": "Verified source inspection",
+      "finding": [
+        "All 23 referenced files fetched and parsed",
+        "Each has name, description, model_reasoning_effort, sandbox_mode, nickname_candidates and developer_instructions",
+        "No role has a fixed model",
+        "Four read-only roles and nineteen workspace-write roles"
+      ],
+      "architectural_consequence": "See detailed source record and linked subsystem decisions.",
+      "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+      "detail_file": "evidence-c.json"
+    },
+    {
+      "id": "SRC-C04",
+      "title": "Canonical Claude roles and settings",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/tree/856940f2a629e0e2f3e03fc484cb0c0309c96734/.claude",
+      "revision": "856940f2a629e0e2f3e03fc484cb0c0309c96734",
+      "license": "Apache-2.0 original content, with NOTICE exclusions and asset uncertainty",
+      "qualification": "Verified source inspection",
+      "finding": [
+        "23 Claude agents map Opus to xhigh, Sonnet to high, and Haiku to medium in Codex projections",
+        "Source Claude settings deny Read of root .env patterns",
+        "Source MCP JSON contains only HOI4 stdio connection"
+      ],
+      "architectural_consequence": "See detailed source record and linked subsystem decisions.",
+      "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+      "detail_file": "evidence-c.json"
+    },
+    {
+      "id": "SRC-C05",
+      "title": "Agentic projection and synchronization",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.tools/sync/README.md",
+      "revision": "856940f2a629e0e2f3e03fc484cb0c0309c96734",
+      "license": "Apache-2.0 original content, with NOTICE exclusions and asset uncertainty",
+      "qualification": "Verified source inspection",
+      "finding": [
+        "Canonical source uses CLAUDE and .claude skills",
+        "Codex skills projection destination is .agents/skills",
+        "Check mode detects drift",
+        "Isolated pure source projection reproduced all 23 role files and root Codex registry without differences"
+      ],
+      "architectural_consequence": "See detailed source record and linked subsystem decisions.",
+      "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+      "detail_file": "evidence-c.json"
+    },
+    {
+      "id": "SRC-C06",
+      "title": "Agentic setup manifest",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/hoi4-mod-setup.manifest.json",
+      "revision": "856940f2a629e0e2f3e03fc484cb0c0309c96734",
+      "license": "Apache-2.0 original content, with NOTICE exclusions and asset uncertainty",
+      "qualification": "Verified source inspection",
+      "finding": [
+        "Schema version 5.0.0",
+        "generated_for_revision e814a581a121a3006c4a7085a8f3c4ef6e24ed58",
+        "Claude Code default primary with Codex, Cursor, Qoder and OpenCode supported",
+        "HOI4 Agent Tools 4.0.3 pin",
+        "No committed .codex/skills or .agents/skills in source tree"
+      ],
+      "architectural_consequence": "See detailed source record and linked subsystem decisions.",
+      "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+      "detail_file": "evidence-c.json"
+    },
+    {
+      "id": "SRC-C07",
+      "title": "Agentic license and attribution",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/NOTICE",
+      "revision": "856940f2a629e0e2f3e03fc484cb0c0309c96734",
+      "license": "Apache-2.0 original content, with NOTICE exclusions and asset uncertainty",
+      "qualification": "Verified source inspection",
+      "finding": [
+        "Original code and guidance Apache-2.0",
+        "Third-party game and wiki material excluded",
+        "Inherited Super Events art has no separate verified license"
+      ],
+      "architectural_consequence": "See detailed source record and linked subsystem decisions.",
+      "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+      "detail_file": "evidence-c.json"
+    },
+    {
+      "id": "SRC-C08",
+      "title": "Agentic test and CI contracts",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/scripts/test_agent_sync_contract.py",
+      "revision": "856940f2a629e0e2f3e03fc484cb0c0309c96734",
+      "license": "Apache-2.0 original content, with NOTICE exclusions and asset uncertainty",
+      "qualification": "Verified source inspection",
+      "finding": [
+        "Source test checks 23 roles, tiers, generated registry and guidance drift",
+        "mcp-runtime workflow declares Ubuntu and Windows, Node 22 and 24, Python 3.13",
+        "Upstream test suite and CI runs were not executed or certified"
+      ],
+      "architectural_consequence": "See detailed source record and linked subsystem decisions.",
+      "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+      "detail_file": "evidence-c.json"
+    },
+    {
+      "id": "SRC-C09",
+      "title": "Codex basic configuration",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://learn.chatgpt.com/docs/config-file/config-basic",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Verified source inspection",
+      "finding": [
+        "Project settings are .codex/config.toml and require trusted project",
+        "Project configuration is distinct from user configuration"
+      ],
+      "architectural_consequence": "See detailed source record and linked subsystem decisions.",
+      "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+      "detail_file": "evidence-c.json"
+    },
+    {
+      "id": "SRC-C10",
+      "title": "Codex configuration reference",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://learn.chatgpt.com/docs/config-file/config-reference",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Verified source inspection",
+      "finding": [
+        "max_threads documented as legacy alias of max_concurrent_threads_per_session",
+        "MCP enabled and default_tools_approval_mode supported",
+        "Instruction byte budget is distinct from model context"
+      ],
+      "architectural_consequence": "See detailed source record and linked subsystem decisions.",
+      "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+      "detail_file": "evidence-c.json"
+    },
+    {
+      "id": "SRC-C11",
+      "title": "Codex exact configuration schema",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/openai/codex/blob/f71c6afc30031011fe0b4d757b981fd0301b2536/codex-rs/core/config.schema.json",
+      "revision": "f71c6afc30031011fe0b4d757b981fd0301b2536",
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Verified source inspection",
+      "finding": [
+        "Pinned schema fetched and compared equal to initial current fetch",
+        "max_concurrent_threads_per_session is canonical key",
+        "max_depth is V1 only and ignored by V2",
+        "Legacy max_threads alias omitted from JSON schema",
+        "Root additionalProperties false"
+      ],
+      "architectural_consequence": "See detailed source record and linked subsystem decisions.",
+      "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+      "detail_file": "evidence-c.json"
+    },
+    {
+      "id": "SRC-C12",
+      "title": "Codex skill discovery and metadata",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://learn.chatgpt.com/docs/build-skills",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Verified source inspection",
+      "finding": [
+        "Current repository discovery uses .agents/skills",
+        "Optional agents/openai.yaml policy.allow_implicit_invocation false supports explicit invocation",
+        ".codex copies are deliverable compatibility copies, not asserted automatic discovery"
+      ],
+      "architectural_consequence": "See detailed source record and linked subsystem decisions.",
+      "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+      "detail_file": "evidence-c.json"
+    },
+    {
+      "id": "SRC-C13",
+      "title": "Codex AGENTS discovery",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://learn.chatgpt.com/docs/agent-configuration/agents-md",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Verified source inspection",
+      "finding": [
+        "Root-to-current-directory instruction chain",
+        "AGENTS.override takes precedence within a directory",
+        "Default instruction budget 32 KiB and configurable"
+      ],
+      "architectural_consequence": "See detailed source record and linked subsystem decisions.",
+      "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+      "detail_file": "evidence-c.json"
+    },
+    {
+      "id": "SRC-C14",
+      "title": "Evaluating skills",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://developers.openai.com/blog/eval-skills",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Verified source inspection",
+      "finding": [
+        "Define outcome, process, style and efficiency success",
+        "Combine deterministic artifact checks and rubric review",
+        "Positive, negative and permission regression cases"
+      ],
+      "architectural_consequence": "See detailed source record and linked subsystem decisions.",
+      "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+      "detail_file": "evidence-c.json"
+    },
+    {
+      "id": "SRC-C15",
+      "title": "Iterating engineering workflows",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://developers.openai.com/cookbook/examples/codex/iterating-development-workflows-with-codex",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Verified source inspection",
+      "finding": [
+        "Published 2026-08-03 by Tony Alaniz",
+        "Small explicit phases with scope, outcome, criteria and evidence",
+        "GOALS, PLANS and PROMPTS are workflow conventions, not native mandatory filenames"
+      ],
+      "architectural_consequence": "See detailed source record and linked subsystem decisions.",
+      "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+      "detail_file": "evidence-c.json"
+    },
+    {
+      "id": "SRC-C16",
+      "title": "Claude project memory and imports",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://code.claude.com/docs/en/memory",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Verified source inspection",
+      "finding": [
+        "@AGENTS.md import explicitly supported",
+        "Native AGENTS support added in v2.1.277 and depends on CLAUDE presence and settings",
+        "Instruction context is not an enforcement boundary",
+        "Project .claude/rules Markdown may use paths frontmatter. Missing or malformed path frontmatter can load rules without the intended scope."
+      ],
+      "architectural_consequence": "See detailed source record and linked subsystem decisions.",
+      "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+      "detail_file": "evidence-c.json"
+    },
+    {
+      "id": "SRC-C17",
+      "title": "Claude skills",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://code.claude.com/docs/en/skills",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Verified source inspection",
+      "finding": [
+        "Project .claude/skills discovery",
+        "disable-model-invocation true makes invocation manual",
+        "allowed-tools preapproves tools rather than constraining all tools",
+        "Malformed frontmatter can lose field behavior, so package checker rejects it"
+      ],
+      "architectural_consequence": "See detailed source record and linked subsystem decisions.",
+      "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+      "detail_file": "evidence-c.json"
+    },
+    {
+      "id": "SRC-C18",
+      "title": "Claude MCP",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://code.claude.com/docs/en/mcp",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Verified source inspection",
+      "finding": [
+        "Project .mcp.json uses native JSON shape",
+        "disabledMcpjsonServers rejects listed project servers",
+        "Per-server timeout is milliseconds",
+        "MCP_TIMEOUT startup environment is client-wide, not exact per-server startup equivalent"
+      ],
+      "architectural_consequence": "See detailed source record and linked subsystem decisions.",
+      "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+      "detail_file": "evidence-c.json"
+    },
+    {
+      "id": "SRC-C19",
+      "title": "Claude settings",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://code.claude.com/docs/en/settings",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Verified source inspection",
+      "finding": [
+        "Project .claude/settings.json is versionable",
+        "Local and user settings have separate scopes",
+        "No TOML configuration ingestion"
+      ],
+      "architectural_consequence": "See detailed source record and linked subsystem decisions.",
+      "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+      "detail_file": "evidence-c.json"
+    },
+    {
+      "id": "SRC-C20",
+      "title": "Claude settings schema",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/SchemaStore/schemastore/blob/bf7c6745505ccace5568dc0d7f4ae29647e9b41a/src/schemas/json/claude-code-settings.json",
+      "revision": "bf7c6745505ccace5568dc0d7f4ae29647e9b41a",
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Verified source inspection",
+      "finding": [
+        "Pinned SchemaStore schema matches initial retrieval",
+        "permissions.defaultMode, disabledMcpjsonServers and enableAllProjectMcpServers present",
+        "Root additionalProperties true means schema acceptance alone cannot prove an unfamiliar key supported"
+      ],
+      "architectural_consequence": "See detailed source record and linked subsystem decisions.",
+      "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+      "detail_file": "evidence-c.json"
+    },
+    {
+      "id": "SRC-C21",
+      "title": "Claude subagents",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://code.claude.com/docs/en/sub-agents",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Verified source inspection",
+      "finding": [
+        "Project Markdown agent definitions",
+        "tools and disallowedTools are native fields",
+        "Subagents have separate context and require explicit skill preloading",
+        "Disallowing Write and Edit alone does not block Bash or MCP effects"
+      ],
+      "architectural_consequence": "See detailed source record and linked subsystem decisions.",
+      "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+      "detail_file": "evidence-c.json"
+    },
+    {
+      "id": "SRC-C22",
+      "title": "Claude sessions",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://code.claude.com/docs/en/sessions",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Verified source inspection",
+      "finding": [
+        "Continue uses recent current-directory session",
+        "Resume selects session",
+        "Client transcript continuity is distinct from durable product recovery"
+      ],
+      "architectural_consequence": "See detailed source record and linked subsystem decisions.",
+      "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+      "detail_file": "evidence-c.json"
+    },
+    {
+      "id": "SRC-C23",
+      "title": "Claude worktrees",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://code.claude.com/docs/en/worktrees",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Verified source inspection",
+      "finding": [
+        "CLI worktree option uses Git isolation",
+        "Worktree creation needs committed Git history",
+        "Worktrees are not independent security sandboxes"
+      ],
+      "architectural_consequence": "See detailed source record and linked subsystem decisions.",
+      "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+      "detail_file": "evidence-c.json"
+    },
+    {
+      "id": "SRC-C24",
+      "title": "Claude permissions",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://code.claude.com/docs/en/permissions",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Verified source inspection",
+      "finding": [
+        "default mode prompts on first tool use",
+        "Permission rules and OS sandboxing are separate controls",
+        "Project-root launch matters for configuration discovery"
+      ],
+      "architectural_consequence": "See detailed source record and linked subsystem decisions.",
+      "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+      "detail_file": "evidence-c.json"
+    },
+    {
+      "id": "SRC-C25",
+      "title": "Agent Skills standard",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://agentskills.io/specification",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Verified source inspection",
+      "finding": [
+        "name and description frontmatter required",
+        "Name matches directory and uses lowercase kebab case",
+        "Description maximum 1024 characters"
+      ],
+      "architectural_consequence": "See detailed source record and linked subsystem decisions.",
+      "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+      "detail_file": "evidence-c.json"
+    },
+    {
+      "id": "SRC-C26",
+      "title": "Agentic HOI4 Agent Tools bootstrap implementation and contract tests",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.tools/mcp/bootstrap_hoi4_agent_tools.py",
+      "revision": "856940f2a629e0e2f3e03fc484cb0c0309c96734",
+      "license": "Apache-2.0 original content, with NOTICE exclusions and asset uncertainty",
+      "qualification": "Verified source inspection",
+      "finding": [
+        "Complete bootstrap and scripts/test_mcp_bootstrap_contract.py inspected, neither executed",
+        "Pinned package 4.0.3 with platform tree hashes, runtime entry hash and registry integrity",
+        "Native Windows and Linux x64, Node 22.19+ in major 22 or 24",
+        "Bootstrap can install Node through Windows winget and install or remove user-prefix npm packages",
+        "Not a read-only environment diagnostic and not shipped or invoked by this starter"
+      ],
+      "architectural_consequence": "See detailed source record and linked subsystem decisions.",
+      "limitations": "No installed client, connected MCP, game runtime or end-to-end product execution was verified.",
+      "detail_file": "evidence-c.json"
+    },
+    {
+      "id": "SRC-R01",
+      "title": "Agent Beacon",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/Asymptote-Labs/agent-beacon",
+      "revision": "cfbd7b1d721664e3b1b5ca2fca5eac4327532c07",
+      "license": "MIT",
+      "qualification": "Source inspection only",
+      "finding": "Useful reviewed-memory state machine and provenance. Atomic review writes and failure-injection tests are present. No automatic promotion of inferred lessons is required for the proposed product.",
+      "architectural_consequence": "Adapt design and tests as patterns. Do not require Beacon Cloud or evaluator service. Native product should own canon and policy decisions.",
+      "limitations": "Tests not run. External evaluator accuracy and all adapters unmeasured.",
+      "detail_file": "evidence-root.json",
+      "maintenance": {
+        "observed_date": "2026-10-23",
+        "default_branch": "main",
+        "repository_owner": "Asymptote-Labs",
+        "archived": false,
+        "last_push_observed": "2026-10-22T20:47:09Z",
+        "audited_commit_date": "2026-10-22T20:43:17Z",
+        "latest_release_observed": {
+          "tag": "ext-v0.1.0",
+          "published_at": "2026-10-22T19:39:43Z",
+          "url": "https://github.com/Asymptote-Labs/agent-beacon/releases/tag/ext-v0.1.0"
+        },
+        "qualification": "Repository activity and releases are metadata observations, not an assessment of maintainer capacity or production reliability.",
+        "sources": [
+          "https://api.github.com/repos/Asymptote-Labs/agent-beacon",
+          "https://api.github.com/repos/Asymptote-Labs/agent-beacon/commits/cfbd7b1d721664e3b1b5ca2fca5eac4327532c07",
+          "https://api.github.com/repos/Asymptote-Labs/agent-beacon/releases/latest"
+        ]
+      }
+    },
+    {
+      "id": "SRC-R02",
+      "title": "Entire CLI",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/entireio/cli",
+      "revision": "ee57ff55142e5078b625dd963fc398d49a8ddda1",
+      "license": "MIT",
+      "qualification": "Source inspection only",
+      "finding": "Separates checkpoint, session and task readers. Reserved IDs support readable retries when backend changes. Native Git compare-and-swap, bounded lock retries and context cancellation are explicit.",
+      "architectural_consequence": "Adapt checkpoint provenance and guarded Git update patterns. Keep full run database outside normal mod history, publish redacted evidence references.",
+      "limitations": "Tests not run. No claim that Entire is a model-agnostic embedded runtime. Metadata branch growth, redaction completeness and restore UX need experiments.",
+      "detail_file": "evidence-root.json",
+      "maintenance": {
+        "observed_date": "2026-10-23",
+        "default_branch": "main",
+        "repository_owner": "entireio",
+        "archived": false,
+        "last_push_observed": "2026-10-23T13:19:16Z",
+        "audited_commit_date": "2026-10-23T12:30:46Z",
+        "latest_release_observed": {
+          "tag": "v0.12.0",
+          "published_at": "2026-10-21T16:54:51Z",
+          "url": "https://github.com/entireio/cli/releases/tag/v0.12.0"
+        },
+        "qualification": "Repository activity and releases are metadata observations, not an assessment of maintainer capacity or production reliability.",
+        "sources": [
+          "https://api.github.com/repos/entireio/cli",
+          "https://api.github.com/repos/entireio/cli/commits/ee57ff55142e5078b625dd963fc398d49a8ddda1",
+          "https://api.github.com/repos/entireio/cli/releases/latest"
+        ]
+      }
+    },
+    {
+      "id": "SRC-R03",
+      "title": "agentglass",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/BjoernSchotte/agentglass",
+      "revision": "3fdd14eafdc873f23b009a273580b4a0ff9b5ca0",
+      "license": "Apache-2.0",
+      "qualification": "Source inspection only",
+      "finding": "Read models carry harness/session/parent/model/branch and usage data, distinguish unknown cost, paginate sessions and support redaction. Checks exercise cursor errors, generation changes and redacted output.",
+      "architectural_consequence": "Adapt observability vocabulary and unknown-cost handling. Optional export integration after native traces are stable.",
+      "limitations": "Not a durable task engine or approved-canon store. Current checkout not built. Glass Town is a different project.",
+      "detail_file": "evidence-root.json",
+      "maintenance": {
+        "observed_date": "2026-10-23",
+        "default_branch": "main",
+        "repository_owner": "BjoernSchotte",
+        "archived": false,
+        "last_push_observed": "2026-10-20T15:46:03Z",
+        "audited_commit_date": "2026-10-19T05:51:52Z",
+        "latest_release_observed": {
+          "tag": "v2026.10.13",
+          "published_at": "2026-10-10T22:37:38Z",
+          "url": "https://github.com/BjoernSchotte/agentglass/releases/tag/v2026.10.13"
+        },
+        "qualification": "Repository activity and releases are metadata observations, not an assessment of maintainer capacity or production reliability.",
+        "sources": [
+          "https://api.github.com/repos/BjoernSchotte/agentglass",
+          "https://api.github.com/repos/BjoernSchotte/agentglass/commits/3fdd14eafdc873f23b009a273580b4a0ff9b5ca0",
+          "https://api.github.com/repos/BjoernSchotte/agentglass/releases/latest"
+        ]
+      }
+    },
+    {
+      "id": "SRC-R04",
+      "title": "MFS",
+      "status": "Verified",
+      "inspection_date": "2026-10-23",
+      "url": "https://github.com/zilliztech/mfs",
+      "revision": "78352894a0a826ee24db852411bf9a3c49884922",
+      "license": "Apache-2.0",
+      "qualification": "Source and selected documentation inspection",
+      "finding": "Derived search spans relational metadata, Milvus and artifact caches. Cancellation test checks orphan vector cleanup after a lost completion claim. Fingerprints and scoped connector manifests support invalidation.",
+      "architectural_consequence": "Borrow fingerprint, locator and reconciliation concepts. Defer MFS service or vector stack until exact search and domain indexes fail measured retrieval tasks.",
+      "limitations": "Tests not run. Backups need consistent related stores. Do not treat derived index as original source or an approval record.",
+      "detail_file": "evidence-root.json",
+      "maintenance": {
+        "observed_date": "2026-10-23",
+        "default_branch": "main",
+        "repository_owner": "zilliztech",
+        "archived": false,
+        "last_push_observed": "2026-07-31T06:49:03Z",
+        "audited_commit_date": "2026-07-31T06:48:14Z",
+        "latest_release_observed": {
+          "tag": "v0.4.6",
+          "published_at": "2026-07-31T06:52:47Z",
+          "url": "https://github.com/zilliztech/mfs/releases/tag/v0.4.6"
+        },
+        "qualification": "Repository activity and releases are metadata observations, not an assessment of maintainer capacity or production reliability.",
+        "sources": [
+          "https://api.github.com/repos/zilliztech/mfs",
+          "https://api.github.com/repos/zilliztech/mfs/commits/78352894a0a826ee24db852411bf9a3c49884922",
+          "https://api.github.com/repos/zilliztech/mfs/releases/latest"
+        ]
+      }
+    },
+    {
+      "id": "SRC-R05",
+      "title": "MCP specification and Tasks extension",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://modelcontextprotocol.io/specification/2026-07-28",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Official documentation read",
+      "finding": "Latest specification redirect observed to 2026-07-28. Core documentation now describes stateless requests and per-request capabilities. Tasks is opt-in with durable handles.",
+      "architectural_consequence": "Negotiate actual server version and capabilities. Support existing HOI4 server versions through adapters. Do not assume a session-based handshake or task support universally.",
+      "limitations": "No HOI4 MCP tools exposed in this session. No server connectivity or protocol conformance run.",
+      "detail_file": "evidence-root.json"
+    },
+    {
+      "id": "SRC-R06",
+      "title": "Agent Skills specification",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://agentskills.io/specification",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Official specification read",
+      "finding": "SKILL.md has name and description frontmatter with naming and size constraints. Optional metadata does not establish runtime authorization.",
+      "architectural_consequence": "Portable workflow body and explicit client-specific discovery mirrors. Validate metadata, paths and cross-client drift.",
+      "limitations": "Client discovery and invocation depend on client version and are not proven by metadata validation.",
+      "detail_file": "evidence-root.json"
+    },
+    {
+      "id": "SRC-R07",
+      "title": "Agent Client Protocol",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://agentclientprotocol.com/protocol/v1/overview",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Official overview and initialization read",
+      "finding": "v1 is latest on inspected docs, v2 marked draft. Initialization negotiates version/capabilities, session load is optional, omitted capabilities are unsupported.",
+      "architectural_consequence": "Optional external editor interoperability after native product works. Do not put ACP between every internal module or depend on an external agent executable.",
+      "limitations": "No implementation tested. ACP does not itself supply the native runtime, durable canon or safe side effects.",
+      "detail_file": "evidence-root.json"
+    },
+    {
+      "id": "SRC-R08",
+      "title": "LiteLLM",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://docs.litellm.ai/docs/",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Official getting-started and routing docs read",
+      "finding": "Python SDK and gateway provide provider normalization, retry/fallback and cost features. Documentation presents local provider examples.",
+      "architectural_consequence": "Optional user-managed gateway or Python alternative. Avoid adding a gateway service solely to obtain a uniform API if the selected runtime already has tested adapters.",
+      "limitations": "No source audit of LiteLLM internals or live provider compatibility performed. Provider normalization does not prove feature parity or billing entitlement.",
+      "detail_file": "evidence-root.json"
+    },
+    {
+      "id": "SRC-R09",
+      "title": "Harness Engineering source-code study",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://arxiv.org/html/2609.00006v1",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Research paper sections 4, 15, 16 inspected",
+      "finding": "Source anatomy motivates narrow loops and explicit subsystem boundaries. It states comparisons are source reading, not shared runtime measurements, and identifies a weaker reproducibility basis for its Claude Code analysis.",
+      "architectural_consequence": "Use taxonomy as a research checklist. Recheck candidate implementations at current pins. Do not repeat its benchmark numbers as HOI4 evidence.",
+      "limitations": "Not an empirical HOI4 comparison. Fetched metadata pairs September-style identifier with July submission date, preserved as source metadata discrepancy. No leaked code retrieved.",
+      "detail_file": "evidence-root.json"
+    },
+    {
+      "id": "SRC-R10",
+      "title": "AI Harness Engineering runtime substrate",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://arxiv.org/html/2605.13357v1",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Methods, evidence ladder, controlled case and outlook inspected",
+      "finding": "Connects task requirements, context use, failures and verification in episode records. The controlled example is a constructed login task, not a broad performance demonstration.",
+      "architectural_consequence": "Adapt requirement-linked evidence and intervention metrics into proposed HOI4 evaluation. Separate behavioral correctness from evidence completeness.",
+      "limitations": "Does not validate the proposed architecture or demonstrate measured gains on HOI4. Quantitative generalization remains future work.",
+      "detail_file": "evidence-root.json"
+    },
+    {
+      "id": "SRC-R11",
+      "title": "byProduct lifecycle",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://byproduct.ai/docs/how-it-works",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Vendor operating-model documentation",
+      "finding": "Describes goal, context, rules, blueprint, jobs, tests and feedback with visible approval ownership.",
+      "architectural_consequence": "Use a compact goal-to-evidence trace for stage packets. No dependency on its service.",
+      "limitations": "Marketing and workflow description, no inspected implementation or execution evidence.",
+      "detail_file": "evidence-root.json"
+    },
+    {
+      "id": "SRC-R12",
+      "title": "Warp software factory article",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://www.warp.dev/articles/coding-agents-to-software-factory",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Vendor article dated 2026-08-25",
+      "finding": "Suggests moving bounded checkable workflows first and measuring acceptance, cost and intervention as automation expands.",
+      "architectural_consequence": "Adopt bounded workflow rollout as a hypothesis. Keep local-first deployment because the user's game and files are local.",
+      "limitations": "No verified performance transfer from Warp's reported adoption. Cloud-first recommendation is not assumed appropriate for HOI4.",
+      "detail_file": "evidence-root.json"
+    },
+    {
+      "id": "SRC-R13",
+      "title": "Paradox Interactive User Agreement",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://store.steampowered.com/eula/3493540_eula_0",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "User-supplied publisher agreement read, legal applicability not adjudicated",
+      "finding": "Sections 1 and 5 describe noncommercial service and UGC use, free UGC and limits on third-party rights. Section 6 has separate streaming and soundtrack terms.",
+      "architectural_consequence": "Keep game/DLC bytes local and out of distribution, record asset provenance, and make commercial product/UGC licensing review a release gate.",
+      "limitations": "This URL is a publisher agreement hosted under a particular Steam item. Verify applicability to the user's HOI4 distribution and planned business model. It does not settle whether every independent tool business model is permitted.",
+      "detail_file": "evidence-root.json"
+    },
+    {
+      "id": "SRC-R14",
+      "title": "Tauri v2 capabilities and external binaries",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://v2.tauri.app/security/capabilities/",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Official capability and sidecar documentation inspected on 2026-10-23",
+      "finding": "Tauri documents capability-based frontend permissions and packaged external binaries. These facilities do not establish arbitrary child-process containment.",
+      "architectural_consequence": "Candidate A uses documented packaging and host APIs, with explicit separate worker containment experiments.",
+      "limitations": "No application build, sidecar packaging or OS sandbox enforcement was tested.",
+      "detail_file": "evidence-root.json"
+    },
+    {
+      "id": "SRC-R15",
+      "title": "Electron security",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://www.electronjs.org/docs/latest/tutorial/security",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Official renderer security guidance inspected on 2026-10-23",
+      "finding": "Security guidance covers context isolation, sandboxing, constrained IPC and remote-content risks.",
+      "architectural_consequence": "Candidate B keeps the renderer isolated and puts privileged operations behind the same host authority contract.",
+      "limitations": "No Electron package or exploit test was executed. Documentation does not prove a proposed application is secure.",
+      "detail_file": "evidence-root.json"
+    },
+    {
+      "id": "SRC-R16",
+      "title": "SQLite atomic commit",
+      "status": "Documented only",
+      "inspection_date": "2026-10-23",
+      "url": "https://www.sqlite.org/atomiccommit.html",
+      "revision": null,
+      "license": "Documentation/reference only, no code or asset distribution granted",
+      "qualification": "Official transaction and filesystem-assumption discussion inspected on 2026-10-23",
+      "finding": "Atomic commit depends on declared storage/OS behavior and covers the database transaction boundary, not arbitrary Git and artifact-store side effects.",
+      "architectural_consequence": "Use a transactional operational store with explicit multi-store intent, receipts, reconciliation and backup tests.",
+      "limitations": "No power-loss, filesystem or platform durability benchmark was run.",
+      "detail_file": "evidence-root.json"
+    }
+  ],
+  "external_audit_scope": "Selective code, tests and guidance, not every file in each repository",
+  "reproduction": "Use exact pinned URLs and detailed record paths. No upstream source is redistributed."
+}

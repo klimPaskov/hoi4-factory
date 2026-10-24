@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-23",
+  "scope": "Six isolated negative fixture groups for the planning package validator",
+  "validator_path": "05-verification/validate_package.py",
+  "validator_sha256": "781e1e1b1d6fbfcace536c5cc851291e55a6d08b2d581dfcca29d6959c0ebafb",
+  "python_version": "3.12.14",
+  "method": "Each mutation ran against a temporary package copy with a fresh manifest. Original package files were not mutated by fixtures.",
+  "baseline_targeted_checks": {
+    "starter_config_and_field_mapping": true,
+    "manifest_hashes": true,
+    "zip_inventory_crc_and_bytes": true
+  },
+  "cases": [
+    {
+      "case_id": "NEG-01",
+      "mutation": "Add an invented active Claude settings key",
+      "check": "starter_config_and_field_mapping",
+      "rejection_observed": true,
+      "errors": [
+        "Unexpected active Claude root key"
+      ],
+      "passed": true
+    },
+    {
+      "case_id": "NEG-02",
+      "mutation": "Replace a source-field identity while retaining 196 unique rows",
+      "check": "starter_config_and_field_mapping",
+      "rejection_observed": true,
+      "errors": [
+        "Mapping identities differ from actual pinned source inventory"
+      ],
+      "passed": true
+    },
+    {
+      "case_id": "NEG-03",
+      "mutation": "Duplicate an otherwise valid manifest entry",
+      "check": "manifest_hashes",
+      "rejection_observed": true,
+      "errors": [
+        "Manifest has duplicate entries or incorrect count"
+      ],
+      "passed": true
+    },
+    {
+      "case_id": "NEG-04",
+      "mutation": "Add a directory-only ZIP member containing parent traversal",
+      "check": "zip_inventory_crc_and_bytes",
+      "rejection_observed": true,
+      "errors": [
+        "Unsafe member ../../unexpected-directory/"
+      ],
+      "passed": true
+    },
+    {
+      "case_id": "NEG-05",
+      "mutation": "Request an in-package report write during archive verification",
+      "exit_code": 2,
+      "expected_guard_message_observed": true,
+      "report_bytes_unchanged": true,
+      "passed": true
+    },
+    {
+      "case_id": "NEG-06",
+      "mutation": "Add parent traversal and absolute manifest paths in separate temporary copies",
+      "instrumentation": "Path methods are spied for the synthetic target and raise before access",
+      "spied_methods": [
+        "is_file",
+        "exists",
+        "stat",
+        "lstat",
+        "read_bytes",
+        "read_text",
+        "open",
+        "resolve"
+      ],
+      "variants": [
+        {
+          "variant": "parent_traversal",
+          "target": "Synthetic file outside the temporary package",
+          "spy_control_intercepted": true,
+          "target_accesses_during_validation": [],
+          "unsafe_path_rejection_observed": true,
+          "manifest_check_passed": false,
+          "validator_exit_code": 1,
+          "passed": true
+        },
+        {
+          "variant": "absolute_path",
+          "target": "Synthetic file outside the temporary package",
+          "spy_control_intercepted": true,
+          "target_accesses_during_validation": [],
+          "unsafe_path_rejection_observed": true,
+          "manifest_check_passed": false,
+          "validator_exit_code": 1,
+          "passed": true
+        }
+      ],
+      "passed": true
+    }
+  ],
+  "case_groups": 6,
+  "status": "pass",
+  "limitations": [
+    "This is regression evidence for the six listed cases, not exhaustive validator security testing.",
+    "Unrelated missing final package reports did not determine the targeted assertions.",
+    "No product runtime, live Claude or Codex client, MCP server, or game was invoked."
+  ]
+}

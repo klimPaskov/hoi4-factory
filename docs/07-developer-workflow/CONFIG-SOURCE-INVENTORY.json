@@ -1,0 +1,474 @@
+{
+  "source_repository": "klimPaskov/Agentic-HOI4-Modding",
+  "source_revision": "856940f2a629e0e2f3e03fc484cb0c0309c96734",
+  "retrieved_date": "2026-10-23",
+  "root_scalar_leaves": 58,
+  "role_scalar_leaves": 138,
+  "total_mapped_scalar_leaves": 196,
+  "included_layers": "No include or profile layer found in the inspected root file",
+  "root_sha256": "cd1746b7ef551d361c8c34d872a13e3c91b0f920941adca9c2f16e4008a59e8f",
+  "roles": [
+    {
+      "role": "hoi4_3d_model_pipeline",
+      "path": ".codex/agents/hoi4_3d_model_pipeline.toml",
+      "sha256": "0efb3287b4460b63480ecfe62fe5a5dd72092ba17407b42b84f7c93a9935851c",
+      "fields": [
+        "name",
+        "description",
+        "model_reasoning_effort",
+        "sandbox_mode",
+        "nickname_candidates",
+        "developer_instructions"
+      ],
+      "reasoning_effort": "high",
+      "sandbox_mode": "workspace-write",
+      "source_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/agents/hoi4_3d_model_pipeline.toml",
+      "adoption": "Optional after scope and tool review, absent from active starter"
+    },
+    {
+      "role": "hoi4_ai_probability_auditor",
+      "path": ".codex/agents/hoi4_ai_probability_auditor.toml",
+      "sha256": "3baa7d15866c069ebd58e38cd9c703b97115af4cf9879d037696de47b5fe54c9",
+      "fields": [
+        "name",
+        "description",
+        "model_reasoning_effort",
+        "sandbox_mode",
+        "nickname_candidates",
+        "developer_instructions"
+      ],
+      "reasoning_effort": "medium",
+      "sandbox_mode": "read-only",
+      "source_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/agents/hoi4_ai_probability_auditor.toml",
+      "adoption": "Optional after scope and tool review, absent from active starter"
+    },
+    {
+      "role": "hoi4_asset_source_researcher",
+      "path": ".codex/agents/hoi4_asset_source_researcher.toml",
+      "sha256": "1d81a6ffd239a88e0d316d6bd973efb0904640efbc305b8a2dbafefdb99fe022",
+      "fields": [
+        "name",
+        "description",
+        "model_reasoning_effort",
+        "sandbox_mode",
+        "nickname_candidates",
+        "developer_instructions"
+      ],
+      "reasoning_effort": "medium",
+      "sandbox_mode": "workspace-write",
+      "source_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/agents/hoi4_asset_source_researcher.toml",
+      "adoption": "Optional after scope and tool review, absent from active starter"
+    },
+    {
+      "role": "hoi4_audio_researcher",
+      "path": ".codex/agents/hoi4_audio_researcher.toml",
+      "sha256": "bb2230947d82e54aecbfa66045dec9fb98cddaf9046e51a1f0f3177cb2a66784",
+      "fields": [
+        "name",
+        "description",
+        "model_reasoning_effort",
+        "sandbox_mode",
+        "nickname_candidates",
+        "developer_instructions"
+      ],
+      "reasoning_effort": "medium",
+      "sandbox_mode": "workspace-write",
+      "source_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/agents/hoi4_audio_researcher.toml",
+      "adoption": "Optional after scope and tool review, absent from active starter"
+    },
+    {
+      "role": "hoi4_country_package_auditor",
+      "path": ".codex/agents/hoi4_country_package_auditor.toml",
+      "sha256": "6f6bb930b5ee713a275e5ff584e4f912724205ecdd7facc0906d1664fdb0074c",
+      "fields": [
+        "name",
+        "description",
+        "model_reasoning_effort",
+        "sandbox_mode",
+        "nickname_candidates",
+        "developer_instructions"
+      ],
+      "reasoning_effort": "medium",
+      "sandbox_mode": "workspace-write",
+      "source_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/agents/hoi4_country_package_auditor.toml",
+      "adoption": "Optional after scope and tool review, absent from active starter"
+    },
+    {
+      "role": "hoi4_decision_mission_auditor",
+      "path": ".codex/agents/hoi4_decision_mission_auditor.toml",
+      "sha256": "e55a91c21cc5665f584094a39aaeb402512a5ca491d16e39e295d388e1b8f2d8",
+      "fields": [
+        "name",
+        "description",
+        "model_reasoning_effort",
+        "sandbox_mode",
+        "nickname_candidates",
+        "developer_instructions"
+      ],
+      "reasoning_effort": "medium",
+      "sandbox_mode": "workspace-write",
+      "source_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/agents/hoi4_decision_mission_auditor.toml",
+      "adoption": "Optional after scope and tool review, absent from active starter"
+    },
+    {
+      "role": "hoi4_documentation_curator",
+      "path": ".codex/agents/hoi4_documentation_curator.toml",
+      "sha256": "0d53873a5a2ba621e0714b467ff235fcda76a9843854635be8245a6eff5b4bd9",
+      "fields": [
+        "name",
+        "description",
+        "model_reasoning_effort",
+        "sandbox_mode",
+        "nickname_candidates",
+        "developer_instructions"
+      ],
+      "reasoning_effort": "medium",
+      "sandbox_mode": "workspace-write",
+      "source_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/agents/hoi4_documentation_curator.toml",
+      "adoption": "Optional after scope and tool review, absent from active starter"
+    },
+    {
+      "role": "hoi4_event_ui_worker",
+      "path": ".codex/agents/hoi4_event_ui_worker.toml",
+      "sha256": "6ec3fd6325e2db8112f492b3883b82295beeda29e0aa54402495fc859bbf5001",
+      "fields": [
+        "name",
+        "description",
+        "model_reasoning_effort",
+        "sandbox_mode",
+        "nickname_candidates",
+        "developer_instructions"
+      ],
+      "reasoning_effort": "medium",
+      "sandbox_mode": "workspace-write",
+      "source_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/agents/hoi4_event_ui_worker.toml",
+      "adoption": "Optional after scope and tool review, absent from active starter"
+    },
+    {
+      "role": "hoi4_feature_completion_auditor",
+      "path": ".codex/agents/hoi4_feature_completion_auditor.toml",
+      "sha256": "3475ee16cd788348d059d00f949defe02a593c5d67759dc48a11f8dfc9b09721",
+      "fields": [
+        "name",
+        "description",
+        "model_reasoning_effort",
+        "sandbox_mode",
+        "nickname_candidates",
+        "developer_instructions"
+      ],
+      "reasoning_effort": "high",
+      "sandbox_mode": "read-only",
+      "source_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/agents/hoi4_feature_completion_auditor.toml",
+      "adoption": "Optional after scope and tool review, absent from active starter"
+    },
+    {
+      "role": "hoi4_focus_tree_auditor",
+      "path": ".codex/agents/hoi4_focus_tree_auditor.toml",
+      "sha256": "aae0ef5aaa30c2a7de0fb316e540129420c290b19167ae68c9ce9b83700d0611",
+      "fields": [
+        "name",
+        "description",
+        "model_reasoning_effort",
+        "sandbox_mode",
+        "nickname_candidates",
+        "developer_instructions"
+      ],
+      "reasoning_effort": "medium",
+      "sandbox_mode": "workspace-write",
+      "source_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/agents/hoi4_focus_tree_auditor.toml",
+      "adoption": "Optional after scope and tool review, absent from active starter"
+    },
+    {
+      "role": "hoi4_generated_feature_art",
+      "path": ".codex/agents/hoi4_generated_feature_art.toml",
+      "sha256": "49cc85d677a568495de1cee9a099afaa6fa339b4b8cf1029e80789274911cb2b",
+      "fields": [
+        "name",
+        "description",
+        "model_reasoning_effort",
+        "sandbox_mode",
+        "nickname_candidates",
+        "developer_instructions"
+      ],
+      "reasoning_effort": "medium",
+      "sandbox_mode": "workspace-write",
+      "source_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/agents/hoi4_generated_feature_art.toml",
+      "adoption": "Optional after scope and tool review, absent from active starter"
+    },
+    {
+      "role": "hoi4_icon_artist",
+      "path": ".codex/agents/hoi4_icon_artist.toml",
+      "sha256": "53f2ba501518bce0d6681d147f3fcd21ab1da760c5fbb7dbd6c6318029efd847",
+      "fields": [
+        "name",
+        "description",
+        "model_reasoning_effort",
+        "sandbox_mode",
+        "nickname_candidates",
+        "developer_instructions"
+      ],
+      "reasoning_effort": "medium",
+      "sandbox_mode": "workspace-write",
+      "source_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/agents/hoi4_icon_artist.toml",
+      "adoption": "Optional after scope and tool review, absent from active starter"
+    },
+    {
+      "role": "hoi4_improvement_loop_planner",
+      "path": ".codex/agents/hoi4_improvement_loop_planner.toml",
+      "sha256": "2e9f467af48d5859db08f566c3dff252d3333c8ebf04f736f6d0547376eae33d",
+      "fields": [
+        "name",
+        "description",
+        "model_reasoning_effort",
+        "sandbox_mode",
+        "nickname_candidates",
+        "developer_instructions"
+      ],
+      "reasoning_effort": "xhigh",
+      "sandbox_mode": "read-only",
+      "source_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/agents/hoi4_improvement_loop_planner.toml",
+      "adoption": "Optional after scope and tool review, absent from active starter"
+    },
+    {
+      "role": "hoi4_localisation_auditor",
+      "path": ".codex/agents/hoi4_localisation_auditor.toml",
+      "sha256": "26bc12acf2e602d86f197cd7002c1f14065f4aa82d192cd0d763f262a737f7d6",
+      "fields": [
+        "name",
+        "description",
+        "model_reasoning_effort",
+        "sandbox_mode",
+        "nickname_candidates",
+        "developer_instructions"
+      ],
+      "reasoning_effort": "high",
+      "sandbox_mode": "workspace-write",
+      "source_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/agents/hoi4_localisation_auditor.toml",
+      "adoption": "Optional after scope and tool review, absent from active starter"
+    },
+    {
+      "role": "hoi4_quote_remark_researcher",
+      "path": ".codex/agents/hoi4_quote_remark_researcher.toml",
+      "sha256": "6973c81e91d81e00de903716c4b82ef4c5891c678df3d6244c85615a7c07746f",
+      "fields": [
+        "name",
+        "description",
+        "model_reasoning_effort",
+        "sandbox_mode",
+        "nickname_candidates",
+        "developer_instructions"
+      ],
+      "reasoning_effort": "medium",
+      "sandbox_mode": "workspace-write",
+      "source_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/agents/hoi4_quote_remark_researcher.toml",
+      "adoption": "Optional after scope and tool review, absent from active starter"
+    },
+    {
+      "role": "hoi4_repo_explorer",
+      "path": ".codex/agents/hoi4_repo_explorer.toml",
+      "sha256": "2ab224383a34602b0d558a260965661440f58f644c678b3344ec688d44844d13",
+      "fields": [
+        "name",
+        "description",
+        "model_reasoning_effort",
+        "sandbox_mode",
+        "nickname_candidates",
+        "developer_instructions"
+      ],
+      "reasoning_effort": "medium",
+      "sandbox_mode": "read-only",
+      "source_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/agents/hoi4_repo_explorer.toml",
+      "adoption": "Optional after scope and tool review, absent from active starter"
+    },
+    {
+      "role": "hoi4_scripted_system_architect",
+      "path": ".codex/agents/hoi4_scripted_system_architect.toml",
+      "sha256": "4113922e20ef141385cef1a528b01f42a76628160bbf0659179acaff5c9a5848",
+      "fields": [
+        "name",
+        "description",
+        "model_reasoning_effort",
+        "sandbox_mode",
+        "nickname_candidates",
+        "developer_instructions"
+      ],
+      "reasoning_effort": "high",
+      "sandbox_mode": "workspace-write",
+      "source_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/agents/hoi4_scripted_system_architect.toml",
+      "adoption": "Optional after scope and tool review, absent from active starter"
+    },
+    {
+      "role": "hoi4_skill_maintainer",
+      "path": ".codex/agents/hoi4_skill_maintainer.toml",
+      "sha256": "b4a0ebdb77ce8cc0b302ce183cc9cf73ef2314ab96db5b8e1a57dcac9f55afac",
+      "fields": [
+        "name",
+        "description",
+        "model_reasoning_effort",
+        "sandbox_mode",
+        "nickname_candidates",
+        "developer_instructions"
+      ],
+      "reasoning_effort": "high",
+      "sandbox_mode": "workspace-write",
+      "source_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/agents/hoi4_skill_maintainer.toml",
+      "adoption": "Optional after scope and tool review, absent from active starter"
+    },
+    {
+      "role": "hoi4_spreadsheet_doc_worker",
+      "path": ".codex/agents/hoi4_spreadsheet_doc_worker.toml",
+      "sha256": "75a96ab23f5b31af71a6d75f63c62bf701f78102bb936ba41dab3c1233978266",
+      "fields": [
+        "name",
+        "description",
+        "model_reasoning_effort",
+        "sandbox_mode",
+        "nickname_candidates",
+        "developer_instructions"
+      ],
+      "reasoning_effort": "medium",
+      "sandbox_mode": "workspace-write",
+      "source_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/agents/hoi4_spreadsheet_doc_worker.toml",
+      "adoption": "Optional after scope and tool review, absent from active starter"
+    },
+    {
+      "role": "hoi4_super_event_art_researcher",
+      "path": ".codex/agents/hoi4_super_event_art_researcher.toml",
+      "sha256": "4c04d6c97f90d8098404504d570e7e6fad5a28ac9fcd0c2ce9d6289ba0b8cf20",
+      "fields": [
+        "name",
+        "description",
+        "model_reasoning_effort",
+        "sandbox_mode",
+        "nickname_candidates",
+        "developer_instructions"
+      ],
+      "reasoning_effort": "medium",
+      "sandbox_mode": "workspace-write",
+      "source_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/agents/hoi4_super_event_art_researcher.toml",
+      "adoption": "Optional after scope and tool review, absent from active starter"
+    },
+    {
+      "role": "hoi4_super_event_audio_researcher",
+      "path": ".codex/agents/hoi4_super_event_audio_researcher.toml",
+      "sha256": "4bcc8d5824bf8e738aeccae7572be817be3855a55fcc5fc88761d83e53852267",
+      "fields": [
+        "name",
+        "description",
+        "model_reasoning_effort",
+        "sandbox_mode",
+        "nickname_candidates",
+        "developer_instructions"
+      ],
+      "reasoning_effort": "medium",
+      "sandbox_mode": "workspace-write",
+      "source_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/agents/hoi4_super_event_audio_researcher.toml",
+      "adoption": "Optional after scope and tool review, absent from active starter"
+    },
+    {
+      "role": "hoi4_super_event_quote_researcher",
+      "path": ".codex/agents/hoi4_super_event_quote_researcher.toml",
+      "sha256": "fe2c7a92040a64535a5206bec1b25010ef850ff7ea090dee4b97329d1c5ca7b5",
+      "fields": [
+        "name",
+        "description",
+        "model_reasoning_effort",
+        "sandbox_mode",
+        "nickname_candidates",
+        "developer_instructions"
+      ],
+      "reasoning_effort": "medium",
+      "sandbox_mode": "workspace-write",
+      "source_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/agents/hoi4_super_event_quote_researcher.toml",
+      "adoption": "Optional after scope and tool review, absent from active starter"
+    },
+    {
+      "role": "hoi4_portrait_creator",
+      "path": ".codex/agents/hoi4_portrait_creator.toml",
+      "sha256": "acd8a09a48d83ba43a6a11edfe6807fcd3f88d848befddee6d0abce47ac58cb4",
+      "fields": [
+        "name",
+        "description",
+        "model_reasoning_effort",
+        "sandbox_mode",
+        "nickname_candidates",
+        "developer_instructions"
+      ],
+      "reasoning_effort": "medium",
+      "sandbox_mode": "workspace-write",
+      "source_url": "https://github.com/klimPaskov/Agentic-HOI4-Modding/blob/856940f2a629e0e2f3e03fc484cb0c0309c96734/.codex/agents/hoi4_portrait_creator.toml",
+      "adoption": "Optional after scope and tool review, absent from active starter"
+    }
+  ],
+  "absent_root_keys": [
+    "model",
+    "model_provider",
+    "model_context_window",
+    "model_auto_compact_token_limit",
+    "profiles",
+    "include",
+    "projects",
+    "features"
+  ],
+  "distinction": "The supplied ChaosRedux configuration is a different Project Source and is not the Agentic repository configuration.",
+  "root_field_keys": [
+    "agents.hoi4_3d_model_pipeline.config_file",
+    "agents.hoi4_3d_model_pipeline.description",
+    "agents.hoi4_ai_probability_auditor.config_file",
+    "agents.hoi4_ai_probability_auditor.description",
+    "agents.hoi4_asset_source_researcher.config_file",
+    "agents.hoi4_asset_source_researcher.description",
+    "agents.hoi4_audio_researcher.config_file",
+    "agents.hoi4_audio_researcher.description",
+    "agents.hoi4_country_package_auditor.config_file",
+    "agents.hoi4_country_package_auditor.description",
+    "agents.hoi4_decision_mission_auditor.config_file",
+    "agents.hoi4_decision_mission_auditor.description",
+    "agents.hoi4_documentation_curator.config_file",
+    "agents.hoi4_documentation_curator.description",
+    "agents.hoi4_event_ui_worker.config_file",
+    "agents.hoi4_event_ui_worker.description",
+    "agents.hoi4_feature_completion_auditor.config_file",
+    "agents.hoi4_feature_completion_auditor.description",
+    "agents.hoi4_focus_tree_auditor.config_file",
+    "agents.hoi4_focus_tree_auditor.description",
+    "agents.hoi4_generated_feature_art.config_file",
+    "agents.hoi4_generated_feature_art.description",
+    "agents.hoi4_icon_artist.config_file",
+    "agents.hoi4_icon_artist.description",
+    "agents.hoi4_improvement_loop_planner.config_file",
+    "agents.hoi4_improvement_loop_planner.description",
+    "agents.hoi4_localisation_auditor.config_file",
+    "agents.hoi4_localisation_auditor.description",
+    "agents.hoi4_portrait_creator.config_file",
+    "agents.hoi4_portrait_creator.description",
+    "agents.hoi4_quote_remark_researcher.config_file",
+    "agents.hoi4_quote_remark_researcher.description",
+    "agents.hoi4_repo_explorer.config_file",
+    "agents.hoi4_repo_explorer.description",
+    "agents.hoi4_scripted_system_architect.config_file",
+    "agents.hoi4_scripted_system_architect.description",
+    "agents.hoi4_skill_maintainer.config_file",
+    "agents.hoi4_skill_maintainer.description",
+    "agents.hoi4_spreadsheet_doc_worker.config_file",
+    "agents.hoi4_spreadsheet_doc_worker.description",
+    "agents.hoi4_super_event_art_researcher.config_file",
+    "agents.hoi4_super_event_art_researcher.description",
+    "agents.hoi4_super_event_audio_researcher.config_file",
+    "agents.hoi4_super_event_audio_researcher.description",
+    "agents.hoi4_super_event_quote_researcher.config_file",
+    "agents.hoi4_super_event_quote_researcher.description",
+    "agents.max_depth",
+    "agents.max_threads",
+    "approval_policy",
+    "mcp_servers.comfy_cloud_portraits.url",
+    "mcp_servers.hoi4_agent_tools.command",
+    "mcp_servers.hoi4_agent_tools.cwd",
+    "mcp_servers.hoi4_agent_tools.default_tools_approval_mode",
+    "mcp_servers.hoi4_agent_tools.env.HOI4_AGENT_STDIO_IDLE_EXIT_MINUTES",
+    "mcp_servers.hoi4_agent_tools.startup_timeout_sec",
+    "mcp_servers.hoi4_agent_tools.tool_timeout_sec",
+    "project_doc_max_bytes",
+    "sandbox_mode"
+  ]
+}

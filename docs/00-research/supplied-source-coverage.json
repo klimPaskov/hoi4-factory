@@ -1,0 +1,3536 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-23",
+  "protocol": "project_sources/25-CHAOS_REDUX_PROJECT_SOURCE_PROTOCOL.md",
+  "coverage": "Complete collaborative full reading before external research",
+  "gate": {
+    "date": "2026-10-23",
+    "status": "all assignments have complete reader coverage",
+    "source_protocol": "project_sources/25-CHAOS_REDUX_PROJECT_SOURCE_PROTOCOL.md",
+    "distinct_text_files": 152,
+    "text_bytes": 3286648,
+    "chunks": 250,
+    "readers": [
+      {
+        "reader": "root",
+        "files": 17,
+        "bytes": 746213,
+        "chunks": 46,
+        "coverage": "complete",
+        "method": "Full chunk reads with truncated attempts repaired before completion"
+      },
+      {
+        "reader": "reader_a",
+        "files": 45,
+        "bytes": 846606,
+        "chunks": 69,
+        "coverage": "complete",
+        "method": "Full chunk reads with truncated attempts repaired before completion"
+      },
+      {
+        "reader": "reader_b",
+        "files": 45,
+        "bytes": 847247,
+        "chunks": 68,
+        "coverage": "complete",
+        "method": "Each listed chunk was displayed in complete exec_command output and read. Outputs with any omitted middle range were reread fully before recording completion."
+      },
+      {
+        "reader": "reader_c",
+        "files": 45,
+        "bytes": 846582,
+        "chunks": 67,
+        "coverage": "complete",
+        "method": "Full chunk reads with truncated attempts repaired before completion"
+      }
+    ],
+    "no_substantive_research_before_gate": true,
+    "duplicate_method": "SHA-256 plus full byte equality",
+    "limitations": "Collaborative source reading, not an assertion that every reader personally read every file"
+  },
+  "duplicate_method": "SHA-256 plus full byte equality",
+  "top_level_sources": [
+    {
+      "origin": "project_sources/01-subagents.zip",
+      "bytes": 62071,
+      "sha256": "376a16781713da153b3031c304ca33f76b28d48bfc4d891a21abd726e8f1b854",
+      "type": "zip"
+    },
+    {
+      "origin": "project_sources/02-chaos-redux-improvement-loop.md",
+      "bytes": 28515,
+      "sha256": "ca2b6a001f691f2b247823b5b9914a3d04076dff429aa85bc035aa34f6124d73",
+      "type": "text"
+    },
+    {
+      "origin": "project_sources/03-chaos-redux-comfyui.md",
+      "bytes": 2456,
+      "sha256": "125daa4e66957fcf02f5cd91e3a0a17f4a99395ad0f40c7ae376b4b59393b303",
+      "type": "text"
+    },
+    {
+      "origin": "project_sources/04-chaos-redux-decisions-missions.md",
+      "bytes": 64394,
+      "sha256": "bd92b691ec78d81db2fe9c19f5574e21969dfa951ef08dbb9dc80085cc2034d9",
+      "type": "text"
+    },
+    {
+      "origin": "project_sources/05-AGENTS.md",
+      "bytes": 44442,
+      "sha256": "ba5f6799c692f461e3922e0a2e6687516bba210206c3758b07c37fce5cfb56d4",
+      "type": "text"
+    },
+    {
+      "origin": "project_sources/06-chaos-redux-subagents.md",
+      "bytes": 41493,
+      "sha256": "68e6b1d4878e4c87981c9e58cebb1182052555d9313d60748fd573f01ad8223e",
+      "type": "text"
+    },
+    {
+      "origin": "project_sources/07-chaos-redux-3d-model-pipeline.md",
+      "bytes": 96728,
+      "sha256": "45ffc273c4df5ec479c83f193815d2c9ffd6092e18cec54242544c08684442f7",
+      "type": "text"
+    },
+    {
+      "origin": "project_sources/08-chaos-redux-event-planning.md",
+      "bytes": 197109,
+      "sha256": "4a1a0a46ffe4145d61fe0992ad7eb82650c386af028b21a1dbd10a6e227881cb",
+      "type": "text"
+    },
+    {
+      "origin": "project_sources/09-chaos-redux-event-assets.md",
+      "bytes": 109712,
+      "sha256": "6766e846130e22a1ac0cea89e32bb0fca9495828216a130c1a882e1544212bfd",
+      "type": "text"
+    },
+    {
+      "origin": "project_sources/10-chaos-redux-events.md",
+      "bytes": 80791,
+      "sha256": "42b1c53c5996f8bb495426b9ebdc6854cdd4309744feddb26df781a0692dd036",
+      "type": "text"
+    },
+    {
+      "origin": "project_sources/11-chaosx_dynamic_effects.md",
+      "bytes": 19635,
+      "sha256": "73b2740ebfb891c6772de72d456dd1805f5bd3921f61ff60c0df38c6f2c45030",
+      "type": "text"
+    },
+    {
+      "origin": "project_sources/12-chaos-redux-scripted-gui.md",
+      "bytes": 23695,
+      "sha256": "f85f0a0888b25d14ca6d6b6535ea8b578542e19dac1f5fbd3d9113e51a525b93",
+      "type": "text"
+    },
+    {
+      "origin": "project_sources/13-chaos-redux-frame-animation.md",
+      "bytes": 28266,
+      "sha256": "86469ff50f33ead0690d3709b0523de1992f01a29713b801a6dd08c27b1be870",
+      "type": "text"
+    },
+    {
+      "origin": "project_sources/14-chaos-redux-focus-trees.md",
+      "bytes": 98951,
+      "sha256": "74805c1f8522ee8630912fd8946c6d547fd43d61e4a907fc71ba08a803253d3f",
+      "type": "text"
+    },
+    {
+      "origin": "project_sources/15-chaos-redux-debug-playtest.md",
+      "bytes": 34086,
+      "sha256": "9c6e27b8a86fd27422d8b2ec5302ac6fa7c64d89a564dbbda71db238190e3549",
+      "type": "text"
+    },
+    {
+      "origin": "project_sources/16-chaos-redux-super-events.md",
+      "bytes": 33489,
+      "sha256": "001a899b4b19ccf6bdf15a82bd446eae0e290c5f64caec5762883af25976924e",
+      "type": "text"
+    },
+    {
+      "origin": "project_sources/17-chaos_redux_clusters_catalog-5-.csv",
+      "bytes": 5362,
+      "sha256": "689fe07883da14abe2ceb7c29c151db50808cf97a366e60808281b16e37c76a2",
+      "type": "text"
+    },
+    {
+      "origin": "project_sources/18-chaos_redux_scenarios_catalog-5-.csv",
+      "bytes": 16848,
+      "sha256": "8b944de19817b3887eac22e3d12437e62990273c8b0db1c6f27928f349d4b2e7",
+      "type": "text"
+    },
+    {
+      "origin": "project_sources/19-chaos_redux_events_catalog-5-.csv",
+      "bytes": 65053,
+      "sha256": "e2e457ba96ae89b316aa01248eebe41d9aacbafc590f4940b56a55133fcd35c6",
+      "type": "text"
+    },
+    {
+      "origin": "project_sources/20-config.toml",
+      "bytes": 11714,
+      "sha256": "24bcac71960d42d2958fc98b49fd38a5244b0946bf80cf3ddb879a633c269427",
+      "type": "text"
+    },
+    {
+      "origin": "project_sources/21-README.md",
+      "bytes": 2857,
+      "sha256": "9f713e2dcaf1e0fad5b070b8a921b23a648a1a01583e4f698cdd50e8e66bce74",
+      "type": "text"
+    },
+    {
+      "origin": "project_sources/22-chaosx_dynamic_triggers.md",
+      "bytes": 3991,
+      "sha256": "6792ee030cb6b658698e92f188f4980e05553f80ba3de8b9260d3cf47fab4843",
+      "type": "text"
+    },
+    {
+      "origin": "project_sources/23-CHAOS_REDUX_MECHANICS.md",
+      "bytes": 41848,
+      "sha256": "e3f21aca358f84d085222272bccd1d2896b4c0ef4bb418de079f882975e35da1",
+      "type": "text"
+    },
+    {
+      "origin": "project_sources/24-all-project-sources.zip",
+      "bytes": 418567,
+      "sha256": "658006c9a1fdde344db7a647a329c70478bb2dac564371c2eac4bc4cf01ee318",
+      "type": "zip"
+    },
+    {
+      "origin": "project_sources/25-CHAOS_REDUX_PROJECT_SOURCE_PROTOCOL.md",
+      "bytes": 12728,
+      "sha256": "e7d9ac3d70b8a883371b5b89aa4bcbe6657b4a87d0b3da31019e1e48bc7101c9",
+      "type": "text"
+    },
+    {
+      "origin": "upload/Pasted text(20261023-123425).txt",
+      "bytes": 76905,
+      "sha256": "12c44a91a6e9225a6714108ea967b4ae8480c5318a96660a2cc6e8acfd6258bb",
+      "type": "text"
+    },
+    {
+      "origin": "upload/all-project-sources(20261023-123435).zip",
+      "bytes": 738995,
+      "sha256": "82fd1eb220e9b903e7f0d597ece677b7ad88054c81ca4721b43a636b60791237",
+      "type": "zip"
+    }
+  ],
+  "file_occurrences": 199,
+  "text_occurrences": 194,
+  "archive_occurrences": 5,
+  "distinct_archives": 4,
+  "distinct_texts": [
+    {
+      "sha256": "f0036ce6d12b60c01c3b1042ddee59bbefad13f8267625efcfd9569ac42d226d",
+      "bytes": 27552,
+      "lines": 197,
+      "origins": [
+        "project_sources/01-subagents.zip!/chaosx_3d_model_pipeline.toml",
+        "project_sources/24-all-project-sources.zip!/subagents.zip!/chaosx_3d_model_pipeline.toml"
+      ],
+      "chunks": [
+        {
+          "id": 1,
+          "line_start": 1,
+          "line_end": 134,
+          "source_lines": 197,
+          "characters": 19860
+        },
+        {
+          "id": 2,
+          "line_start": 135,
+          "line_end": 197,
+          "source_lines": 197,
+          "characters": 7692
+        }
+      ]
+    },
+    {
+      "sha256": "1c3c202e7f15d310cbe2879f3d6f088e2c2fe71806bb33f13bd276c173d184b2",
+      "bytes": 6414,
+      "lines": 66,
+      "origins": [
+        "project_sources/01-subagents.zip!/chaosx_ai_probability_auditor.toml",
+        "project_sources/24-all-project-sources.zip!/subagents.zip!/chaosx_ai_probability_auditor.toml"
+      ],
+      "chunks": [
+        {
+          "id": 3,
+          "line_start": 1,
+          "line_end": 66,
+          "source_lines": 66,
+          "characters": 6414
+        }
+      ]
+    },
+    {
+      "sha256": "f652dfac61f3e41decbdcbb48765b281f7ac7bc0eb7803aa2a89d94c6ccdea7b",
+      "bytes": 3024,
+      "lines": 58,
+      "origins": [
+        "project_sources/01-subagents.zip!/chaosx_asset_source_researcher.toml",
+        "project_sources/24-all-project-sources.zip!/subagents.zip!/chaosx_asset_source_researcher.toml"
+      ],
+      "chunks": [
+        {
+          "id": 4,
+          "line_start": 1,
+          "line_end": 58,
+          "source_lines": 58,
+          "characters": 3024
+        }
+      ]
+    },
+    {
+      "sha256": "d1c6e194082366b514310f76d4c8e7e81679fc81d2be6d23bb59fc16a0ce4bd0",
+      "bytes": 8099,
+      "lines": 87,
+      "origins": [
+        "project_sources/01-subagents.zip!/chaosx_country_package_auditor.toml",
+        "project_sources/24-all-project-sources.zip!/subagents.zip!/chaosx_country_package_auditor.toml"
+      ],
+      "chunks": [
+        {
+          "id": 5,
+          "line_start": 1,
+          "line_end": 87,
+          "source_lines": 87,
+          "characters": 8099
+        }
+      ]
+    },
+    {
+      "sha256": "1b1f9e50909d54daf2a11d255873b7382f970871543d751d924d94b015265a32",
+      "bytes": 8994,
+      "lines": 100,
+      "origins": [
+        "project_sources/01-subagents.zip!/chaosx_decision_mission_auditor.toml",
+        "project_sources/24-all-project-sources.zip!/subagents.zip!/chaosx_decision_mission_auditor.toml"
+      ],
+      "chunks": [
+        {
+          "id": 6,
+          "line_start": 1,
+          "line_end": 100,
+          "source_lines": 100,
+          "characters": 8994
+        }
+      ]
+    },
+    {
+      "sha256": "e881bcc4303dac392904464c7bdce47a11d2210f6f794842f56245579c048008",
+      "bytes": 11319,
+      "lines": 134,
+      "origins": [
+        "project_sources/01-subagents.zip!/chaosx_documentation_curator.toml",
+        "project_sources/24-all-project-sources.zip!/subagents.zip!/chaosx_documentation_curator.toml"
+      ],
+      "chunks": [
+        {
+          "id": 7,
+          "line_start": 1,
+          "line_end": 134,
+          "source_lines": 134,
+          "characters": 11319
+        }
+      ]
+    },
+    {
+      "sha256": "38180484672c2cb363b40cbdd712ef9dbdd1df9cda9acbc534223ab42fb22990",
+      "bytes": 4141,
+      "lines": 66,
+      "origins": [
+        "project_sources/01-subagents.zip!/chaosx_event_completion_auditor.toml",
+        "project_sources/24-all-project-sources.zip!/subagents.zip!/chaosx_event_completion_auditor.toml"
+      ],
+      "chunks": [
+        {
+          "id": 8,
+          "line_start": 1,
+          "line_end": 66,
+          "source_lines": 66,
+          "characters": 4141
+        }
+      ]
+    },
+    {
+      "sha256": "56a254896faf78e4c6ca5aa6398fa5ac6b7106ec6bdc6f0efe767acfa879032c",
+      "bytes": 10136,
+      "lines": 90,
+      "origins": [
+        "project_sources/01-subagents.zip!/chaosx_event_ui_worker.toml",
+        "project_sources/24-all-project-sources.zip!/subagents.zip!/chaosx_event_ui_worker.toml"
+      ],
+      "chunks": [
+        {
+          "id": 9,
+          "line_start": 1,
+          "line_end": 90,
+          "source_lines": 90,
+          "characters": 10136
+        }
+      ]
+    },
+    {
+      "sha256": "88149cedcf2de42a2b824635133d083dac4ab9e911de4d91174b727919bb7aac",
+      "bytes": 4480,
+      "lines": 80,
+      "origins": [
+        "project_sources/01-subagents.zip!/chaosx_focus_tree_auditor.toml",
+        "project_sources/24-all-project-sources.zip!/subagents.zip!/chaosx_focus_tree_auditor.toml"
+      ],
+      "chunks": [
+        {
+          "id": 10,
+          "line_start": 1,
+          "line_end": 80,
+          "source_lines": 80,
+          "characters": 4480
+        }
+      ]
+    },
+    {
+      "sha256": "d056a89535a8740cd6dac3d61cea5f5a73fe9ef6e4d9a87406a86aedc851a38d",
+      "bytes": 3930,
+      "lines": 72,
+      "origins": [
+        "project_sources/01-subagents.zip!/chaosx_generated_event_art.toml",
+        "project_sources/24-all-project-sources.zip!/subagents.zip!/chaosx_generated_event_art.toml"
+      ],
+      "chunks": [
+        {
+          "id": 11,
+          "line_start": 1,
+          "line_end": 72,
+          "source_lines": 72,
+          "characters": 3930
+        }
+      ]
+    },
+    {
+      "sha256": "df0345a30665c2197b77e5a9df72fd12d545086de3010358077fbe4bf9799f2b",
+      "bytes": 10096,
+      "lines": 117,
+      "origins": [
+        "project_sources/01-subagents.zip!/chaosx_icon_artist.toml",
+        "project_sources/24-all-project-sources.zip!/subagents.zip!/chaosx_icon_artist.toml"
+      ],
+      "chunks": [
+        {
+          "id": 12,
+          "line_start": 1,
+          "line_end": 117,
+          "source_lines": 117,
+          "characters": 10096
+        }
+      ]
+    },
+    {
+      "sha256": "c8bcb04ac81e33dac5975c7f3294383f730645b3a3fc3ef26b0c2eb1d79a86b8",
+      "bytes": 7229,
+      "lines": 61,
+      "origins": [
+        "project_sources/01-subagents.zip!/chaosx_improvement_loop_planner.toml",
+        "project_sources/24-all-project-sources.zip!/subagents.zip!/chaosx_improvement_loop_planner.toml"
+      ],
+      "chunks": [
+        {
+          "id": 13,
+          "line_start": 1,
+          "line_end": 61,
+          "source_lines": 61,
+          "characters": 7229
+        }
+      ]
+    },
+    {
+      "sha256": "8d588111bb27da851af9d16b8c426d6e9b59e517444464225e0a3e91385a161b",
+      "bytes": 9782,
+      "lines": 111,
+      "origins": [
+        "project_sources/01-subagents.zip!/chaosx_localisation_auditor.toml",
+        "project_sources/24-all-project-sources.zip!/subagents.zip!/chaosx_localisation_auditor.toml"
+      ],
+      "chunks": [
+        {
+          "id": 14,
+          "line_start": 1,
+          "line_end": 111,
+          "source_lines": 111,
+          "characters": 9782
+        }
+      ]
+    },
+    {
+      "sha256": "ea2ae603081f64afa82f588bfc143b35f97ee8165f16cf0271784869c55086f8",
+      "bytes": 2049,
+      "lines": 20,
+      "origins": [
+        "project_sources/01-subagents.zip!/chaosx_portrait_creator.toml",
+        "project_sources/24-all-project-sources.zip!/subagents.zip!/chaosx_portrait_creator.toml"
+      ],
+      "chunks": [
+        {
+          "id": 15,
+          "line_start": 1,
+          "line_end": 20,
+          "source_lines": 20,
+          "characters": 2049
+        }
+      ]
+    },
+    {
+      "sha256": "276acf0305e8b2a1a9c2b6f60cc8153a9e5cd2d629dca85c592e834c9a65fd9a",
+      "bytes": 13488,
+      "lines": 235,
+      "origins": [
+        "project_sources/01-subagents.zip!/chaosx_repo_explorer.toml",
+        "project_sources/24-all-project-sources.zip!/subagents.zip!/chaosx_repo_explorer.toml"
+      ],
+      "chunks": [
+        {
+          "id": 16,
+          "line_start": 1,
+          "line_end": 235,
+          "source_lines": 235,
+          "characters": 13488
+        }
+      ]
+    },
+    {
+      "sha256": "7c845c07d54d3c19533ed24f6a68a9b77d9e90e056824bd87023916d9a8a89f2",
+      "bytes": 5388,
+      "lines": 74,
+      "origins": [
+        "project_sources/01-subagents.zip!/chaosx_scripted_system_architect.toml",
+        "project_sources/24-all-project-sources.zip!/subagents.zip!/chaosx_scripted_system_architect.toml"
+      ],
+      "chunks": [
+        {
+          "id": 17,
+          "line_start": 1,
+          "line_end": 74,
+          "source_lines": 74,
+          "characters": 5388
+        }
+      ]
+    },
+    {
+      "sha256": "232a9a008c076c9baf38e10b412c8d1bbedfd108e209f33b514053f29b41d148",
+      "bytes": 3258,
+      "lines": 45,
+      "origins": [
+        "project_sources/01-subagents.zip!/chaosx_skill_maintainer.toml",
+        "project_sources/24-all-project-sources.zip!/subagents.zip!/chaosx_skill_maintainer.toml"
+      ],
+      "chunks": [
+        {
+          "id": 18,
+          "line_start": 1,
+          "line_end": 45,
+          "source_lines": 45,
+          "characters": 3258
+        }
+      ]
+    },
+    {
+      "sha256": "896cb63222484317280d31c340edfc282847774f8edab31a68d7fc2b8b0be33b",
+      "bytes": 4605,
+      "lines": 59,
+      "origins": [
+        "project_sources/01-subagents.zip!/chaosx_spreadsheet_doc_worker.toml",
+        "project_sources/24-all-project-sources.zip!/subagents.zip!/chaosx_spreadsheet_doc_worker.toml"
+      ],
+      "chunks": [
+        {
+          "id": 19,
+          "line_start": 1,
+          "line_end": 59,
+          "source_lines": 59,
+          "characters": 4605
+        }
+      ]
+    },
+    {
+      "sha256": "c0e7e0c422f158e566e2b8fa72de3da225ff626ef3fab06927281b9e33a458c3",
+      "bytes": 3342,
+      "lines": 65,
+      "origins": [
+        "project_sources/01-subagents.zip!/chaosx_super_event_audio_researcher.toml",
+        "project_sources/24-all-project-sources.zip!/subagents.zip!/chaosx_super_event_audio_researcher.toml"
+      ],
+      "chunks": [
+        {
+          "id": 20,
+          "line_start": 1,
+          "line_end": 65,
+          "source_lines": 65,
+          "characters": 3342
+        }
+      ]
+    },
+    {
+      "sha256": "c918dae02f2b1127f71134065558f313faec82fba49f3e43022bfeaf3bfb66cb",
+      "bytes": 3921,
+      "lines": 62,
+      "origins": [
+        "project_sources/01-subagents.zip!/chaosx_super_event_text_researcher.toml",
+        "project_sources/24-all-project-sources.zip!/subagents.zip!/chaosx_super_event_text_researcher.toml"
+      ],
+      "chunks": [
+        {
+          "id": 21,
+          "line_start": 1,
+          "line_end": 62,
+          "source_lines": 62,
+          "characters": 3921
+        }
+      ]
+    },
+    {
+      "sha256": "ca2b6a001f691f2b247823b5b9914a3d04076dff429aa85bc035aa34f6124d73",
+      "bytes": 28515,
+      "lines": 289,
+      "origins": [
+        "project_sources/02-chaos-redux-improvement-loop.md",
+        "project_sources/24-all-project-sources.zip!/chaos-redux-improvement-loop.md"
+      ],
+      "chunks": [
+        {
+          "id": 22,
+          "line_start": 1,
+          "line_end": 230,
+          "source_lines": 289,
+          "characters": 19822
+        },
+        {
+          "id": 23,
+          "line_start": 231,
+          "line_end": 289,
+          "source_lines": 289,
+          "characters": 8693
+        }
+      ]
+    },
+    {
+      "sha256": "125daa4e66957fcf02f5cd91e3a0a17f4a99395ad0f40c7ae376b4b59393b303",
+      "bytes": 2456,
+      "lines": 21,
+      "origins": [
+        "project_sources/03-chaos-redux-comfyui.md",
+        "project_sources/24-all-project-sources.zip!/chaos-redux-comfyui.md"
+      ],
+      "chunks": [
+        {
+          "id": 24,
+          "line_start": 1,
+          "line_end": 21,
+          "source_lines": 21,
+          "characters": 2456
+        }
+      ]
+    },
+    {
+      "sha256": "bd92b691ec78d81db2fe9c19f5574e21969dfa951ef08dbb9dc80085cc2034d9",
+      "bytes": 64394,
+      "lines": 1022,
+      "origins": [
+        "project_sources/04-chaos-redux-decisions-missions.md",
+        "project_sources/24-all-project-sources.zip!/chaos-redux-decisions-missions.md"
+      ],
+      "chunks": [
+        {
+          "id": 25,
+          "line_start": 1,
+          "line_end": 464,
+          "source_lines": 1022,
+          "characters": 19982
+        },
+        {
+          "id": 26,
+          "line_start": 465,
+          "line_end": 721,
+          "source_lines": 1022,
+          "characters": 19969
+        },
+        {
+          "id": 27,
+          "line_start": 722,
+          "line_end": 976,
+          "source_lines": 1022,
+          "characters": 19994
+        },
+        {
+          "id": 28,
+          "line_start": 977,
+          "line_end": 1022,
+          "source_lines": 1022,
+          "characters": 4427
+        }
+      ]
+    },
+    {
+      "sha256": "ba5f6799c692f461e3922e0a2e6687516bba210206c3758b07c37fce5cfb56d4",
+      "bytes": 44442,
+      "lines": 431,
+      "origins": [
+        "project_sources/05-AGENTS.md",
+        "project_sources/24-all-project-sources.zip!/AGENTS.md"
+      ],
+      "chunks": [
+        {
+          "id": 29,
+          "line_start": 1,
+          "line_end": 161,
+          "source_lines": 431,
+          "characters": 19877
+        },
+        {
+          "id": 30,
+          "line_start": 162,
+          "line_end": 385,
+          "source_lines": 431,
+          "characters": 19765
+        },
+        {
+          "id": 31,
+          "line_start": 386,
+          "line_end": 431,
+          "source_lines": 431,
+          "characters": 4776
+        }
+      ]
+    },
+    {
+      "sha256": "68e6b1d4878e4c87981c9e58cebb1182052555d9313d60748fd573f01ad8223e",
+      "bytes": 41493,
+      "lines": 366,
+      "origins": [
+        "project_sources/06-chaos-redux-subagents.md",
+        "project_sources/24-all-project-sources.zip!/chaos-redux-subagents.md"
+      ],
+      "chunks": [
+        {
+          "id": 32,
+          "line_start": 1,
+          "line_end": 160,
+          "source_lines": 366,
+          "characters": 19544
+        },
+        {
+          "id": 33,
+          "line_start": 161,
+          "line_end": 335,
+          "source_lines": 366,
+          "characters": 19930
+        },
+        {
+          "id": 34,
+          "line_start": 336,
+          "line_end": 366,
+          "source_lines": 366,
+          "characters": 2019
+        }
+      ]
+    },
+    {
+      "sha256": "45ffc273c4df5ec479c83f193815d2c9ffd6092e18cec54242544c08684442f7",
+      "bytes": 96728,
+      "lines": 477,
+      "origins": [
+        "project_sources/07-chaos-redux-3d-model-pipeline.md",
+        "project_sources/24-all-project-sources.zip!/chaos-redux-3d-model-pipeline.md"
+      ],
+      "chunks": [
+        {
+          "id": 35,
+          "line_start": 1,
+          "line_end": 103,
+          "source_lines": 477,
+          "characters": 19889
+        },
+        {
+          "id": 36,
+          "line_start": 104,
+          "line_end": 223,
+          "source_lines": 477,
+          "characters": 19748
+        },
+        {
+          "id": 37,
+          "line_start": 224,
+          "line_end": 305,
+          "source_lines": 477,
+          "characters": 19543
+        },
+        {
+          "id": 38,
+          "line_start": 306,
+          "line_end": 409,
+          "source_lines": 477,
+          "characters": 19782
+        },
+        {
+          "id": 39,
+          "line_start": 410,
+          "line_end": 477,
+          "source_lines": 477,
+          "characters": 17762
+        }
+      ]
+    },
+    {
+      "sha256": "4a1a0a46ffe4145d61fe0992ad7eb82650c386af028b21a1dbd10a6e227881cb",
+      "bytes": 197109,
+      "lines": 2297,
+      "origins": [
+        "project_sources/08-chaos-redux-event-planning.md",
+        "project_sources/24-all-project-sources.zip!/chaos-redux-event-planning.md"
+      ],
+      "chunks": [
+        {
+          "id": 40,
+          "line_start": 1,
+          "line_end": 360,
+          "source_lines": 2297,
+          "characters": 19968
+        },
+        {
+          "id": 41,
+          "line_start": 361,
+          "line_end": 546,
+          "source_lines": 2297,
+          "characters": 19996
+        },
+        {
+          "id": 42,
+          "line_start": 547,
+          "line_end": 803,
+          "source_lines": 2297,
+          "characters": 19929
+        },
+        {
+          "id": 43,
+          "line_start": 804,
+          "line_end": 1015,
+          "source_lines": 2297,
+          "characters": 19895
+        },
+        {
+          "id": 44,
+          "line_start": 1016,
+          "line_end": 1202,
+          "source_lines": 2297,
+          "characters": 19909
+        },
+        {
+          "id": 45,
+          "line_start": 1203,
+          "line_end": 1369,
+          "source_lines": 2297,
+          "characters": 19982
+        },
+        {
+          "id": 46,
+          "line_start": 1370,
+          "line_end": 1626,
+          "source_lines": 2297,
+          "characters": 19977
+        },
+        {
+          "id": 47,
+          "line_start": 1627,
+          "line_end": 1905,
+          "source_lines": 2297,
+          "characters": 19985
+        },
+        {
+          "id": 48,
+          "line_start": 1906,
+          "line_end": 2145,
+          "source_lines": 2297,
+          "characters": 19906
+        },
+        {
+          "id": 49,
+          "line_start": 2146,
+          "line_end": 2297,
+          "source_lines": 2297,
+          "characters": 17560
+        }
+      ]
+    },
+    {
+      "sha256": "6766e846130e22a1ac0cea89e32bb0fca9495828216a130c1a882e1544212bfd",
+      "bytes": 109712,
+      "lines": 1004,
+      "origins": [
+        "project_sources/09-chaos-redux-event-assets.md",
+        "project_sources/24-all-project-sources.zip!/chaos-redux-event-assets.md"
+      ],
+      "chunks": [
+        {
+          "id": 50,
+          "line_start": 1,
+          "line_end": 225,
+          "source_lines": 1004,
+          "characters": 19810
+        },
+        {
+          "id": 51,
+          "line_start": 226,
+          "line_end": 373,
+          "source_lines": 1004,
+          "characters": 19903
+        },
+        {
+          "id": 52,
+          "line_start": 374,
+          "line_end": 578,
+          "source_lines": 1004,
+          "characters": 19811
+        },
+        {
+          "id": 53,
+          "line_start": 579,
+          "line_end": 720,
+          "source_lines": 1004,
+          "characters": 19970
+        },
+        {
+          "id": 54,
+          "line_start": 721,
+          "line_end": 894,
+          "source_lines": 1004,
+          "characters": 19947
+        },
+        {
+          "id": 55,
+          "line_start": 895,
+          "line_end": 1004,
+          "source_lines": 1004,
+          "characters": 10247
+        }
+      ]
+    },
+    {
+      "sha256": "42b1c53c5996f8bb495426b9ebdc6854cdd4309744feddb26df781a0692dd036",
+      "bytes": 80791,
+      "lines": 833,
+      "origins": [
+        "project_sources/10-chaos-redux-events.md",
+        "project_sources/24-all-project-sources.zip!/chaos-redux-events.md"
+      ],
+      "chunks": [
+        {
+          "id": 56,
+          "line_start": 1,
+          "line_end": 155,
+          "source_lines": 833,
+          "characters": 19920
+        },
+        {
+          "id": 57,
+          "line_start": 156,
+          "line_end": 347,
+          "source_lines": 833,
+          "characters": 18717
+        },
+        {
+          "id": 58,
+          "line_start": 348,
+          "line_end": 548,
+          "source_lines": 833,
+          "characters": 19870
+        },
+        {
+          "id": 59,
+          "line_start": 549,
+          "line_end": 819,
+          "source_lines": 833,
+          "characters": 19784
+        },
+        {
+          "id": 60,
+          "line_start": 820,
+          "line_end": 833,
+          "source_lines": 833,
+          "characters": 2496
+        }
+      ]
+    },
+    {
+      "sha256": "73b2740ebfb891c6772de72d456dd1805f5bd3921f61ff60c0df38c6f2c45030",
+      "bytes": 19635,
+      "lines": 328,
+      "origins": [
+        "project_sources/11-chaosx_dynamic_effects.md",
+        "project_sources/24-all-project-sources.zip!/chaosx_dynamic_effects.md"
+      ],
+      "chunks": [
+        {
+          "id": 61,
+          "line_start": 1,
+          "line_end": 328,
+          "source_lines": 328,
+          "characters": 19635
+        }
+      ]
+    },
+    {
+      "sha256": "f85f0a0888b25d14ca6d6b6535ea8b578542e19dac1f5fbd3d9113e51a525b93",
+      "bytes": 23695,
+      "lines": 130,
+      "origins": [
+        "project_sources/12-chaos-redux-scripted-gui.md",
+        "project_sources/24-all-project-sources.zip!/chaos-redux-scripted-gui.md"
+      ],
+      "chunks": [
+        {
+          "id": 62,
+          "line_start": 1,
+          "line_end": 115,
+          "source_lines": 130,
+          "characters": 19049
+        },
+        {
+          "id": 63,
+          "line_start": 116,
+          "line_end": 130,
+          "source_lines": 130,
+          "characters": 4644
+        }
+      ]
+    },
+    {
+      "sha256": "86469ff50f33ead0690d3709b0523de1992f01a29713b801a6dd08c27b1be870",
+      "bytes": 28266,
+      "lines": 501,
+      "origins": [
+        "project_sources/13-chaos-redux-frame-animation.md",
+        "project_sources/24-all-project-sources.zip!/chaos-redux-frame-animation.md"
+      ],
+      "chunks": [
+        {
+          "id": 64,
+          "line_start": 1,
+          "line_end": 369,
+          "source_lines": 501,
+          "characters": 19749
+        },
+        {
+          "id": 65,
+          "line_start": 370,
+          "line_end": 501,
+          "source_lines": 501,
+          "characters": 8517
+        }
+      ]
+    },
+    {
+      "sha256": "74805c1f8522ee8630912fd8946c6d547fd43d61e4a907fc71ba08a803253d3f",
+      "bytes": 98951,
+      "lines": 1505,
+      "origins": [
+        "project_sources/14-chaos-redux-focus-trees.md",
+        "project_sources/24-all-project-sources.zip!/chaos-redux-focus-trees.md"
+      ],
+      "chunks": [
+        {
+          "id": 66,
+          "line_start": 1,
+          "line_end": 313,
+          "source_lines": 1505,
+          "characters": 19946
+        },
+        {
+          "id": 67,
+          "line_start": 314,
+          "line_end": 612,
+          "source_lines": 1505,
+          "characters": 19716
+        },
+        {
+          "id": 68,
+          "line_start": 613,
+          "line_end": 946,
+          "source_lines": 1505,
+          "characters": 19888
+        },
+        {
+          "id": 69,
+          "line_start": 947,
+          "line_end": 1239,
+          "source_lines": 1505,
+          "characters": 19998
+        },
+        {
+          "id": 70,
+          "line_start": 1240,
+          "line_end": 1505,
+          "source_lines": 1505,
+          "characters": 19403
+        }
+      ]
+    },
+    {
+      "sha256": "9c6e27b8a86fd27422d8b2ec5302ac6fa7c64d89a564dbbda71db238190e3549",
+      "bytes": 34086,
+      "lines": 698,
+      "origins": [
+        "project_sources/15-chaos-redux-debug-playtest.md",
+        "project_sources/24-all-project-sources.zip!/chaos-redux-debug-playtest.md"
+      ],
+      "chunks": [
+        {
+          "id": 71,
+          "line_start": 1,
+          "line_end": 366,
+          "source_lines": 698,
+          "characters": 19928
+        },
+        {
+          "id": 72,
+          "line_start": 367,
+          "line_end": 698,
+          "source_lines": 698,
+          "characters": 14158
+        }
+      ]
+    },
+    {
+      "sha256": "001a899b4b19ccf6bdf15a82bd446eae0e290c5f64caec5762883af25976924e",
+      "bytes": 33489,
+      "lines": 787,
+      "origins": [
+        "project_sources/16-chaos-redux-super-events.md",
+        "project_sources/24-all-project-sources.zip!/chaos-redux-super-events.md"
+      ],
+      "chunks": [
+        {
+          "id": 73,
+          "line_start": 1,
+          "line_end": 497,
+          "source_lines": 787,
+          "characters": 19864
+        },
+        {
+          "id": 74,
+          "line_start": 498,
+          "line_end": 787,
+          "source_lines": 787,
+          "characters": 13623
+        }
+      ]
+    },
+    {
+      "sha256": "689fe07883da14abe2ceb7c29c151db50808cf97a366e60808281b16e37c76a2",
+      "bytes": 5362,
+      "lines": 20,
+      "origins": [
+        "project_sources/17-chaos_redux_clusters_catalog-5-.csv",
+        "project_sources/24-all-project-sources.zip!/chaos_redux_clusters_catalog.csv"
+      ],
+      "chunks": [
+        {
+          "id": 75,
+          "line_start": 1,
+          "line_end": 20,
+          "source_lines": 20,
+          "characters": 5359
+        }
+      ]
+    },
+    {
+      "sha256": "8b944de19817b3887eac22e3d12437e62990273c8b0db1c6f27928f349d4b2e7",
+      "bytes": 16848,
+      "lines": 120,
+      "origins": [
+        "project_sources/18-chaos_redux_scenarios_catalog-5-.csv",
+        "project_sources/24-all-project-sources.zip!/chaos_redux_scenarios_catalog.csv"
+      ],
+      "chunks": [
+        {
+          "id": 76,
+          "line_start": 1,
+          "line_end": 120,
+          "source_lines": 120,
+          "characters": 16837
+        }
+      ]
+    },
+    {
+      "sha256": "e2e457ba96ae89b316aa01248eebe41d9aacbafc590f4940b56a55133fcd35c6",
+      "bytes": 65053,
+      "lines": 294,
+      "origins": [
+        "project_sources/19-chaos_redux_events_catalog-5-.csv",
+        "project_sources/24-all-project-sources.zip!/chaos_redux_events_catalog.csv"
+      ],
+      "chunks": [
+        {
+          "id": 77,
+          "line_start": 1,
+          "line_end": 66,
+          "source_lines": 294,
+          "characters": 19923
+        },
+        {
+          "id": 78,
+          "line_start": 67,
+          "line_end": 155,
+          "source_lines": 294,
+          "characters": 19847
+        },
+        {
+          "id": 79,
+          "line_start": 156,
+          "line_end": 258,
+          "source_lines": 294,
+          "characters": 19858
+        },
+        {
+          "id": 80,
+          "line_start": 259,
+          "line_end": 294,
+          "source_lines": 294,
+          "characters": 5398
+        }
+      ]
+    },
+    {
+      "sha256": "24bcac71960d42d2958fc98b49fd38a5244b0946bf80cf3ddb879a633c269427",
+      "bytes": 11714,
+      "lines": 192,
+      "origins": [
+        "project_sources/20-config.toml",
+        "project_sources/24-all-project-sources.zip!/config.toml"
+      ],
+      "chunks": [
+        {
+          "id": 81,
+          "line_start": 1,
+          "line_end": 192,
+          "source_lines": 192,
+          "characters": 11714
+        }
+      ]
+    },
+    {
+      "sha256": "9f713e2dcaf1e0fad5b070b8a921b23a648a1a01583e4f698cdd50e8e66bce74",
+      "bytes": 2857,
+      "lines": 42,
+      "origins": [
+        "project_sources/21-README.md",
+        "project_sources/24-all-project-sources.zip!/README.md"
+      ],
+      "chunks": [
+        {
+          "id": 82,
+          "line_start": 1,
+          "line_end": 42,
+          "source_lines": 42,
+          "characters": 2849
+        }
+      ]
+    },
+    {
+      "sha256": "6792ee030cb6b658698e92f188f4980e05553f80ba3de8b9260d3cf47fab4843",
+      "bytes": 3991,
+      "lines": 61,
+      "origins": [
+        "project_sources/22-chaosx_dynamic_triggers.md",
+        "project_sources/24-all-project-sources.zip!/chaosx_dynamic_triggers.md"
+      ],
+      "chunks": [
+        {
+          "id": 83,
+          "line_start": 1,
+          "line_end": 61,
+          "source_lines": 61,
+          "characters": 3991
+        }
+      ]
+    },
+    {
+      "sha256": "e3f21aca358f84d085222272bccd1d2896b4c0ef4bb418de079f882975e35da1",
+      "bytes": 41848,
+      "lines": 855,
+      "origins": [
+        "project_sources/23-CHAOS_REDUX_MECHANICS.md",
+        "project_sources/24-all-project-sources.zip!/CHAOS_REDUX_MECHANICS.md"
+      ],
+      "chunks": [
+        {
+          "id": 84,
+          "line_start": 1,
+          "line_end": 415,
+          "source_lines": 855,
+          "characters": 19947
+        },
+        {
+          "id": 85,
+          "line_start": 416,
+          "line_end": 816,
+          "source_lines": 855,
+          "characters": 19934
+        },
+        {
+          "id": 86,
+          "line_start": 817,
+          "line_end": 855,
+          "source_lines": 855,
+          "characters": 1900
+        }
+      ]
+    },
+    {
+      "sha256": "e7d9ac3d70b8a883371b5b89aa4bcbe6657b4a87d0b3da31019e1e48bc7101c9",
+      "bytes": 12728,
+      "lines": 373,
+      "origins": [
+        "project_sources/25-CHAOS_REDUX_PROJECT_SOURCE_PROTOCOL.md"
+      ],
+      "chunks": [
+        {
+          "id": 87,
+          "line_start": 1,
+          "line_end": 373,
+          "source_lines": 373,
+          "characters": 12712
+        }
+      ]
+    },
+    {
+      "sha256": "12c44a91a6e9225a6714108ea967b4ae8480c5318a96660a2cc6e8acfd6258bb",
+      "bytes": 76905,
+      "lines": 546,
+      "origins": [
+        "upload/Pasted text(20261023-123425).txt"
+      ],
+      "chunks": [
+        {
+          "id": 88,
+          "line_start": 1,
+          "line_end": 111,
+          "source_lines": 546,
+          "characters": 19892
+        },
+        {
+          "id": 89,
+          "line_start": 112,
+          "line_end": 301,
+          "source_lines": 546,
+          "characters": 19848
+        },
+        {
+          "id": 90,
+          "line_start": 302,
+          "line_end": 424,
+          "source_lines": 546,
+          "characters": 19791
+        },
+        {
+          "id": 91,
+          "line_start": 425,
+          "line_end": 546,
+          "source_lines": 546,
+          "characters": 17374
+        }
+      ]
+    },
+    {
+      "sha256": "f5efeb6e0ecc0e25724b6b8216859122fa223a644cc54300bc56cfda0037c5bd",
+      "bytes": 50063,
+      "lines": 319,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-3d-model-pipeline/SKILL.md"
+      ],
+      "chunks": [
+        {
+          "id": 92,
+          "line_start": 1,
+          "line_end": 116,
+          "source_lines": 319,
+          "characters": 19720
+        },
+        {
+          "id": 93,
+          "line_start": 117,
+          "line_end": 277,
+          "source_lines": 319,
+          "characters": 19885
+        },
+        {
+          "id": 94,
+          "line_start": 278,
+          "line_end": 319,
+          "source_lines": 319,
+          "characters": 10452
+        }
+      ]
+    },
+    {
+      "sha256": "d2a4ed570ff3f76dc2dc23f8463cf35b718b416bc697e9e094249afb76bed236",
+      "bytes": 40856,
+      "lines": 194,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-3d-model-pipeline/references/blender-processing-and-export.md"
+      ],
+      "chunks": [
+        {
+          "id": 95,
+          "line_start": 1,
+          "line_end": 110,
+          "source_lines": 194,
+          "characters": 19427
+        },
+        {
+          "id": 96,
+          "line_start": 111,
+          "line_end": 191,
+          "source_lines": 194,
+          "characters": 19909
+        },
+        {
+          "id": 97,
+          "line_start": 192,
+          "line_end": 194,
+          "source_lines": 194,
+          "characters": 1506
+        }
+      ]
+    },
+    {
+      "sha256": "badc6d76d959ae7725089cd35d11872f36a5967c297e7b946a5f4174d8807f30",
+      "bytes": 12047,
+      "lines": 37,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-3d-model-pipeline/references/reference-images.md"
+      ],
+      "chunks": [
+        {
+          "id": 98,
+          "line_start": 1,
+          "line_end": 37,
+          "source_lines": 37,
+          "characters": 12047
+        }
+      ]
+    },
+    {
+      "sha256": "2f38a7675eb02ab7ba67c98fc2d35165f194c299ca14f87130cefa6c085f113e",
+      "bytes": 18912,
+      "lines": 88,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-3d-model-pipeline/references/start-gates-and-adapter.md"
+      ],
+      "chunks": [
+        {
+          "id": 99,
+          "line_start": 1,
+          "line_end": 88,
+          "source_lines": 88,
+          "characters": 18912
+        }
+      ]
+    },
+    {
+      "sha256": "e6edb855a160bd664dbb993b683d53c7431f18c472358ce02913a702aef56655",
+      "bytes": 10707,
+      "lines": 65,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-3d-model-pipeline/references/unit-audio-and-counters.md"
+      ],
+      "chunks": [
+        {
+          "id": 100,
+          "line_start": 1,
+          "line_end": 65,
+          "source_lines": 65,
+          "characters": 10707
+        }
+      ]
+    },
+    {
+      "sha256": "ae01f5d9f7e5304aa22a465bbe9edb14796de1513c6b4041df19c4c54aadbd72",
+      "bytes": 23142,
+      "lines": 226,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-3d-model-pipeline/references/unit_rebuild_workflow.md"
+      ],
+      "chunks": [
+        {
+          "id": 101,
+          "line_start": 1,
+          "line_end": 209,
+          "source_lines": 226,
+          "characters": 19758
+        },
+        {
+          "id": 102,
+          "line_start": 210,
+          "line_end": 226,
+          "source_lines": 226,
+          "characters": 3362
+        }
+      ]
+    },
+    {
+      "sha256": "d27d6c1102e3ac7726c806a905bb15615fe9b403d91f7b8361430b2622a1c255",
+      "bytes": 35398,
+      "lines": 390,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-ai-strategies/SKILL.md"
+      ],
+      "chunks": [
+        {
+          "id": 103,
+          "line_start": 1,
+          "line_end": 213,
+          "source_lines": 390,
+          "characters": 19678
+        },
+        {
+          "id": 104,
+          "line_start": 214,
+          "line_end": 390,
+          "source_lines": 390,
+          "characters": 15720
+        }
+      ]
+    },
+    {
+      "sha256": "afe9a0a22d557bdf5328336e60797d02b821c2b11cdc9eb93556467e235060a6",
+      "bytes": 12347,
+      "lines": 206,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-ai-strategies/references/other-ai-systems.md"
+      ],
+      "chunks": [
+        {
+          "id": 105,
+          "line_start": 1,
+          "line_end": 206,
+          "source_lines": 206,
+          "characters": 12347
+        }
+      ]
+    },
+    {
+      "sha256": "8c9b640fae7c4a17a7d3cac316b3f8a8ac81870838763c5fa03297814d0ec847",
+      "bytes": 17493,
+      "lines": 154,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-ai-strategies/references/strategy-token-catalog.md"
+      ],
+      "chunks": [
+        {
+          "id": 106,
+          "line_start": 1,
+          "line_end": 154,
+          "source_lines": 154,
+          "characters": 17493
+        }
+      ]
+    },
+    {
+      "sha256": "5340d015b0b079a7b8b970ff854b3f213add057414fe293d24d29b8a1135c46d",
+      "bytes": 36499,
+      "lines": 349,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-characters-leaders/SKILL.md"
+      ],
+      "chunks": [
+        {
+          "id": 107,
+          "line_start": 1,
+          "line_end": 211,
+          "source_lines": 349,
+          "characters": 19818
+        },
+        {
+          "id": 108,
+          "line_start": 212,
+          "line_end": 349,
+          "source_lines": 349,
+          "characters": 16681
+        }
+      ]
+    },
+    {
+      "sha256": "868406c71a946c0b95f45d4f9a3a6b5d9c8eae9a142037c53cabd589920aba12",
+      "bytes": 9706,
+      "lines": 109,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-characters-leaders/references/effects-triggers.md"
+      ],
+      "chunks": [
+        {
+          "id": 109,
+          "line_start": 1,
+          "line_end": 109,
+          "source_lines": 109,
+          "characters": 9706
+        }
+      ]
+    },
+    {
+      "sha256": "8100802fba7c191fdfe6150763c14c4b3053f74e815b9e35427bc18f0d472edd",
+      "bytes": 9766,
+      "lines": 141,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-characters-leaders/references/unit-leader-traits.md"
+      ],
+      "chunks": [
+        {
+          "id": 110,
+          "line_start": 1,
+          "line_end": 141,
+          "source_lines": 141,
+          "characters": 9766
+        }
+      ]
+    },
+    {
+      "sha256": "17d5cd60387a9a7f598c8082ee04a432a849d6411cb9dff164f47454e3e9e8fe",
+      "bytes": 6469,
+      "lines": 78,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-codebase-cleanup/SKILL.md"
+      ],
+      "chunks": [
+        {
+          "id": 111,
+          "line_start": 1,
+          "line_end": 78,
+          "source_lines": 78,
+          "characters": 6468
+        }
+      ]
+    },
+    {
+      "sha256": "b735c59cb056826c97f53d6588b147f365ef75a1cd53682b1eb0872f7f75f625",
+      "bytes": 52677,
+      "lines": 794,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-debug-playtest/SKILL.md"
+      ],
+      "chunks": [
+        {
+          "id": 112,
+          "line_start": 1,
+          "line_end": 222,
+          "source_lines": 794,
+          "characters": 19248
+        },
+        {
+          "id": 113,
+          "line_start": 223,
+          "line_end": 495,
+          "source_lines": 794,
+          "characters": 19923
+        },
+        {
+          "id": 114,
+          "line_start": 496,
+          "line_end": 794,
+          "source_lines": 794,
+          "characters": 13506
+        }
+      ]
+    },
+    {
+      "sha256": "04ccd1520e1dd73456f70d96e99536cb042bca7998a171b15b05e96ec2dbe24a",
+      "bytes": 53438,
+      "lines": 849,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-decisions-missions/SKILL.md"
+      ],
+      "chunks": [
+        {
+          "id": 115,
+          "line_start": 1,
+          "line_end": 274,
+          "source_lines": 849,
+          "characters": 19811
+        },
+        {
+          "id": 116,
+          "line_start": 275,
+          "line_end": 639,
+          "source_lines": 849,
+          "characters": 19944
+        },
+        {
+          "id": 117,
+          "line_start": 640,
+          "line_end": 849,
+          "source_lines": 849,
+          "characters": 13661
+        }
+      ]
+    },
+    {
+      "sha256": "edaf2de4b6cf75922f6021acae271fa2883bf7a7d5b63892d4d2b217fcc0fd57",
+      "bytes": 10066,
+      "lines": 87,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-decisions-missions/references/cost-payment-and-localisation.md"
+      ],
+      "chunks": [
+        {
+          "id": 118,
+          "line_start": 1,
+          "line_end": 87,
+          "source_lines": 87,
+          "characters": 10066
+        }
+      ]
+    },
+    {
+      "sha256": "a6b358b5ecb76500de27ef1b649bf3346fc00ae79c57fcfd3165a2f5398b238b",
+      "bytes": 17510,
+      "lines": 182,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-decisions-missions/references/formables-and-category-presentation.md"
+      ],
+      "chunks": [
+        {
+          "id": 119,
+          "line_start": 1,
+          "line_end": 182,
+          "source_lines": 182,
+          "characters": 17510
+        }
+      ]
+    },
+    {
+      "sha256": "fa01621561cee990900145bf612784516b63711cda12910dc300b3c7a64e8aef",
+      "bytes": 4777,
+      "lines": 45,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-decisions-missions/references/mechanic-values-and-faction-goals.md"
+      ],
+      "chunks": [
+        {
+          "id": 120,
+          "line_start": 1,
+          "line_end": 45,
+          "source_lines": 45,
+          "characters": 4777
+        }
+      ]
+    },
+    {
+      "sha256": "89b7a8015c08323bebd9472879999ee50ace19378174fa9cc6a8def16b9ae569",
+      "bytes": 5439,
+      "lines": 34,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-decisions-missions/references/validation-addenda-and-handoffs.md"
+      ],
+      "chunks": [
+        {
+          "id": 121,
+          "line_start": 1,
+          "line_end": 34,
+          "source_lines": 34,
+          "characters": 5439
+        }
+      ]
+    },
+    {
+      "sha256": "7160cb17894c14beb58785aeb0454c4d841911940a40129220090e691c5ec617",
+      "bytes": 22750,
+      "lines": 139,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-decisions-missions/templates/formable_state_puzzle/README.md"
+      ],
+      "chunks": [
+        {
+          "id": 122,
+          "line_start": 1,
+          "line_end": 129,
+          "source_lines": 139,
+          "characters": 19787
+        },
+        {
+          "id": 123,
+          "line_start": 130,
+          "line_end": 139,
+          "source_lines": 139,
+          "characters": 2961
+        }
+      ]
+    },
+    {
+      "sha256": "7a6f781e941d2778ec0ed89558bcb358cad6ad8983713c92e566c0bd8c306ed9",
+      "bytes": 4987,
+      "lines": 33,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-decisions-missions/templates/formable_state_puzzle/category_attachment_audit.md"
+      ],
+      "chunks": [
+        {
+          "id": 124,
+          "line_start": 1,
+          "line_end": 33,
+          "source_lines": 33,
+          "characters": 4987
+        }
+      ]
+    },
+    {
+      "sha256": "e42dbf180b098a996f401f58fe5882ffcc3aa11609fe5fb3b76e9155975590ff",
+      "bytes": 2931,
+      "lines": 72,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-decisions-missions/templates/formable_state_puzzle/static_category_picture_option.md"
+      ],
+      "chunks": [
+        {
+          "id": 125,
+          "line_start": 1,
+          "line_end": 72,
+          "source_lines": 72,
+          "characters": 2931
+        }
+      ]
+    },
+    {
+      "sha256": "53e88cb780658c102ce350be7d2fa23ab69a4a97c6def1b0504a4eaf525098ed",
+      "bytes": 13637,
+      "lines": 114,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-decisions-missions/templates/formable_state_puzzle/universal_state_registry_workflow.md"
+      ],
+      "chunks": [
+        {
+          "id": 126,
+          "line_start": 1,
+          "line_end": 114,
+          "source_lines": 114,
+          "characters": 13637
+        }
+      ]
+    },
+    {
+      "sha256": "360c0836c9b78338aa5252303252d87ea7bb2135a4ca23305715e774b4f0ea1f",
+      "bytes": 8269,
+      "lines": 72,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-decisions-missions/templates/formable_state_puzzle/validation_checklist.md"
+      ],
+      "chunks": [
+        {
+          "id": 127,
+          "line_start": 1,
+          "line_end": 72,
+          "source_lines": 72,
+          "characters": 8269
+        }
+      ]
+    },
+    {
+      "sha256": "c7ee80a0be46ed197dec122b99d130ae52b50fbb7fee8d65e3bb4a43ea00cceb",
+      "bytes": 39782,
+      "lines": 383,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-diplomacy-war/SKILL.md"
+      ],
+      "chunks": [
+        {
+          "id": 128,
+          "line_start": 1,
+          "line_end": 203,
+          "source_lines": 383,
+          "characters": 19951
+        },
+        {
+          "id": 129,
+          "line_start": 204,
+          "line_end": 383,
+          "source_lines": 383,
+          "characters": 19830
+        }
+      ]
+    },
+    {
+      "sha256": "3f488d21d8054b2fd04662c988e7170bf0bb447c6418d6e09a03ee0b3a54f4b8",
+      "bytes": 12457,
+      "lines": 150,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-diplomacy-war/references/syntax-reference.md"
+      ],
+      "chunks": [
+        {
+          "id": 130,
+          "line_start": 1,
+          "line_end": 150,
+          "source_lines": 150,
+          "characters": 12456
+        }
+      ]
+    },
+    {
+      "sha256": "fc9a8d2f01a6027743dfb79c9b52b05fa3d0ac2fb83db9a94cfd84ba4950b94f",
+      "bytes": 25156,
+      "lines": 346,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-equipment/SKILL.md"
+      ],
+      "chunks": [
+        {
+          "id": 131,
+          "line_start": 1,
+          "line_end": 298,
+          "source_lines": 346,
+          "characters": 19932
+        },
+        {
+          "id": 132,
+          "line_start": 299,
+          "line_end": 346,
+          "source_lines": 346,
+          "characters": 5224
+        }
+      ]
+    },
+    {
+      "sha256": "5c6006d957a74d9ffcb7a405fd731bd9e6d5ff6921cced3f846ed3b46ba34448",
+      "bytes": 10978,
+      "lines": 154,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-equipment/references/modular-equipment-and-designer.md"
+      ],
+      "chunks": [
+        {
+          "id": 133,
+          "line_start": 1,
+          "line_end": 154,
+          "source_lines": 154,
+          "characters": 10978
+        }
+      ]
+    },
+    {
+      "sha256": "98ea5e8948f70c1b77cef18f6c2709f9ba54d61467a7df0328b607b83499dbcf",
+      "bytes": 11293,
+      "lines": 131,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-equipment/references/production-and-stockpile.md"
+      ],
+      "chunks": [
+        {
+          "id": 134,
+          "line_start": 1,
+          "line_end": 131,
+          "source_lines": 131,
+          "characters": 11293
+        }
+      ]
+    },
+    {
+      "sha256": "eae8e08271c233b85b8766ab1a2ca434a62c41f3ffb5ad6b9f1162624b2fcf98",
+      "bytes": 58224,
+      "lines": 557,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-event-assets/SKILL.md"
+      ],
+      "chunks": [
+        {
+          "id": 135,
+          "line_start": 1,
+          "line_end": 179,
+          "source_lines": 557,
+          "characters": 19996
+        },
+        {
+          "id": 136,
+          "line_start": 180,
+          "line_end": 364,
+          "source_lines": 557,
+          "characters": 19900
+        },
+        {
+          "id": 137,
+          "line_start": 365,
+          "line_end": 557,
+          "source_lines": 557,
+          "characters": 18320
+        }
+      ]
+    },
+    {
+      "sha256": "28b59a9f86fb3dc0bfe3c21ed0b131009a163c8c56a355d396c5ac4b619c5d2f",
+      "bytes": 9084,
+      "lines": 82,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-event-assets/references/event-images-and-flags.md"
+      ],
+      "chunks": [
+        {
+          "id": 138,
+          "line_start": 1,
+          "line_end": 82,
+          "source_lines": 82,
+          "characters": 9084
+        }
+      ]
+    },
+    {
+      "sha256": "d786e5fb2b889665aa06447e808d9100595b979368856af5f1218ffec49d03d5",
+      "bytes": 32393,
+      "lines": 315,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-event-assets/references/icon-and-ui-families.md"
+      ],
+      "chunks": [
+        {
+          "id": 139,
+          "line_start": 1,
+          "line_end": 206,
+          "source_lines": 315,
+          "characters": 19781
+        },
+        {
+          "id": 140,
+          "line_start": 207,
+          "line_end": 315,
+          "source_lines": 315,
+          "characters": 12612
+        }
+      ]
+    },
+    {
+      "sha256": "9a006df84775032f438eb8700aaf033b9fa18bd07866a3620a9de0be2deb027c",
+      "bytes": 7104,
+      "lines": 62,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-event-assets/references/manifest-and-lineage.md"
+      ],
+      "chunks": [
+        {
+          "id": 141,
+          "line_start": 1,
+          "line_end": 62,
+          "source_lines": 62,
+          "characters": 7104
+        }
+      ]
+    },
+    {
+      "sha256": "8d2690da31e8f6b4323e5af3f80d7c8fb282385caa4aba8e487b70f936edcb26",
+      "bytes": 21024,
+      "lines": 135,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-event-assets/references/portrait-production.md"
+      ],
+      "chunks": [
+        {
+          "id": 142,
+          "line_start": 1,
+          "line_end": 127,
+          "source_lines": 135,
+          "characters": 19830
+        },
+        {
+          "id": 143,
+          "line_start": 128,
+          "line_end": 135,
+          "source_lines": 135,
+          "characters": 1192
+        }
+      ]
+    },
+    {
+      "sha256": "0ddebefc8f448156206c22fa11699f84b5e07452b387ada910c795c50b8f98ef",
+      "bytes": 11249,
+      "lines": 110,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-event-assets/references/reference-library.md"
+      ],
+      "chunks": [
+        {
+          "id": 144,
+          "line_start": 1,
+          "line_end": 110,
+          "source_lines": 110,
+          "characters": 11249
+        }
+      ]
+    },
+    {
+      "sha256": "9ab6970e3015ef775b2292ca49ff96d033e9788c4ce9d12fa638f3638dc44118",
+      "bytes": 4863,
+      "lines": 30,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-event-assets/references/unit-visuals.md"
+      ],
+      "chunks": [
+        {
+          "id": 145,
+          "line_start": 1,
+          "line_end": 30,
+          "source_lines": 30,
+          "characters": 4849
+        }
+      ]
+    },
+    {
+      "sha256": "5aa8bd4013ba33982eb2f4f4ca810a8aacf1bfe269ee10a75bd5bddb672a239e",
+      "bytes": 52550,
+      "lines": 702,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-event-planning/SKILL.md"
+      ],
+      "chunks": [
+        {
+          "id": 146,
+          "line_start": 1,
+          "line_end": 308,
+          "source_lines": 702,
+          "characters": 19709
+        },
+        {
+          "id": 147,
+          "line_start": 309,
+          "line_end": 503,
+          "source_lines": 702,
+          "characters": 19995
+        },
+        {
+          "id": 148,
+          "line_start": 504,
+          "line_end": 702,
+          "source_lines": 702,
+          "characters": 12846
+        }
+      ]
+    },
+    {
+      "sha256": "9e5217ac8fa6683652074780e6b3aa84b8a9bd641bc5463bfa3759a9c3d205b0",
+      "bytes": 13911,
+      "lines": 140,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-event-planning/references/advanced-chaos-generation-design.md"
+      ],
+      "chunks": [
+        {
+          "id": 149,
+          "line_start": 1,
+          "line_end": 140,
+          "source_lines": 140,
+          "characters": 13911
+        }
+      ]
+    },
+    {
+      "sha256": "5d0fa02b3f4dbc8bb774f52ba89cb41e7a06d46cd2fc1b51fb22eb7b071ba7aa",
+      "bytes": 34057,
+      "lines": 318,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-event-planning/references/advanced-country-and-forces-design.md"
+      ],
+      "chunks": [
+        {
+          "id": 150,
+          "line_start": 1,
+          "line_end": 190,
+          "source_lines": 318,
+          "characters": 19815
+        },
+        {
+          "id": 151,
+          "line_start": 191,
+          "line_end": 318,
+          "source_lines": 318,
+          "characters": 14242
+        }
+      ]
+    },
+    {
+      "sha256": "de01708724dd931ebb360839562b22d94c4951bb61fe7fd330fc91ed108bedc7",
+      "bytes": 31696,
+      "lines": 369,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-event-planning/references/advanced-focus-tree-design.md"
+      ],
+      "chunks": [
+        {
+          "id": 152,
+          "line_start": 1,
+          "line_end": 246,
+          "source_lines": 369,
+          "characters": 19710
+        },
+        {
+          "id": 153,
+          "line_start": 247,
+          "line_end": 369,
+          "source_lines": 369,
+          "characters": 11984
+        }
+      ]
+    },
+    {
+      "sha256": "fef80d851d2e497c4a2d8cc59e3dbc68f610aeff1732a721e00722a2c05dc746",
+      "bytes": 1267,
+      "lines": 9,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-event-planning/references/advanced-system-design.md"
+      ],
+      "chunks": [
+        {
+          "id": 154,
+          "line_start": 1,
+          "line_end": 9,
+          "source_lines": 9,
+          "characters": 1267
+        }
+      ]
+    },
+    {
+      "sha256": "3cdf7b3946a56abb12b9dc110c31ab7df14cfedf9d36f768c9a9b86399e9ff23",
+      "bytes": 11088,
+      "lines": 139,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-event-planning/references/player-facing-text-direction.md"
+      ],
+      "chunks": [
+        {
+          "id": 155,
+          "line_start": 1,
+          "line_end": 139,
+          "source_lines": 139,
+          "characters": 11086
+        }
+      ]
+    },
+    {
+      "sha256": "8cc27195ee4b7ae31ef13d6418c804cabd626870dfa64e09d4e34eeca0962be9",
+      "bytes": 22549,
+      "lines": 284,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-event-planning/references/presentation-and-assets.md"
+      ],
+      "chunks": [
+        {
+          "id": 156,
+          "line_start": 1,
+          "line_end": 239,
+          "source_lines": 284,
+          "characters": 19978
+        },
+        {
+          "id": 157,
+          "line_start": 240,
+          "line_end": 284,
+          "source_lines": 284,
+          "characters": 2569
+        }
+      ]
+    },
+    {
+      "sha256": "5dc6797ddfeaab9538b9420d298d527c01e6e4bdc7ff393068944ff989dd2fcd",
+      "bytes": 40195,
+      "lines": 434,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-event-planning/references/specification-delivery.md"
+      ],
+      "chunks": [
+        {
+          "id": 158,
+          "line_start": 1,
+          "line_end": 251,
+          "source_lines": 434,
+          "characters": 20000
+        },
+        {
+          "id": 159,
+          "line_start": 252,
+          "line_end": 430,
+          "source_lines": 434,
+          "characters": 19916
+        },
+        {
+          "id": 160,
+          "line_start": 431,
+          "line_end": 434,
+          "source_lines": 434,
+          "characters": 279
+        }
+      ]
+    },
+    {
+      "sha256": "95a994715c786c9acb13334dc4cd1f4bfe683e7348b8430ca13b953eb75463f6",
+      "bytes": 50632,
+      "lines": 549,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-events/SKILL.md"
+      ],
+      "chunks": [
+        {
+          "id": 161,
+          "line_start": 1,
+          "line_end": 159,
+          "source_lines": 549,
+          "characters": 19812
+        },
+        {
+          "id": 162,
+          "line_start": 160,
+          "line_end": 404,
+          "source_lines": 549,
+          "characters": 19656
+        },
+        {
+          "id": 163,
+          "line_start": 405,
+          "line_end": 549,
+          "source_lines": 549,
+          "characters": 11162
+        }
+      ]
+    },
+    {
+      "sha256": "7dcb982ca162f38ac2fb55249c609125fcd0913690fc3c370fb6e368d33a1e7a",
+      "bytes": 13182,
+      "lines": 150,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-events/references/event-log-evolutions-and-clusters.md"
+      ],
+      "chunks": [
+        {
+          "id": 164,
+          "line_start": 1,
+          "line_end": 150,
+          "source_lines": 150,
+          "characters": 13180
+        }
+      ]
+    },
+    {
+      "sha256": "64d9ca7a1d15b561d06799311eb23506c4087675520a24f8506886097c26b4c4",
+      "bytes": 4858,
+      "lines": 31,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-events/references/event-text-formatting-and-details.md"
+      ],
+      "chunks": [
+        {
+          "id": 165,
+          "line_start": 1,
+          "line_end": 31,
+          "source_lines": 31,
+          "characters": 4857
+        }
+      ]
+    },
+    {
+      "sha256": "ee6096a78b07085a6d03a3541473ec00c4b6d60d87427976a2527274290dcc6c",
+      "bytes": 37078,
+      "lines": 316,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-events/references/scripted-systems-and-country-integration.md"
+      ],
+      "chunks": [
+        {
+          "id": 166,
+          "line_start": 1,
+          "line_end": 161,
+          "source_lines": 316,
+          "characters": 19817
+        },
+        {
+          "id": 167,
+          "line_start": 162,
+          "line_end": 316,
+          "source_lines": 316,
+          "characters": 17261
+        }
+      ]
+    },
+    {
+      "sha256": "428753a0046a5b7d7f31c5ca29b4c3127505b1f217bf6d46515011aca38e6a0c",
+      "bytes": 8588,
+      "lines": 103,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-events/references/world-end-triggerable-scenarios-and-aftermath.md"
+      ],
+      "chunks": [
+        {
+          "id": 168,
+          "line_start": 1,
+          "line_end": 103,
+          "source_lines": 103,
+          "characters": 8588
+        }
+      ]
+    },
+    {
+      "sha256": "7519e58332b5e2632180b958e265e89522824f48044e2b48b3f2294af72dd208",
+      "bytes": 49108,
+      "lines": 766,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-focus-trees/SKILL.md"
+      ],
+      "chunks": [
+        {
+          "id": 169,
+          "line_start": 1,
+          "line_end": 332,
+          "source_lines": 766,
+          "characters": 19883
+        },
+        {
+          "id": 170,
+          "line_start": 333,
+          "line_end": 662,
+          "source_lines": 766,
+          "characters": 19807
+        },
+        {
+          "id": 171,
+          "line_start": 663,
+          "line_end": 766,
+          "source_lines": 766,
+          "characters": 9416
+        }
+      ]
+    },
+    {
+      "sha256": "2c70954a0c005fd58d629bfe6d12c09992ecce147799bafbe975a41c4748ad51",
+      "bytes": 16369,
+      "lines": 146,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-focus-trees/references/layout-and-navigation.md"
+      ],
+      "chunks": [
+        {
+          "id": 172,
+          "line_start": 1,
+          "line_end": 146,
+          "source_lines": 146,
+          "characters": 16367
+        }
+      ]
+    },
+    {
+      "sha256": "cb4ed32d3a6cadc734c2d536a5331eafab8fe4190f9738f387f7a24a05a1af1e",
+      "bytes": 37641,
+      "lines": 609,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-focus-trees/references/major-country-design.md"
+      ],
+      "chunks": [
+        {
+          "id": 173,
+          "line_start": 1,
+          "line_end": 318,
+          "source_lines": 609,
+          "characters": 20000
+        },
+        {
+          "id": 174,
+          "line_start": 319,
+          "line_end": 609,
+          "source_lines": 609,
+          "characters": 17639
+        }
+      ]
+    },
+    {
+      "sha256": "07a0d6b7e032c745d0f04473b58a21f3418fc34344353d1ea1c6eae77d52834e",
+      "bytes": 29729,
+      "lines": 501,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-frame-animation/SKILL.md"
+      ],
+      "chunks": [
+        {
+          "id": 175,
+          "line_start": 1,
+          "line_end": 333,
+          "source_lines": 501,
+          "characters": 19814
+        },
+        {
+          "id": 176,
+          "line_start": 334,
+          "line_end": 501,
+          "source_lines": 501,
+          "characters": 9915
+        }
+      ]
+    },
+    {
+      "sha256": "7c136d082883692c21e840f7cb997d2f8520612d46ce497a856d178efa7ac55a",
+      "bytes": 36171,
+      "lines": 301,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-ideas-modifiers/SKILL.md"
+      ],
+      "chunks": [
+        {
+          "id": 177,
+          "line_start": 1,
+          "line_end": 181,
+          "source_lines": 301,
+          "characters": 19986
+        },
+        {
+          "id": 178,
+          "line_start": 182,
+          "line_end": 301,
+          "source_lines": 301,
+          "characters": 16170
+        }
+      ]
+    },
+    {
+      "sha256": "1a4d14996738994ee4780df589141ecc5c45eb3b787b44b3e1eb0f52ff8a6621",
+      "bytes": 29088,
+      "lines": 291,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-improvement-loop/SKILL.md"
+      ],
+      "chunks": [
+        {
+          "id": 179,
+          "line_start": 1,
+          "line_end": 222,
+          "source_lines": 291,
+          "characters": 19941
+        },
+        {
+          "id": 180,
+          "line_start": 223,
+          "line_end": 291,
+          "source_lines": 291,
+          "characters": 9147
+        }
+      ]
+    },
+    {
+      "sha256": "c0b916d62bbba0d68f03f4edb95ff7de9e65c6dc3346a8646dbd117acf436b43",
+      "bytes": 39271,
+      "lines": 360,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-map-states/SKILL.md"
+      ],
+      "chunks": [
+        {
+          "id": 181,
+          "line_start": 1,
+          "line_end": 207,
+          "source_lines": 360,
+          "characters": 19920
+        },
+        {
+          "id": 182,
+          "line_start": 208,
+          "line_end": 360,
+          "source_lines": 360,
+          "characters": 19351
+        }
+      ]
+    },
+    {
+      "sha256": "06dfae7bb38c154838c5986e35d3e5f8cccbba724e03356aa5cbb8dbbc0b51ca",
+      "bytes": 8680,
+      "lines": 109,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-map-states/references/map-geometry.md"
+      ],
+      "chunks": [
+        {
+          "id": 183,
+          "line_start": 1,
+          "line_end": 109,
+          "source_lines": 109,
+          "characters": 8680
+        }
+      ]
+    },
+    {
+      "sha256": "28e5ce71ebde6134dfaaf16dd51b23575d9fa46f552adb0f8812830b9d5246af",
+      "bytes": 11844,
+      "lines": 82,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-map-states/references/state-ledgers.md"
+      ],
+      "chunks": [
+        {
+          "id": 184,
+          "line_start": 1,
+          "line_end": 82,
+          "source_lines": 82,
+          "characters": 11844
+        }
+      ]
+    },
+    {
+      "sha256": "3d148f8c8592dd9046e1f30c85d5650b2c7507820578f03e18d6ce883778a41b",
+      "bytes": 2637,
+      "lines": 70,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-mtth/SKILL.md"
+      ],
+      "chunks": [
+        {
+          "id": 185,
+          "line_start": 1,
+          "line_end": 70,
+          "source_lines": 70,
+          "characters": 2637
+        }
+      ]
+    },
+    {
+      "sha256": "3d146b94582b48a6f6832783017d27dfe91c40b3cb2884952643e1e8e2055147",
+      "bytes": 5176,
+      "lines": 37,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-native-raids/SKILL.md"
+      ],
+      "chunks": [
+        {
+          "id": 186,
+          "line_start": 1,
+          "line_end": 37,
+          "source_lines": 37,
+          "characters": 5176
+        }
+      ]
+    },
+    {
+      "sha256": "ef46a62be8872459402e524ebd0b51eb12c3d1651de6485f24f415c56f6f167e",
+      "bytes": 8279,
+      "lines": 93,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-save-inspection/SKILL.md"
+      ],
+      "chunks": [
+        {
+          "id": 187,
+          "line_start": 1,
+          "line_end": 93,
+          "source_lines": 93,
+          "characters": 8279
+        }
+      ]
+    },
+    {
+      "sha256": "958a7671c4eefdc68cf771e6cf1de28687871a735d22bb0ece4649de4cf04089",
+      "bytes": 31082,
+      "lines": 157,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-scripted-gui/SKILL.md"
+      ],
+      "chunks": [
+        {
+          "id": 188,
+          "line_start": 1,
+          "line_end": 97,
+          "source_lines": 157,
+          "characters": 19934
+        },
+        {
+          "id": 189,
+          "line_start": 98,
+          "line_end": 157,
+          "source_lines": 157,
+          "characters": 11146
+        }
+      ]
+    },
+    {
+      "sha256": "93f4bc424192c43c0c0562bb4643b2dfe346b6623bf761af2bd9b422731eb4b7",
+      "bytes": 7747,
+      "lines": 39,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-shared-git-commit/SKILL.md"
+      ],
+      "chunks": [
+        {
+          "id": 190,
+          "line_start": 1,
+          "line_end": 39,
+          "source_lines": 39,
+          "characters": 7747
+        }
+      ]
+    },
+    {
+      "sha256": "a8ae53cad112cf72db642eaa5a7c4a98447fc3bd4fa4b97de81c68d35474dbfa",
+      "bytes": 51180,
+      "lines": 452,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-subagents/SKILL.md"
+      ],
+      "chunks": [
+        {
+          "id": 191,
+          "line_start": 1,
+          "line_end": 134,
+          "source_lines": 452,
+          "characters": 19978
+        },
+        {
+          "id": 192,
+          "line_start": 135,
+          "line_end": 344,
+          "source_lines": 452,
+          "characters": 19993
+        },
+        {
+          "id": 193,
+          "line_start": 345,
+          "line_end": 452,
+          "source_lines": 452,
+          "characters": 11205
+        }
+      ]
+    },
+    {
+      "sha256": "29910f20e0b5224920bd8700d4b1d1aaedc1bbd66cdd473082981f6668c32dfb",
+      "bytes": 35075,
+      "lines": 776,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-super-events/SKILL.md"
+      ],
+      "chunks": [
+        {
+          "id": 194,
+          "line_start": 1,
+          "line_end": 479,
+          "source_lines": 776,
+          "characters": 19721
+        },
+        {
+          "id": 195,
+          "line_start": 480,
+          "line_end": 776,
+          "source_lines": 776,
+          "characters": 15346
+        }
+      ]
+    },
+    {
+      "sha256": "dd64a493b7a7a38dbfb538f461da7600833eef18f8333e72d798bd1884b8b898",
+      "bytes": 28884,
+      "lines": 357,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-technology-doctrines/SKILL.md"
+      ],
+      "chunks": [
+        {
+          "id": 196,
+          "line_start": 1,
+          "line_end": 272,
+          "source_lines": 357,
+          "characters": 19911
+        },
+        {
+          "id": 197,
+          "line_start": 273,
+          "line_end": 357,
+          "source_lines": 357,
+          "characters": 8973
+        }
+      ]
+    },
+    {
+      "sha256": "2f3134cb7a5861605d64bbe11c2c6585d21e4b8258982c1b940ee910277a2daf",
+      "bytes": 10092,
+      "lines": 193,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-technology-doctrines/references/doctrine-authoring.md"
+      ],
+      "chunks": [
+        {
+          "id": 198,
+          "line_start": 1,
+          "line_end": 193,
+          "source_lines": 193,
+          "characters": 10092
+        }
+      ]
+    },
+    {
+      "sha256": "c172e78ec882b4a65959085df20f91a3962071de9df0d4ecfa8aca0e669f76c3",
+      "bytes": 8597,
+      "lines": 119,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-technology-doctrines/references/technology-tree-gui.md"
+      ],
+      "chunks": [
+        {
+          "id": 199,
+          "line_start": 1,
+          "line_end": 119,
+          "source_lines": 119,
+          "characters": 8597
+        }
+      ]
+    },
+    {
+      "sha256": "401e66ab93746e33714f009babafd7a0e2e95816f93345a4dfad7557bb3203cf",
+      "bytes": 41582,
+      "lines": 412,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-units-divisions/SKILL.md"
+      ],
+      "chunks": [
+        {
+          "id": 200,
+          "line_start": 1,
+          "line_end": 224,
+          "source_lines": 412,
+          "characters": 19866
+        },
+        {
+          "id": 201,
+          "line_start": 225,
+          "line_end": 398,
+          "source_lines": 412,
+          "characters": 19901
+        },
+        {
+          "id": 202,
+          "line_start": 399,
+          "line_end": 412,
+          "source_lines": 412,
+          "characters": 1815
+        }
+      ]
+    },
+    {
+      "sha256": "eb78ab82a6526612c4b721cb046b1adbbc50d4d8738e02fd82f9f904792a3f7e",
+      "bytes": 4566,
+      "lines": 57,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-units-divisions/references/names-stats-visuals.md"
+      ],
+      "chunks": [
+        {
+          "id": 203,
+          "line_start": 1,
+          "line_end": 57,
+          "source_lines": 57,
+          "characters": 4566
+        }
+      ]
+    },
+    {
+      "sha256": "5e37a5b38ec1b4abef62571f5af80a0fac9e893713f4d9e9ba04deaeb8193dbd",
+      "bytes": 8826,
+      "lines": 131,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-units-divisions/references/naval-air-oob.md"
+      ],
+      "chunks": [
+        {
+          "id": 204,
+          "line_start": 1,
+          "line_end": 131,
+          "source_lines": 131,
+          "characters": 8826
+        }
+      ]
+    },
+    {
+      "sha256": "947047f159783f17066d38f1f4f17255fa50c9e4d57af4f0c4656e6856123d66",
+      "bytes": 7420,
+      "lines": 74,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-units-divisions/references/runtime-effects-triggers.md"
+      ],
+      "chunks": [
+        {
+          "id": 205,
+          "line_start": 1,
+          "line_end": 74,
+          "source_lines": 74,
+          "characters": 7420
+        }
+      ]
+    },
+    {
+      "sha256": "f7fd5443a985e8e6b01c96a9c85b45979372b02e10ecb1202e23b2e36f7b8f21",
+      "bytes": 3131,
+      "lines": 35,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-xlsx/SKILL.md"
+      ],
+      "chunks": [
+        {
+          "id": 206,
+          "line_start": 1,
+          "line_end": 35,
+          "source_lines": 35,
+          "characters": 3131
+        }
+      ]
+    },
+    {
+      "sha256": "4adb7bac59c535822cadb0ce4c14acc5b873d572764fd093a6d9cf567062279d",
+      "bytes": 3349,
+      "lines": 40,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-xlsx/references/catalog.md"
+      ],
+      "chunks": [
+        {
+          "id": 207,
+          "line_start": 1,
+          "line_end": 40,
+          "source_lines": 40,
+          "characters": 3349
+        }
+      ]
+    },
+    {
+      "sha256": "e5bd431395a3f25efce77afb82b20ab212bdad15ac7411e0ae23962dd729a157",
+      "bytes": 1337,
+      "lines": 15,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-xlsx/references/doctrines.md"
+      ],
+      "chunks": [
+        {
+          "id": 208,
+          "line_start": 1,
+          "line_end": 15,
+          "source_lines": 15,
+          "characters": 1337
+        }
+      ]
+    },
+    {
+      "sha256": "f673aabdc0fcc7fca6ea962586636733cf39faabd48c1f36329fa3b1e4245863",
+      "bytes": 10713,
+      "lines": 165,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/.claude/skills/chaos-redux-xlsx/references/preservation.md"
+      ],
+      "chunks": [
+        {
+          "id": 209,
+          "line_start": 1,
+          "line_end": 165,
+          "source_lines": 165,
+          "characters": 10713
+        }
+      ]
+    },
+    {
+      "sha256": "7999e656e21583953ef60a9849c9f042d5fabc68c0299f389606f44db8c9ba6f",
+      "bytes": 59777,
+      "lines": 522,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/AGENTS.md"
+      ],
+      "chunks": [
+        {
+          "id": 210,
+          "line_start": 1,
+          "line_end": 161,
+          "source_lines": 522,
+          "characters": 19925
+        },
+        {
+          "id": 211,
+          "line_start": 162,
+          "line_end": 371,
+          "source_lines": 522,
+          "characters": 19964
+        },
+        {
+          "id": 212,
+          "line_start": 372,
+          "line_end": 522,
+          "source_lines": 522,
+          "characters": 19864
+        }
+      ]
+    },
+    {
+      "sha256": "21f21df8bf621e4362f1e010d342f71df2a939c499bbfce89bc7772790411b56",
+      "bytes": 55586,
+      "lines": 1023,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/CHAOS_REDUX_MECHANICS.md"
+      ],
+      "chunks": [
+        {
+          "id": 213,
+          "line_start": 1,
+          "line_end": 403,
+          "source_lines": 1023,
+          "characters": 19944
+        },
+        {
+          "id": 214,
+          "line_start": 404,
+          "line_end": 766,
+          "source_lines": 1023,
+          "characters": 19919
+        },
+        {
+          "id": 215,
+          "line_start": 767,
+          "line_end": 1023,
+          "source_lines": 1023,
+          "characters": 15638
+        }
+      ]
+    },
+    {
+      "sha256": "1b820bf81c439b9a15779a2d695fa80286f604affb7baa6c7469799d5eddc7f3",
+      "bytes": 3421,
+      "lines": 44,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/README.md"
+      ],
+      "chunks": [
+        {
+          "id": 216,
+          "line_start": 1,
+          "line_end": 44,
+          "source_lines": 44,
+          "characters": 3413
+        }
+      ]
+    },
+    {
+      "sha256": "e9a728efedbafdf6699ada8b34568638471b247d056760950431b1636dcf2caa",
+      "bytes": 5358,
+      "lines": 20,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/chaos_redux_clusters_catalog.csv"
+      ],
+      "chunks": [
+        {
+          "id": 217,
+          "line_start": 1,
+          "line_end": 20,
+          "source_lines": 20,
+          "characters": 5355
+        }
+      ]
+    },
+    {
+      "sha256": "66f6d682b2b3445024635a9954677543a94f4b222dadc0cfbec46a9fa0f2f44d",
+      "bytes": 70351,
+      "lines": 296,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/chaos_redux_events_catalog.csv"
+      ],
+      "chunks": [
+        {
+          "id": 218,
+          "line_start": 1,
+          "line_end": 94,
+          "source_lines": 296,
+          "characters": 19889
+        },
+        {
+          "id": 219,
+          "line_start": 95,
+          "line_end": 145,
+          "source_lines": 296,
+          "characters": 19542
+        },
+        {
+          "id": 220,
+          "line_start": 146,
+          "line_end": 220,
+          "source_lines": 296,
+          "characters": 19932
+        },
+        {
+          "id": 221,
+          "line_start": 221,
+          "line_end": 296,
+          "source_lines": 296,
+          "characters": 10965
+        }
+      ]
+    },
+    {
+      "sha256": "c2c421b1219356482ce1db3db80d84af87b032b1cf0945a8fe2e806c38ce3bb5",
+      "bytes": 19470,
+      "lines": 137,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/chaos_redux_scenarios_catalog.csv"
+      ],
+      "chunks": [
+        {
+          "id": 222,
+          "line_start": 1,
+          "line_end": 137,
+          "source_lines": 137,
+          "characters": 19451
+        }
+      ]
+    },
+    {
+      "sha256": "b3ac82d2c2ff017895b9353c3de3e4a6ded15db6f0d07d5130db8f6c50cdbf8e",
+      "bytes": 59641,
+      "lines": 688,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/chaosx_dynamic_effects.md"
+      ],
+      "chunks": [
+        {
+          "id": 223,
+          "line_start": 1,
+          "line_end": 345,
+          "source_lines": 688,
+          "characters": 19890
+        },
+        {
+          "id": 224,
+          "line_start": 346,
+          "line_end": 547,
+          "source_lines": 688,
+          "characters": 19985
+        },
+        {
+          "id": 225,
+          "line_start": 548,
+          "line_end": 688,
+          "source_lines": 688,
+          "characters": 19764
+        }
+      ]
+    },
+    {
+      "sha256": "a2fb5e8d52d336f877d85f413c6adfac8c5be0efa753dfb1c8445e4bc3369410",
+      "bytes": 5522,
+      "lines": 75,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/chaosx_dynamic_triggers.md"
+      ],
+      "chunks": [
+        {
+          "id": 226,
+          "line_start": 1,
+          "line_end": 75,
+          "source_lines": 75,
+          "characters": 5522
+        }
+      ]
+    },
+    {
+      "sha256": "b39e25b135e644d9cc62b6003df53ac1eca8c3af618e5aacd7f3403d2a4a8b73",
+      "bytes": 14250,
+      "lines": 255,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/config.toml"
+      ],
+      "chunks": [
+        {
+          "id": 227,
+          "line_start": 1,
+          "line_end": 255,
+          "source_lines": 255,
+          "characters": 14250
+        }
+      ]
+    },
+    {
+      "sha256": "11c5e073780bdd915d207279161c7145e175d1f130ba4e7a2469fef454efb2da",
+      "bytes": 9501,
+      "lines": 50,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/subagents.zip!/chaosx-3d-model-pipeline.md"
+      ],
+      "chunks": [
+        {
+          "id": 228,
+          "line_start": 1,
+          "line_end": 50,
+          "source_lines": 50,
+          "characters": 9501
+        }
+      ]
+    },
+    {
+      "sha256": "b4b792f78dfe0b9f589e80b9d657edf55d47e7f6008d6711e04573812899ee29",
+      "bytes": 6787,
+      "lines": 64,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/subagents.zip!/chaosx-ai-probability-auditor.md"
+      ],
+      "chunks": [
+        {
+          "id": 229,
+          "line_start": 1,
+          "line_end": 64,
+          "source_lines": 64,
+          "characters": 6787
+        }
+      ]
+    },
+    {
+      "sha256": "b1568542d99d7c1cd124721618b16f55e5aa6e692f18e9542f40713e363cabe8",
+      "bytes": 2832,
+      "lines": 56,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/subagents.zip!/chaosx-asset-source-researcher.md"
+      ],
+      "chunks": [
+        {
+          "id": 230,
+          "line_start": 1,
+          "line_end": 56,
+          "source_lines": 56,
+          "characters": 2832
+        }
+      ]
+    },
+    {
+      "sha256": "ca019b8e81c6080dd56de26b7d0446ac7bdee29e8d07c889028c7e0731d2c70c",
+      "bytes": 7503,
+      "lines": 89,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/subagents.zip!/chaosx-country-package-auditor.md"
+      ],
+      "chunks": [
+        {
+          "id": 231,
+          "line_start": 1,
+          "line_end": 89,
+          "source_lines": 89,
+          "characters": 7503
+        }
+      ]
+    },
+    {
+      "sha256": "0a9863762d22225b26b239042422ffc598a253a677e7b6cf9f151374ac72166b",
+      "bytes": 8376,
+      "lines": 102,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/subagents.zip!/chaosx-decision-mission-auditor.md"
+      ],
+      "chunks": [
+        {
+          "id": 232,
+          "line_start": 1,
+          "line_end": 102,
+          "source_lines": 102,
+          "characters": 8376
+        }
+      ]
+    },
+    {
+      "sha256": "1b9b52bb09155220ff2ebe931f237dd18cc3418a1f54140322640464d2dc5e72",
+      "bytes": 7048,
+      "lines": 44,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/subagents.zip!/chaosx-documentation-curator.md"
+      ],
+      "chunks": [
+        {
+          "id": 233,
+          "line_start": 1,
+          "line_end": 44,
+          "source_lines": 44,
+          "characters": 7048
+        }
+      ]
+    },
+    {
+      "sha256": "56eae9f23b81d6c0e9be78294e394292a64632006f20010fb6288b937b4528eb",
+      "bytes": 3844,
+      "lines": 46,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/subagents.zip!/chaosx-equipment-units-worker.md"
+      ],
+      "chunks": [
+        {
+          "id": 234,
+          "line_start": 1,
+          "line_end": 46,
+          "source_lines": 46,
+          "characters": 3844
+        }
+      ]
+    },
+    {
+      "sha256": "5acbac98f30792981dc0628debf770f43f3eacdcd715e265f9dbde9680f66fed",
+      "bytes": 4014,
+      "lines": 61,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/subagents.zip!/chaosx-event-completion-auditor.md"
+      ],
+      "chunks": [
+        {
+          "id": 235,
+          "line_start": 1,
+          "line_end": 61,
+          "source_lines": 61,
+          "characters": 4014
+        }
+      ]
+    },
+    {
+      "sha256": "135e3ea565e19b31e08d4bbbf2d9cf40e9197eae0e2185240205d1b90a20d0f8",
+      "bytes": 7661,
+      "lines": 44,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/subagents.zip!/chaosx-event-ui-worker.md"
+      ],
+      "chunks": [
+        {
+          "id": 236,
+          "line_start": 1,
+          "line_end": 44,
+          "source_lines": 44,
+          "characters": 7661
+        }
+      ]
+    },
+    {
+      "sha256": "baacc543ec12f84914c42f45f84dab142fdde04bd00530ed254b9ef07c2e33a2",
+      "bytes": 4204,
+      "lines": 83,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/subagents.zip!/chaosx-focus-tree-auditor.md"
+      ],
+      "chunks": [
+        {
+          "id": 237,
+          "line_start": 1,
+          "line_end": 83,
+          "source_lines": 83,
+          "characters": 4204
+        }
+      ]
+    },
+    {
+      "sha256": "0f06189f2b362e320eaa8ff8f2cd748affcf776565089f72cf7f2b62acdfe065",
+      "bytes": 3931,
+      "lines": 70,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/subagents.zip!/chaosx-generated-event-art.md"
+      ],
+      "chunks": [
+        {
+          "id": 238,
+          "line_start": 1,
+          "line_end": 70,
+          "source_lines": 70,
+          "characters": 3931
+        }
+      ]
+    },
+    {
+      "sha256": "461c4a2070b1220d02de67f9e3f7b06d07cef959ee0b36f0840262c3ed40a77a",
+      "bytes": 10788,
+      "lines": 127,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/subagents.zip!/chaosx-icon-artist.md"
+      ],
+      "chunks": [
+        {
+          "id": 239,
+          "line_start": 1,
+          "line_end": 127,
+          "source_lines": 127,
+          "characters": 10788
+        }
+      ]
+    },
+    {
+      "sha256": "3b21f6cff0255ac9a0e156122799197f89d3b5128381aeffd29eb189cde52d77",
+      "bytes": 6170,
+      "lines": 63,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/subagents.zip!/chaosx-improvement-loop-planner.md"
+      ],
+      "chunks": [
+        {
+          "id": 240,
+          "line_start": 1,
+          "line_end": 63,
+          "source_lines": 63,
+          "characters": 6170
+        }
+      ]
+    },
+    {
+      "sha256": "6fcb3a08221aa681ff8baeabf912fc0809c4bcea54053141a627f0a5e5332940",
+      "bytes": 8934,
+      "lines": 110,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/subagents.zip!/chaosx-localisation-auditor.md"
+      ],
+      "chunks": [
+        {
+          "id": 241,
+          "line_start": 1,
+          "line_end": 110,
+          "source_lines": 110,
+          "characters": 8934
+        }
+      ]
+    },
+    {
+      "sha256": "1929ed110dc908277ec5d6e36fb5ecb3ac28a4efd7806fb3517f96c4d7352b28",
+      "bytes": 3405,
+      "lines": 44,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/subagents.zip!/chaosx-map-states-worker.md"
+      ],
+      "chunks": [
+        {
+          "id": 242,
+          "line_start": 1,
+          "line_end": 44,
+          "source_lines": 44,
+          "characters": 3405
+        }
+      ]
+    },
+    {
+      "sha256": "89c929137cb830044ee503e5c223386c98823be8989a09c7faca9152cb7cdfab",
+      "bytes": 2567,
+      "lines": 20,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/subagents.zip!/chaosx-portrait-creator.md"
+      ],
+      "chunks": [
+        {
+          "id": 243,
+          "line_start": 1,
+          "line_end": 20,
+          "source_lines": 20,
+          "characters": 2567
+        }
+      ]
+    },
+    {
+      "sha256": "468b74735033b5ec6fb7685ef6e8fe3371171c6a58a181a72490b47cbc19292f",
+      "bytes": 7323,
+      "lines": 50,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/subagents.zip!/chaosx-repo-explorer.md"
+      ],
+      "chunks": [
+        {
+          "id": 244,
+          "line_start": 1,
+          "line_end": 50,
+          "source_lines": 50,
+          "characters": 7323
+        }
+      ]
+    },
+    {
+      "sha256": "fd494290f59ece40388d1326946a69acfbacbf74db7f51fcf4e173e52d5c64ac",
+      "bytes": 5104,
+      "lines": 76,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/subagents.zip!/chaosx-scripted-system-architect.md"
+      ],
+      "chunks": [
+        {
+          "id": 245,
+          "line_start": 1,
+          "line_end": 76,
+          "source_lines": 76,
+          "characters": 5104
+        }
+      ]
+    },
+    {
+      "sha256": "fe25fff0c275dca5920f37a404942d9f35a5d3ccb88069ac357bf816d32e72c5",
+      "bytes": 3083,
+      "lines": 43,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/subagents.zip!/chaosx-skill-maintainer.md"
+      ],
+      "chunks": [
+        {
+          "id": 246,
+          "line_start": 1,
+          "line_end": 43,
+          "source_lines": 43,
+          "characters": 3083
+        }
+      ]
+    },
+    {
+      "sha256": "cc29e317769699b1623b5240778ddd5824242bca18bef57ec4a9f7c36e5ac7af",
+      "bytes": 4523,
+      "lines": 58,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/subagents.zip!/chaosx-spreadsheet-doc-worker.md"
+      ],
+      "chunks": [
+        {
+          "id": 247,
+          "line_start": 1,
+          "line_end": 58,
+          "source_lines": 58,
+          "characters": 4523
+        }
+      ]
+    },
+    {
+      "sha256": "b3397deb63a9d619472f36e9a2f7525defa9148b0db2ff3f224ecf7a470b2038",
+      "bytes": 3367,
+      "lines": 63,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/subagents.zip!/chaosx-super-event-audio-researcher.md"
+      ],
+      "chunks": [
+        {
+          "id": 248,
+          "line_start": 1,
+          "line_end": 63,
+          "source_lines": 63,
+          "characters": 3367
+        }
+      ]
+    },
+    {
+      "sha256": "cc46361b955816aad4bdd2e399c20e0accd6b668139003825d02e899483e970d",
+      "bytes": 3878,
+      "lines": 60,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/subagents.zip!/chaosx-super-event-text-researcher.md"
+      ],
+      "chunks": [
+        {
+          "id": 249,
+          "line_start": 1,
+          "line_end": 60,
+          "source_lines": 60,
+          "characters": 3878
+        }
+      ]
+    },
+    {
+      "sha256": "e6dd48b4a76bcc6affd2e1e07253e1af584ac85017f0885e2ac64fde456804f9",
+      "bytes": 3396,
+      "lines": 44,
+      "origins": [
+        "upload/all-project-sources(20261023-123435).zip!/subagents.zip!/chaosx-technology-tree-worker.md"
+      ],
+      "chunks": [
+        {
+          "id": 250,
+          "line_start": 1,
+          "line_end": 44,
+          "source_lines": 44,
+          "characters": 3396
+        }
+      ]
+    }
+  ],
+  "archive_errors": [],
+  "distribution": "Metadata and hashes only. Supplied mod/project source contents are not copied into this planning archive."
+}

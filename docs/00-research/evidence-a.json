@@ -1,0 +1,1145 @@
+{
+  "schema_version": "1.0",
+  "audit_date": "2026-10-23",
+  "scope": "Research Track A. Actual public source inspection with explicit no-local-runtime qualification.",
+  "source_gate": "Parent announced complete shared source processing before this research began.",
+  "global_limitations": [
+    "No product implementation was created.",
+    "No repository code, published binary or game process was executed in this audit.",
+    "Only the enumerated paths and ranges were inspected. Caching or tree enumeration is not full source reading.",
+    "Direct git network access failed because the execution environment could not connect to its proxy. GitHub connector supplied read-only primary-source access.",
+    "Initial general GitHub fetch of job-log URL was not allowed. Purpose-built job-log retrieval succeeded.",
+    "Research cache code and CI logs are excluded from the planning deliverable."
+  ],
+  "repositories": [
+    {
+      "key": "setup",
+      "repository": "klimPaskov/HOI4-Mod-Setup",
+      "audited_commit": "4488a418cad56a158273cb66c4ce7794696b7ed1",
+      "head_commit_date": "2026-10-19T15:51:40Z",
+      "created_at": "2026-07-28T15:09:17Z",
+      "pushed_at": "2026-10-20T08:57:49Z",
+      "archived": false,
+      "license_api": "Apache-2.0",
+      "license_actual": "Apache-2.0",
+      "latest_release": {
+        "tag": "v0.6.3",
+        "published_at": "2026-10-18T13:19:49Z",
+        "prerelease": false,
+        "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/releases/tag/v0.6.3"
+      }
+    },
+    {
+      "key": "agent",
+      "repository": "klimPaskov/hoi4-agent-tools",
+      "audited_commit": "25f5641bbc07c65a822ef576ac6e92bd12666880",
+      "head_commit_date": "2026-10-19T17:16:41Z",
+      "created_at": "2026-07-10T22:50:02Z",
+      "pushed_at": "2026-10-19T17:16:46Z",
+      "archived": false,
+      "license_api": "Apache-2.0",
+      "license_actual": "Apache-2.0",
+      "latest_release": {
+        "tag": "v4.3.0",
+        "published_at": "2026-10-19T14:26:41Z",
+        "prerelease": false,
+        "url": "https://github.com/klimPaskov/hoi4-agent-tools/releases/tag/v4.3.0"
+      }
+    },
+    {
+      "key": "live",
+      "repository": "klimPaskov/HOI4-Live-Tools",
+      "audited_commit": "6b91a2a43edfeab60a415ec2ddd9b71d215b8a56",
+      "head_commit_date": "2026-10-18T07:10:18Z",
+      "created_at": "2026-10-11T06:28:31Z",
+      "pushed_at": "2026-10-23T10:25:48Z",
+      "archived": false,
+      "license_api": "Apache-2.0",
+      "license_actual": "Apache-2.0",
+      "latest_release": {
+        "tag": "v1.1.0",
+        "published_at": "2026-10-11T09:56:34Z",
+        "prerelease": false,
+        "url": "https://github.com/klimPaskov/HOI4-Live-Tools/releases/tag/v1.1.0"
+      }
+    },
+    {
+      "key": "cw",
+      "repository": "cwtools/cwtools",
+      "audited_commit": "b377453dee803f9258be92cfc49896d09039702d",
+      "head_commit_date": "2025-12-08T22:07:45Z",
+      "created_at": "2017-10-30T21:52:37Z",
+      "pushed_at": "2026-06-30T21:06:33Z",
+      "archived": false,
+      "license_api": "MIT",
+      "license_actual": "MIT",
+      "latest_release": {
+        "tag": "0.6.0-alpha",
+        "published_at": "2025-09-14T19:45:20Z",
+        "prerelease": true,
+        "url": "https://github.com/cwtools/cwtools/releases/tag/0.6.0-alpha"
+      }
+    },
+    {
+      "key": "cwt",
+      "repository": "cwtools/cwtools-hoi4-config",
+      "audited_commit": "297dd69c42aabe10078a8b7ab7f2d07ee631d4ef",
+      "head_commit_date": "2026-09-18T13:23:25Z",
+      "created_at": "2018-11-22T18:54:36Z",
+      "pushed_at": "2026-09-18T13:23:25Z",
+      "archived": false,
+      "license_api": "MIT",
+      "license_actual": "MIT",
+      "latest_release": null
+    },
+    {
+      "key": "maker",
+      "repository": "Floxizdia/hoi4-modmaker",
+      "audited_commit": "a5c138ffacf4ed471769558f864cbe55ec5163fa",
+      "head_commit_date": "2026-08-08T01:49:38Z",
+      "created_at": "2026-08-02T13:15:35Z",
+      "pushed_at": "2026-08-08T01:53:58Z",
+      "archived": false,
+      "license_api": "MIT",
+      "license_actual": "MIT",
+      "latest_release": {
+        "tag": "v1.4.1",
+        "published_at": "2026-08-08T01:53:58Z",
+        "prerelease": false,
+        "url": "https://github.com/Floxizdia/hoi4-modmaker/releases/tag/v1.4.1"
+      }
+    },
+    {
+      "key": "utils",
+      "repository": "battleskorpion/HOIIVUtils",
+      "audited_commit": "0fe06450bf17c506485caf90fb5d52cf8a2e1b33",
+      "head_commit_date": "2026-04-18T20:45:05Z",
+      "created_at": "2022-12-23T19:15:14Z",
+      "pushed_at": "2026-08-11T02:36:53Z",
+      "archived": false,
+      "license_api": "Apache-2.0",
+      "license_actual": "Apache-2.0",
+      "latest_release": {
+        "tag": "16.0.2",
+        "published_at": "2026-02-28T21:18:07Z",
+        "prerelease": false,
+        "url": "https://github.com/battleskorpion/HOIIVUtils/releases/tag/16.0.2"
+      }
+    },
+    {
+      "key": "nova",
+      "repository": "Ultra-XT/HOI4-Modding-Suite",
+      "audited_commit": "5e44bc4f483e504310a0d4bad6e5ecc3c1cd08a6",
+      "head_commit_date": "2026-08-28T20:50:51Z",
+      "created_at": "2026-04-21T21:50:10Z",
+      "pushed_at": "2026-08-28T20:54:14Z",
+      "archived": false,
+      "license_api": "NOASSERTION",
+      "license_actual": "CC-BY-NC-ND-4.0 with repository-specific explanatory restrictions",
+      "latest_release": {
+        "tag": "v1.0.6",
+        "published_at": "2026-08-28T19:01:06Z",
+        "prerelease": false,
+        "url": "https://github.com/Ultra-XT/HOI4-Modding-Suite/releases/tag/v1.0.6"
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "id": "SRC-A01",
+      "title": "Setup architecture and license",
+      "status": "Verified",
+      "observed_date": "2026-10-23",
+      "repository": "klimPaskov/HOI4-Mod-Setup",
+      "commit": "4488a418cad56a158273cb66c4ce7794696b7ed1",
+      "claim": "The desktop is Tauri with React and Rust. The portable Rust core exposes read-only ProjectFs and source adapters. Desktop scanner and transaction services remain outside that portable crate. Original source is Apache-2.0 and bundled dependencies retain their licenses.",
+      "source_files": [
+        {
+          "path": "AGENTS.md",
+          "inspected": "Entire contributor guidance",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/AGENTS.md"
+        },
+        {
+          "path": "Cargo.toml",
+          "inspected": "Workspace definition",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/Cargo.toml"
+        },
+        {
+          "path": "package.json",
+          "inspected": "Application dependencies and scripts",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/package.json"
+        },
+        {
+          "path": "crates/hoi4-setup-core/src/lib.rs",
+          "inspected": "Module surface",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/crates/hoi4-setup-core/src/lib.rs"
+        },
+        {
+          "path": "crates/hoi4-setup-core/src/adapters.rs",
+          "inspected": "ProjectFs, SourceClient, Clock, Entropy",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/crates/hoi4-setup-core/src/adapters.rs"
+        },
+        {
+          "path": "LICENSE",
+          "inspected": "License header and declaration",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/LICENSE"
+        },
+        {
+          "path": "THIRD_PARTY_NOTICES.md",
+          "inspected": "Introduction and dependency-license entries",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/THIRD_PARTY_NOTICES.md"
+        }
+      ],
+      "tests_inspected": [],
+      "local_execution": "Not executed",
+      "reuse_decision": "Reuse portable core and wrap desktop services behind C-09. Do not claim an existing general public onboarding API.",
+      "gaps_and_next_experiments": "S01 extraction and packaging probe. Preserve Apache notices and inspect dependency closure before distribution.",
+      "source_status_detail": "Verified (source)"
+    },
+    {
+      "id": "SRC-A02",
+      "title": "Actual wizard routes and controls",
+      "status": "Verified",
+      "observed_date": "2026-10-23",
+      "repository": "klimPaskov/HOI4-Mod-Setup",
+      "commit": "4488a418cad56a158273cb66c4ce7794696b7ed1",
+      "claim": "Create and import share the wizard after initial identity or scan review. Current route includes coding environments, image generation, components, workflows, conditional Live Tools and Meshy, conditional MCP, Git, dry run, install and ready. Identity and Git controls are concrete existing UI.",
+      "source_files": [
+        {
+          "path": "src/App.tsx",
+          "inspected": "nextScreen and previousScreen, lines 408-615, identity and Git controls at 2907-3022 and 3746-3829",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/src/App.tsx"
+        },
+        {
+          "path": "docs/02_user_flows.md",
+          "inspected": "Entire flow document",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/docs/02_user_flows.md"
+        },
+        {
+          "path": "src/lib/tauri.ts",
+          "inspected": "Lines 1-240 including typed TauriCommandMap and invocation wrappers",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/src/lib/tauri.ts"
+        }
+      ],
+      "tests_inspected": [],
+      "local_execution": "Not executed",
+      "reuse_decision": "Adapt the existing route and controls, with progressive disclosure. Preserve provider analysis and review invariants.",
+      "gaps_and_next_experiments": "Do not conflate source HEAD route with v0.6.3 released binary. Verify skipped optional routes and back navigation in native integration.",
+      "source_status_detail": "Verified (source)"
+    },
+    {
+      "id": "SRC-A03",
+      "title": "Read-only import scanner",
+      "status": "Verified",
+      "observed_date": "2026-10-23",
+      "repository": "klimPaskov/HOI4-Mod-Setup",
+      "commit": "4488a418cad56a158273cb66c4ce7794696b7ed1",
+      "claim": "The scanner binds the chosen root identity, has bounded traversal and source retention, reports limits and supports cancellation. Parent-directory launcher descriptors are discovered within bounds and require explicit approval before use.",
+      "source_files": [
+        {
+          "path": "src-tauri/src/scanner.rs",
+          "inspected": "Lines 1-245 and 408-795, launcher discovery and scan execution",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/src-tauri/src/scanner.rs"
+        },
+        {
+          "path": "src-tauri/src/paths.rs",
+          "inspected": "Root and path capability types inspected through call sites",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/src-tauri/src/paths.rs"
+        }
+      ],
+      "tests_inspected": [],
+      "local_execution": "Not executed",
+      "reuse_decision": "Reuse scanner facts, coverage and root binding as C-01 inputs.",
+      "gaps_and_next_experiments": "S02 needs workshop-sized and dirty Git fixtures, cancellation, symlink/root swap, case collision and incomplete scan handling.",
+      "source_status_detail": "Verified (source)"
+    },
+    {
+      "id": "SRC-A04",
+      "title": "Assistant analysis and source closure",
+      "status": "Verified",
+      "observed_date": "2026-10-23",
+      "repository": "klimPaskov/HOI4-Mod-Setup",
+      "commit": "4488a418cad56a158273cb66c4ce7794696b7ed1",
+      "claim": "Setup requires a provider analysis session before building an install plan. Source files are selected from a resolved manifest dependency closure and verified by expected hashes. A provider proposal does not authorize filesystem mutations.",
+      "source_files": [
+        {
+          "path": "AGENTS.md",
+          "inspected": "Analysis, source manifest and provider boundaries",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/AGENTS.md"
+        },
+        {
+          "path": "src-tauri/src/commands.rs",
+          "inspected": "build_plan at 6249-6760 and build_installation_plan_blocking at 7229-7335",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/src-tauri/src/commands.rs"
+        },
+        {
+          "path": "src-tauri/src/source.rs",
+          "inspected": "Resolved source and integrity call sites",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/src-tauri/src/source.rs"
+        },
+        {
+          "path": "crates/hoi4-setup-core/src/manifest.rs",
+          "inspected": "Manifest validation and dependency closure call sites",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/crates/hoi4-setup-core/src/manifest.rs"
+        }
+      ],
+      "tests_inspected": [],
+      "local_execution": "Not executed",
+      "reuse_decision": "Reuse exact-revision source resolution and schema-checked proposals. Supply an API or local provider without requiring a coding CLI.",
+      "gaps_and_next_experiments": "Bridge factory model/auth service through the existing bounded analysis contract. Current Agentic manifest may resolve older components than audited latest repository HEAD.",
+      "source_status_detail": "Verified (source)"
+    },
+    {
+      "id": "SRC-A05",
+      "title": "Plan outputs and conflict ownership",
+      "status": "Verified",
+      "observed_date": "2026-10-23",
+      "repository": "klimPaskov/HOI4-Mod-Setup",
+      "commit": "4488a418cad56a158273cb66c4ce7794696b7ed1",
+      "claim": "New plans generate descriptor.mod, a launcher .mod, thumbnail, README, setup state and merged ignore policy plus selected components. Existing modified paths are skipped or treated as conflicts. Core stores prepared plan bytes and application requires approval and dry-run review.",
+      "source_files": [
+        {
+          "path": "src-tauri/src/commands.rs",
+          "inspected": "build_plan lines 6249-6760 and apply_installation_plan at 9635-9825",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/src-tauri/src/commands.rs"
+        },
+        {
+          "path": "crates/hoi4-setup-core/src/project_files.rs",
+          "inspected": "Entire README and managed gitignore generation",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/crates/hoi4-setup-core/src/project_files.rs"
+        },
+        {
+          "path": "crates/hoi4-setup-core/src/descriptors.rs",
+          "inspected": "Descriptor generation call sites",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/crates/hoi4-setup-core/src/descriptors.rs"
+        }
+      ],
+      "tests_inspected": [],
+      "local_execution": "Not executed",
+      "reuse_decision": "Reuse exact plans and explicit conflict decisions. Adapt gitignore policy deliberately because generated guidance is currently ignored.",
+      "gaps_and_next_experiments": "No blanket overwrite. Verify existing descriptor, user AGENTS, changed managed skills, external launcher path and unsupported merge base cases.",
+      "source_status_detail": "Verified (source)"
+    },
+    {
+      "id": "SRC-A06",
+      "title": "Desktop transaction and recovery states",
+      "status": "Verified",
+      "observed_date": "2026-10-23",
+      "repository": "klimPaskov/HOI4-Mod-Setup",
+      "commit": "4488a418cad56a158273cb66c4ce7794696b7ed1",
+      "claim": "The transaction validates root identity and source bytes, writes durable plan and journal state, stages and validates, applies, runs reviewed post-install work and readiness, then writes the success lock. Verified staging may resume before apply. Partial apply refuses resume and requires rollback. Finalizing state can reconcile.",
+      "source_files": [
+        {
+          "path": "src-tauri/src/transaction.rs",
+          "inspected": "run transaction lines 1328-2020, tests 13864-13980, 14327-14436 and 14525-14608",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/src-tauri/src/transaction.rs"
+        },
+        {
+          "path": "src-tauri/src/commands.rs",
+          "inspected": "apply, resume, rollback, find and discard handlers at 9635-9825",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/src-tauri/src/commands.rs"
+        },
+        {
+          "path": "docs/02_user_flows.md",
+          "inspected": "Recovery wording conflicts with narrower current source behavior",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/docs/02_user_flows.md"
+        }
+      ],
+      "tests_inspected": [
+        "Verified staging resumes before apply",
+        "interrupted_after_apply_refuses_resume",
+        "Fault matrix across stages and operations",
+        "Concurrent edit and newly appeared file preservation"
+      ],
+      "local_execution": "Not executed",
+      "reuse_decision": "Wrap actual allowed recovery actions, do not invent universal resume.",
+      "gaps_and_next_experiments": "Resolve exact-head CI recovery failure in SRC-A09. Filesystem final_live_verification is not actual gameplay validation.",
+      "source_status_detail": "Verified (source)"
+    },
+    {
+      "id": "SRC-A07",
+      "title": "Lifecycle tests and maintenance preservation",
+      "status": "Verified",
+      "observed_date": "2026-10-23",
+      "repository": "klimPaskov/HOI4-Mod-Setup",
+      "commit": "4488a418cad56a158273cb66c4ce7794696b7ed1",
+      "claim": "The inspected offline lifecycle test covers create, import, repair, managed removal and rollback. It preserves a user gameplay file, modified managed skill and explicitly retained AGENTS. Update requires fresh maintenance analysis. Repair does not unconditionally require that same update-only guard.",
+      "source_files": [
+        {
+          "path": "src-tauri/src/commands_lifecycle_tests.rs",
+          "inspected": "Lines 816-1145, offline_all_component_install_import_repair_remove_and_rollback and migration fixture",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/src-tauri/src/commands_lifecycle_tests.rs"
+        },
+        {
+          "path": "src-tauri/src/commands.rs",
+          "inspected": "read_project_lock and require_maintenance_reanalysis",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/src-tauri/src/commands.rs"
+        },
+        {
+          "path": "src-tauri/src/migrations.rs",
+          "inspected": "Migration call sites",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/src-tauri/src/migrations.rs"
+        }
+      ],
+      "tests_inspected": [
+        "offline_all_component_install_import_repair_remove_and_rollback",
+        "public_035_manifest_still_validates",
+        "Historical upgrade fixture is ignored and requires explicit checkout"
+      ],
+      "local_execution": "Not executed",
+      "reuse_decision": "Reuse maintenance lock and original-versus-installed hash distinction.",
+      "gaps_and_next_experiments": "Run lifecycle against the selected actual Agentic manifest closure and test interrupted native desktop recovery. Inspected tests are not proof of execution.",
+      "source_status_detail": "Verified (source)"
+    },
+    {
+      "id": "SRC-A08",
+      "title": "Browser export differs from desktop transaction",
+      "status": "Verified",
+      "observed_date": "2026-10-23",
+      "repository": "klimPaskov/HOI4-Mod-Setup",
+      "commit": "4488a418cad56a158273cb66c4ce7794696b7ed1",
+      "claim": "The web export creates a reviewed ZIP. It can validate verified merge-base bytes and perform structured JSON/TOML or text three-way merges. It reports remaining user actions. Export is not native in-place installation.",
+      "source_files": [
+        {
+          "path": "crates/hoi4-setup-web/src/export.rs",
+          "inspected": "Export and merge_bytes lines 1-185",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/crates/hoi4-setup-web/src/export.rs"
+        },
+        {
+          "path": "crates/hoi4-setup-core/src/export.rs",
+          "inspected": "Public export plan surface and tests located",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/crates/hoi4-setup-core/src/export.rs"
+        },
+        {
+          "path": "tests/web/web-edition.spec.ts",
+          "inspected": "Cached for follow-up, not asserted as fully inspected",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/tests/web/web-edition.spec.ts"
+        }
+      ],
+      "tests_inspected": [],
+      "local_execution": "Not executed",
+      "reuse_decision": "Reuse portable planning and export as escape hatches, keep desktop effect ownership explicit.",
+      "gaps_and_next_experiments": "Test generated ZIP independently and preserve readiness actions. Do not advertise desktop credentials or installation guarantees for browser export.",
+      "source_status_detail": "Verified (source)"
+    },
+    {
+      "id": "SRC-A09",
+      "title": "Exact-head CI recovery failure",
+      "status": "Verified",
+      "observed_date": "2026-10-23",
+      "repository": "klimPaskov/HOI4-Mod-Setup",
+      "commit": "4488a418cad56a158273cb66c4ce7794696b7ed1",
+      "claim": "GitHub CI run 39281117181 is failed. Candidate acceptance (recovery), Windows job 118160257466, reached recovery-without-provider and failed with 'The project was not restored exactly.' The log reports unequal actual and expected inventory hashes. Most other named CI jobs passed. Root cause has not been established.",
+      "source_files": [
+        {
+          "path": "scripts/run_released_e2e.mjs",
+          "inspected": "Log reports line 652 as error propagation, source not audited for root cause",
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/blob/4488a418cad56a158273cb66c4ce7794696b7ed1/scripts/run_released_e2e.mjs"
+        }
+      ],
+      "tests_inspected": [
+        "Repository CI metadata inspected, not locally executed",
+        "Failing recovery job log inspected",
+        "Other jobs include successful frontend, Rust, portable core, web, platform E2E and new/client/Kaiserreich candidate jobs"
+      ],
+      "local_execution": "Not executed",
+      "reuse_decision": "Treat preservation recovery as an unresolved S01/S02 acceptance risk.",
+      "gaps_and_next_experiments": "Reproduce exact candidate, recover failed artifact, compare path inventories, identify whether implementation or acceptance fixture caused mismatch, fix and rerun before declaring recovery accepted.",
+      "external_evidence": [
+        {
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/actions/runs/39281117181",
+          "kind": "workflow"
+        },
+        {
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/actions/runs/39281117181/job/118160257466",
+          "kind": "failed job and log"
+        },
+        {
+          "url": "https://github.com/klimPaskov/HOI4-Mod-Setup/actions/runs/39281117181/artifacts/12201302573",
+          "kind": "reported recovery artifact, not downloaded"
+        }
+      ],
+      "source_status_detail": "Verified (repository CI and log)"
+    },
+    {
+      "id": "SRC-A10",
+      "title": "MCP product boundary and tool surface",
+      "status": "Verified",
+      "observed_date": "2026-10-23",
+      "repository": "klimPaskov/hoi4-agent-tools",
+      "commit": "25f5641bbc07c65a822ef576ac6e92bd12666880",
+      "claim": "Agent Tools 4.3.0 is a TypeScript MCP server with local stdio and authenticated HTTP. It supplies reference, source lookup, validation, focus, GUI, map, event, technology, probability, impact and mechanic surfaces. Event and technology tools are read-only. Mod mutations retain internal plan and atomic recovery rather than exposing apply tokens to agents.",
+      "source_files": [
+        {
+          "path": "AGENTS.md",
+          "inspected": "Entire architecture and safety guidance",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/AGENTS.md"
+        },
+        {
+          "path": "package.json",
+          "inspected": "Version, Node engines, entrypoints and dependencies",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/package.json"
+        },
+        {
+          "path": "docs/tools.md",
+          "inspected": "Entire tool reference",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/docs/tools.md"
+        },
+        {
+          "path": "src/hoi4_agent_tools/mcp/transports/protocol-gate.ts",
+          "inspected": "Protocol negotiation gate",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/src/hoi4_agent_tools/mcp/transports/protocol-gate.ts"
+        },
+        {
+          "path": "src/hoi4_agent_tools/mcp/tools/event.ts",
+          "inspected": "Lines 280-313, read-only typed event tool registrations",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/src/hoi4_agent_tools/mcp/tools/event.ts"
+        },
+        {
+          "path": "src/hoi4_agent_tools/mcp/tools/technology.ts",
+          "inspected": "Lines 128-161, read-only typed technology tool registrations",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/src/hoi4_agent_tools/mcp/tools/technology.ts"
+        }
+      ],
+      "tests_inspected": [],
+      "local_execution": "Not executed",
+      "reuse_decision": "Wrap typed tools and reuse shared cores. Keep native factory UI outside this server's product boundary.",
+      "gaps_and_next_experiments": "Discover tools and schemas at runtime. Document capability gaps and protocol-version fallback rather than assume every client supports tasks.",
+      "source_status_detail": "Verified (source)"
+    },
+    {
+      "id": "SRC-A11",
+      "title": "Source preservation and internal transaction execution",
+      "status": "Verified",
+      "observed_date": "2026-10-23",
+      "repository": "klimPaskov/hoi4-agent-tools",
+      "commit": "25f5641bbc07c65a822ef576ac6e92bd12666880",
+      "claim": "Parser retains source bytes, token ranges and source hash. No-op serialization returns original bytes. Span rewrites preserve untouched source and original supported encoding. Unsafe syntax blocks rewrites. The transaction executor validates, binds a request to the prepared transaction, applies, validates after application and rolls back on failure.",
+      "source_files": [
+        {
+          "path": "src/hoi4_agent_tools/core/source/encoding.ts",
+          "inspected": "Entire encoding module",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/src/hoi4_agent_tools/core/source/encoding.ts"
+        },
+        {
+          "path": "src/hoi4_agent_tools/core/source/rewrite.ts",
+          "inspected": "Entire rewrite module",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/src/hoi4_agent_tools/core/source/rewrite.ts"
+        },
+        {
+          "path": "src/hoi4_agent_tools/core/source/parser.ts",
+          "inspected": "Lines 1-150 and 290-390, assertRewriteSafe and serializeUnchanged",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/src/hoi4_agent_tools/core/source/parser.ts"
+        },
+        {
+          "path": "src/hoi4_agent_tools/core/transaction-execution.ts",
+          "inspected": "Entire executePlannedTransaction",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/src/hoi4_agent_tools/core/transaction-execution.ts"
+        }
+      ],
+      "tests_inspected": [
+        "tests/unit/source-property.test.ts read, generated roundtrip and scalar rewrite cases",
+        "tests/unit/core-source.test.ts lines 1-180 read, BOM/CRLF, Windows-1252 and malformed syntax"
+      ],
+      "local_execution": "Not executed",
+      "reuse_decision": "Preferred preservation foundation after adapter tests. Bind final normalized arguments and path hashes in C-02/C-04.",
+      "gaps_and_next_experiments": "Prove unsupported encoding refusal, duplicate keys, unknown raw blocks, concurrent edits and multi-file crash recovery on chosen host OS.",
+      "source_status_detail": "Verified (source)"
+    },
+    {
+      "id": "SRC-A12",
+      "title": "Focus authoring and preview evidence",
+      "status": "Verified",
+      "observed_date": "2026-10-23",
+      "repository": "klimPaskov/hoi4-agent-tools",
+      "commit": "25f5641bbc07c65a822ef576ac6e92bd12666880",
+      "claim": "Public focus inspect/render/rewrite tools have typed source and output contracts. Renders return linked PNG, SVG, HTML, JSON and source-map artifacts. Large-workflow test source creates 1024 focuses, compacts, repeats compaction unchanged, inspects and renders through an in-memory MCP client. This is test intent, not a measured benchmark in this audit.",
+      "source_files": [
+        {
+          "path": "src/hoi4_agent_tools/mcp/tools/focus.ts",
+          "inspected": "Entire tool schema and registration",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/src/hoi4_agent_tools/mcp/tools/focus.ts"
+        },
+        {
+          "path": "tests/integration/mcp-large-focus-workflow.test.ts",
+          "inspected": "Lines 250-458",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/tests/integration/mcp-large-focus-workflow.test.ts"
+        },
+        {
+          "path": "docs/focus.md",
+          "inspected": "Documentation cached, specific claims supported by code above",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/docs/focus.md"
+        }
+      ],
+      "tests_inspected": [
+        "1024-focus MCP creation and repeated compact no-op test inspected",
+        "Vector-only and default PNG render assertions inspected"
+      ],
+      "local_execution": "Not executed",
+      "reuse_decision": "Reuse focus core and artifacts for S04. Stage changes in isolated proposal workspaces if previewing a mutation requires executing the upstream single-call writer.",
+      "gaps_and_next_experiments": "Benchmark actual project scale and validate source-map freshness. Preserve plan sidecar as derived planning data, with source authoritative.",
+      "source_status_detail": "Verified (source)"
+    },
+    {
+      "id": "SRC-A13",
+      "title": "Map capabilities and structured geography limitation",
+      "status": "Verified",
+      "observed_date": "2026-10-23",
+      "repository": "klimPaskov/hoi4-agent-tools",
+      "commit": "25f5641bbc07c65a822ef576ac6e92bd12666880",
+      "claim": "Map service has hash-bound plans, semantic diffs, read-only previews, bounded geography input and linked artifacts. Geography-model preview exists but actual synthesis from that model is explicitly unavailable. Reference-image generation and procedural output tests are separate capabilities and do not establish game-ready worlds.",
+      "source_files": [
+        {
+          "path": "src/hoi4_agent_tools/mcp/tools/map.ts",
+          "inspected": "Entire schema, truncated segment reread 70-116",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/src/hoi4_agent_tools/mcp/tools/map.ts"
+        },
+        {
+          "path": "src/hoi4_agent_tools/map/service.ts",
+          "inspected": "planRewriteWithDiff, previewRewriteWithDiff and previewGeographyModels at 1350-1510",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/src/hoi4_agent_tools/map/service.ts"
+        },
+        {
+          "path": "src/hoi4_agent_tools/map/geography/preparation.ts",
+          "inspected": "Entire bounded model preparation",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/src/hoi4_agent_tools/map/geography/preparation.ts"
+        },
+        {
+          "path": "tests/integration/mcp-map-geography.test.ts",
+          "inspected": "113-177, 206-253, 276-345",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/tests/integration/mcp-map-geography.test.ts"
+        },
+        {
+          "path": "tests/unit/map-world-output.test.ts",
+          "inspected": "71-151 and 159-255",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/tests/unit/map-world-output.test.ts"
+        }
+      ],
+      "tests_inspected": [
+        "Valid model preview leaves source inventory unchanged",
+        "Invalid geography and escaping paths rejected",
+        "Model write returns MAP_GEOGRAPHY_SYNTHESIS_UNAVAILABLE",
+        "Deterministic world output and country/state membership assertions inspected"
+      ],
+      "local_execution": "Not executed",
+      "reuse_decision": "Reuse inspection and bounded edit services. Structured geography is a reviewed intermediate representation, with conversion to complete playable map deferred.",
+      "gaps_and_next_experiments": "S07 tests complete load order, replace_path, IDs, raster palette, topology and dependent references. Full world generation requires additional separately scoped game validation.",
+      "source_status_detail": "Verified (source)"
+    },
+    {
+      "id": "SRC-A14",
+      "title": "Source interpretation is not game simulation",
+      "status": "Verified",
+      "observed_date": "2026-10-23",
+      "repository": "klimPaskov/hoi4-agent-tools",
+      "commit": "25f5641bbc07c65a822ef576ac6e92bd12666880",
+      "claim": "Mechanic and scenario tools interpret declared source steps. Unknown effects or unknown write sets leave assertions unresolved. Advancing modeled days only expires modeled timed flags. Package checks validate declarations and references, not execution of required cases.",
+      "source_files": [
+        {
+          "path": "docs/mechanics.md",
+          "inspected": "Entire mechanism and limits",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/docs/mechanics.md"
+        },
+        {
+          "path": "docs/tools.md",
+          "inspected": "Tool reference and result evidence limits",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/docs/tools.md"
+        },
+        {
+          "path": "src/hoi4_agent_tools/mechanic/service.ts",
+          "inspected": "Entire service, runMechanicCase and revision-bound result evidence",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/src/hoi4_agent_tools/mechanic/service.ts"
+        },
+        {
+          "path": "src/hoi4_agent_tools/mechanic/interpreter.ts",
+          "inspected": "Lines 128-176, 195-255 and 790-837, time advance, unknown writes and unsupported effect fallback",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/src/hoi4_agent_tools/mechanic/interpreter.ts"
+        }
+      ],
+      "tests_inspected": [],
+      "local_execution": "Not executed",
+      "reuse_decision": "Use these as a distinct modeled validation layer. Retain unknown and unresolved coverage in C-05.",
+      "gaps_and_next_experiments": "Add tiny known scenarios and counterexamples against actual HOI4 observations before upgrading individual semantics.",
+      "source_status_detail": "Verified (source)"
+    },
+    {
+      "id": "SRC-A15",
+      "title": "HTTP authorization and session boundaries",
+      "status": "Verified",
+      "observed_date": "2026-10-23",
+      "repository": "klimPaskov/hoi4-agent-tools",
+      "commit": "25f5641bbc07c65a822ef576ac6e92bd12666880",
+      "claim": "HTTP supports OAuth/OIDC principal and workspace grants with read and write scopes. Static bearer-token mode grants both read and write. Source contains host/origin checks and credential-bound sessions. Inspected integration test rejects writes for a read-only token and rejects session takeover with a replacement credential.",
+      "source_files": [
+        {
+          "path": "docs/http.md",
+          "inspected": "Entire transport and security documentation",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/docs/http.md"
+        },
+        {
+          "path": "src/hoi4_agent_tools/mcp/transports/http.ts",
+          "inspected": "Targeted authentication, origin, scope and session branches",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/src/hoi4_agent_tools/mcp/transports/http.ts"
+        },
+        {
+          "path": "tests/integration/http-authorization.test.ts",
+          "inspected": "Lines 1-235",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/tests/integration/http-authorization.test.ts"
+        }
+      ],
+      "tests_inspected": [
+        "Read-scope write refusal",
+        "Replacement-token session takeover refusal"
+      ],
+      "local_execution": "Not executed",
+      "reuse_decision": "Prefer local stdio for the first local app. Treat remote HTTP as a separate supported capability with explicit grant and origin configuration.",
+      "gaps_and_next_experiments": "This is a targeted source review, not a full security audit or penetration test. Test revocation, request normalization and task ownership through the factory.",
+      "source_status_detail": "Verified (source)"
+    },
+    {
+      "id": "SRC-A16",
+      "title": "Agent Tools license, dependencies and CI",
+      "status": "Verified",
+      "observed_date": "2026-10-23",
+      "repository": "klimPaskov/hoi4-agent-tools",
+      "commit": "25f5641bbc07c65a822ef576ac6e92bd12666880",
+      "claim": "Original source is Apache-2.0. Notices separately identify Roboto OFL-1.1 and Tesseract engine/model licenses. Repository CI for the audited HEAD reports success.",
+      "source_files": [
+        {
+          "path": "LICENSE",
+          "inspected": "Apache declaration",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/LICENSE"
+        },
+        {
+          "path": "docs/third-party-notices.md",
+          "inspected": "Entire notice file",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/docs/third-party-notices.md"
+        },
+        {
+          "path": "package.json",
+          "inspected": "Pinned runtime and dependency details",
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/blob/25f5641bbc07c65a822ef576ac6e92bd12666880/package.json"
+        }
+      ],
+      "tests_inspected": [],
+      "local_execution": "Not executed",
+      "reuse_decision": "Pin the full installed dependency closure and retain notices. Load game assets from the user's installation.",
+      "gaps_and_next_experiments": "Do not claim a source license clears third-party artwork. No runtime package installation or game test performed here.",
+      "external_evidence": [
+        {
+          "url": "https://github.com/klimPaskov/hoi4-agent-tools/actions/runs/39292737534",
+          "kind": "CI success metadata"
+        }
+      ],
+      "source_status_detail": "Verified (source and repository CI)"
+    },
+    {
+      "id": "SRC-A17",
+      "title": "Native Live Tools capability limits",
+      "status": "Verified",
+      "observed_date": "2026-10-23",
+      "repository": "klimPaskov/HOI4-Live-Tools",
+      "commit": "6b91a2a43edfeab60a415ec2ddd9b71d215b8a56",
+      "claim": "Native Rust runtime is presently implemented for Linux and bound to an exact executable build ID and SHA-256. Unsupported builds and native Windows/macOS adapters fail closed. Protocol capability output reports explicit unavailable and unverified observations, FAIR default, no native mod-QA path and a quarantined native game-command posting path.",
+      "source_files": [
+        {
+          "path": "README.md",
+          "inspected": "Entire current status",
+          "url": "https://github.com/klimPaskov/HOI4-Live-Tools/blob/6b91a2a43edfeab60a415ec2ddd9b71d215b8a56/README.md"
+        },
+        {
+          "path": "native/src/platform/mod.rs",
+          "inspected": "Entire platform adapter",
+          "url": "https://github.com/klimPaskov/HOI4-Live-Tools/blob/6b91a2a43edfeab60a415ec2ddd9b71d215b8a56/native/src/platform/mod.rs"
+        },
+        {
+          "path": "native/src/platform/linux.rs",
+          "inspected": "Executable verification 325-405 and session open 470-500",
+          "url": "https://github.com/klimPaskov/HOI4-Live-Tools/blob/6b91a2a43edfeab60a415ec2ddd9b71d215b8a56/native/src/platform/linux.rs"
+        },
+        {
+          "path": "native/src/game.rs",
+          "inspected": "Lines 1-185, exact build constants and snapshot binding",
+          "url": "https://github.com/klimPaskov/HOI4-Live-Tools/blob/6b91a2a43edfeab60a415ec2ddd9b71d215b8a56/native/src/game.rs"
+        },
+        {
+          "path": "native/src/protocol.rs",
+          "inspected": "Capabilities 396-423 and tool declarations",
+          "url": "https://github.com/klimPaskov/HOI4-Live-Tools/blob/6b91a2a43edfeab60a415ec2ddd9b71d215b8a56/native/src/protocol.rs"
+        }
+      ],
+      "tests_inspected": [],
+      "local_execution": "Not executed",
+      "reuse_decision": "Optional capability-gated observation adapter, not mandatory bootstrap dependency or general QA oracle.",
+      "gaps_and_next_experiments": "Run actual supported-build smoke tests in an owned isolated campaign. Published Python v1.1.0 does not establish current Rust HEAD behavior.",
+      "source_status_detail": "Verified (source)"
+    },
+    {
+      "id": "SRC-A18",
+      "title": "Live action journal and uncertain effects",
+      "status": "Verified",
+      "observed_date": "2026-10-23",
+      "repository": "klimPaskov/HOI4-Live-Tools",
+      "commit": "6b91a2a43edfeab60a415ec2ddd9b71d215b8a56",
+      "claim": "Ordinary pause/speed actions record dispatch durably before sending and need observed target state before verification. Verified receipts are historical and idempotent across restarts. Uncertain dispatch blocks replays and new IDs for the same game process. Bounded-wait tests reject observations arriving after the deadline.",
+      "source_files": [
+        {
+          "path": "native/src/actions.rs",
+          "inspected": "Lines 1-370, Journal::execute and append",
+          "url": "https://github.com/klimPaskov/HOI4-Live-Tools/blob/6b91a2a43edfeab60a415ec2ddd9b71d215b8a56/native/src/actions.rs"
+        },
+        {
+          "path": "native/tests/actions.rs",
+          "inspected": "104-227 and 270-335",
+          "url": "https://github.com/klimPaskov/HOI4-Live-Tools/blob/6b91a2a43edfeab60a415ec2ddd9b71d215b8a56/native/tests/actions.rs"
+        },
+        {
+          "path": "native/src/protocol.rs",
+          "inspected": "late_followup_discards_target test 990-1051",
+          "url": "https://github.com/klimPaskov/HOI4-Live-Tools/blob/6b91a2a43edfeab60a415ec2ddd9b71d215b8a56/native/src/protocol.rs"
+        }
+      ],
+      "tests_inspected": [
+        "No stale no-op after preflight state change",
+        "Crash after dispatch cannot replay or bypass with new ID",
+        "Changed epoch and unobserved target uncertain",
+        "Exclusive journal and corrupt tail fail before input"
+      ],
+      "local_execution": "Not executed",
+      "reuse_decision": "Adopt the receipt and no-replay semantics in C-04. Preserve upstream ownership and quarantine boundaries.",
+      "gaps_and_next_experiments": "Do not equate a previously verified receipt with fresh current state. Factory timeout must not infer that action had no effect.",
+      "source_status_detail": "Verified (source)"
+    },
+    {
+      "id": "SRC-A19",
+      "title": "Live licensing, campaign policy and CI",
+      "status": "Verified",
+      "observed_date": "2026-10-23",
+      "repository": "klimPaskov/HOI4-Live-Tools",
+      "commit": "6b91a2a43edfeab60a415ec2ddd9b71d215b8a56",
+      "claim": "Original source is Apache-2.0 with MIT-derived Clausewitz provenance and dependency notices. Python campaign tests enforce owned FAIR campaign policy and refuse debug arguments before launching. GitHub Python and Rust workflows report success at the audited HEAD.",
+      "source_files": [
+        {
+          "path": "LICENSE",
+          "inspected": "Apache declaration",
+          "url": "https://github.com/klimPaskov/HOI4-Live-Tools/blob/6b91a2a43edfeab60a415ec2ddd9b71d215b8a56/LICENSE"
+        },
+        {
+          "path": "NOTICE",
+          "inspected": "Entire third-party notice",
+          "url": "https://github.com/klimPaskov/HOI4-Live-Tools/blob/6b91a2a43edfeab60a415ec2ddd9b71d215b8a56/NOTICE"
+        },
+        {
+          "path": "tests/test_campaign_policy_integration.py",
+          "inspected": "Entire test file",
+          "url": "https://github.com/klimPaskov/HOI4-Live-Tools/blob/6b91a2a43edfeab60a415ec2ddd9b71d215b8a56/tests/test_campaign_policy_integration.py"
+        }
+      ],
+      "tests_inspected": [
+        "FAIR campaign ownership and cannot switch to testing",
+        "Enemy visibility bypass refused",
+        "Debug launch argument refusal",
+        "Read-only status before ownership allowed"
+      ],
+      "local_execution": "Not executed",
+      "reuse_decision": "Reuse narrow live adapter after source and platform qualification, do not bypass policy for factory convenience.",
+      "gaps_and_next_experiments": "No actual game or campaign run executed here. Repository documentation states no full-campaign acceptance for any runtime.",
+      "external_evidence": [
+        {
+          "url": "https://github.com/klimPaskov/HOI4-Live-Tools/actions/runs/39106668071",
+          "kind": "Python CI"
+        },
+        {
+          "url": "https://github.com/klimPaskov/HOI4-Live-Tools/actions/runs/39106668081",
+          "kind": "Rust CI"
+        }
+      ],
+      "source_status_detail": "Verified (source and repository CI)"
+    },
+    {
+      "id": "SRC-A20",
+      "title": "CWTools HOI4 validation services",
+      "status": "Verified",
+      "observed_date": "2026-10-23",
+      "repository": "cwtools/cwtools",
+      "commit": "b377453dee803f9258be92cfc49896d09039702d",
+      "claim": "F# HOI4Game supplies parser, validation, localization, references, completion, scopes and config replacement through IGame. It initializes province enums and rule-backed effects, triggers and modifiers from project resources and rules.",
+      "source_files": [
+        {
+          "path": "README.md",
+          "inspected": "Entire library description",
+          "url": "https://github.com/cwtools/cwtools/blob/b377453dee803f9258be92cfc49896d09039702d/README.md"
+        },
+        {
+          "path": "LICENSE",
+          "inspected": "Entire MIT license",
+          "url": "https://github.com/cwtools/cwtools/blob/b377453dee803f9258be92cfc49896d09039702d/LICENSE"
+        },
+        {
+          "path": "CWTools/Game/HOI4/HOI4Game.fs",
+          "inspected": "Entire file",
+          "url": "https://github.com/cwtools/cwtools/blob/b377453dee803f9258be92cfc49896d09039702d/CWTools/Game/HOI4/HOI4Game.fs"
+        },
+        {
+          "path": "CWToolsCLI/Validator.fs",
+          "inspected": "Entire diagnostic view model and ErrorGame",
+          "url": "https://github.com/cwtools/cwtools/blob/b377453dee803f9258be92cfc49896d09039702d/CWToolsCLI/Validator.fs"
+        }
+      ],
+      "tests_inspected": [
+        "CWToolsTests/ParserTests.fs read, localization and one formatted Jomini roundtrip fixture"
+      ],
+      "local_execution": "Not executed",
+      "reuse_decision": "Wrap as an independent pinned static diagnostic engine, ideally isolated process or library adapter.",
+      "gaps_and_next_experiments": "Measure startup, memory, updates and diagnostic false positives on target fixture. Validation is not engine execution.",
+      "source_status_detail": "Verified (source)"
+    },
+    {
+      "id": "SRC-A21",
+      "title": "CWTools printer normalizes output",
+      "status": "Verified",
+      "observed_date": "2026-10-23",
+      "repository": "cwtools/cwtools",
+      "commit": "b377453dee803f9258be92cfc49896d09039702d",
+      "claim": "CKPrinter generates tab indentation, operator spacing and newlines. Value serialization converts booleans and numbers. It is not a demonstrated byte-preserving patch engine for arbitrary imported mods.",
+      "source_files": [
+        {
+          "path": "CWTools/Parser/Printer.fs",
+          "inspected": "Entire file",
+          "url": "https://github.com/cwtools/cwtools/blob/b377453dee803f9258be92cfc49896d09039702d/CWTools/Parser/Printer.fs"
+        },
+        {
+          "path": "CWTools/Parser/Types.fs",
+          "inspected": "Entire file",
+          "url": "https://github.com/cwtools/cwtools/blob/b377453dee803f9258be92cfc49896d09039702d/CWTools/Parser/Types.fs"
+        }
+      ],
+      "tests_inspected": [
+        "One roundtrip test uses a preformatted fixture and does not establish arbitrary byte preservation"
+      ],
+      "local_execution": "Not executed",
+      "reuse_decision": "Avoid using printer as canonical mutation writer. Use parser/diagnostics with source-preserving patch layer.",
+      "gaps_and_next_experiments": "Run differential parser corpus and keep opaque unknown source spans if adapting.",
+      "source_status_detail": "Verified (source)"
+    },
+    {
+      "id": "SRC-A22",
+      "title": "HOI4 rule pack and limits",
+      "status": "Verified",
+      "observed_date": "2026-10-23",
+      "repository": "cwtools/cwtools-hoi4-config",
+      "commit": "297dd69c42aabe10078a8b7ab7f2d07ee631d4ef",
+      "claim": "MIT CWT rule pack defines focus types, relationships, relative positions, trigger/effect scopes and localization. README acknowledges variable and array false positives. The inspected Python completeness helper compares effect names against bundled documentation. The visible workflow dispatches cache generation and is not a complete semantic test suite.",
+      "source_files": [
+        {
+          "path": "README.md",
+          "inspected": "Entire file and stated limitations",
+          "url": "https://github.com/cwtools/cwtools-hoi4-config/blob/297dd69c42aabe10078a8b7ab7f2d07ee631d4ef/README.md"
+        },
+        {
+          "path": "LICENSE",
+          "inspected": "Entire MIT license",
+          "url": "https://github.com/cwtools/cwtools-hoi4-config/blob/297dd69c42aabe10078a8b7ab7f2d07ee631d4ef/LICENSE"
+        },
+        {
+          "path": "Config/common/national_focus.cwt",
+          "inspected": "1-120 and 160-300",
+          "url": "https://github.com/cwtools/cwtools-hoi4-config/blob/297dd69c42aabe10078a8b7ab7f2d07ee631d4ef/Config/common/national_focus.cwt"
+        },
+        {
+          "path": "Config/settings.cwt",
+          "inspected": "Entire file",
+          "url": "https://github.com/cwtools/cwtools-hoi4-config/blob/297dd69c42aabe10078a8b7ab7f2d07ee631d4ef/Config/settings.cwt"
+        },
+        {
+          "path": "tests/test_check_missing_effects.py",
+          "inspected": "Entire file",
+          "url": "https://github.com/cwtools/cwtools-hoi4-config/blob/297dd69c42aabe10078a8b7ab7f2d07ee631d4ef/tests/test_check_missing_effects.py"
+        },
+        {
+          "path": ".github/workflows/create_dispatch.yml",
+          "inspected": "Entire workflow",
+          "url": "https://github.com/cwtools/cwtools-hoi4-config/blob/297dd69c42aabe10078a8b7ab7f2d07ee631d4ef/.github/workflows/create_dispatch.yml"
+        }
+      ],
+      "tests_inspected": [
+        "Effect coverage comparison script inspected, not executed"
+      ],
+      "local_execution": "Not executed",
+      "reuse_decision": "Pin rule SHA separately from CWTools engine and game/DLC profile. Track baseline and newly introduced diagnostics.",
+      "gaps_and_next_experiments": "Refresh with game changes. Do not globally suppress or blindly fail on every rule warning. Inspect provenance of embedded documentation before redistribution.",
+      "source_status_detail": "Verified (source)"
+    },
+    {
+      "id": "SRC-A23",
+      "title": "Modmaker editing and map comparison",
+      "status": "Verified",
+      "observed_date": "2026-10-23",
+      "repository": "Floxizdia/hoi4-modmaker",
+      "commit": "a5c138ffacf4ed471769558f864cbe55ec5163fa",
+      "claim": "Python/Tkinter/Pillow desktop offers useful focus and map interaction examples. Data layer overlays mod files onto base files and discards stale asynchronous results. Targeted focus/state edits decode utf-8-sig with errors ignored and rewrite utf-8 through normal text I/O, so comments claiming byte preservation are broader than implementation guarantees. Backups are one-time .bak and writes are not a multi-file durable transaction.",
+      "source_files": [
+        {
+          "path": "README.md",
+          "inspected": "Entire project overview and original-code license boundary",
+          "url": "https://github.com/Floxizdia/hoi4-modmaker/blob/a5c138ffacf4ed471769558f864cbe55ec5163fa/README.md"
+        },
+        {
+          "path": "LICENSE",
+          "inspected": "Entire MIT license",
+          "url": "https://github.com/Floxizdia/hoi4-modmaker/blob/a5c138ffacf4ed471769558f864cbe55ec5163fa/LICENSE"
+        },
+        {
+          "path": "app/focus_surgery.py",
+          "inspected": "Entire file",
+          "url": "https://github.com/Floxizdia/hoi4-modmaker/blob/a5c138ffacf4ed471769558f864cbe55ec5163fa/app/focus_surgery.py"
+        },
+        {
+          "path": "app/focus_tree_data.py",
+          "inspected": "Entire file",
+          "url": "https://github.com/Floxizdia/hoi4-modmaker/blob/a5c138ffacf4ed471769558f864cbe55ec5163fa/app/focus_tree_data.py"
+        },
+        {
+          "path": "app/safe_io.py",
+          "inspected": "Entire file",
+          "url": "https://github.com/Floxizdia/hoi4-modmaker/blob/a5c138ffacf4ed471769558f864cbe55ec5163fa/app/safe_io.py"
+        },
+        {
+          "path": "app/pds_scan.py",
+          "inspected": "Entire read-only scanner",
+          "url": "https://github.com/Floxizdia/hoi4-modmaker/blob/a5c138ffacf4ed471769558f864cbe55ec5163fa/app/pds_scan.py"
+        },
+        {
+          "path": "app/map_data.py",
+          "inspected": "1-184, 506-562 and 637-690",
+          "url": "https://github.com/Floxizdia/hoi4-modmaker/blob/a5c138ffacf4ed471769558f864cbe55ec5163fa/app/map_data.py"
+        },
+        {
+          "path": "tests/test_focus_tree_data.py",
+          "inspected": "55-112 and 295-335",
+          "url": "https://github.com/Floxizdia/hoi4-modmaker/blob/a5c138ffacf4ed471769558f864cbe55ec5163fa/tests/test_focus_tree_data.py"
+        },
+        {
+          "path": "tests/test_world_states.py",
+          "inspected": "Entire file",
+          "url": "https://github.com/Floxizdia/hoi4-modmaker/blob/a5c138ffacf4ed471769558f864cbe55ec5163fa/tests/test_world_states.py"
+        }
+      ],
+      "tests_inspected": [
+        "Vanilla tree copy before edit",
+        "Stale async result discarded",
+        "Focus undo and prerequisite AND/OR groups",
+        "Base/mod world-state overlay fixtures"
+      ],
+      "local_execution": "Not executed",
+      "reuse_decision": "Adapt UX, source-discovery ideas and semantic fixtures. Do not transplant current writer into preservation-critical path.",
+      "gaps_and_next_experiments": "Need strict encoding, malformed input, comments with braces, same-prefix paths, dependencies and replace_path tests before any parser reuse.",
+      "source_status_detail": "Verified (source)"
+    },
+    {
+      "id": "SRC-A24",
+      "title": "HOIIVUtils parser and province generation comparison",
+      "status": "Verified",
+      "observed_date": "2026-10-23",
+      "repository": "battleskorpion/HOIIVUtils",
+      "commit": "0fe06450bf17c506485caf90fb5d52cf8a2e1b33",
+      "claim": "Apache-2.0 Java/Scala/JavaFX desktop targets Java24 and Scala3.7.3 at the inspected POM. README marks features WIP. NodeScripter regenerates spacing/newlines and strips tabs from trivia. ProvinceGeneration composes seeds and distance methods into a province bitmap, not a complete independently verified playable world pipeline. The inspected ParserTest file is entirely commented out, and the inspected focus integration test section is also commented.",
+      "source_files": [
+        {
+          "path": "README.md",
+          "inspected": "Entire status and runtime requirements",
+          "url": "https://github.com/battleskorpion/HOIIVUtils/blob/0fe06450bf17c506485caf90fb5d52cf8a2e1b33/README.md"
+        },
+        {
+          "path": "LICENSE",
+          "inspected": "Apache declaration",
+          "url": "https://github.com/battleskorpion/HOIIVUtils/blob/0fe06450bf17c506485caf90fb5d52cf8a2e1b33/LICENSE"
+        },
+        {
+          "path": "pom.xml",
+          "inspected": "1-130",
+          "url": "https://github.com/battleskorpion/HOIIVUtils/blob/0fe06450bf17c506485caf90fb5d52cf8a2e1b33/pom.xml"
+        },
+        {
+          "path": "PDX_PARSING_ARCHITECTURE.md",
+          "inspected": "Entire design documentation",
+          "url": "https://github.com/battleskorpion/HOIIVUtils/blob/0fe06450bf17c506485caf90fb5d52cf8a2e1b33/PDX_PARSING_ARCHITECTURE.md"
+        },
+        {
+          "path": "src/main/scala/com/hoi4utils/parser/Parser.scala",
+          "inspected": "Entire parser",
+          "url": "https://github.com/battleskorpion/HOIIVUtils/blob/0fe06450bf17c506485caf90fb5d52cf8a2e1b33/src/main/scala/com/hoi4utils/parser/Parser.scala"
+        },
+        {
+          "path": "src/main/scala/com/hoi4utils/script/scripter/NodeScripter.scala",
+          "inspected": "Entire writer",
+          "url": "https://github.com/battleskorpion/HOIIVUtils/blob/0fe06450bf17c506485caf90fb5d52cf8a2e1b33/src/main/scala/com/hoi4utils/script/scripter/NodeScripter.scala"
+        },
+        {
+          "path": "src/main/java/com/hoi4utils/hoi4/map/province/ProvinceGeneration.java",
+          "inspected": "Entire generator",
+          "url": "https://github.com/battleskorpion/HOIIVUtils/blob/0fe06450bf17c506485caf90fb5d52cf8a2e1b33/src/main/java/com/hoi4utils/hoi4/map/province/ProvinceGeneration.java"
+        },
+        {
+          "path": "src/main/scala/com/hoi4utils/hoi4/common/national_focus/FocusTree.scala",
+          "inspected": "1-135 and 200-320",
+          "url": "https://github.com/battleskorpion/HOIIVUtils/blob/0fe06450bf17c506485caf90fb5d52cf8a2e1b33/src/main/scala/com/hoi4utils/hoi4/common/national_focus/FocusTree.scala"
+        },
+        {
+          "path": "src/test/scala/com/hoi4utils/parser/ParserTest.scala",
+          "inspected": "Entire commented file",
+          "url": "https://github.com/battleskorpion/HOIIVUtils/blob/0fe06450bf17c506485caf90fb5d52cf8a2e1b33/src/test/scala/com/hoi4utils/parser/ParserTest.scala"
+        },
+        {
+          "path": "src/test/scala/com/hoi4utils/hoi4/common/focus/FocusTreeIntegrationTest.scala",
+          "inspected": "1-105 commented section",
+          "url": "https://github.com/battleskorpion/HOIIVUtils/blob/0fe06450bf17c506485caf90fb5d52cf8a2e1b33/src/test/scala/com/hoi4utils/hoi4/common/focus/FocusTreeIntegrationTest.scala"
+        }
+      ],
+      "tests_inspected": [
+        "Inspected parser tests are disabled by comments",
+        "No execution or full suite audit"
+      ],
+      "local_execution": "Not executed",
+      "reuse_decision": "Use as design reference and candidate algorithms behind later benchmarks. Avoid additional runtime and writer adoption in first release.",
+      "gaps_and_next_experiments": "Establish active tests, preservation and asset provenance. GPU support and complete map generation remain unverified.",
+      "source_status_detail": "Verified (source)"
+    },
+    {
+      "id": "SRC-A25",
+      "title": "Nova comparison-only license and absent public implementation",
+      "status": "Verified",
+      "observed_date": "2026-10-23",
+      "repository": "Ultra-XT/HOI4-Modding-Suite",
+      "commit": "5e44bc4f483e504310a0d4bad6e5ecc3c1cd08a6",
+      "claim": "The repository LICENSE states CC BY-NC-ND4.0 with restrictions on commercial bundling and distributing modified derivatives. The recursive tree has 16 entries with executable, documentation and images, but no public implementation or tests. Feature and atomic-save claims can only be treated as documented claims here.",
+      "source_files": [
+        {
+          "path": "LICENSE",
+          "inspected": "Entire custom license text",
+          "url": "https://github.com/Ultra-XT/HOI4-Modding-Suite/blob/5e44bc4f483e504310a0d4bad6e5ecc3c1cd08a6/LICENSE"
+        },
+        {
+          "path": "README.md",
+          "inspected": "Feature overview",
+          "url": "https://github.com/Ultra-XT/HOI4-Modding-Suite/blob/5e44bc4f483e504310a0d4bad6e5ecc3c1cd08a6/README.md"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "inspected": "Release notes",
+          "url": "https://github.com/Ultra-XT/HOI4-Modding-Suite/blob/5e44bc4f483e504310a0d4bad6e5ecc3c1cd08a6/CHANGELOG.md"
+        },
+        {
+          "path": "Repository recursive tree",
+          "inspected": "16 entries, API tree at audited commit",
+          "url": "https://github.com/Ultra-XT/HOI4-Modding-Suite/blob/5e44bc4f483e504310a0d4bad6e5ecc3c1cd08a6/Repository recursive tree"
+        }
+      ],
+      "tests_inspected": [],
+      "local_execution": "Not executed",
+      "reuse_decision": "Comparison only. Do not fork, embed or copy implementation under this planning decision.",
+      "gaps_and_next_experiments": "No executable downloaded or run. Obtain permission and independently inspect code before any changed reuse decision.",
+      "source_status_detail": "Verified (license and tree), Documented (features)"
+    }
+  ]
+}
