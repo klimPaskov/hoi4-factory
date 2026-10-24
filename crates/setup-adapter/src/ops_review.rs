@@ -918,6 +918,11 @@ fn candidates_of(
             let Some(first) = finding.evidence.first() else {
                 continue;
             };
+            // Setup refuses to send the local portrait routes of an earlier installation to any
+            // provider, so they are not offered.
+            if finding.id == hoi4_mod_setup::scanner::LOCAL_ONLY_PORTRAIT_ROUTES_FINDING {
+                continue;
+            }
             // An excerpt that carries a host path cannot be shown or hashed faithfully.
             if active.redactor.leaks(excerpt) || active.redactor.leaks(&first.path) {
                 continue;

@@ -367,9 +367,29 @@ async fn g1_new(live: bool) {
     print_pin("g1_new");
 }
 
+/// The intake double's repository has a bare-bones descriptor, which Setup's readiness check
+/// rightly refuses (no `supported_version`). The imported mod is the gate mod: one more commit
+/// on `main` of the double's repository, before the person imports it.
+fn publish_gate_descriptor(gh: &GithubFixture) {
+    for (name, data, _) in fixture_files() {
+        if name == "descriptor.mod" || name == "AGENTS.md" || name == "README.md" {
+            let path = gh.remote.work.join(name);
+            std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+            std::fs::write(path, data).unwrap();
+        }
+    }
+    git(&gh.remote.work, &["add", "-A"]);
+    git(&gh.remote.work, &["commit", "-q", "-m", "the gate mod"]);
+    git(
+        &gh.remote.work,
+        &["push", "-q", gh.remote.bare.to_str().unwrap(), "main"],
+    );
+}
+
 async fn g1_import(live: bool) {
     let model = model_for("github-import", live);
     let gh = github_fixture().await;
+    publish_gate_descriptor(&gh);
     let h = gate_harness(&model, Some(gh)).await;
     let alice = h.verified_user("alice@example.org").await;
     h.link_github(&alice, 424_242).await;
@@ -492,13 +512,13 @@ fn status_lines(source: &std::path::Path) -> Vec<String> {
         .collect()
 }
 
-/// Paths the plan creates, from the plan as shown.
+/// Paths the plan writes (everything except what it preserves), from the plan as shown.
 fn created_paths(plan: &Value) -> Vec<String> {
     plan["operations"]
         .as_array()
         .unwrap()
         .iter()
-        .filter(|op| op["action"] == "create")
+        .filter(|op| op["action"] != "preserve" && op["action"] != "conflict")
         .map(|op| op["path"].as_str().unwrap().to_owned())
         .collect()
 }
@@ -580,8 +600,13 @@ async fn g2_preserves(label: &str, replace_readme: bool, live: bool) {
         allowed_changed,
         "only a change the reviewer chose may alter an existing file: {diff:?}"
     );
+    // A replaced file is written afresh, so its mode may follow Setup's own; no other mode moves.
     assert!(
-        diff.removed.is_empty() && diff.mode_changed.is_empty(),
+        diff.removed.is_empty()
+            && diff
+                .mode_changed
+                .iter()
+                .all(|p| allowed_changed.contains(&p.as_str())),
         "{diff:?}"
     );
     assert!(
@@ -849,6 +874,19 @@ fn real_plan(
         },
         "componentRecommendations": [],
     });
+    // Setup accepts only the distribution's own /usr/bin/node; where there is none the plan is
+    // built for the platform without one.
+    let node = if cfg!(unix) && std::path::Path::new("/usr/bin/node").exists() {
+        Some(
+            hoi4_mod_setup::service::NodeRuntime::new(
+                "/usr/bin/node",
+                state_root.parent().unwrap().join("node-prefix"),
+            )
+            .expect("Setup accepts /usr/bin/node"),
+        )
+    } else {
+        None
+    };
     let built = DefaultPlanBuilder::with_source(fetcher)
         .build(&PlanRequest {
             state: &state,
@@ -857,7 +895,7 @@ fn real_plan(
             project_root_identity: &identity,
             analysis: &record,
             state_root,
-            node: None,
+            node: node.as_ref(),
         })
         .expect("Setup builds the plan");
     let mut plan = built.plan;
@@ -1241,6 +1279,7 @@ async fn hard_kill(window: &str, op: usize) {
     let scene = scene(&h, "killed@example.org", "Killed").await;
     let signal = scene.state_root.parent().unwrap().join("child-ready");
     let plan_file = scene.state_root.parent().unwrap().join("child-plan-id");
+    let child_log = scene.state_root.parent().unwrap().join("child.log");
     let mut child = Command::new(std::env::current_exe().unwrap())
         .args([
             "--ignored",
@@ -1255,14 +1294,22 @@ async fn hard_kill(window: &str, op: usize) {
         .env("HF_G4_SIGNAL", &signal)
         .env("HF_G4_KILL_AT", window)
         .env("HF_G4_KILL_OP", op.to_string())
-        .stdout(std::process::Stdio::null())
-        .stderr(std::process::Stdio::null())
+        .stdout(std::fs::File::create(&child_log).unwrap())
+        .stderr(
+            std::fs::File::options()
+                .append(true)
+                .open(&child_log)
+                .unwrap(),
+        )
         .spawn()
         .expect("the child process starts");
     let started = std::time::Instant::now();
     while !signal.exists() {
         if let Some(status) = child.try_wait().unwrap() {
-            panic!("the child ended ({status}) before it reached the kill window");
+            panic!(
+                "the child ended ({status}) before it reached the kill window: {}",
+                std::fs::read_to_string(&child_log).unwrap_or_default()
+            );
         }
         assert!(
             started.elapsed().as_secs() < 900,

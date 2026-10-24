@@ -364,28 +364,51 @@ async fn evidence(
     Ok(Json(json!({ "approved": approved })))
 }
 
-/// `1.19.3` is `1.19.*`: a mod targets a release line, not a patch.
+/// `1.19.3.0` is `1.19.*`: a mod targets a release line, not a patch. The game's own `version`
+/// text is prose ("Operation Postern v1.19.3.0.c01a (5632)"), so the first `major.minor` number
+/// pair in the text is taken.
 fn supported_game_version(version: Option<&str>) -> String {
     let Some(version) = version else {
         return String::new();
     };
-    let parts: Vec<&str> = version.split('.').collect();
-    if parts.len() >= 2
-        && parts
-            .iter()
-            .all(|p| !p.is_empty() && p.bytes().all(|b| b.is_ascii_digit()))
-    {
-        format!("{}.{}.*", parts[0], parts[1])
-    } else {
-        String::new()
+    let bytes = version.as_bytes();
+    let mut i = 0;
+    while i < bytes.len() {
+        if bytes[i].is_ascii_digit() && (i == 0 || !bytes[i - 1].is_ascii_digit()) {
+            let major_end = i + bytes[i..].iter().take_while(|b| b.is_ascii_digit()).count();
+            if bytes.get(major_end) == Some(&b'.')
+                && bytes.get(major_end + 1).is_some_and(u8::is_ascii_digit)
+            {
+                let minor_end = major_end
+                    + 1
+                    + bytes[major_end + 1..]
+                        .iter()
+                        .take_while(|b| b.is_ascii_digit())
+                        .count();
+                return format!(
+                    "{}.{}.*",
+                    &version[i..major_end],
+                    &version[major_end + 1..minor_end]
+                );
+            }
+            i = major_end;
+        } else {
+            i += 1;
+        }
     }
+    String::new()
 }
 
 fn review_defaults(state: &ServerState, principal: &Principal) -> ReviewDefaults {
     let summary = state.game_reference.status().summary();
     ReviewDefaults {
         author: principal.account.display_name.clone(),
-        supported_game_version: supported_game_version(summary.version.as_deref()),
+        supported_game_version: supported_game_version(
+            summary
+                .raw_version
+                .as_deref()
+                .or(summary.version.as_deref()),
+        ),
     }
 }
 
@@ -577,13 +600,22 @@ async fn plan(
 ) -> Result<Json<Value>, Fail> {
     let project = project_for(&state, &principal, &id, READ_PERMISSION).await?;
     let adapter = &state.setup.adapter;
-    let session = adapter
-        .open_session_state(principal.account_id(), project.id)
-        .await?
-        .map(|(id, _, _)| id);
-    let current = adapter
-        .current_plan(principal.account_id(), project.id, session)
-        .await?;
+    let has_workspace = open_workspace(&state, &project).is_ok();
+    let session = if has_workspace {
+        adapter
+            .open_session_state(principal.account_id(), project.id)
+            .await?
+            .map(|(id, _, _)| id)
+    } else {
+        None
+    };
+    let current = if has_workspace {
+        adapter
+            .current_plan(principal.account_id(), project.id, session)
+            .await?
+    } else {
+        None
+    };
     if let Some(view) = current {
         return Ok(Json(json!({ "plan": client_plan(&view) })));
     }
@@ -799,6 +831,19 @@ async fn status(
     Path(id): Path<String>,
 ) -> Result<Json<Value>, Fail> {
     let project = project_for(&state, &principal, &id, READ_PERMISSION).await?;
+    if open_workspace(&state, &project).is_err() {
+        // A project that has no mod yet has nothing to report, and that is not an error.
+        return Ok(Json(json!({
+            "status": null,
+            "session_open": false,
+            "step": "none",
+            "session": null,
+            "scan": null,
+            "analysis": null,
+            "confirmed_values": null,
+            "plan": null,
+        })));
+    }
     let adapter = &state.setup.adapter;
     let account = principal.account_id();
     let open = adapter.open_session_state(account, project.id).await?;
@@ -866,6 +911,9 @@ async fn recovery(
     Path(id): Path<String>,
 ) -> Result<Json<Value>, Fail> {
     let project = project_for(&state, &principal, &id, READ_PERMISSION).await?;
+    if open_workspace(&state, &project).is_err() {
+        return Ok(Json(json!({ "recovery": null })));
+    }
     let view = state
         .setup
         .adapter
@@ -914,6 +962,10 @@ mod tests {
     fn a_patch_version_becomes_a_release_line() {
         assert_eq!(supported_game_version(Some("1.19.3")), "1.19.*");
         assert_eq!(supported_game_version(Some("1.19.3.0")), "1.19.*");
+        assert_eq!(
+            supported_game_version(Some("Operation Postern v1.19.3.0.c01a (5632)")),
+            "1.19.*"
+        );
         assert_eq!(supported_game_version(Some("beta")), "");
         assert_eq!(supported_game_version(None), "");
     }
