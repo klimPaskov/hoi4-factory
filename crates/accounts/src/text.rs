@@ -19,26 +19,29 @@ pub const PROJECT_NAME_BYTES: usize = 400;
 /// Trims and checks a free-text label. `what` names the field in the error message.
 pub fn normalize_label(
     raw: &str,
+    field: &'static str,
     what: &str,
     max_graphemes: usize,
     max_bytes: usize,
 ) -> Result<String, ApiError> {
     let text = raw.trim();
     if text.is_empty() {
-        return Err(ApiError::invalid_request(format!(
-            "{what} cannot be empty."
-        )));
+        return Err(
+            ApiError::invalid_request(format!("{what} cannot be empty.")).with_id("field", field),
+        );
     }
     // Check bytes first so that a huge input is never segmented.
     if text.len() > max_bytes || text.graphemes(true).count() > max_graphemes {
         return Err(ApiError::invalid_request(format!(
             "{what} is too long: at most {max_graphemes} characters."
-        )));
+        ))
+        .with_id("field", field));
     }
     if text.chars().any(char::is_control) {
         return Err(ApiError::invalid_request(format!(
             "{what} cannot contain control characters."
-        )));
+        ))
+        .with_id("field", field));
     }
     Ok(text.to_owned())
 }
@@ -51,6 +54,7 @@ pub fn normalize_display_name(requested: Option<&str>, email: &str) -> Result<St
         .unwrap_or(fallback);
     normalize_label(
         chosen,
+        "display_name",
         "A display name",
         DISPLAY_NAME_GRAPHEMES,
         DISPLAY_NAME_BYTES,
@@ -60,6 +64,7 @@ pub fn normalize_display_name(requested: Option<&str>, email: &str) -> Result<St
 pub fn normalize_project_name(raw: &str) -> Result<String, ApiError> {
     normalize_label(
         raw,
+        "name",
         "A project name",
         PROJECT_NAME_GRAPHEMES,
         PROJECT_NAME_BYTES,
@@ -71,7 +76,8 @@ pub fn normalize_project_name(raw: &str) -> Result<String, ApiError> {
 /// Not a full RFC 5322 parser: it accepts what a verification mail can reach. The domain must be
 /// ASCII (an internationalised domain is given in its punycode form).
 pub fn normalize_email(raw: &str) -> Result<String, ApiError> {
-    let invalid = || ApiError::invalid_request("Enter a valid email address.");
+    let invalid =
+        || ApiError::invalid_request("Enter a valid email address.").with_id("field", "email");
     let email = raw.trim();
     if email.len() > 254 || email.chars().any(|c| c.is_whitespace() || c.is_control()) {
         return Err(invalid());
@@ -183,7 +189,7 @@ mod tests {
             "نموذج عربي",
             "日本語のMOD",
         ] {
-            assert_eq!(normalize_label(ok, "x", 100, 400).unwrap(), ok);
+            assert_eq!(normalize_label(ok, "x", "x", 100, 400).unwrap(), ok);
         }
         // 100 family emoji are 100 graphemes but 2500 bytes: the byte ceiling stops it.
         assert!(normalize_project_name(&"👨‍👩‍👧‍👦".repeat(100)).is_err());

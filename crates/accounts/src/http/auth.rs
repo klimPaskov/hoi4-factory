@@ -264,7 +264,13 @@ pub async fn github_callback(
     let result = github_callback_inner(&state, &ip, &headers, query).await;
     let mut response = match result {
         Ok(response) => response,
-        Err(error) => error.into_response(),
+        // A browser navigation, not an API call: send the person back to the sign-in page with
+        // the failure named, instead of showing raw JSON. The code is already stable; it is
+        // prefixed with `github_` unless it has that prefix.
+        Err(error) => {
+            let code = error.code.strip_prefix("github_").unwrap_or(error.code);
+            redirect(&format!("/signin?error=github_{code}"))
+        }
     };
     // The state is single use, whatever the outcome.
     push_cookie(&mut response, &clear_github_state_cookie(secure));

@@ -17,6 +17,12 @@ async fn complete(client: &Client, code: &str) -> Resp {
         .await
 }
 
+/// A failed callback is a browser navigation: it redirects to the sign-in page naming the code.
+fn assert_signin_error(resp: &Resp, code: &str) {
+    assert_eq!(resp.status, 302, "{}", resp.text);
+    assert_eq!(resp.location().unwrap(), format!("/signin?error={code}"));
+}
+
 fn authorize_state(start: &Resp) -> String {
     let location = start.location().expect("redirect to GitHub");
     url_param(&location, "state")
@@ -322,12 +328,7 @@ async fn github_emails_that_are_missing_unverified_or_secondary_are_not_trusted(
     for user in cases {
         let client = app.client();
         let resp = complete(&client, &fake.grant_code(user.clone())).await;
-        assert_eq!(
-            (resp.status, resp.error_code()),
-            (422, "github_email_unavailable"),
-            "{}",
-            user.login
-        );
+        assert_signin_error(&resp, "github_email_unavailable");
         assert!(resp.set_cookie("hf_session").is_none());
         assert_eq!(client.get("/api/v1/auth/me").await.status, 401);
     }
@@ -345,10 +346,7 @@ async fn a_forged_missing_or_replayed_state_is_refused_before_any_github_call() 
         .client()
         .get(&format!("{CALLBACK}?code={code}&state=whatever"))
         .await;
-    assert_eq!(
-        (resp.status, resp.error_code()),
-        (400, "github_state_mismatch")
-    );
+    assert_signin_error(&resp, "github_state_mismatch");
 
     // A cookie that does not match the returned state.
     let client = app.client();
@@ -357,16 +355,13 @@ async fn a_forged_missing_or_replayed_state_is_refused_before_any_github_call() 
     let wrong = client
         .get(&format!("{CALLBACK}?code={code}&state=forged"))
         .await;
-    assert_eq!(
-        (wrong.status, wrong.error_code()),
-        (400, "github_state_mismatch")
-    );
+    assert_signin_error(&wrong, "github_state_mismatch");
     assert!(
         client.cookie("hf_gh_state").is_none(),
         "state is single use even on failure"
     );
     let missing = client.get(&format!("{CALLBACK}?code={code}")).await;
-    assert_eq!(missing.error_code(), "github_state_mismatch");
+    assert_signin_error(&missing, "github_state_mismatch");
 
     assert_eq!(fake.token_requests(), 0, "no code was exchanged");
     assert_eq!(app.count("SELECT count(*) FROM accounts").await, 0);
@@ -382,11 +377,7 @@ async fn a_forged_missing_or_replayed_state_is_refused_before_any_github_call() 
     let replay = client
         .get(&format!("{CALLBACK}?code={code}&state={real}"))
         .await;
-    assert_eq!(
-        (replay.status, replay.error_code()),
-        (502, "github_code_rejected")
-    );
-    assert_eq!(replay.body["error"]["retry_class"], "refresh_preconditions");
+    assert_signin_error(&replay, "github_code_rejected");
     assert_eq!(app.count("SELECT count(*) FROM accounts").await, 1);
 
     // The user pressing "Cancel" on GitHub.
@@ -396,7 +387,7 @@ async fn a_forged_missing_or_replayed_state_is_refused_before_any_github_call() 
     let denied = client
         .get(&format!("{CALLBACK}?error=access_denied&state={state}"))
         .await;
-    assert_eq!((denied.status, denied.error_code()), (400, "github_denied"));
+    assert_signin_error(&denied, "github_denied");
 }
 
 #[tokio::test]
@@ -450,10 +441,7 @@ async fn linking_attaches_github_to_the_signed_in_account_only() {
         .client
         .get(&format!("{CALLBACK}?code={code}&state={state}"))
         .await;
-    assert_eq!(
-        (clash.status, clash.error_code()),
-        (409, "github_already_linked")
-    );
+    assert_signin_error(&clash, "github_already_linked");
     assert_eq!(
         bob.client.get("/api/v1/auth/me").await.body["account"]["github_linked"],
         false
@@ -469,10 +457,7 @@ async fn linking_attaches_github_to_the_signed_in_account_only() {
     let resp = hijack
         .get(&format!("{CALLBACK}?code={code}&state={state}"))
         .await;
-    assert_eq!(
-        (resp.status, resp.error_code()),
-        (400, "github_state_mismatch")
-    );
+    assert_signin_error(&resp, "github_state_mismatch");
 }
 
 #[tokio::test]
@@ -489,10 +474,7 @@ async fn an_address_owned_by_another_github_identity_is_a_conflict() {
         &fake.grant_code(FakeUser::verified(2, "second", "shared@example.org")),
     )
     .await;
-    assert_eq!(
-        (resp.status, resp.error_code()),
-        (409, "github_email_conflict")
-    );
+    assert_signin_error(&resp, "github_email_conflict");
     assert_eq!(app.count("SELECT count(*) FROM accounts").await, 1);
 }
 
@@ -514,7 +496,7 @@ async fn disabled_accounts_cannot_sign_in_with_github() {
         &fake.grant_code(FakeUser::verified(1, "octocat", "octo@example.org")),
     )
     .await;
-    assert_eq!((resp.status, resp.error_code()), (403, "account_disabled"));
+    assert_signin_error(&resp, "github_account_disabled");
 }
 
 #[tokio::test]
@@ -523,10 +505,7 @@ async fn bad_client_credentials_and_unreachable_github_are_reported_without_leak
     let fake = app.github.as_ref().unwrap();
     // A code the fake never issued.
     let resp = complete(&app.client(), "never-issued").await;
-    assert_eq!(
-        (resp.status, resp.error_code()),
-        (502, "github_code_rejected")
-    );
+    assert_signin_error(&resp, "github_code_rejected");
     assert!(!resp.text.contains(&fake.client_secret));
 
     // GitHub down: the token endpoint refuses connections.
@@ -539,11 +518,7 @@ async fn bad_client_credentials_and_unreachable_github_are_reported_without_leak
         .build()
         .await;
     let resp = complete(&down.client(), "any").await;
-    assert_eq!(
-        (resp.status, resp.error_code()),
-        (502, "github_unreachable")
-    );
-    assert_eq!(resp.body["error"]["retry_class"], "refresh_preconditions");
+    assert_signin_error(&resp, "github_unreachable");
     assert!(!resp.text.contains("127.0.0.1"));
 }
 
@@ -559,5 +534,5 @@ async fn github_routes_report_when_the_server_has_no_github_app() {
         .client()
         .get(&format!("{CALLBACK}?code=x&state=y"))
         .await;
-    assert_eq!(cb.status, 400, "state is checked first");
+    assert_signin_error(&cb, "github_state_mismatch"); // state is checked first
 }

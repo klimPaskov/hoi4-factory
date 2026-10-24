@@ -13,6 +13,12 @@
 //! | `FACTORY_GAME_REF` | Read-only mount of the game folder | `/game` |
 //! | `FACTORY_WEB_DIST` | Directory of the built browser client; served when it exists | none |
 //! | `FACTORY_MAX_BODY_BYTES` | Default request body limit (routes may raise their own) | `1048576` |
+//! | `FACTORY_UPLOAD_MAX_BYTES` | Body limit of the upload route only, also the intake limit for the upload as received | `536870912` (512 MiB) |
+//! | `FACTORY_INTAKE_MAX_TOTAL_BYTES`, `FACTORY_INTAKE_MAX_FILE_BYTES`, `FACTORY_INTAKE_MAX_FILES`, `FACTORY_INTAKE_MAX_ENTRIES` | Further upload limits (bytes after extraction, bytes of one file, files, entries) | intake defaults |
+//! | `FACTORY_GITHUB_APP_ID` | Numeric id of the HOI4 Factory GitHub App. GitHub import is unavailable when absent | none |
+//! | `FACTORY_GITHUB_APP_PRIVATE_KEY_FILE` | Path of the App private key (PEM), read at startup and never logged | none |
+//! | `FACTORY_GITHUB_APP_SLUG` | App slug, for the installation link | `hoi4-factory-dev` |
+//! | `FACTORY_GITHUB_APP_API_BASE`, `FACTORY_GITHUB_CLONE_BASE` | GitHub REST and Git transport bases (tests; `https`, or `http` on loopback) | `https://api.github.com`, `https://github.com` |
 //! | `RUST_LOG` | Log filter | `info,sqlx=warn` |
 //!
 //! Pool limits (`FACTORY_DB_*`) are read by [`factory_accounts::PoolSettings`].
@@ -20,6 +26,7 @@
 use std::path::PathBuf;
 
 use factory_accounts::{AccountsConfig, Environment, PoolSettings, Redacted};
+use factory_intake::{GithubEndpoints, IntakeLimits};
 
 /// Everything the server needs to start.
 #[derive(Debug, Clone)]
@@ -33,7 +40,30 @@ pub struct ServerConfig {
     pub game_ref_dir: PathBuf,
     pub web_dist: Option<PathBuf>,
     pub max_body_bytes: usize,
+    pub intake: IntakeSettings,
+    /// `None` when `FACTORY_GITHUB_APP_ID` or the key file setting is absent.
+    pub github_app: Option<GithubAppSettings>,
 }
+
+/// Upload route and intake limits.
+#[derive(Debug, Clone)]
+pub struct IntakeSettings {
+    /// Body limit of the upload route. Equals `limits.max_upload_bytes`.
+    pub upload_max_bytes: usize,
+    pub limits: IntakeLimits,
+}
+
+/// The HOI4 Factory GitHub App as the server is configured to use it.
+#[derive(Debug, Clone)]
+pub struct GithubAppSettings {
+    pub app_id: String,
+    /// Where the PEM lives. The server reads it once at startup.
+    pub private_key_file: PathBuf,
+    pub slug: String,
+    pub endpoints: GithubEndpoints,
+}
+
+const DEFAULT_UPLOAD_MAX_BYTES: usize = 512 * 1024 * 1024;
 
 #[derive(Debug, thiserror::Error)]
 pub enum ConfigError {
@@ -72,6 +102,8 @@ impl ServerConfig {
                 })?,
         };
         validate_origins(&accounts.allowed_origins)?;
+        let intake = intake_settings(&non_empty)?;
+        let github_app = github_app_settings(&non_empty)?;
         Ok(Self {
             listen: non_empty("FACTORY_LISTEN").unwrap_or_else(|| "0.0.0.0:8080".to_owned()),
             database_url: Redacted(database_url),
@@ -85,6 +117,8 @@ impl ServerConfig {
             ),
             web_dist: non_empty("FACTORY_WEB_DIST").map(PathBuf::from),
             max_body_bytes,
+            intake,
+            github_app,
             accounts,
         })
     }
@@ -96,6 +130,91 @@ impl ServerConfig {
     pub fn is_development(&self) -> bool {
         self.accounts.environment == Environment::Development
     }
+}
+
+fn positive(key: &'static str, raw: &str) -> Result<u64, ConfigError> {
+    raw.trim()
+        .parse::<u64>()
+        .ok()
+        .filter(|n| *n > 0)
+        .ok_or_else(|| ConfigError::Invalid(key, "expected a positive number".into()))
+}
+
+fn intake_settings(
+    non_empty: &impl Fn(&str) -> Option<String>,
+) -> Result<IntakeSettings, ConfigError> {
+    let mut limits = IntakeLimits::default();
+    let upload_max_bytes = match non_empty("FACTORY_UPLOAD_MAX_BYTES") {
+        None => DEFAULT_UPLOAD_MAX_BYTES,
+        Some(raw) => usize::try_from(positive("FACTORY_UPLOAD_MAX_BYTES", &raw)?)
+            .map_err(|_| ConfigError::Invalid("FACTORY_UPLOAD_MAX_BYTES", "too large".into()))?,
+    };
+    limits.max_upload_bytes = upload_max_bytes as u64;
+    for (key, slot) in [
+        (
+            "FACTORY_INTAKE_MAX_TOTAL_BYTES",
+            &mut limits.max_total_bytes,
+        ),
+        ("FACTORY_INTAKE_MAX_FILE_BYTES", &mut limits.max_file_bytes),
+        ("FACTORY_INTAKE_MAX_FILES", &mut limits.max_files),
+        ("FACTORY_INTAKE_MAX_ENTRIES", &mut limits.max_entries),
+    ] {
+        if let Some(raw) = non_empty(key) {
+            *slot = positive(key, &raw)?;
+        }
+    }
+    Ok(IntakeSettings {
+        upload_max_bytes,
+        limits,
+    })
+}
+
+fn github_app_settings(
+    non_empty: &impl Fn(&str) -> Option<String>,
+) -> Result<Option<GithubAppSettings>, ConfigError> {
+    let id = non_empty("FACTORY_GITHUB_APP_ID");
+    let key_file = non_empty("FACTORY_GITHUB_APP_PRIVATE_KEY_FILE");
+    let (app_id, key_file) = match (id, key_file) {
+        (None, None) => return Ok(None),
+        (Some(id), Some(file)) => (id.trim().to_owned(), file),
+        (Some(_), None) => {
+            return Err(ConfigError::Missing("FACTORY_GITHUB_APP_PRIVATE_KEY_FILE"));
+        }
+        (None, Some(_)) => return Err(ConfigError::Missing("FACTORY_GITHUB_APP_ID")),
+    };
+    if app_id.is_empty() || app_id.len() > 20 || !app_id.bytes().all(|b| b.is_ascii_digit()) {
+        return Err(ConfigError::Invalid(
+            "FACTORY_GITHUB_APP_ID",
+            "expected the numeric App id".into(),
+        ));
+    }
+    let slug = non_empty("FACTORY_GITHUB_APP_SLUG").unwrap_or_else(|| "hoi4-factory-dev".into());
+    if slug.len() > 100 || !slug.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'-') {
+        return Err(ConfigError::Invalid(
+            "FACTORY_GITHUB_APP_SLUG",
+            "expected letters, digits and hyphens".into(),
+        ));
+    }
+    let endpoints = match (
+        non_empty("FACTORY_GITHUB_APP_API_BASE"),
+        non_empty("FACTORY_GITHUB_CLONE_BASE"),
+    ) {
+        (None, None) => GithubEndpoints::github_com(),
+        (api, clone) => {
+            let default = GithubEndpoints::github_com();
+            GithubEndpoints::custom(
+                &api.unwrap_or(default.api_base),
+                &clone.unwrap_or(default.clone_base),
+            )
+            .map_err(|e| ConfigError::Invalid("FACTORY_GITHUB_APP_API_BASE", e.to_string()))?
+        }
+    };
+    Ok(Some(GithubAppSettings {
+        app_id,
+        private_key_file: PathBuf::from(key_file),
+        slug,
+        endpoints,
+    }))
 }
 
 /// CORS must never be allow-all: every entry is a plain `scheme://host[:port]` origin.
@@ -204,5 +323,80 @@ mod tests {
             ("FACTORY_MAX_BODY_BYTES", "0"),
         ]));
         assert!(r.is_err());
+    }
+
+    fn base<'a>(extra: &[(&'a str, &'a str)]) -> Vec<(&'a str, &'a str)> {
+        let mut vars = vec![
+            ("FACTORY_ENV", "development"),
+            ("DATABASE_URL", "postgres://x@y/z"),
+        ];
+        vars.extend_from_slice(extra);
+        vars
+    }
+
+    #[test]
+    fn upload_limits_default_and_override() {
+        let cfg = ServerConfig::from_lookup(lookup(&base(&[]))).unwrap();
+        assert_eq!(cfg.intake.upload_max_bytes, 512 * 1024 * 1024);
+        assert_eq!(cfg.intake.limits.max_upload_bytes, 512 * 1024 * 1024);
+        assert_eq!(
+            cfg.intake.limits,
+            IntakeLimits {
+                max_upload_bytes: 512 * 1024 * 1024,
+                ..IntakeLimits::default()
+            }
+        );
+        let cfg = ServerConfig::from_lookup(lookup(&base(&[
+            ("FACTORY_UPLOAD_MAX_BYTES", "1000"),
+            ("FACTORY_INTAKE_MAX_FILES", "7"),
+        ])))
+        .unwrap();
+        assert_eq!(cfg.intake.upload_max_bytes, 1000);
+        assert_eq!(cfg.intake.limits.max_upload_bytes, 1000);
+        assert_eq!(cfg.intake.limits.max_files, 7);
+        for bad in ["0", "-1", "many"] {
+            let r = ServerConfig::from_lookup(lookup(&base(&[("FACTORY_UPLOAD_MAX_BYTES", bad)])));
+            assert!(r.is_err(), "{bad}");
+        }
+    }
+
+    #[test]
+    fn github_app_is_off_without_settings_and_needs_both_when_set() {
+        let cfg = ServerConfig::from_lookup(lookup(&base(&[]))).unwrap();
+        assert!(cfg.github_app.is_none());
+        for partial in [
+            ("FACTORY_GITHUB_APP_ID", "5453675"),
+            ("FACTORY_GITHUB_APP_PRIVATE_KEY_FILE", "/run/secrets/k.pem"),
+        ] {
+            let r = ServerConfig::from_lookup(lookup(&base(&[partial])));
+            assert!(matches!(r, Err(ConfigError::Missing(_))), "{partial:?}");
+        }
+        let cfg = ServerConfig::from_lookup(lookup(&base(&[
+            ("FACTORY_GITHUB_APP_ID", "5453675"),
+            ("FACTORY_GITHUB_APP_PRIVATE_KEY_FILE", "/run/secrets/k.pem"),
+        ])))
+        .unwrap();
+        let app = cfg.github_app.unwrap();
+        assert_eq!(app.app_id, "5453675");
+        assert_eq!(app.slug, "hoi4-factory-dev");
+        assert_eq!(app.endpoints, GithubEndpoints::github_com());
+        assert_eq!(app.private_key_file, PathBuf::from("/run/secrets/k.pem"));
+    }
+
+    #[test]
+    fn github_app_values_are_validated() {
+        for (key, bad) in [
+            ("FACTORY_GITHUB_APP_ID", "abc"),
+            ("FACTORY_GITHUB_APP_SLUG", "has space"),
+            ("FACTORY_GITHUB_APP_API_BASE", "http://example.org"),
+        ] {
+            let mut vars = base(&[
+                ("FACTORY_GITHUB_APP_ID", "1"),
+                ("FACTORY_GITHUB_APP_PRIVATE_KEY_FILE", "k.pem"),
+            ]);
+            vars.retain(|(k, _)| *k != key);
+            vars.push((key, bad));
+            assert!(ServerConfig::from_lookup(lookup(&vars)).is_err(), "{key}");
+        }
     }
 }

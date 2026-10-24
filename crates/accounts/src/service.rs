@@ -477,7 +477,8 @@ Someone asked to reset the password of this HOI4 Factory account.               
         token: &str,
         new_password: String,
     ) -> Result<(), ApiError> {
-        PasswordHasher::check_policy(&new_password)?;
+        PasswordHasher::check_policy(&new_password)
+            .map_err(|e| e.with_id("field", "new_password"))?;
         if token.is_empty() || token.len() > 128 {
             return Err(invalid_token());
         }

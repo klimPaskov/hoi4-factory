@@ -385,6 +385,26 @@ async fn invalid_input_uses_the_error_envelope() {
         assert!(err["affected_ids"].is_object());
         assert!(err["evidence_refs"].is_array());
     }
+    // A validation error names the field the form should mark.
+    let named = [
+        (
+            json!({"email": "player@example.org", "password": "short"}),
+            "password",
+        ),
+        (
+            json!({"email": "not-an-email", "password": GOOD_PASSWORD}),
+            "email",
+        ),
+        (
+            json!({"email": "player@example.org", "password": GOOD_PASSWORD, "display_name": "x".repeat(81)}),
+            "display_name",
+        ),
+    ];
+    for (body, field) in named {
+        let resp = c.post("/api/v1/auth/signup", body).await;
+        assert_eq!(resp.status, 400, "{}", resp.text);
+        assert_eq!(resp.body["error"]["affected_ids"]["field"], field);
+    }
     // Not JSON at all.
     let resp = c.send("POST", "/api/v1/auth/signup", None, &[]).await;
     assert_eq!((resp.status, resp.error_code()), (400, "invalid_request"));

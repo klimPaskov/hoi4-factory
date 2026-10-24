@@ -41,11 +41,22 @@ struct Db {
     app: PgPool,
 }
 
+/// This crate's own migrations (0300 to 0302). The foreign keys to accounts and projects
+/// (0303) and the accounts tables belong to the server's migration set and are tested there
+/// (`crates/server/tests/intake_api.rs`); these tests use free-standing account and project ids.
 async fn migrator() -> sqlx::migrate::Migrator {
     let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../migrations");
-    sqlx::migrate::Migrator::new(dir)
+    let mut migrator = sqlx::migrate::Migrator::new(dir)
         .await
-        .expect("load migrations")
+        .expect("load migrations");
+    let own: Vec<_> = migrator
+        .migrations
+        .iter()
+        .filter(|m| (300..=302).contains(&m.version))
+        .cloned()
+        .collect();
+    migrator.migrations = std::borrow::Cow::Owned(own);
+    migrator
 }
 
 impl Db {

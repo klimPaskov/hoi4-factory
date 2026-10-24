@@ -9,6 +9,10 @@
 #
 #   HOI4_GAME_DIR=C:/Program Files (x86)/Steam/steamapps/common/Hearts of Iron IV
 #
+# Required: the GitHub App private key file, ./.work/github-app/private-key.pem (git-ignored). It is
+# bind-mounted read-only at /run/secrets/github-app-key.pem. To use another location set
+# FACTORY_GITHUB_APP_KEY_FILE; to run without GitHub, point it at any empty file.
+#
 # Optional: FACTORY_HOST_PORT (default 8080), MAILPIT_UI_PORT (default 8025),
 # FACTORY_ALLOWED_ORIGINS (default: a Vite dev server on port 5173).
 #
@@ -34,8 +38,18 @@ services:
       # The server connects as a non-superuser member of factory_app; the owner role migrates.
       DATABASE_URL: "postgres://factory_server@db:5432/factory"
       DATABASE_MIGRATION_URL: "postgres://factory@db:5432/factory"
+      # GitHub App (HOI4 Factory Dev). The private key is a read-only file mount, never an env value.
+      # Without the key file's content the GitHub routes report unavailable and nothing else changes.
+      FACTORY_GITHUB_APP_ID: "5453675"
+      FACTORY_GITHUB_APP_PRIVATE_KEY_FILE: /run/secrets/github-app-key.pem
     volumes:
       - workspace-data:/data
+      - type: bind
+        source: "${FACTORY_GITHUB_APP_KEY_FILE:-./.work/github-app/private-key.pem}"
+        target: /run/secrets/github-app-key.pem
+        read_only: true
+        bind:
+          create_host_path: false
       - type: bind
         source: "${HOI4_GAME_DIR:?Set HOI4_GAME_DIR to the Hearts of Iron IV game folder, for example in a git-ignored .env file}"
         target: /game

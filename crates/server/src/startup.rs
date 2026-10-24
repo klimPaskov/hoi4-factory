@@ -12,14 +12,22 @@ use factory_accounts::{
     AccountsDeps, AccountsState, Clock, Database, PoolSettings, PostureError, SetupError,
     SystemClock,
 };
+use factory_intake::{
+    FileTypePolicy, GithubConfig, GithubImporter, HttpGithubApi, IntakeError, IntakeService,
+    IntakeStore, SecretString, UploadIntake,
+};
 use factory_workspace::{StorageRoot, WorkspaceError};
 use tokio::net::TcpListener;
 
-use crate::config::{ServerConfig, cors_origins};
+use crate::config::{GithubAppSettings, ServerConfig, cors_origins};
 use crate::game_reference::GameReferenceHandle;
+use crate::github::{AppInstallations, ConfigSecrets, GithubRuntime, HttpAppInstallations};
 use crate::migrations;
-use crate::state::{RuntimeSettings, ServerState};
+use crate::state::{IntakeState, RuntimeSettings, ServerState};
 use crate::web::StaticSite;
+
+/// Directory under the data root where received uploads are spooled.
+const INCOMING_DIR: &str = "incoming";
 
 const CONNECT_ATTEMPTS: u32 = 15;
 const CONNECT_PAUSE: Duration = Duration::from_secs(2);
@@ -36,6 +44,10 @@ pub enum StartupError {
     Storage(#[from] WorkspaceError),
     #[error("{0}")]
     Setup(#[from] SetupError),
+    #[error("intake setup failed: {0}")]
+    Intake(#[from] IntakeError),
+    #[error("the upload spool directory is unusable: {0}")]
+    Spool(std::io::Error),
 }
 
 /// Replaceable collaborators, for tests.
@@ -43,6 +55,8 @@ pub enum StartupError {
 pub struct Overrides {
     pub accounts_deps: Option<AccountsDeps>,
     pub clock: Option<Arc<dyn Clock>>,
+    /// Replaces the HTTP lookup of the App's installations.
+    pub app_installations: Option<Arc<dyn AppInstallations>>,
 }
 
 pub async fn initialize(config: ServerConfig) -> Result<ServerState, StartupError> {
@@ -106,6 +120,8 @@ pub async fn initialize_with(
     };
     let accounts = AccountsState::new(db.clone(), config.accounts.clone(), deps)?;
 
+    let intake = build_intake(&config, &db, &storage, overrides.app_installations)?;
+
     let web = config.web_dist.as_deref().and_then(StaticSite::open);
     match (&config.web_dist, &web) {
         (Some(_), Some(_)) => tracing::info!("serving the browser client"),
@@ -118,6 +134,7 @@ pub async fn initialize_with(
         db,
         storage,
         game_reference,
+        intake,
         migrations: Arc::new(report),
         settings: Arc::new(RuntimeSettings {
             development: config.is_development(),
@@ -126,6 +143,95 @@ pub async fn initialize_with(
         }),
         web,
     })
+}
+
+/// Intake: upload limits, the spool directory and the GitHub importer. A GitHub App that is not
+/// configured, or whose key cannot be used, disables the GitHub routes and nothing else.
+fn build_intake(
+    config: &ServerConfig,
+    db: &Database,
+    storage: &StorageRoot,
+    app_installations: Option<Arc<dyn AppInstallations>>,
+) -> Result<IntakeState, StartupError> {
+    let limits = config.intake.limits.clone();
+    let policy = FileTypePolicy::default();
+
+    // Nothing uploaded survives a restart in the spool: whatever is there belongs to a request
+    // that no longer exists.
+    let incoming_dir = storage.data_root().join(INCOMING_DIR);
+    if incoming_dir.exists() {
+        std::fs::remove_dir_all(&incoming_dir).map_err(StartupError::Spool)?;
+    }
+    std::fs::create_dir_all(&incoming_dir).map_err(StartupError::Spool)?;
+
+    let (app_id, private_key) = load_github_credentials(config.github_app.as_ref());
+    let endpoints = config
+        .github_app
+        .as_ref()
+        .map(|g| g.endpoints.clone())
+        .unwrap_or_else(factory_intake::GithubEndpoints::github_com);
+    let secrets = Arc::new(ConfigSecrets::new(app_id, private_key.clone()));
+    let api = Arc::new(HttpGithubApi::new(&endpoints)?);
+    let importer = Arc::new(GithubImporter::new(
+        api,
+        secrets,
+        storage.clone(),
+        GithubConfig::new(endpoints.clone()),
+        limits.clone(),
+        policy.clone(),
+    ));
+    let uploads = Arc::new(UploadIntake::new(storage.clone(), limits.clone(), policy));
+    let service = IntakeService::new(IntakeStore::new(db.pool().clone()), uploads, importer);
+
+    let github = match (&config.github_app, private_key) {
+        (Some(settings), Some(key)) => {
+            let installations: Arc<dyn AppInstallations> = match app_installations {
+                Some(custom) => custom,
+                None => Arc::new(HttpAppInstallations::new(&endpoints)?),
+            };
+            let runtime = GithubRuntime::new(settings, key, installations);
+            tracing::info!(app_id = %settings.app_id, "GitHub import is available");
+            Some(runtime)
+        }
+        _ => None,
+    };
+    Ok(IntakeState {
+        service,
+        github,
+        limits,
+        upload_max_bytes: config.intake.upload_max_bytes,
+        incoming_dir,
+    })
+}
+
+/// The App id and the PEM, when the App is configured and the key file is usable. Logs what is
+/// wrong without ever printing the key.
+fn load_github_credentials(
+    settings: Option<&GithubAppSettings>,
+) -> (Option<String>, Option<SecretString>) {
+    let Some(settings) = settings else {
+        tracing::info!("GitHub import is unavailable: the GitHub App is not configured");
+        return (None, None);
+    };
+    let pem = match std::fs::read_to_string(&settings.private_key_file) {
+        Ok(text) if text.trim().is_empty() => {
+            tracing::warn!("GitHub import is unavailable: the App private key file is empty");
+            return (None, None);
+        }
+        Ok(text) => SecretString::new(text),
+        Err(err) => {
+            tracing::error!(
+                kind = ?err.kind(),
+                "GitHub import is unavailable: the App private key file cannot be read"
+            );
+            return (None, None);
+        }
+    };
+    if factory_intake::app_jwt(&settings.app_id, &pem, 0).is_err() {
+        tracing::error!("GitHub import is unavailable: the App private key is not a valid RSA PEM");
+        return (None, None);
+    }
+    (Some(settings.app_id.clone()), Some(pem))
 }
 
 /// Connects, retrying while the database comes up.

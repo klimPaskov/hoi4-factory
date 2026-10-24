@@ -1,19 +1,13 @@
-// PENDING ENDPOINTS. Everything in this module talks to routes that are being built in parallel
-// (intake and Setup). The paths and shapes below are the assumed contract. Until the server
-// serves them, the routes answer 404 and the UI shows a "not available yet" state
-// (ApiError.isUnavailable). Adjust the shapes here when the real contract lands.
+// Workspace, upload and GitHub routes are served by crates/server (intake_api.rs). The Setup
+// routes below are PENDING: the assumed contract is used until the server serves them, and a 404
+// shows a "not available yet" state (ApiError.isUnavailable).
 import { request } from './client';
 
-/** Endpoints this client expects but that did not exist when it was written. */
+/** Endpoints this client expects but that the server does not serve yet. */
 export const PENDING_ENDPOINTS = [
-  'GET /api/v1/game-reference',
-  'POST /api/v1/projects/{id}/uploads',
-  'GET /api/v1/projects/{id}/github/repositories',
-  'POST /api/v1/projects/{id}/github/import',
   'POST /api/v1/projects/{id}/setup/scan',
   'GET /api/v1/projects/{id}/setup/plan',
   'POST /api/v1/projects/{id}/setup/apply',
-  'GET /api/v1/projects/{id}/workspace',
 ] as const;
 
 const base = (projectId: string) => `/projects/${encodeURIComponent(projectId)}`;
@@ -34,13 +28,18 @@ export interface WorkspaceSummary {
   setup_state?: string | null;
 }
 
-/** PENDING: GET /api/v1/projects/{id}/workspace */
+/**
+ * GET /api/v1/projects/{id}/workspace answers { summary, descriptor }: the summary is this
+ * shape, the descriptor is the C-01 WorkspaceDescriptor (null while the project has no
+ * workspace, then summary.has_source is false).
+ */
 export async function getWorkspace(projectId: string, signal?: AbortSignal): Promise<WorkspaceSummary> {
-  const data = await request<{ workspace: WorkspaceSummary } | WorkspaceSummary>(
-    `${base(projectId)}/workspace`,
-    { signal },
-  );
-  return 'workspace' in data ? data.workspace : data;
+  const data = await request<
+    { summary: WorkspaceSummary } | { workspace: WorkspaceSummary } | WorkspaceSummary
+  >(`${base(projectId)}/workspace`, { signal });
+  if ('summary' in data) return data.summary;
+  if ('workspace' in data) return data.workspace;
+  return data;
 }
 
 // ----- Upload ------------------------------------------------------------------------------
@@ -52,17 +51,20 @@ export interface UploadItem {
 }
 
 /**
- * PENDING: POST /api/v1/projects/{id}/uploads (multipart/form-data).
- * Fields: `kind` ("zip" or "folder"), then one `files` part per file whose filename is the
- * relative path inside the upload.
+ * POST /api/v1/projects/{id}/uploads (multipart/form-data).
+ * Fields: `kind` ("zip" or "folder"), `git_init_consent` ("true" lets the server start a Git
+ * history when the mod has none), then one `files` part per file whose filename is the relative
+ * path inside the upload.
  */
 export async function uploadMod(
   projectId: string,
   kind: 'zip' | 'folder',
   items: UploadItem[],
-): Promise<{ upload_id?: string }> {
+  options: { gitInitConsent?: boolean } = {},
+): Promise<{ upload?: { upload_id?: string } }> {
   const form = new FormData();
   form.append('kind', kind);
+  form.append('git_init_consent', options.gitInitConsent ? 'true' : 'false');
   for (const item of items) form.append('files', item.file, item.path);
   return request(`${base(projectId)}/uploads`, { method: 'POST', form });
 }
@@ -76,7 +78,7 @@ export interface GithubRepository {
   private: boolean;
 }
 
-/** PENDING: GET /api/v1/projects/{id}/github/repositories */
+/** GET /api/v1/projects/{id}/github/repositories */
 export async function listGithubRepositories(
   projectId: string,
   signal?: AbortSignal,
@@ -88,11 +90,11 @@ export async function listGithubRepositories(
   return data.repositories;
 }
 
-/** PENDING: POST /api/v1/projects/{id}/github/import. `ref` is a branch, tag or commit; empty means default. */
+/** POST /api/v1/projects/{id}/github/import. `ref` is a branch name; empty means the default branch. */
 export async function importFromGithub(
   projectId: string,
   input: { repository: string; ref?: string },
-): Promise<{ import_id?: string }> {
+): Promise<{ link?: { id: string } }> {
   return request(`${base(projectId)}/github/import`, { method: 'POST', body: input });
 }
 
