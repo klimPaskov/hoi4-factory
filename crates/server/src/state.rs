@@ -1,11 +1,13 @@
 //! Shared state of the running server.
 
+use std::collections::HashMap;
 use std::path::PathBuf;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 use axum::extract::FromRef;
 use factory_accounts::{AccountsState, Database};
 use factory_intake::{IntakeLimits, IntakeService};
+use factory_setup_adapter::{OnboardingSessionId, SetupAdapter};
 use factory_workspace::StorageRoot;
 
 use crate::game_reference::GameReferenceHandle;
@@ -36,10 +38,29 @@ pub struct IntakeState {
     pub incoming_dir: PathBuf,
 }
 
+/// The onboarding session of one account on one project, as the scan route opened it.
+#[derive(Debug, Clone)]
+pub struct ActiveSetup {
+    pub session: OnboardingSessionId,
+    /// `create` or `existing`, as the scan was asked for.
+    pub mode: String,
+    /// The brief of a new mod. Kept for the analysis step.
+    pub description: Option<String>,
+}
+
+/// The Setup adapter and the registry of live onboarding sessions. The adapter keeps the Setup
+/// gates of a session in memory, so a restart ends every session: the next scan opens a new one.
+#[derive(Clone)]
+pub struct SetupState {
+    pub adapter: SetupAdapter,
+    pub sessions: Arc<
+        Mutex<HashMap<(factory_accounts::AccountId, factory_accounts::ProjectId), ActiveSetup>>,
+    >,
+}
+
 /// Everything a handler can reach. Cloning shares the underlying pools and handles.
 ///
-/// Extension point: the Setup adapter adds its own field here and is wired in
-/// [`crate::routes::api_routes`]. A handler that needs only one part takes it with
+/// A handler that needs only one part takes it with
 /// `State<AccountsState>` (via [`FromRef`]) instead of the whole struct.
 #[derive(Clone)]
 pub struct ServerState {
@@ -48,10 +69,10 @@ pub struct ServerState {
     pub storage: StorageRoot,
     pub game_reference: GameReferenceHandle,
     pub intake: IntakeState,
+    pub setup: SetupState,
     pub migrations: Arc<MigrationReport>,
     pub settings: Arc<RuntimeSettings>,
     pub web: Option<StaticSite>,
-    // pub setup: factory_setup_adapter::SetupState,
 }
 
 impl FromRef<ServerState> for AccountsState {
@@ -75,6 +96,12 @@ impl FromRef<ServerState> for StorageRoot {
 impl FromRef<ServerState> for GameReferenceHandle {
     fn from_ref(state: &ServerState) -> Self {
         state.game_reference.clone()
+    }
+}
+
+impl FromRef<ServerState> for SetupState {
+    fn from_ref(state: &ServerState) -> Self {
+        state.setup.clone()
     }
 }
 

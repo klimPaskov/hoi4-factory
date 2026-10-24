@@ -20,6 +20,8 @@ factory-accounts = { path = "../accounts" }
 factory-workspace = { path = "../workspace" }
 factory-game-ref = { path = "../game-ref" }
 factory-intake = { path = "../intake" }
+factory-setup-adapter = { path = "../setup-adapter" }
+factory-agent = { path = "../agent", default-features = false, features = ["anthropic"] }
 axum = { workspace = true, features = ["multipart"] }
 async-trait.workspace = true
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }

@@ -13,6 +13,9 @@
 # bind-mounted read-only at /run/secrets/github-app-key.pem. To use another location set
 # FACTORY_GITHUB_APP_KEY_FILE; to run without GitHub, point it at any empty file.
 #
+# Optional: FACTORY_ANTHROPIC_API_KEY (host environment, for Setup analysis) and
+# FACTORY_ANTHROPIC_MODEL.
+#
 # Optional: FACTORY_HOST_PORT (default 8080), MAILPIT_UI_PORT (default 8025),
 # FACTORY_ALLOWED_ORIGINS (default: a Vite dev server on port 5173).
 #
@@ -42,6 +45,10 @@ services:
       # Without the key file's content the GitHub routes report unavailable and nothing else changes.
       FACTORY_GITHUB_APP_ID: "5453675"
       FACTORY_GITHUB_APP_PRIVATE_KEY_FILE: /run/secrets/github-app-key.pem
+      # Setup analysis model. The key is passed from the host environment (never baked into the image,
+      # never logged); an empty value leaves analysis unavailable. Model default: claude-haiku-5-5.
+      FACTORY_ANTHROPIC_API_KEY: "${FACTORY_ANTHROPIC_API_KEY:-}"
+      FACTORY_ANTHROPIC_MODEL: "${FACTORY_ANTHROPIC_MODEL:-}"
     volumes:
       - workspace-data:/data
       - type: bind

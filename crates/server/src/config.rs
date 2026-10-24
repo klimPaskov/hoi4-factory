@@ -19,6 +19,8 @@
 //! | `FACTORY_GITHUB_APP_PRIVATE_KEY_FILE` | Path of the App private key (PEM), read at startup and never logged | none |
 //! | `FACTORY_GITHUB_APP_SLUG` | App slug, for the installation link | `hoi4-factory-dev` |
 //! | `FACTORY_GITHUB_APP_API_BASE`, `FACTORY_GITHUB_CLONE_BASE` | GitHub REST and Git transport bases (tests; `https`, or `http` on loopback) | `https://api.github.com`, `https://github.com` |
+//! | `FACTORY_ANTHROPIC_API_KEY` | API key for setup analysis. Analysis is unavailable when absent. Never logged | none |
+//! | `FACTORY_ANTHROPIC_MODEL`, `FACTORY_ANTHROPIC_BASE_URL` | Model id and API base | `claude-haiku-5-5`, `https://api.anthropic.com` |
 //! | `RUST_LOG` | Log filter | `info,sqlx=warn` |
 //!
 //! Pool limits (`FACTORY_DB_*`) are read by [`factory_accounts::PoolSettings`].
@@ -43,6 +45,17 @@ pub struct ServerConfig {
     pub intake: IntakeSettings,
     /// `None` when `FACTORY_GITHUB_APP_ID` or the key file setting is absent.
     pub github_app: Option<GithubAppSettings>,
+    /// `None` when `FACTORY_ANTHROPIC_API_KEY` is absent: analysis is then unavailable.
+    pub anthropic: Option<AnthropicSettings>,
+}
+
+/// The model provider the server routes analysis to.
+#[derive(Debug, Clone)]
+pub struct AnthropicSettings {
+    pub api_key: Redacted<String>,
+    pub model: String,
+    /// No trailing slash; `https`, or `http` on loopback for tests.
+    pub base_url: String,
 }
 
 /// Upload route and intake limits.
@@ -104,6 +117,7 @@ impl ServerConfig {
         validate_origins(&accounts.allowed_origins)?;
         let intake = intake_settings(&non_empty)?;
         let github_app = github_app_settings(&non_empty)?;
+        let anthropic = anthropic_settings(&non_empty)?;
         Ok(Self {
             listen: non_empty("FACTORY_LISTEN").unwrap_or_else(|| "0.0.0.0:8080".to_owned()),
             database_url: Redacted(database_url),
@@ -119,6 +133,7 @@ impl ServerConfig {
             max_body_bytes,
             intake,
             github_app,
+            anthropic,
             accounts,
         })
     }
@@ -167,6 +182,35 @@ fn intake_settings(
         upload_max_bytes,
         limits,
     })
+}
+
+fn anthropic_settings(
+    non_empty: &impl Fn(&str) -> Option<String>,
+) -> Result<Option<AnthropicSettings>, ConfigError> {
+    let Some(key) = non_empty("FACTORY_ANTHROPIC_API_KEY") else {
+        return Ok(None);
+    };
+    let model = non_empty("FACTORY_ANTHROPIC_MODEL").unwrap_or_else(|| "claude-haiku-5-5".into());
+    if model.len() > 100
+        || !model
+            .bytes()
+            .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'-' | b'.' | b'_'))
+    {
+        return Err(ConfigError::Invalid(
+            "FACTORY_ANTHROPIC_MODEL",
+            "expected a model id".into(),
+        ));
+    }
+    let base_url = non_empty("FACTORY_ANTHROPIC_BASE_URL")
+        .unwrap_or_else(|| "https://api.anthropic.com".into());
+    // The same rule as the GitHub endpoints: https, or http on loopback, no credentials in the URL.
+    GithubEndpoints::custom(&base_url, &base_url)
+        .map_err(|e| ConfigError::Invalid("FACTORY_ANTHROPIC_BASE_URL", e.to_string()))?;
+    Ok(Some(AnthropicSettings {
+        api_key: Redacted(key.trim().to_owned()),
+        model,
+        base_url: base_url.trim_end_matches('/').to_owned(),
+    }))
 }
 
 fn github_app_settings(
@@ -395,6 +439,43 @@ mod tests {
                 ("FACTORY_GITHUB_APP_PRIVATE_KEY_FILE", "k.pem"),
             ]);
             vars.retain(|(k, _)| *k != key);
+            vars.push((key, bad));
+            assert!(ServerConfig::from_lookup(lookup(&vars)).is_err(), "{key}");
+        }
+    }
+
+    #[test]
+    fn anthropic_key_is_optional_and_never_printed() {
+        let cfg = ServerConfig::from_lookup(lookup(&base(&[]))).unwrap();
+        assert!(cfg.anthropic.is_none());
+        let cfg = ServerConfig::from_lookup(lookup(&base(&[(
+            "FACTORY_ANTHROPIC_API_KEY",
+            "sk-secret-value",
+        )])))
+        .unwrap();
+        let settings = cfg.anthropic.clone().unwrap();
+        assert_eq!(settings.model, "claude-haiku-5-5");
+        assert_eq!(settings.base_url, "https://api.anthropic.com");
+        assert_eq!(settings.api_key.0, "sk-secret-value");
+        assert!(!format!("{cfg:?}").contains("sk-secret-value"));
+        // An empty value (compose passes an unset host variable as empty) means "not set".
+        let cfg = ServerConfig::from_lookup(lookup(&base(&[("FACTORY_ANTHROPIC_API_KEY", " ")])))
+            .unwrap();
+        assert!(cfg.anthropic.is_none());
+        let cfg = ServerConfig::from_lookup(lookup(&base(&[
+            ("FACTORY_ANTHROPIC_API_KEY", "k"),
+            ("FACTORY_ANTHROPIC_MODEL", "claude-sonnet-5-5"),
+            ("FACTORY_ANTHROPIC_BASE_URL", "http://127.0.0.1:9999/"),
+        ])))
+        .unwrap();
+        let settings = cfg.anthropic.unwrap();
+        assert_eq!(settings.model, "claude-sonnet-5-5");
+        assert_eq!(settings.base_url, "http://127.0.0.1:9999");
+        for (key, bad) in [
+            ("FACTORY_ANTHROPIC_MODEL", "no spaces allowed"),
+            ("FACTORY_ANTHROPIC_BASE_URL", "http://example.org"),
+        ] {
+            let mut vars = base(&[("FACTORY_ANTHROPIC_API_KEY", "k")]);
             vars.push((key, bad));
             assert!(ServerConfig::from_lookup(lookup(&vars)).is_err(), "{key}");
         }

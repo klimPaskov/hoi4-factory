@@ -44,11 +44,16 @@ pub fn components() -> Vec<Component> {
             migrator: factory_accounts::migrator(),
             probe_table: "accounts",
         },
-        // The workspace crate has no tables. Component { name: "setup-adapter", ... } follows at 0400.
+        // The workspace crate has no tables.
         Component {
             name: "intake",
             migrator: range_migrator(INTAKE_VERSIONS),
             probe_table: "intake_uploads",
+        },
+        Component {
+            name: "setup-adapter",
+            migrator: factory_setup_adapter::migrator(),
+            probe_table: "setup_sessions",
         },
     ]
 }

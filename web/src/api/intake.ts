@@ -1,14 +1,7 @@
-// Workspace, upload and GitHub routes are served by crates/server (intake_api.rs). The Setup
-// routes below are PENDING: the assumed contract is used until the server serves them, and a 404
-// shows a "not available yet" state (ApiError.isUnavailable).
+// Workspace, upload, GitHub and Setup routes are served by crates/server (intake_api.rs,
+// setup_api.rs). A 404 or 501 shows a "not available yet" state (ApiError.isUnavailable): today
+// that is the plan, until the server has a plan builder.
 import { request } from './client';
-
-/** Endpoints this client expects but that the server does not serve yet. */
-export const PENDING_ENDPOINTS = [
-  'POST /api/v1/projects/{id}/setup/scan',
-  'GET /api/v1/projects/{id}/setup/plan',
-  'POST /api/v1/projects/{id}/setup/apply',
-] as const;
 
 const base = (projectId: string) => `/projects/${encodeURIComponent(projectId)}`;
 
@@ -108,7 +101,11 @@ export interface SetupScan {
   incomplete?: boolean;
 }
 
-/** PENDING: POST /api/v1/projects/{id}/setup/scan. `mode: "create"` plans a new mod; `"existing"` inspects what was brought in. */
+/**
+ * POST /api/v1/projects/{id}/setup/scan. `mode: "create"` plans a new mod (the server prepares an
+ * empty workspace); `"existing"` inspects what was brought in and answers 409 `no_source` when
+ * nothing was. The scan is read-only.
+ */
 export async function scanSetup(
   projectId: string,
   input: { mode: 'create' | 'existing'; description?: string },
@@ -120,11 +117,18 @@ export type PlanAction = 'create' | 'change' | 'preserve' | 'conflict';
 
 export interface SetupPlan {
   plan_id: string;
+  /** The hash of the plan as shown. Send it back with apply to approve exactly this plan. */
+  plan_sha256?: string;
+  state?: string;
   operations: { path: string; action: PlanAction; note?: string }[];
   components?: { name: string; version: string }[];
 }
 
-/** PENDING: GET /api/v1/projects/{id}/setup/plan (the dry run; nothing is written). */
+/**
+ * GET /api/v1/projects/{id}/setup/plan answers { plan }. It answers 501 `capability_unavailable`
+ * until the server has a plan builder, and 409 `plan_not_built` when none was built yet; the UI
+ * shows the first as "not available yet".
+ */
 export async function getSetupPlan(projectId: string, signal?: AbortSignal): Promise<SetupPlan> {
   const data = await request<{ plan: SetupPlan } | SetupPlan>(`${base(projectId)}/setup/plan`, {
     signal,
@@ -133,12 +137,57 @@ export async function getSetupPlan(projectId: string, signal?: AbortSignal): Pro
 }
 
 export interface SetupApplyResult {
-  /** For example "applied", "needs_rollback" or "failed". */
+  /** "applied", "needs_rollback" (the project was changed and the apply did not finish) or "interrupted". */
   status: string;
   receipt_id?: string;
+  journal_id?: string;
+  /** For an unfinished apply: the one recovery the journal permits. */
+  variant?: string;
+  explanation?: string;
 }
 
-/** PENDING: POST /api/v1/projects/{id}/setup/apply. Authorizes exactly the plan named by `plan_id`. */
-export async function applySetup(projectId: string, planId: string): Promise<SetupApplyResult> {
-  return request(`${base(projectId)}/setup/apply`, { method: 'POST', body: { plan_id: planId } });
+/**
+ * POST /api/v1/projects/{id}/setup/apply. Applies exactly the plan named by `plan_id`, and only
+ * once it is approved. Sending `plan_sha256` (from the plan as shown) approves that exact plan
+ * first; without approval the server refuses and changes nothing.
+ */
+export async function applySetup(
+  projectId: string,
+  planId: string,
+  planSha256?: string,
+): Promise<SetupApplyResult> {
+  return request(`${base(projectId)}/setup/apply`, {
+    method: 'POST',
+    body: planSha256 ? { plan_id: planId, plan_sha256: planSha256 } : { plan_id: planId },
+  });
+}
+
+export interface SetupRecovery {
+  journal_id: string;
+  variant: string;
+  /** "resume", "rollback" or "discard_staging"; absent when only manual review is possible. */
+  allowed_action: string | null;
+  explanation: string;
+  journal_state: string;
+  owner_active: boolean;
+}
+
+/** GET /api/v1/projects/{id}/setup/recovery answers { recovery }, null when nothing was interrupted. */
+export async function getSetupRecovery(
+  projectId: string,
+  signal?: AbortSignal,
+): Promise<SetupRecovery | null> {
+  const data = await request<{ recovery: SetupRecovery | null }>(
+    `${base(projectId)}/setup/recovery`,
+    { signal },
+  );
+  return data.recovery;
+}
+
+/** POST /api/v1/projects/{id}/setup/recover takes the one action the journal permits for `variant`. */
+export async function recoverSetup(
+  projectId: string,
+  input: { journal_id: string; variant: string },
+): Promise<{ recovery: { action: string; journal_state: string } }> {
+  return request(`${base(projectId)}/setup/recover`, { method: 'POST', body: input });
 }

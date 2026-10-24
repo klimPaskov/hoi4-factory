@@ -64,11 +64,17 @@ const BASELINE_BRANCH: &str = "main";
 const LINK_GITHUB_PATH: &str = "/api/v1/auth/github/start?link=1";
 
 /// The routes of this module, relative to `/api/v1`.
-pub fn router(state: &ServerState) -> Router {
+/// Origins that may make state-changing requests: ours and the configured extras.
+pub(crate) fn accepted_origins(state: &ServerState) -> Vec<String> {
     let mut accepted = cors_origins(&state.accounts.config().allowed_origins);
     accepted.extend(cors_origins(std::slice::from_ref(
         &state.accounts.config().public_url,
     )));
+    accepted
+}
+
+pub fn router(state: &ServerState) -> Router {
+    let accepted = accepted_origins(state);
     Router::new()
         .route(
             "/projects/{id}/uploads",
@@ -85,7 +91,7 @@ pub fn router(state: &ServerState) -> Router {
 /// The accounts router's cross-site protection for state-changing requests, applied to these
 /// routes too: a request that names an origin must name one of ours, and a browser-declared
 /// cross-site request without an Origin header is refused. Clients that send neither pass.
-async fn origin_guard(
+pub(crate) async fn origin_guard(
     State(accepted): State<Vec<String>>,
     request: Request,
     next: Next,

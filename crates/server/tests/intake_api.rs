@@ -189,6 +189,7 @@ async fn github_fixture() -> GithubFixture {
 struct Options {
     github: Option<GithubFixture>,
     upload_max_bytes: Option<usize>,
+    anthropic_key: Option<&'static str>,
 }
 
 struct Harness {
@@ -223,6 +224,9 @@ impl Harness {
         vars.insert("FACTORY_ENV", "development".into());
         vars.insert("FACTORY_PUBLIC_URL", "http://localhost:8080".into());
         vars.insert("FACTORY_ALLOWED_ORIGINS", "http://localhost:5173".into());
+        if let Some(key) = options.anthropic_key {
+            vars.insert("FACTORY_ANTHROPIC_API_KEY", key.to_owned());
+        }
         if let Some(limit) = options.upload_max_bytes {
             vars.insert("FACTORY_UPLOAD_MAX_BYTES", limit.to_string());
         }
@@ -1566,5 +1570,505 @@ async fn hit(client: &Client, method: &str, tail: &str, project: &str) -> Resp {
         }
         ("POST", _) => client.post(&path, json!({"repository": REPO})).await,
         _ => client.get(&path).await,
+    }
+}
+
+// ----- Setup routes --------------------------------------------------------------------------
+
+async fn uploaded_project(h: &Harness, user: &User, name: &str) -> String {
+    let project = h.project(user, name).await;
+    let resp = user
+        .client
+        .upload(
+            &project,
+            &[
+                Part::text("kind", "zip"),
+                Part::text("git_init_consent", "true"),
+                Part::file("synthetic.zip", build_zip(&mod_entries())),
+            ],
+        )
+        .await;
+    assert_eq!(resp.status, 201, "{}", resp.text);
+    project
+}
+
+#[tokio::test]
+async fn a_scan_of_an_uploaded_mod_is_read_only_and_planning_is_unavailable() {
+    let h = Harness::start(Options::default()).await;
+    let alice = h.verified_user("alice@example.org").await;
+    let project = uploaded_project(&h, &alice, "Scanned").await;
+    let base = format!("/api/v1/projects/{project}/setup");
+    let source = h.workspace_source(&alice, &project);
+    let before = alice
+        .client
+        .get(&format!("/api/v1/projects/{project}/workspace"))
+        .await;
+
+    // Nothing to plan or apply before a scan.
+    let status0 = alice.client.get(&format!("{base}/status")).await;
+    assert_eq!(status0.status, 200, "{}", status0.text);
+    assert_eq!(status0.body["session_open"], false);
+    assert!(status0.body["status"]["latest_scan"].is_null());
+    let apply0 = alice
+        .client
+        .post(&format!("{base}/apply"), json!({"plan_id": Uuid::new_v4()}))
+        .await;
+    assert_eq!(
+        (apply0.status, apply0.error_code()),
+        (409, "setup_session_missing")
+    );
+
+    // The scan.
+    let scan = alice
+        .client
+        .post(&format!("{base}/scan"), json!({"mode": "existing"}))
+        .await;
+    assert_eq!(scan.status, 200, "{}", scan.text);
+    let scan_id = scan.body["scan_id"].as_str().expect("scan id").to_owned();
+    assert_eq!(scan.body["incomplete"], false);
+    assert_eq!(scan.body["workspace_unchanged"], true);
+    let facts = scan.body["facts"].as_array().unwrap();
+    let fact = |label: &str| {
+        facts
+            .iter()
+            .find(|f| f["label"] == label)
+            .unwrap_or_else(|| panic!("fact {label} in {facts:?}"))["value"]
+            .as_str()
+            .unwrap()
+            .to_owned()
+    };
+    assert_eq!(fact("Coverage"), "complete");
+    assert!(fact("Files scanned").parse::<u32>().unwrap() >= 1, "{facts:?}");
+    assert_eq!(fact("descriptor: mod_name"), "Synthetic");
+    let labels: Vec<&str> = facts.iter().map(|f| f["label"].as_str().unwrap()).collect();
+    let unique: std::collections::BTreeSet<_> = labels.iter().collect();
+    assert_eq!(
+        labels.len(),
+        unique.len(),
+        "fact labels are unique: {labels:?}"
+    );
+    assert!(
+        !scan
+            .text
+            .contains(&h.data_dir.path().to_string_lossy().into_owned())
+    );
+
+    // Read-only: bytes and the descriptor of the workspace are exactly what they were.
+    assert_eq!(
+        std::fs::read(source.join("descriptor.mod")).unwrap(),
+        DESCRIPTOR_MOD
+    );
+    assert_eq!(std::fs::read(source.join("notes.txt")).unwrap(), LF_TXT);
+    let after = alice
+        .client
+        .get(&format!("/api/v1/projects/{project}/workspace"))
+        .await;
+    assert_eq!(
+        before.body["descriptor"]["source_snapshot"]["inventory_hash"],
+        after.body["descriptor"]["source_snapshot"]["inventory_hash"]
+    );
+
+    // Status remembers the scan; recovery has nothing to say.
+    let status = alice.client.get(&format!("{base}/status")).await;
+    assert_eq!(status.status, 200, "{}", status.text);
+    assert_eq!(status.body["session_open"], true);
+    assert_eq!(status.body["status"]["latest_scan"]["id"], scan_id);
+    let caps = status.body["status"]["capabilities"]["operations"]
+        .as_array()
+        .unwrap();
+    let plan_cap = caps.iter().find(|c| c["operation"] == "planSetup").unwrap();
+    assert_eq!(plan_cap["available"], false);
+    let recovery = alice.client.get(&format!("{base}/recovery")).await;
+    assert_eq!(recovery.status, 200, "{}", recovery.text);
+    assert!(recovery.body["recovery"].is_null());
+
+    // No plan builder: the plan is unavailable and nothing is invented.
+    let plan = alice.client.get(&format!("{base}/plan")).await;
+    assert_eq!(
+        (plan.status, plan.error_code()),
+        (501, "capability_unavailable"),
+        "{}",
+        plan.text
+    );
+
+    // A second scan replaces the session and reports a new scan.
+    let again = alice
+        .client
+        .post(&format!("{base}/scan"), json!({"mode": "existing"}))
+        .await;
+    assert_eq!(again.status, 200, "{}", again.text);
+    assert_ne!(again.body["scan_id"].as_str().unwrap(), scan_id);
+
+    // Request mistakes name the field.
+    let bad_mode = alice
+        .client
+        .post(&format!("{base}/scan"), json!({"mode": "everything"}))
+        .await;
+    assert_eq!(
+        (bad_mode.status, bad_mode.error_code()),
+        (400, "invalid_request")
+    );
+    assert_eq!(bad_mode.body["error"]["affected_ids"]["field"], "mode");
+    let unknown = alice
+        .client
+        .post(
+            &format!("{base}/scan"),
+            json!({"mode": "existing", "path": "/etc"}),
+        )
+        .await;
+    assert_eq!(unknown.status, 400, "no path comes from the caller");
+}
+
+#[tokio::test]
+async fn apply_is_refused_without_an_approved_plan_and_changes_nothing() {
+    let h = Harness::start(Options::default()).await;
+    let alice = h.verified_user("alice@example.org").await;
+    let project = uploaded_project(&h, &alice, "Unapproved").await;
+    let base = format!("/api/v1/projects/{project}/setup");
+    let scan = alice
+        .client
+        .post(&format!("{base}/scan"), json!({"mode": "existing"}))
+        .await;
+    assert_eq!(scan.status, 200, "{}", scan.text);
+    let inventory_before = alice
+        .client
+        .get(&format!("/api/v1/projects/{project}/workspace"))
+        .await
+        .body["descriptor"]["source_snapshot"]["inventory_hash"]
+        .clone();
+
+    // A plan id nobody built, with and without the hash an approval would carry, and the id of
+    // the scan, which is not a plan.
+    for body in [
+        json!({"plan_id": Uuid::new_v4()}),
+        json!({"plan_id": Uuid::new_v4(), "plan_sha256": "0".repeat(64)}),
+        json!({"plan_id": scan.body["scan_id"]}),
+    ] {
+        let resp = alice.client.post(&format!("{base}/apply"), body).await;
+        assert!(
+            (400..500).contains(&resp.status),
+            "refused, not applied: {} {}",
+            resp.status,
+            resp.text
+        );
+        assert_ne!(resp.body["status"], "applied");
+        assert!(resp.body["error"]["code"].is_string(), "{}", resp.text);
+    }
+
+    let after = alice
+        .client
+        .get(&format!("/api/v1/projects/{project}/workspace"))
+        .await;
+    assert_eq!(
+        after.body["descriptor"]["source_snapshot"]["inventory_hash"],
+        inventory_before
+    );
+    assert!(
+        after.body["descriptor"]["source_snapshot"]["dirty_files"]
+            .as_array()
+            .unwrap()
+            .is_empty()
+    );
+    let admin = h.admin().await;
+    let transactions: i64 = sqlx::query_scalar("SELECT count(*) FROM setup_transactions")
+        .fetch_one(&admin)
+        .await
+        .unwrap();
+    assert_eq!(transactions, 0, "no transaction was started");
+    let approvals: i64 = sqlx::query_scalar("SELECT count(*) FROM setup_approvals")
+        .fetch_one(&admin)
+        .await
+        .unwrap();
+    assert_eq!(approvals, 0);
+}
+
+#[tokio::test]
+async fn a_new_mod_scan_starts_from_an_empty_workspace_and_existing_needs_a_mod() {
+    let h = Harness::start(Options::default()).await;
+    let alice = h.verified_user("alice@example.org").await;
+    let project = h.project(&alice, "Brand new").await;
+    let base = format!("/api/v1/projects/{project}/setup");
+
+    let none = alice
+        .client
+        .post(&format!("{base}/scan"), json!({"mode": "existing"}))
+        .await;
+    assert_eq!((none.status, none.error_code()), (409, "no_source"));
+
+    let created = alice
+        .client
+        .post(
+            &format!("{base}/scan"),
+            json!({"mode": "create", "description": "A small focus tree mod"}),
+        )
+        .await;
+    assert_eq!(created.status, 200, "{}", created.text);
+    assert!(h.workspace_source(&alice, &project).is_dir());
+    let ws = alice
+        .client
+        .get(&format!("/api/v1/projects/{project}/workspace"))
+        .await;
+    assert_eq!(ws.body["summary"]["has_source"], false);
+    assert_eq!(ws.body["summary"]["file_count"], 0);
+    let too_long = alice
+        .client
+        .post(
+            &format!("{base}/scan"),
+            json!({"mode": "create", "description": "x".repeat(5000)}),
+        )
+        .await;
+    assert_eq!(
+        too_long.body["error"]["affected_ids"]["field"],
+        "description"
+    );
+}
+
+#[tokio::test]
+async fn setup_routes_of_another_account_are_the_same_404_and_signed_out_is_401() {
+    let h = Harness::start(Options::default()).await;
+    let alice = h.verified_user("alice@example.org").await;
+    let bob = h.verified_user("bob@example.org").await;
+    let project = uploaded_project(&h, &alice, "Alice's").await;
+    let alice_scan = alice
+        .client
+        .post(
+            &format!("/api/v1/projects/{project}/setup/scan"),
+            json!({"mode": "existing"}),
+        )
+        .await;
+    assert_eq!(alice_scan.status, 200, "{}", alice_scan.text);
+    let missing = Uuid::new_v4().to_string();
+    let calls: Vec<(&str, &str, Value)> = vec![
+        ("POST", "scan", json!({"mode": "existing"})),
+        ("POST", "scan", json!({"mode": "create"})),
+        ("GET", "plan", Value::Null),
+        ("POST", "apply", json!({"plan_id": Uuid::new_v4()})),
+        ("GET", "status", Value::Null),
+        ("GET", "recovery", Value::Null),
+        (
+            "POST",
+            "recover",
+            json!({"journal_id": Uuid::new_v4(), "variant": "manual_review"}),
+        ),
+    ];
+    for (method, tail, body) in &calls {
+        let foreign = setup_call(&bob.client, method, &project, tail, body).await;
+        let absent = setup_call(&bob.client, method, &missing, tail, body).await;
+        assert_eq!(
+            (foreign.status, foreign.error_code()),
+            (404, "not_found"),
+            "{method} {tail}: {}",
+            foreign.text
+        );
+        assert_eq!(
+            foreign.body, absent.body,
+            "{method} {tail}: a foreign project looks exactly like a missing one"
+        );
+        let anonymous_client = h.client();
+        let anonymous = setup_call(&anonymous_client, method, &project, tail, body).await;
+        assert_eq!(
+            (anonymous.status, anonymous.error_code()),
+            (401, "unauthenticated"),
+            "{method} {tail}"
+        );
+    }
+    // Alice is unaffected: her bytes, her session and her workspace.
+    let status = alice
+        .client
+        .get(&format!("/api/v1/projects/{project}/setup/status"))
+        .await;
+    assert_eq!(status.body["session_open"], true);
+    assert_eq!(
+        std::fs::read(h.workspace_source(&alice, &project).join("descriptor.mod")).unwrap(),
+        DESCRIPTOR_MOD
+    );
+    assert!(!h.data_dir.path().join("workspaces").join(&bob.id).exists());
+    // A cross-site request is refused like every other state-changing route.
+    let csrf = alice
+        .client
+        .send_raw(
+            "POST",
+            &format!("/api/v1/projects/{project}/setup/scan"),
+            Some("application/json"),
+            json!({"mode": "existing"}).to_string().into_bytes(),
+            &[("origin", "https://evil.example")],
+        )
+        .await;
+    assert_eq!(
+        (csrf.status, csrf.error_code()),
+        (403, "origin_not_allowed")
+    );
+}
+
+#[tokio::test]
+async fn the_setup_migrations_run_in_order_after_intake() {
+    let h = Harness::start(Options::default()).await;
+    let names: Vec<&str> = h
+        .state
+        .migrations
+        .components
+        .iter()
+        .map(|c| c.name)
+        .collect();
+    assert_eq!(names, ["accounts", "intake", "setup-adapter"]);
+    let latest: Vec<i64> = h
+        .state
+        .migrations
+        .components
+        .iter()
+        .map(|c| c.latest_version)
+        .collect();
+    assert!(latest.windows(2).all(|w| w[0] < w[1]), "{latest:?}");
+    let ready = h.client().get("/readyz").await;
+    assert_eq!(ready.status, 200, "{}", ready.text);
+    assert_eq!(ready.body["checks"]["migrations"]["ok"], true);
+}
+
+// ----- the model client ----------------------------------------------------------------------
+
+type SeenRequests = Arc<Mutex<Vec<(HeaderMap, Value)>>>;
+
+async fn fake_messages(
+    axum::extract::State(seen): axum::extract::State<SeenRequests>,
+    headers: HeaderMap,
+    axum::Json(body): axum::Json<Value>,
+) -> axum::response::Response {
+    use axum::http::StatusCode;
+    use axum::response::IntoResponse;
+    let fail = headers.get("x-api-key").and_then(|v| v.to_str().ok()) == Some("sk-wrong");
+    seen.lock().unwrap().push((headers, body));
+    if fail {
+        return (
+            StatusCode::UNAUTHORIZED,
+            axum::Json(json!({"type": "error", "error": {"type": "authentication_error", "message": "invalid x-api-key"}})),
+        )
+            .into_response();
+    }
+    let events = [
+        (
+            "message_start",
+            json!({"type": "message_start", "message": {"id": "msg_test", "model": "claude-haiku-5-5", "usage": {"input_tokens": 11, "output_tokens": 0}}}),
+        ),
+        (
+            "content_block_start",
+            json!({"type": "content_block_start", "index": 0, "content_block": {"type": "text", "text": ""}}),
+        ),
+        (
+            "content_block_delta",
+            json!({"type": "content_block_delta", "index": 0, "delta": {"type": "text_delta", "text": "{\"summary\":"}}),
+        ),
+        (
+            "content_block_delta",
+            json!({"type": "content_block_delta", "index": 0, "delta": {"type": "text_delta", "text": " \"ok\"}"}}),
+        ),
+        (
+            "content_block_stop",
+            json!({"type": "content_block_stop", "index": 0}),
+        ),
+        (
+            "message_delta",
+            json!({"type": "message_delta", "delta": {"stop_reason": "end_turn"}, "usage": {"output_tokens": 7}}),
+        ),
+        ("message_stop", json!({"type": "message_stop"})),
+    ];
+    let body: String = events
+        .iter()
+        .map(|(name, data)| format!("event: {name}\ndata: {data}\n\n"))
+        .collect();
+    ([(header::CONTENT_TYPE, "text/event-stream")], body).into_response()
+}
+
+#[tokio::test]
+async fn the_model_client_sends_setups_contract_as_native_structured_output() {
+    use axum::routing::post;
+    use factory_server::config::AnthropicSettings;
+    use factory_server::model::AnthropicModel;
+    use factory_setup_adapter::{
+        ANTHROPIC_UNSUPPORTED_KEYWORDS, ModelClient, ModelRequest, analysis_contract,
+    };
+
+    let seen: SeenRequests = Arc::default();
+    let app = Router::new()
+        .route("/v1/messages", post(fake_messages))
+        .with_state(seen.clone());
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let base = format!("http://127.0.0.1:{}", listener.local_addr().unwrap().port());
+    tokio::spawn(async move {
+        axum::serve(listener, app).await.unwrap();
+    });
+
+    let (system, schema) = analysis_contract("claude-haiku-5-5").expect("Setup's contract");
+    let request = |model: &str| ModelRequest {
+        provider: "claude".into(),
+        model: model.into(),
+        reasoning_effort: "high".into(),
+        endpoint: "ignored".into(),
+        prompt: "the evidence".into(),
+        system_prompt: system.clone(),
+        output_schema: schema.clone(),
+        input_sha256: "0".repeat(64),
+        credential: None,
+    };
+    let settings = |key: &str| AnthropicSettings {
+        api_key: factory_accounts::Redacted(key.to_owned()),
+        model: "claude-haiku-5-5".to_owned(),
+        base_url: base.clone(),
+    };
+
+    let model = AnthropicModel::new(&settings("sk-test-key"));
+    assert!(!format!("{model:?}").contains("sk-test-key"));
+    let reply = model.complete(request("some-other-model")).await.unwrap();
+    assert_eq!(reply.reply, json!({"summary": "ok"}));
+    assert_eq!(reply.response_id.as_deref(), Some("msg_test"));
+    assert_eq!(reply.usage.unwrap()["output_tokens"], 7);
+
+    let (headers, body) = seen.lock().unwrap()[0].clone();
+    assert_eq!(headers["x-api-key"], "sk-test-key");
+    assert!(headers.contains_key("anthropic-version"));
+    assert_eq!(
+        body["model"], "claude-haiku-5-5",
+        "the server picks the model"
+    );
+    assert_eq!(body["system"], system.as_str());
+    assert_eq!(body["messages"][0]["role"], "user");
+    assert_eq!(body["messages"][0]["content"], "the evidence");
+    assert_eq!(body["output_config"]["format"]["type"], "json_schema");
+    let sent_schema = &body["output_config"]["format"]["schema"];
+    let expected =
+        factory_setup_adapter::strip_schema_keywords(&schema, ANTHROPIC_UNSUPPORTED_KEYWORDS);
+    assert_eq!(sent_schema, &expected);
+    let text = sent_schema.to_string();
+    for keyword in [
+        "\"minimum\":",
+        "\"maximum\":",
+        "\"maxLength\":",
+        "\"minLength\":",
+    ] {
+        assert!(
+            !text.contains(keyword),
+            "{keyword} must be stripped from {text}"
+        );
+    }
+    assert!(body.get("temperature").is_none());
+
+    // A provider refusal is an error that does not repeat the key.
+    let wrong = AnthropicModel::new(&settings("sk-wrong"));
+    let err = wrong.complete(request("x")).await.unwrap_err();
+    assert!(!err.to_string().contains("sk-wrong"), "{err}");
+}
+
+/// One call to a Setup route.
+async fn setup_call(
+    client: &Client,
+    method: &str,
+    project: &str,
+    tail: &str,
+    body: &Value,
+) -> Resp {
+    let path = format!("/api/v1/projects/{project}/setup/{tail}");
+    if method == "POST" {
+        client.post(&path, body.clone()).await
+    } else {
+        client.get(&path).await
     }
 }

@@ -50,6 +50,21 @@ impl From<sqlx::Error> for Fail {
     }
 }
 
+impl From<factory_setup_adapter::SetupError> for Fail {
+    fn from(err: factory_setup_adapter::SetupError) -> Self {
+        if matches!(
+            err,
+            factory_setup_adapter::SetupError::Database(_)
+                | factory_setup_adapter::SetupError::Internal(_)
+                | factory_setup_adapter::SetupError::UnknownEffect(_)
+                | factory_setup_adapter::SetupError::ReadOnlyViolated(_)
+        ) {
+            tracing::error!(code = err.code(), error = %err, "setup operation failed");
+        }
+        ApiError::from(err).into()
+    }
+}
+
 impl IntoResponse for Fail {
     fn into_response(self) -> Response {
         let Some(details) = self.details else {

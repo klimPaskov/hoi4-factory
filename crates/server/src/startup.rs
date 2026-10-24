@@ -16,6 +16,7 @@ use factory_intake::{
     FileTypePolicy, GithubConfig, GithubImporter, HttpGithubApi, IntakeError, IntakeService,
     IntakeStore, SecretString, UploadIntake,
 };
+use factory_setup_adapter::{SetupAdapter, SetupAdapterDeps};
 use factory_workspace::{StorageRoot, WorkspaceError};
 use tokio::net::TcpListener;
 
@@ -23,7 +24,8 @@ use crate::config::{GithubAppSettings, ServerConfig, cors_origins};
 use crate::game_reference::GameReferenceHandle;
 use crate::github::{AppInstallations, ConfigSecrets, GithubRuntime, HttpAppInstallations};
 use crate::migrations;
-use crate::state::{IntakeState, RuntimeSettings, ServerState};
+use crate::model::AnthropicModel;
+use crate::state::{IntakeState, RuntimeSettings, ServerState, SetupState};
 use crate::web::StaticSite;
 
 /// Directory under the data root where received uploads are spooled.
@@ -121,6 +123,7 @@ pub async fn initialize_with(
     let accounts = AccountsState::new(db.clone(), config.accounts.clone(), deps)?;
 
     let intake = build_intake(&config, &db, &storage, overrides.app_installations)?;
+    let setup = build_setup(&config, &db, &storage);
 
     let web = config.web_dist.as_deref().and_then(StaticSite::open);
     match (&config.web_dist, &web) {
@@ -135,6 +138,7 @@ pub async fn initialize_with(
         storage,
         game_reference,
         intake,
+        setup,
         migrations: Arc::new(report),
         settings: Arc::new(RuntimeSettings {
             development: config.is_development(),
@@ -143,6 +147,26 @@ pub async fn initialize_with(
         }),
         web,
     })
+}
+
+/// The Setup adapter. Analysis needs the model key; without it that one operation reports itself
+/// unavailable. No plan builder is injected until the extraction lands upstream, so planning
+/// reports `capability_unavailable`.
+fn build_setup(config: &ServerConfig, db: &Database, storage: &StorageRoot) -> SetupState {
+    let mut deps = SetupAdapterDeps::new(db.clone(), storage.clone());
+    match &config.anthropic {
+        Some(settings) => {
+            tracing::info!(model = %settings.model, "setup analysis model configured");
+            deps = deps.with_model(Arc::new(AnthropicModel::new(settings)));
+        }
+        None => {
+            tracing::info!("setup analysis is unavailable: FACTORY_ANTHROPIC_API_KEY is not set")
+        }
+    }
+    SetupState {
+        adapter: SetupAdapter::new(deps),
+        sessions: Arc::default(),
+    }
 }
 
 /// Intake: upload limits, the spool directory and the GitHub importer. A GitHub App that is not

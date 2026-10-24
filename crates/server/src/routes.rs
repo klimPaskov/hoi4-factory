@@ -59,7 +59,7 @@ pub fn api_routes(state: &ServerState) -> Router {
         .route("/game-reference", get(game_reference))
         .with_state(state.clone())
         .merge(crate::intake_api::router(state))
-        // .merge(factory_setup_adapter::router(state.setup.clone()))
+        .merge(crate::setup_api::router(state))
         .merge(factory_accounts::router(state.accounts.clone()))
 }
 
