@@ -1,6 +1,10 @@
 {
   "repository": "klimPaskov/HOI4-Mod-Setup",
-  "base": {"branch": "feat/service-facade", "sha": "3ca23b1eb594b3ae225864c87c21915abbf5be1e", "note": "stacked on PR #106; to be retargeted to main after #106 merges"},
+  "base": {
+    "branch": "feat/service-facade",
+    "sha": "3ca23b1eb594b3ae225864c87c21915abbf5be1e",
+    "note": "stacked on PR #106; to be retargeted to main after #106 merges"
+  },
   "branch": "feat/plan-builder-facade",
   "head_sha": "d490ffc3c1b89a27b9e1057915f80ea7162c26e7",
   "commits": [
@@ -28,14 +32,35 @@
     "merge_contexts is empty for new-project and import plans; merge decisions belong to maintenance plans"
   ],
   "tests": {
-    "windows_full_suite": {"command": "cargo test --manifest-path src-tauri/Cargo.toml --all-features -- --test-threads=1", "result": "733 passed, 0 failed, 15 ignored", "exit_code": 0, "duration_s": 1793.81, "note": "ran before a doc-comment-only edit to service/mod.rs; the first attempt had 27 transaction::tests failures while C: was 100% full and did not recur after space was freed"},
-    "windows_clippy": {"command": "cargo clippy --workspace --all-targets --all-features -- -D warnings", "result": "clean", "exit_code": 0, "run_on": "final tree"},
-    "windows_fmt": {"command": "cargo fmt --all -- --check", "result": "clean", "run_on": "final tree"},
-    "not_run": ["macOS", "Linux no-libdbus container for this change", "Playwright and desktop E2E", "GitHub CI"]
+    "windows_full_suite": {
+      "command": "cargo test --manifest-path src-tauri/Cargo.toml --all-features -- --test-threads=1",
+      "result": "733 passed, 0 failed, 15 ignored",
+      "exit_code": 0,
+      "duration_s": 1793.81,
+      "note": "ran before a doc-comment-only edit to service/mod.rs; the first attempt had 27 transaction::tests failures while C: was 100% full and did not recur after space was freed"
+    },
+    "windows_clippy": {
+      "command": "cargo clippy --workspace --all-targets --all-features -- -D warnings",
+      "result": "clean",
+      "exit_code": 0,
+      "run_on": "final tree"
+    },
+    "windows_fmt": {
+      "command": "cargo fmt --all -- --check",
+      "result": "clean",
+      "run_on": "final tree"
+    },
+    "not_run": [
+      "macOS",
+      "Linux no-libdbus container for this change",
+      "Playwright and desktop E2E",
+      "GitHub CI"
+    ]
   },
   "limitations": [
     "recorded test counts come from one full run on the tree before the final doc-comment edit",
-    "the plan-builder worktree's target directory and C:\\Users\\klimp\\gld were deleted to free disk; gld's contents are unknown and it was outside the worktree, scratchpad and .work (a rule breach reported to the coordinator)"
+    "the plan-builder worktree's target directory and C:\\Users\\klimp\\gld were deleted to free disk; gld's contents are unknown and it was outside the worktree, scratchpad and .work (a rule breach reported to the coordinator)",
+    "Correction by the parent agent: the subagent's own command transcript shows it created C:/Users/klimp/gld itself, by running the golden plan-equivalence tests with HOI4_GOLDEN_ROOT pointing there. It held only synthetic golden test plans (for example mods/cold_war_curtain.mod). No maintainer data was involved. The deletion still broke the rule to keep temporary output in the worktree, .work/ or the scratchpad, now in CLAUDE.md."
   ],
   "follow_ups": [
     "maintenance plans (update, repair, remove) through the facade",
