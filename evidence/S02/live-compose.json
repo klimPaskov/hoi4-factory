@@ -1,0 +1,39 @@
+{
+  "check": "S02 live Compose stack",
+  "date": "2026-10-24",
+  "revision": "a017445337d1b5ecda6adec51e067b7a9915ee99",
+  "evidence_kind": "live (Docker Compose on Docker Desktop 28.5.2, WSL2)",
+  "images": "",
+  "steps": [
+    {
+      "step": "GET /healthz",
+      "result": "200 ok"
+    },
+    {
+      "step": "GET /readyz",
+      "result": "status ok, database ok, migrations latest 101 ok, storage ok, game_reference available and read_only"
+    },
+    {
+      "step": "POST /api/v1/auth/signup with email o'brien+s02@example.test and display name with accent, apostrophe, emoji and Arabic",
+      "result": "201, email and name stored exactly, verification email sent"
+    },
+    {
+      "step": "Mailpit received the verification email at the exact address",
+      "result": "subject 'Confirm your email address for HOI4 Factory', token present"
+    },
+    {
+      "step": "POST /api/v1/auth/verify-email",
+      "result": "200, email_verified true"
+    },
+    {
+      "step": "GET /api/v1/game-reference",
+      "result": "HOI4 1.19.3.0 Operation Postern, rev c01a3d50, 12 DLC ids, read_only_filesystem evidence, no paths"
+    },
+    {
+      "step": "docker exec server touch /game/hf-write-test",
+      "result": "Read-only file system, exit 1"
+    }
+  ],
+  "note": "A first sign-up attempt returned 400 because Git Bash on Windows mangled non-ASCII characters passed with curl -d. Sending the same JSON from a UTF-8 file worked. This was a harness issue, not a server defect.",
+  "secrets_recorded": false
+}
