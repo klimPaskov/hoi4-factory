@@ -17,6 +17,10 @@
     {
       "name": "audit-hoi4-integrations",
       "description": "Use on explicit invocation for a bounded source, configuration or capability audit of HOI4 Mod Setup, Agentic HOI4 Modding and domain tools. Pin sources and classify evidence. Do not install, enable remote services or run paid or effectful tools by implication."
+    },
+    {
+      "name": "production-readiness-review",
+      "description": "Use at a stage handoff, before real users can reach a deployment, or when asked what is worth hardening next. Treat the production readiness checklist as a menu, not requirements, recommend only proportionate low-friction items, and leave enterprise and compliance items alone unless the maintainer asks."
     }
   ]
 }

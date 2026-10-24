@@ -56,6 +56,7 @@ REQUIRED = [
 SKILLS = {
     "start-implementation-stage", "validate-stage",
     "capture-engineering-lessons", "audit-hoi4-integrations",
+    "production-readiness-review",
 }
 STAGE_SECTIONS = [
     "Objective and non-goals", "Entry conditions", "Read-first sequence and reuse",
@@ -233,7 +234,7 @@ def main() -> int:
         discovered = {p.parent.name for p in paths}
         skill_set_ok = SKILLS.issubset(discovered) if args.working_tree else discovered == SKILLS
         if not skill_set_ok:
-            skill_errors.append(f"{client}: owned four skill set mismatch")
+            skill_errors.append(f"{client}: owned skill set mismatch")
         if args.working_tree:
             paths = [p for p in paths if p.parent.name in SKILLS]
         for p in paths:

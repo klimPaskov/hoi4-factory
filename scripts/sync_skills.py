@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate or check this repository's four owned skill projections.
+"""Generate or check this repository's owned skill projections.
 
 Default mode is read-only. No global installation or network access occurs.
 """
@@ -22,6 +22,7 @@ EXPECTED_NAMES = {
     "validate-stage",
     "capture-engineering-lessons",
     "audit-hoi4-integrations",
+    "production-readiness-review",
 }
 CLIENTS = (".claude", ".codex", ".agents")
 # ADR-023: these workflows stay invocable only by the maintainer. The others run automatically.
@@ -68,7 +69,7 @@ def expected_files() -> tuple[dict[Path, bytes], dict]:
     skills = metadata.get("skills", [])
     names = [entry.get("name") for entry in skills]
     if len(names) != len(set(names)) or set(names) != EXPECTED_NAMES:
-        raise ValueError("Metadata must define exactly the four owned skill names")
+        raise ValueError("Metadata must define exactly the owned skill names")
     outputs: dict[Path, bytes] = {}
     records = []
     for entry in sorted(skills, key=lambda item: item["name"]):

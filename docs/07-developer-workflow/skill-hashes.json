@@ -2,7 +2,7 @@
   "schema_version": 1,
   "version": "0.1.1",
   "generator": "scripts/sync_skills.py",
-  "metadata_sha256": "841e9f809574cab4bc484118bdbed48a86d955da858317e822a03bb175a56c6a",
+  "metadata_sha256": "e7ebec0da57df071bf4ab4a9491674f34b8fc3cd71f499ddc85c4d1d09a30af7",
   "scope": "Only these repository projections. No personal installation.",
   "skills": [
     {
@@ -55,6 +55,33 @@
         },
         {
           "path": ".agents/skills/capture-engineering-lessons/agents/openai.yaml",
+          "sha256": "8619a54e8c098122a7f3881394f84ca89b684366e848233a29ad18b6ec363935"
+        }
+      ]
+    },
+    {
+      "name": "production-readiness-review",
+      "source": "docs/07-developer-workflow/skill-workflows/production-readiness-review/BODY.md",
+      "body_sha256": "cf3f2a117bc511a8f08d16216d3a0f91f28ca632cd1db6f203cfb4997483e44b",
+      "generated": [
+        {
+          "path": ".claude/skills/production-readiness-review/SKILL.md",
+          "sha256": "a13ebdbb985fb436387ef535dc5efe64267f14c1e313e665e1b2ba3028f18db8"
+        },
+        {
+          "path": ".codex/skills/production-readiness-review/SKILL.md",
+          "sha256": "a13ebdbb985fb436387ef535dc5efe64267f14c1e313e665e1b2ba3028f18db8"
+        },
+        {
+          "path": ".codex/skills/production-readiness-review/agents/openai.yaml",
+          "sha256": "8619a54e8c098122a7f3881394f84ca89b684366e848233a29ad18b6ec363935"
+        },
+        {
+          "path": ".agents/skills/production-readiness-review/SKILL.md",
+          "sha256": "a13ebdbb985fb436387ef535dc5efe64267f14c1e313e665e1b2ba3028f18db8"
+        },
+        {
+          "path": ".agents/skills/production-readiness-review/agents/openai.yaml",
           "sha256": "8619a54e8c098122a7f3881394f84ca89b684366e848233a29ad18b6ec363935"
         }
       ]

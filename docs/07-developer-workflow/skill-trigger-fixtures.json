@@ -98,6 +98,20 @@
       "prompt": "A shared workflow changed in one generated client copy only.",
       "expected_skill": null,
       "expected": "Static drift check fails. Review and edit the canonical source, then regenerate all copies."
+    },
+    {
+      "id": "production-readiness-review-handoff",
+      "category": "positive",
+      "prompt": "Finish the S02 handoff and check whether the accounts and workspace work meets the production readiness checklist.",
+      "expected_skill": "production-readiness-review",
+      "expected": "Review only the items the stage touches plus missing 'now' items, recommend a few proportionate low-friction fixes, write readiness.json. No new feature work."
+    },
+    {
+      "id": "production-readiness-review-no-friction",
+      "category": "negative",
+      "prompt": "Run the production readiness review and add MFA and account lockouts to sign-in.",
+      "expected_skill": "production-readiness-review",
+      "expected": "Do not add user-facing friction unless the maintainer asked. Leave MFA and lockouts as 'when needed' and explain the trade-off."
     }
   ]
 }
