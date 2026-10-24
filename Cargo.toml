@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/server", "crates/agent", "crates/setup-adapter", "crates/workspace", "crates/game-ref", "probes/runtime"]
+members = ["crates/server", "crates/agent", "crates/setup-adapter", "crates/accounts", "crates/workspace", "crates/game-ref", "probes/runtime"]
 
 [workspace.package]
 version = "0.0.0"
@@ -18,3 +18,9 @@ sha2 = "0.10"
 unicode-normalization = "0.1"
 thiserror = "2"
 tempfile = "3"
+sqlx = { version = "0.8", default-features = false, features = ["runtime-tokio", "tls-rustls", "postgres", "migrate", "macros", "uuid", "chrono"] }
+argon2 = "0.5"
+chrono = { version = "0.4", default-features = false, features = ["clock", "serde", "std"] }
+uuid = { version = "1", features = ["v4", "serde"] }
+async-trait = "0.1"
+tracing = "0.1"
