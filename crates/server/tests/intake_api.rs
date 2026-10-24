@@ -1638,7 +1638,10 @@ async fn a_scan_of_an_uploaded_mod_is_read_only_and_planning_is_unavailable() {
             .to_owned()
     };
     assert_eq!(fact("Coverage"), "complete");
-    assert!(fact("Files scanned").parse::<u32>().unwrap() >= 1, "{facts:?}");
+    assert!(
+        fact("Files scanned").parse::<u32>().unwrap() >= 1,
+        "{facts:?}"
+    );
     assert_eq!(fact("descriptor: mod_name"), "Synthetic");
     let labels: Vec<&str> = facts.iter().map(|f| f["label"].as_str().unwrap()).collect();
     let unique: std::collections::BTreeSet<_> = labels.iter().collect();
