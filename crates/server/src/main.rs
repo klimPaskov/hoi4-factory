@@ -1,20 +1,40 @@
-//! HOI4 Factory server. S01 skeleton: a health endpoint only, no product features.
+//! HOI4 Factory server binary. Configuration comes from the environment; see
+//! `factory_server::config`. `factory-server healthcheck` is the container health probe.
 
-use axum::{Json, Router, routing::get};
-use serde_json::{Value, json};
+use std::process::ExitCode;
 
-async fn healthz() -> Json<Value> {
-    Json(json!({ "status": "ok", "version": env!("CARGO_PKG_VERSION") }))
-}
+use factory_server::{ServerConfig, build_app, initialize, logging, serve, shutdown_signal};
 
 #[tokio::main]
-async fn main() -> std::io::Result<()> {
-    let addr = std::env::var("FACTORY_LISTEN").unwrap_or_else(|_| "0.0.0.0:8080".to_owned());
-    let app = Router::new().route("/healthz", get(healthz));
-    let listener = tokio::net::TcpListener::bind(&addr).await?;
-    axum::serve(listener, app)
-        .with_graceful_shutdown(async {
-            let _ = tokio::signal::ctrl_c().await;
-        })
+async fn main() -> ExitCode {
+    if std::env::args().nth(1).as_deref() == Some("healthcheck") {
+        return if factory_server::healthcheck::run_from_env() {
+            ExitCode::SUCCESS
+        } else {
+            ExitCode::FAILURE
+        };
+    }
+    logging::init();
+    match run().await {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(message) => {
+            tracing::error!(error = %message, "the server stopped");
+            ExitCode::FAILURE
+        }
+    }
+}
+
+async fn run() -> Result<(), String> {
+    let config = ServerConfig::from_env().map_err(|e| e.to_string())?;
+    let listen = config.listen.clone();
+    let environment = config.is_development();
+    let state = initialize(config).await.map_err(|e| e.to_string())?;
+    let app = build_app(state);
+    let listener = tokio::net::TcpListener::bind(&listen)
         .await
+        .map_err(|e| format!("cannot listen on {listen}: {e}"))?;
+    tracing::info!(listen = %listen, development = environment, "listening");
+    serve(listener, app, shutdown_signal())
+        .await
+        .map_err(|e| e.to_string())
 }
