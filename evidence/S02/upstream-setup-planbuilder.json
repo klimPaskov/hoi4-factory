@@ -1,0 +1,45 @@
+{
+  "repository": "klimPaskov/HOI4-Mod-Setup",
+  "base": {"branch": "feat/service-facade", "sha": "3ca23b1eb594b3ae225864c87c21915abbf5be1e", "note": "stacked on PR #106; to be retargeted to main after #106 merges"},
+  "branch": "feat/plan-builder-facade",
+  "head_sha": "d490ffc3c1b89a27b9e1057915f80ea7162c26e7",
+  "commits": [
+    "d490ffc feat(service): build plans on a server through DefaultPlanBuilder"
+  ],
+  "pull_request": "https://github.com/klimPaskov/HOI4-Mod-Setup/pull/108",
+  "pushed_to_main": false,
+  "merged": false,
+  "toolchain": "rust 1.88.0 (x86_64-pc-windows-msvc)",
+  "public_api": {
+    "crate": "hoi4_mod_setup (src-tauri, lib)",
+    "items": [
+      "service::DefaultPlanBuilder::{new(cache_root) -> Result<Self, AppError>, with_source(Arc<dyn SourceFetcher>)}",
+      "impl service::PlanBuilder for DefaultPlanBuilder (build(&PlanRequest) -> Result<BuiltPlan, AppError>)",
+      "source::SourceFetcher (trait: resolve_commit, fetch_manifest, fetch_verified_file, prefetch_verified_files, shares_process_cache)",
+      "source::HttpSourceClient::for_cache_root(PathBuf) -> Result<Self, AppError> (ignores the local-checkout environment variable)"
+    ],
+    "server_usage": "SetupService::new(creds).with_plan_builder(Arc::new(DefaultPlanBuilder::new(cache_root)?)).with_node_runtime(..); open_session(SessionConfig::new(workspace_root, state_root)); SetupSession::build_plan(..)",
+    "cache_root_rules": "must exist, be absolute, be free of symlinks, and lie outside every workspace root"
+  },
+  "design": [
+    "build_plan_with is shared by the desktop (DesktopHost in commands.rs) and the service (ServiceHost in service/builder.rs); the desktop path is unchanged in behavior",
+    "integrity does not depend on the SourceFetcher: manifest parsed and validated, every selected file checked against manifest size and SHA-256",
+    "a server refuses the 3D workflow, context documents and images, and any plan writing outside the project root",
+    "merge_contexts is empty for new-project and import plans; merge decisions belong to maintenance plans"
+  ],
+  "tests": {
+    "windows_full_suite": {"command": "cargo test --manifest-path src-tauri/Cargo.toml --all-features -- --test-threads=1", "result": "733 passed, 0 failed, 15 ignored", "exit_code": 0, "duration_s": 1793.81, "note": "ran before a doc-comment-only edit to service/mod.rs; the first attempt had 27 transaction::tests failures while C: was 100% full and did not recur after space was freed"},
+    "windows_clippy": {"command": "cargo clippy --workspace --all-targets --all-features -- -D warnings", "result": "clean", "exit_code": 0, "run_on": "final tree"},
+    "windows_fmt": {"command": "cargo fmt --all -- --check", "result": "clean", "run_on": "final tree"},
+    "not_run": ["macOS", "Linux no-libdbus container for this change", "Playwright and desktop E2E", "GitHub CI"]
+  },
+  "limitations": [
+    "recorded test counts come from one full run on the tree before the final doc-comment edit",
+    "the plan-builder worktree's target directory and C:\\Users\\klimp\\gld were deleted to free disk; gld's contents are unknown and it was outside the worktree, scratchpad and .work (a rule breach reported to the coordinator)"
+  ],
+  "follow_ups": [
+    "maintenance plans (update, repair, remove) through the facade",
+    "context documents and images through the facade",
+    "retarget PR #108 to main after #106 merges"
+  ]
+}
