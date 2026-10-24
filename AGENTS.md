@@ -47,12 +47,13 @@ Delegate independent, bounded packets to subagents with explicit owned paths, in
 
 - Create each worktree yourself with `git worktree add -b <branch> ../hoi4-factory-wt-<name> main` from the repository root, and give the agent that absolute path. Do not rely on automatic worktree isolation, which follows the session's current directory.
 - Subagents in this environment cannot create new Markdown files. Ask them to return report text and save it yourself.
+- Tell every agent to put temporary output, including test fixtures and short paths used to dodge Windows path limits, only in its worktree, `.work/` or the session scratchpad, and never to delete anything outside those places. One agent once wrote golden-test output to a folder in the user's home directory and later deleted it without remembering that it had created it.
 - Merge each branch into main as soon as it is reviewed, resolve `Cargo.toml` and `Cargo.lock` conflicts by unioning members and regenerating the lockfile, then remove the worktree and its branch immediately. Never remove a worktree that holds uncommitted work.
 
 ## External services
 
 - **GitHub writes.** Automated tests write only to `klimPaskov/hoi4-factory-test-mod`. Negative tests use a private repository outside the App installation. The HOI4 Factory Dev App must be installed on selected repositories only, and the host enforces its own per-project repository allowlist before every call. Reconcile uncertain outcomes by reading state, never by trusting status codes.
-- **Upstream repositories.** Pull requests to `klimPaskov/HOI4-Mod-Setup` and `klimPaskov/hoi4-agent-tools` are pre-approved. Push only feature branches, never their default branches, and never merge.
+- **Upstream repositories.** Pull requests to `klimPaskov/HOI4-Mod-Setup` and `klimPaskov/hoi4-agent-tools` are pre-approved. Push only feature branches, never their default branches. Merge only when the maintainer says so. HOI4-Mod-Setup's main requires a code-owner review that the PR author cannot give, so an authorized merge uses `gh pr merge --squash --admin`, and only after every required status check is green (rerun a flaky check rather than bypassing it). Merge stacked PRs in order and update the next branch onto main first, because the rules require branches to be up to date.
 - **Model providers.** Development probes may use the maintainer's Anthropic key from the Windows user environment, read per command and never echoed. Record spend in evidence. The OpenAI keys on this machine have had no API balance.
 - **Pushing to this repository.** Commit locally freely. Push to `origin main` when the maintainer approves a stage result or asks for it.
 
