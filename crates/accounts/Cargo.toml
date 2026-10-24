@@ -1,0 +1,36 @@
+[package]
+name = "factory-accounts"
+description = "HOI4 Factory accounts, sessions, projects and tenant isolation"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+axum.workspace = true
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sqlx.workspace = true
+argon2.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+async-trait.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+sha2 = "0.10"
+rand = "0.8"
+base64 = "0.22"
+aes-gcm = "0.10"
+cookie = "0.18"
+url = "2"
+subtle = "2"
+unicode-segmentation = "1"
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+lettre = { version = "0.11", default-features = false, features = ["builder", "smtp-transport", "tokio1", "tokio1-rustls-tls", "hostname"] }
+
+[dev-dependencies]
+tower = { version = "0.5", features = ["util"] }
+http-body-util = "0.1"
+tokio = { workspace = true, features = ["net", "io-util", "time", "sync"] }
