@@ -8,6 +8,26 @@
 use sqlx::PgPool;
 use sqlx::migrate::Migrator;
 
+/// Versions 0300 to 0399: the intake tables (0300 to 0302) and the foreign keys that join them to
+/// accounts and projects (0303, owned by the server because it is the one place that sees both).
+const INTAKE_VERSIONS: std::ops::RangeInclusive<i64> = 300..=399;
+
+/// A migrator limited to `range`, with `ignore_missing` set because the shared
+/// `_sqlx_migrations` table also records the other components' versions (see
+/// `factory_accounts::migrator`).
+fn range_migrator(range: std::ops::RangeInclusive<i64>) -> Migrator {
+    let mut migrator = sqlx::migrate!("../../migrations");
+    let own: Vec<_> = migrator
+        .migrations
+        .iter()
+        .filter(|m| range.contains(&m.version))
+        .cloned()
+        .collect();
+    migrator.migrations = std::borrow::Cow::Owned(own);
+    migrator.ignore_missing = true;
+    migrator
+}
+
 /// One crate's migrations.
 pub struct Component {
     pub name: &'static str,
@@ -24,9 +44,17 @@ pub fn components() -> Vec<Component> {
             migrator: factory_accounts::migrator(),
             probe_table: "accounts",
         },
-        // Component { name: "workspace", migrator: factory_workspace::migrator(), probe_table: "..." },
-        // Component { name: "intake", ... },
-        // Component { name: "setup-adapter", ... },
+        // The workspace crate has no tables.
+        Component {
+            name: "intake",
+            migrator: range_migrator(INTAKE_VERSIONS),
+            probe_table: "intake_uploads",
+        },
+        Component {
+            name: "setup-adapter",
+            migrator: factory_setup_adapter::migrator(),
+            probe_table: "setup_sessions",
+        },
     ]
 }
 

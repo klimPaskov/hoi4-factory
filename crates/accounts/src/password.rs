@@ -60,12 +60,14 @@ impl PasswordHasher {
         if n < MIN_PASSWORD_CHARS {
             return Err(ApiError::invalid_request(format!(
                 "Use a password of at least {MIN_PASSWORD_CHARS} characters."
-            )));
+            ))
+            .with_id("field", "password"));
         }
         if n > MAX_PASSWORD_CHARS {
             return Err(ApiError::invalid_request(format!(
                 "Use a password of at most {MAX_PASSWORD_CHARS} characters."
-            )));
+            ))
+            .with_id("field", "password"));
         }
         Ok(())
     }

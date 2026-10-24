@@ -5,7 +5,8 @@
 //! | `GET /healthz` | none | Liveness: the process answers |
 //! | `GET /readyz` | none | Readiness: database, migrations, storage layout, game reference status |
 //! | `GET /api/v1/game-reference` | signed in | Manifest summary of the server game reference |
-//! | `/api/v1/auth/*`, `/api/v1/projects/*` | see `factory_accounts::router` | Accounts and projects |
+//! | `/api/v1/auth/*`, `/api/v1/projects`, `/api/v1/projects/{id}`, `.../restore` | see `factory_accounts::router` | Accounts and projects |
+//! | `/api/v1/projects/{id}/uploads`, `.../github/*`, `.../workspace` | signed in, project role | See [`crate::intake_api`] |
 //! | anything else | none | The browser client (single-page fallback), JSON 404 under `/api` |
 
 use std::time::Duration;
@@ -49,16 +50,16 @@ pub fn build_app(state: ServerState) -> Router {
 
 /// Everything mounted under `/api/v1`.
 ///
-/// Extension point: merge the intake router (uploads, GitHub import) and the Setup adapter
-/// routes here. A merged router must not set its own fallback (the accounts router owns the
-/// JSON 404) and may raise the body limit for its upload routes with its own
-/// `DefaultBodyLimit::max` layer.
+/// Extension point: merge the Setup adapter routes here. A merged router must not set its own
+/// fallback (the accounts router owns the JSON 404) and may raise the body limit for its upload
+/// routes with its own `DefaultBodyLimit::max` layer, as the upload route of
+/// [`crate::intake_api`] does.
 pub fn api_routes(state: &ServerState) -> Router {
     Router::new()
         .route("/game-reference", get(game_reference))
         .with_state(state.clone())
-        // .merge(factory_intake::router(state.intake.clone()))
-        // .merge(factory_setup_adapter::router(state.setup.clone()))
+        .merge(crate::intake_api::router(state))
+        .merge(crate::setup_api::router(state))
         .merge(factory_accounts::router(state.accounts.clone()))
 }
 

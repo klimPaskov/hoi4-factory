@@ -71,11 +71,11 @@ export function SetupReview({
     }
   }
 
-  async function apply(planId: string) {
+  async function apply(planId: string, planSha256?: string) {
     setApplying(true);
     setApplyFailure(null);
     try {
-      setResult(await applySetup(projectId, planId));
+      setResult(await applySetup(projectId, planId, planSha256));
       setConfirming(false);
     } catch (error) {
       setApplyFailure(error);
@@ -138,7 +138,7 @@ export function SetupReview({
               failure={applyFailure}
               onAsk={() => setConfirming(true)}
               onCancel={() => setConfirming(false)}
-              onApply={() => void apply(plan.plan.plan_id)}
+              onApply={() => void apply(plan.plan.plan_id, plan.plan.plan_sha256)}
               onRefresh={() => void loadPlan()}
             />
           ) : null}

@@ -147,6 +147,7 @@ interface Picked {
 function UploadPath({ projectId, onBroughtIn }: Pick<Props, 'projectId' | 'onBroughtIn'>) {
   const { t } = useTranslation();
   const [picked, setPicked] = useState<Picked | null>(null);
+  const [initGit, setInitGit] = useState(false);
   const [missing, setMissing] = useState(false);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
@@ -190,7 +191,7 @@ function UploadPath({ projectId, onBroughtIn }: Pick<Props, 'projectId' | 'onBro
     }
     setBusy(true);
     try {
-      await uploadMod(projectId, picked.kind, picked.items);
+      await uploadMod(projectId, picked.kind, picked.items, { gitInitConsent: initGit });
       setDone(true);
       onBroughtIn();
     } catch (error) {
@@ -234,6 +235,17 @@ function UploadPath({ projectId, onBroughtIn }: Pick<Props, 'projectId' | 'onBro
           })}
         </p>
       ) : null}
+      <div className="field">
+        <label htmlFor="upload-git">
+          <input
+            id="upload-git"
+            type="checkbox"
+            checked={initGit}
+            onChange={(event) => setInitGit(event.target.checked)}
+          />{' '}
+          {t('bring.upload.gitConsent')}
+        </label>
+      </div>
       <button type="submit" className="button primary" disabled={busy}>
         {busy ? t('bring.upload.working') : t('bring.upload.button')}
       </button>

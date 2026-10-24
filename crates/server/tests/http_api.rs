@@ -200,6 +200,7 @@ impl Harness {
             Overrides {
                 accounts_deps: Some(deps),
                 clock: Some(clock),
+                ..Overrides::default()
             },
         )
         .await

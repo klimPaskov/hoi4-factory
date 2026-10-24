@@ -246,6 +246,7 @@
       "button": "Upload",
       "done": "Uploaded. The mod is in your workspace now.",
       "folderLabel": "Or choose a folder",
+      "gitConsent": "If the mod has no Git history, start one. This adds a hidden .git folder with one first commit; your files are not changed.",
       "missing": "Choose a ZIP file or a folder first.",
       "picked_one": "{{files}} file selected, {{size}} in total.",
       "picked_other": "{{files}} files selected, {{size}} in total.",
