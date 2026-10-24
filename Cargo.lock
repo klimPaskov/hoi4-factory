@@ -1099,6 +1099,7 @@ dependencies = [
  "factory-setup-adapter",
  "factory-workspace",
  "flate2",
+ "hoi4-mod-setup",
  "http-body-util",
  "jsonwebtoken",
  "rand 0.8.8",
