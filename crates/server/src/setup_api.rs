@@ -689,7 +689,10 @@ async fn approve(
     Ok(Json(json!({
         "approval": {
             "approval_id": approval.approval_id,
-            "plan_sha256": approval.approved_plan_sha256,
+            // The hash the person reviewed. Setup also records the hash of the plan once its
+            // approval flags are set; apply checks that one itself.
+            "plan_sha256": approval.reviewed_plan_sha256,
+            "approved_plan_sha256": approval.approved_plan_sha256,
             "root_identity": approval.root_identity,
         }
     })))
@@ -748,8 +751,10 @@ async fn apply(
         Err(SetupError::ApplyInterrupted {
             journal_id,
             variant,
-            ..
-        }) => Ok(Json(json!({
+            cause,
+        }) => {
+            tracing::warn!(%journal_id, ?variant, %cause, "setup apply was interrupted");
+            Ok(Json(json!({
             "status": if variant == RecoveryVariant::RollbackRequiredPartialApply {
                 "needs_rollback"
             } else {
@@ -758,7 +763,9 @@ async fn apply(
             "journal_id": journal_id,
             "variant": variant,
             "explanation": variant.explanation(),
-        }))),
+            "cause": cause,
+            })))
+        }
         Err(other) => Err(other.into()),
     }
 }

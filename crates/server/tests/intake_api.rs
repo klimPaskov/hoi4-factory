@@ -1183,7 +1183,12 @@ async fn a_scan_of_an_uploaded_mod_is_read_only_and_no_plan_exists_before_the_re
     assert_eq!(cap("analyzeSetup")["available"], false);
     // The scan lists the excerpts the model could see; none is approved yet.
     assert_eq!(scan.body["evidence"]["required"], true);
-    assert!(!scan.body["evidence"]["candidates"].as_array().unwrap().is_empty());
+    assert!(
+        !scan.body["evidence"]["candidates"]
+            .as_array()
+            .unwrap()
+            .is_empty()
+    );
     let recovery = alice.client.get(&format!("{base}/recovery")).await;
     assert_eq!(recovery.status, 200, "{}", recovery.text);
     assert!(recovery.body["recovery"].is_null());
@@ -1197,7 +1202,10 @@ async fn a_scan_of_an_uploaded_mod_is_read_only_and_no_plan_exists_before_the_re
         plan.text
     );
     // Nothing downstream of the scan works without the steps in between.
-    let analyze = alice.client.post(&format!("{base}/analyze"), json!({})).await;
+    let analyze = alice
+        .client
+        .post(&format!("{base}/analyze"), json!({}))
+        .await;
     assert_eq!(
         (analyze.status, analyze.error_code()),
         (501, "capability_unavailable"),

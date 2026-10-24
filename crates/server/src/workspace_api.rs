@@ -54,13 +54,13 @@ pub fn open_workspace(state: &ServerState, project: &Project) -> Result<Workspac
     }
 }
 
-/// Descriptor of `workspace` for the caller, built on the blocking pool.
-pub async fn describe(
+/// The caller-specific inputs of a descriptor: the caller's role, the server game reference as a
+/// read-only root and capability, and the game profile.
+pub fn descriptor_inputs(
     state: &ServerState,
-    workspace: Workspace,
     project: &Project,
     caller: factory_accounts::AccountId,
-) -> Result<WorkspaceDescriptor, Fail> {
+) -> Result<DescriptorInputs, Fail> {
     let reference = state.game_reference.reference();
     let mut inputs = DescriptorInputs::new(
         WorkspaceId::new(project.id.to_string()).map_err(|_| ApiError::internal())?,
@@ -92,6 +92,17 @@ pub async fn describe(
         reason: (!available).then(|| "the server game reference is not mounted".to_owned()),
     });
     inputs.game_profile = GameProfile::new(reference, None, Vec::new());
+    Ok(inputs)
+}
+
+/// Descriptor of `workspace` for the caller, built on the blocking pool.
+pub async fn describe(
+    state: &ServerState,
+    workspace: Workspace,
+    project: &Project,
+    caller: factory_accounts::AccountId,
+) -> Result<WorkspaceDescriptor, Fail> {
+    let inputs = descriptor_inputs(state, project, caller)?;
     tokio::task::spawn_blocking(move || workspace.describe(inputs))
         .await
         .map_err(|_| ApiError::internal())?
@@ -185,7 +196,31 @@ pub async fn get(
         }
         Err(other) => return Err(other),
     };
-    let descriptor = describe(&state, workspace, &project, principal.account_id()).await?;
+    // The C-01 handoff of the Setup adapter adds the Setup receipt, the component closure, the
+    // Setup capabilities and the unresolved checks. While a transaction waits for recovery it
+    // withholds the descriptor; the plain one is still shown, with the blockers beside it.
+    let mut inputs = descriptor_inputs(&state, &project, principal.account_id())?;
+    let handoff = state
+        .setup
+        .adapter
+        .open_workspace(
+            principal.account_id(),
+            project.id,
+            factory_setup_adapter::OpenWorkspaceOptions {
+                game_profile: Some(inputs.game_profile.clone()),
+                member_roles: std::mem::take(&mut inputs.member_roles),
+                extra_roots: std::mem::take(&mut inputs.extra_roots),
+                extra_capabilities: std::mem::take(&mut inputs.capabilities),
+            },
+        )
+        .await?;
+    let (descriptor, blocked) = match handoff.descriptor {
+        Some(descriptor) => (descriptor, None),
+        None => (
+            describe(&state, workspace, &project, principal.account_id()).await?,
+            Some((handoff.blockers.clone(), handoff.recovery.clone())),
+        ),
+    };
     let file_count = descriptor
         .source_snapshot
         .inventory
@@ -199,11 +234,20 @@ pub async fn get(
         .head
         .as_ref()
         .map(|h| h.as_str().chars().take(12).collect::<String>());
-    let setup_state = descriptor
-        .setup_receipt
-        .as_ref()
-        .map_or("not_started", |r| r.transaction_state.as_str())
-        .to_owned();
+    let setup_state = match &blocked {
+        Some((_, Some(recovery)))
+            if recovery.variant
+                == factory_setup_adapter::RecoveryVariant::RollbackRequiredPartialApply =>
+        {
+            "needs_rollback".to_owned()
+        }
+        Some(_) => "recovery_required".to_owned(),
+        None => descriptor
+            .setup_receipt
+            .as_ref()
+            .map_or("not_started", |r| r.transaction_state.as_str())
+            .to_owned(),
+    };
     Ok(Json(json!({
         "summary": {
             "has_source": file_count > 0,
@@ -214,5 +258,11 @@ pub async fn get(
             "setup_state": setup_state,
         },
         "descriptor": descriptor,
+        "setup": {
+            "ready": blocked.is_none(),
+            "blockers": blocked.as_ref().map(|(b, _)| b.clone()).unwrap_or_default(),
+            "revision": factory_setup_adapter::SETUP_PIN.revision,
+            "contains_pr_105_fix": factory_setup_adapter::SETUP_PIN.contains_pr_105_fix,
+        },
     })))
 }

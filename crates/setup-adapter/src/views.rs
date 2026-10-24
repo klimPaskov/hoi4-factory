@@ -234,6 +234,8 @@ pub struct OpenWorkspaceOptions {
     pub game_profile: Option<factory_workspace::GameProfile>,
     pub member_roles: Vec<factory_workspace::MemberRole>,
     pub extra_roots: Vec<factory_workspace::RootHandle>,
+    /// Capabilities the host reports besides the `setup.*` ones (for example the game reference).
+    pub extra_capabilities: Vec<factory_workspace::Capability>,
 }
 
 #[derive(Debug, Clone, Serialize)]

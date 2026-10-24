@@ -346,8 +346,8 @@ mod tests {
 
     #[test]
     fn setup_paths_default_under_the_data_root() {
-        let cfg = ServerConfig::from_lookup(lookup(&base(&[("FACTORY_DATA_ROOT", "/srv/d")])))
-            .unwrap();
+        let cfg =
+            ServerConfig::from_lookup(lookup(&base(&[("FACTORY_DATA_ROOT", "/srv/d")]))).unwrap();
         assert_eq!(cfg.setup.cache_dir, PathBuf::from("/srv/d/setup-cache"));
         assert_eq!(cfg.setup.node_prefix, PathBuf::from("/srv/d/node-prefix"));
         assert!(cfg.setup.node_executable.is_none());
@@ -358,7 +358,10 @@ mod tests {
         ])))
         .unwrap();
         assert_eq!(cfg.setup.cache_dir, PathBuf::from("/cache"));
-        assert_eq!(cfg.setup.node_executable, Some(PathBuf::from("/usr/bin/node")));
+        assert_eq!(
+            cfg.setup.node_executable,
+            Some(PathBuf::from("/usr/bin/node"))
+        );
         assert_eq!(cfg.setup.node_prefix, PathBuf::from("/npm"));
     }
 

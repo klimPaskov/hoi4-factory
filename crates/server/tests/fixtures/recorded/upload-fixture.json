@@ -1,0 +1,129 @@
+{
+  "label": "upload-fixture",
+  "provider": "anthropic",
+  "model": "claude-haiku-5-5",
+  "recorded_at": "2026-10-24T21:33:44.158901500+00:00",
+  "note": "G1/G2/G4 fixture: the uploaded gate mod, existing-mod analysis",
+  "calls": [
+    {
+      "response_id": "msg_011CgMn8WcphURSVVqFjJrZH",
+      "usage": {
+        "input_tokens": 8614,
+        "output_tokens": 1947
+      },
+      "prompt_sha256": "ebd431cf4408cbf30cfcf93a5876a256a6fe5bed9ad330344be357f7d52c1ea9",
+      "reply": {
+        "analysis_id": "gate-fixture-existing-import",
+        "component_recommendations": [],
+        "input_sha256": "06803c1821c84a2359cbd1aaf8fd0f9fdd414e2d86fc69e2dc1c98d477a354f8",
+        "mode": "existing_project_semantics",
+        "project_summary": "Gate Fixture is an existing Hearts of Iron IV mod. The descriptor names it Gate Fixture and tags it Alternative History. The project indexes 8 files across common, docs, gfx, localisation and notes folders. Sampled content includes a national focus file under common/national_focus and an English localisation file with a UTF-8 BOM and versioned keys. Documentation is Markdown in docs/ and the root README. Four files were sampled, so the sampled content describes the project's observed conventions but not every file.",
+        "proposals": [
+          {
+            "confidence": 0.95,
+            "evidence_refs": [
+              "descriptor.name"
+            ],
+            "key": "display_name",
+            "reason": "The name field of descriptor.mod gives the mod's display name.",
+            "value": "Gate Fixture"
+          },
+          {
+            "confidence": 0.8,
+            "evidence_refs": [
+              "descriptor.name"
+            ],
+            "key": "project_id",
+            "reason": "A lowercase identifier derived from the display name for a new project id.",
+            "value": "gate_fixture"
+          },
+          {
+            "confidence": 0.8,
+            "evidence_refs": [
+              "profile.identifiers"
+            ],
+            "key": "script_prefix",
+            "reason": "The sampled identifier prefix observed in the project is gate.",
+            "value": "gate"
+          },
+          {
+            "confidence": 0.7,
+            "evidence_refs": [
+              "profile.identifiers"
+            ],
+            "key": "primary_namespace",
+            "reason": "Matches the observed gate prefix; a suggested namespace that does not rename existing identifiers.",
+            "value": "gate"
+          },
+          {
+            "confidence": 0.6,
+            "evidence_refs": [
+              "profile.documentation",
+              "profile.structure",
+              "profile.detected"
+            ],
+            "key": "project_description",
+            "reason": "Summarises the sampled content: a national focus file, English localisation and Markdown documentation.",
+            "value": "Hearts of Iron IV mod Gate Fixture with national focus content, English localisation and Markdown documentation in docs/."
+          },
+          {
+            "confidence": 0.9,
+            "evidence_refs": [
+              "codex.agents"
+            ],
+            "key": "agents_profile",
+            "reason": "AGENTS.md is present and Codex is the detected primary coding environment.",
+            "value": "Codex primary coding environment with AGENTS.md instructions"
+          },
+          {
+            "confidence": 0.9,
+            "evidence_refs": [
+              "profile.detected",
+              "profile.localisation"
+            ],
+            "key": "localisation_convention",
+            "reason": "Language headers and encodings of the sampled localisation files.",
+            "value": "english; UTF-8 with BOM; versioned keys such as key:0"
+          },
+          {
+            "confidence": 0.9,
+            "evidence_refs": [
+              "profile.detected",
+              "profile.documentation"
+            ],
+            "key": "documentation_convention",
+            "reason": "The documentation files found in the project.",
+            "value": "Markdown documentation in docs/"
+          },
+          {
+            "confidence": 0.9,
+            "evidence_refs": [
+              "profile.detected",
+              "descriptor.metadata"
+            ],
+            "key": "descriptor_tags",
+            "reason": "The tags field of descriptor.mod.",
+            "value": [
+              "Alternative History"
+            ]
+          },
+          {
+            "confidence": 0.85,
+            "evidence_refs": [
+              "profile.detected",
+              "profile.structure"
+            ],
+            "key": "folder_profile",
+            "reason": "Content folders that already hold game files.",
+            "value": [
+              "common/national_focus",
+              "localisation"
+            ]
+          }
+        ],
+        "schema_version": "1.0.0",
+        "warnings": []
+      }
+    }
+  ]
+}

@@ -29,19 +29,20 @@ pub struct PinnedSource {
 }
 
 impl PinnedSource {
+    /// For code that runs outside any async runtime.
+    pub fn build() -> Arc<Self> {
+        let cache = setup_cache_dir();
+        Arc::new(Self {
+            inner: factory_server::startup::DetachedDrop::new(
+                HttpSourceClient::for_cache_root(cache.clone()).expect("source client"),
+            ),
+            manifest_cache: cache,
+        })
+    }
+
     /// Built on the blocking pool: Setup's client must not be created on the async runtime.
     pub async fn new() -> Arc<Self> {
-        tokio::task::spawn_blocking(|| {
-            let cache = setup_cache_dir();
-            Arc::new(Self {
-                inner: factory_server::startup::DetachedDrop::new(
-                    HttpSourceClient::for_cache_root(cache.clone()).expect("source client"),
-                ),
-                manifest_cache: cache,
-            })
-        })
-        .await
-        .unwrap()
+        tokio::task::spawn_blocking(Self::build).await.unwrap()
     }
 }
 
@@ -233,11 +234,13 @@ impl ModelClient for ReplayModel {
             *next += 1;
             index
         };
+        // A recording of one analysis serves every analysis of the same fixture in a test that
+        // does not depend on distinct replies; a recording of several is replayed in order.
         let call = self
             .recording
             .calls
-            .get(index)
-            .ok_or_else(|| ModelError::Failed("the recording has no further reply".into()))?;
+            .get(index % self.recording.calls.len().max(1))
+            .ok_or_else(|| ModelError::Failed("the recording has no reply".into()))?;
         let mut reply = call.reply.clone();
         reply["input_sha256"] = Value::String(request.input_sha256.clone());
         Ok(ModelReply {
@@ -285,7 +288,14 @@ impl Flow<'_> {
     }
 
     pub async fn post(&self, tail: &str, body: Value) -> Resp {
-        self.client.post(&format!("{}/{tail}", self.base()), body).await
+        let started = std::time::Instant::now();
+        let resp = self.client.post(&format!("{}/{tail}", self.base()), body).await;
+        println!(
+            "  POST setup/{tail}: {} in {:.1}s",
+            resp.status,
+            started.elapsed().as_secs_f32()
+        );
+        resp
     }
 
     pub async fn get(&self, tail: &str) -> Resp {
@@ -331,7 +341,9 @@ impl Flow<'_> {
             )
             .await;
         assert_eq!(confirm.status, 200, "confirm: {}", confirm.text);
-        self.post("plan", json!({})).await
+        let plan = self.post("plan", json!({})).await;
+        assert_eq!(plan.status, 200, "plan: {}", plan.text);
+        plan
     }
 
     /// Approves exactly the plan shown and applies it.

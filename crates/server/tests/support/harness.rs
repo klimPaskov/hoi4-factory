@@ -196,6 +196,25 @@ struct Harness {
     data_dir: TempDir,
     database: String,
     github: Option<GithubFixture>,
+    vars: BTreeMap<&'static str, String>,
+    model: Option<Arc<dyn factory_setup_adapter::ModelClient>>,
+    setup_source: Option<Arc<dyn factory_setup_adapter::setup::SourceFetcher>>,
+}
+
+fn test_config(vars: &BTreeMap<&'static str, String>) -> ServerConfig {
+    let mut config = ServerConfig::from_lookup(|k| vars.get(k).cloned()).unwrap();
+    config.accounts.argon2 = Argon2Params {
+        memory_kib: 8,
+        iterations: 1,
+        parallelism: 1,
+    };
+    for rule in config.accounts.rate_limits.rules.values_mut() {
+        *rule = Rule {
+            capacity: 10_000,
+            refill_every: Duration::from_secs(1),
+        };
+    }
+    config
 }
 
 impl Harness {
@@ -205,7 +224,7 @@ impl Harness {
         let game_dir = fixture_game_dir();
         let data_dir = tempfile::tempdir().unwrap();
 
-        let mut vars: BTreeMap<&str, String> = BTreeMap::new();
+        let mut vars: BTreeMap<&'static str, String> = BTreeMap::new();
         vars.insert("DATABASE_URL", url_for(APP_ROLE, &database));
         vars.insert("DATABASE_MIGRATION_URL", url_for(OWNER_ROLE, &database));
         vars.insert(
@@ -219,6 +238,12 @@ impl Harness {
         vars.insert("FACTORY_ENV", "development".into());
         vars.insert("FACTORY_PUBLIC_URL", "http://localhost:8080".into());
         vars.insert("FACTORY_ALLOWED_ORIGINS", "http://localhost:5173".into());
+        // Setup registers a Node runtime in generated client configuration on Linux, and accepts
+        // only the distribution's own /usr/bin/node. Where there is none (Windows hosts) the
+        // tests run without one, and Setup then plans for its own platform.
+        if cfg!(unix) && std::path::Path::new("/usr/bin/node").exists() {
+            vars.insert("FACTORY_NODE_EXECUTABLE", "/usr/bin/node".into());
+        }
         if let Some(key) = options.anthropic_key {
             vars.insert("FACTORY_ANTHROPIC_API_KEY", key.to_owned());
         }
@@ -234,18 +259,7 @@ impl Harness {
             vars.insert("FACTORY_GITHUB_APP_API_BASE", gh.fake.api_base());
             vars.insert("FACTORY_GITHUB_CLONE_BASE", gh.fake.clone_base());
         }
-        let mut config = ServerConfig::from_lookup(|k| vars.get(k).cloned()).unwrap();
-        config.accounts.argon2 = Argon2Params {
-            memory_kib: 8,
-            iterations: 1,
-            parallelism: 1,
-        };
-        for rule in config.accounts.rate_limits.rules.values_mut() {
-            *rule = Rule {
-                capacity: 10_000,
-                refill_every: Duration::from_secs(1),
-            };
-        }
+        let config = test_config(&vars);
         let clock: Arc<dyn Clock> = Arc::new(SystemClock);
         let mailer = Arc::new(MemoryMailer::new());
         let deps = AccountsDeps {
@@ -281,6 +295,50 @@ impl Harness {
             data_dir,
             database,
             github: options.github,
+            vars,
+            model: options.model,
+            setup_source: options.setup_source,
+        }
+    }
+
+    /// A new server process over the same database and data directory: nothing in memory
+    /// survives, the way a restart behaves. Clients made before keep talking to the old router;
+    /// use [`Harness::rebind`] for a signed-in client of the new one.
+    async fn restart(&mut self) {
+        let config = test_config(&self.vars);
+        let clock: Arc<dyn Clock> = Arc::new(SystemClock);
+        let deps = AccountsDeps {
+            mailer: self.mailer.clone(),
+            github: None,
+            limiter: Arc::new(InMemoryRateLimiter::new(
+                clock.clone(),
+                &config.accounts.rate_limits,
+            )),
+        };
+        let state = initialize_with(
+            config,
+            Overrides {
+                accounts_deps: Some(deps),
+                clock: Some(clock),
+                app_installations: Some(self.installations.clone()),
+                model_client: self.model.clone(),
+                setup_source: self.setup_source.clone(),
+            },
+        )
+        .await
+        .expect("the server restarts");
+        self.app = build_app(state.clone());
+        self.state = state;
+    }
+
+    /// The same signed-in user (same session cookie) talking to the current router.
+    fn rebind(&self, user: &User) -> User {
+        User {
+            client: Client {
+                router: self.app.clone(),
+                jar: Mutex::new(user.client.jar.lock().unwrap().clone()),
+            },
+            id: user.id.clone(),
         }
     }
 
