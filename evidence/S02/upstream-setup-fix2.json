@@ -1,0 +1,60 @@
+{
+  "kind": "upstream_pull_request",
+  "repository": "klimPaskov/HOI4-Mod-Setup",
+  "base": "main",
+  "base_sha": "4488a418cad56a158273cb66c4ce7794696b7ed1",
+  "branch": "fix/recovery-and-claude-schema",
+  "head_sha": "667f5f745c8fe0dbba73a17afaaa1dcc2f643832",
+  "commits": [
+    "59590f5 fix(transaction): offer rollback when finalization never wrote the success lock",
+    "667f5f7 fix(analysis): drop schema keywords Anthropic structured output rejects"
+  ],
+  "pull_request_url": "https://github.com/klimPaskov/HOI4-Mod-Setup/pull/107",
+  "independent_of": ["#105", "#106"],
+  "merged": false,
+  "defects": [
+    {
+      "id": "recovery-finalizing-dead-end",
+      "found_by": "HOI4 Factory S02 Setup adapter live run",
+      "summary": "A finalizing journal whose success lock was never committed advertised only resume; resume failed with 'rollback or manual review is required' and rollback was not the advertised action.",
+      "fix": "Journal advertises rollback only until the lock is durable and verified; find_incomplete_transaction and resume classify the live lock against previous_lock_sha256/result_lock_sha256 (FinalizationLock).",
+      "files": ["src-tauri/src/transaction.rs"]
+    },
+    {
+      "id": "anthropic-structured-output-400",
+      "found_by": "HOI4 Factory S02 Setup adapter live run",
+      "summary": "Analysis schema sent unchanged to Anthropic; HTTP 400 \"For 'number' type, properties maximum, minimum are not supported\".",
+      "fix": "anthropic_output_schema strips minimum, maximum, exclusiveMinimum, exclusiveMaximum, multipleOf, minLength, maxLength, maxItems and minItems above 1 from the Anthropic copy only; bounds restated in descriptions; full schema still validates replies.",
+      "documentation": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs (JSON Schema limitations)",
+      "files": ["crates/hoi4-setup-core/src/analysis.rs", "src-tauri/src/ai.rs"]
+    }
+  ],
+  "tests": {
+    "toolchain": "rust 1.88.0, Windows 11, RUST_TEST_THREADS=4, CARGO_INCREMENTAL=0",
+    "fmt": "cargo fmt --all -- --check: pass",
+    "clippy": "cargo clippy --workspace --all-targets --all-features -- -D warnings: pass",
+    "workspace": "cargo test --workspace --all-features: 697 passed (15 ignored) in hoi4-mod-setup lib, 71 core, 3 golden, 4 performance, 13 web; 0 failed",
+    "filters": {
+      "transaction": "148 passed",
+      "safe_fs": "19 passed",
+      "provider": "33 passed (src-tauri lib), 4 core, 1 web"
+    },
+    "new_tests": [
+      "transaction::tests::finalization_stopped_before_the_lock_write_offers_rollback_and_restores_exactly",
+      "transaction::tests::stale_resume_advice_is_corrected_from_the_live_lock",
+      "transaction::tests::a_committed_success_lock_keeps_resume_as_the_advertised_action",
+      "analysis::tests::anthropic_request_schema_has_no_unsupported_keywords",
+      "analysis::tests::other_routes_keep_the_full_schema",
+      "analysis::tests::validation_still_enforces_the_stripped_limits_on_the_reply"
+    ],
+    "regression_check": "With the recovery fix temporarily disabled, the two recovery regression tests failed (advice stayed 'resume'); code restored before commit."
+  },
+  "limitations": [
+    "No live Anthropic call was made; the schema subset follows the published documentation and the reported 400, and is covered by request-body unit tests.",
+    "The claude_account route (Claude Code print mode --json-schema) was not changed.",
+    "Frontend tests (pnpm lint/typecheck/test), Playwright, and the web build were not run; no TypeScript changed.",
+    "A user-deleted lock after commit reads as unfinished and offers rollback, which keeps its own lock checks.",
+    "The shared target directory ran out of disk during the work; old .pdb and incremental files in .work/setup-target were deleted to continue."
+  ],
+  "date": "2026-10-24"
+}
