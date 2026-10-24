@@ -91,3 +91,14 @@ See [learning-review.md](learning-review.md). 23 candidates. S01-L06 (provider q
 - Read first: this file, `scope.md`, `exp01/report.md`, the S02 packet and the maintainer decision record.
 - Pending operations requiring reconciliation: none. All probe containers stopped or are healthy development services.
 - Needed before implementation: the maintainer's review of this S01 result and a separate authorization for S02.
+
+## Maintainer answers for S02 (2026-10-24, after S01 review)
+
+| Topic | Decision |
+|---|---|
+| Setup placement-temp fix | Pull request to HOI4-Mod-Setup with the S01 fix and a regression test that kills apply mid-write. The factory pins the merged revision |
+| Setup service facade | Upstream in HOI4-Mod-Setup as a library API shared with the desktop app |
+| Agent Tools defects | Factory host guards now, plus a pull request to hoi4-agent-tools fixing both, using the S01 fixtures as tests |
+| Upstream pull requests | Standing permission to open pull requests on HOI4-Mod-Setup and hoi4-agent-tools without asking each time. Never push to their default branches or merge. The maintainer reviews and merges |
+
+Defaults chosen by the implementing agent, revisable in S02 scope: make `keyring` an optional feature in the same Setup facade pull request instead of shipping libdbus in the server image, include a pinned Node runtime in the tool image for Setup's plan builder, satisfy Setup's analysis gate through the factory's Anthropic adapter, and relocate the Agent Tools `.focus-plan.json` sidecar into factory state outside the mod.
