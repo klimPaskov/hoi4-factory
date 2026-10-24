@@ -13,8 +13,9 @@ This repository holds the research and planning baseline, revised on 2026-10-24 
 | Client | React with TypeScript |
 | Deployment | Docker images and Compose, portable to any Linux host |
 | Source of truth | Native mod files and Git history in server workspaces, downloadable or pushed to GitHub |
-| Accounts | Sign in with GitHub or email, invite collaborators to a project |
-| Models | Bring your own API key, an operator credit allowance, or any reachable OpenAI-compatible endpoint |
+| Accounts | Sign in with GitHub or verified email, invite collaborators, private or public projects |
+| Collaboration | GitHub issues, pull requests, reviews and merges fully inside the app, no need to open GitHub |
+| Models | Claude and OpenAI, a free monthly allowance, your own API key, or any reachable OpenAI-compatible endpoint |
 | Game data | A server-side read-only reference copy, latest build with all DLC, never redistributed |
 | License | AGPL-3.0 with attribution terms, see [LICENSE](LICENSE) and [NOTICE](NOTICE) |
 

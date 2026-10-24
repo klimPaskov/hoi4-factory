@@ -33,7 +33,8 @@
       "acceptance": "AC-002",
       "scope": "MVP",
       "decisions": [
-        "ADR-011"
+        "ADR-011",
+        "ADR-019"
       ],
       "tests": [
         "T-RUN-05"
@@ -52,7 +53,8 @@
       "scope": "MVP",
       "decisions": [
         "ADR-003",
-        "ADR-016"
+        "ADR-016",
+        "ADR-019"
       ],
       "tests": [
         "T-RUN-06",
@@ -672,6 +674,7 @@
       "tests": [
         "T-GIT-02",
         "T-ACCT-02",
+        "T-GH-03",
         "T-RELEASE-04"
       ],
       "oracle": "Each contributor role has attributable intent and source-linked review, conflict and restore paths.",
@@ -880,14 +883,15 @@
       "scope": "MVP",
       "decisions": [
         "ADR-012",
-        "ADR-003"
+        "ADR-003",
+        "ADR-021"
       ],
       "tests": [
         "T-ACCT-01",
         "T-ACCT-02",
         "T-SEC-01"
       ],
-      "oracle": "No account can read or change another account's workspace, run, secret or budget, and each role permits exactly its granted project actions.",
+      "oracle": "No account can read or change another account's workspace, run, secret or budget, each role permits exactly its granted project actions, and public, copied and deleted projects follow the declared visibility, license and grace rules.",
       "execution_status": "Planned, not executed."
     },
     {
@@ -900,13 +904,15 @@
       "acceptance": "AC-047",
       "scope": "MVP",
       "decisions": [
-        "ADR-014"
+        "ADR-014",
+        "ADR-018"
       ],
       "tests": [
         "T-GH-01",
-        "T-GH-02"
+        "T-GH-02",
+        "T-GH-03"
       ],
-      "oracle": "Import preserves repository bytes and history, and every push, pull request or repository creation has one receipt even after a lost reply.",
+      "oracle": "Import preserves repository bytes and history, issue and pull request state in the app matches GitHub after missed or forged webhooks, and every GitHub write has one receipt even after a lost reply.",
       "execution_status": "Planned, not executed."
     },
     {

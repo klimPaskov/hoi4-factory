@@ -52,7 +52,7 @@ A provider profile identifies data destination, endpoint, authentication, model 
 
 Usage reporting distinguishes provider-reported tokens, locally estimated tokens, known prices, billed cost and unknown values. Unknown is not zero. Budget limits stop new dispatch per user and per task, whether the user's own key or operator credits pay. A lost acknowledgement can leave billing uncertain and is reported without automatic duplicate generation.
 
-Privacy policy, data retention, account deletion and project export are required before public launch. Account deletion removes the user's workspaces, secrets and artifacts on a recorded schedule, while preserving shared projects owned by others.
+Privacy policy, data retention, account deletion and project export are required before public launch. Account deletion disables the account at once and permanently removes its workspaces, secrets and artifacts after a 30-day grace period unless the user restores it. The user's GitHub repositories are never touched, and projects that also have other owners are kept for them. GitHub webhooks arrive at a public endpoint, so every delivery signature is verified before processing and deliveries are de-duplicated.
 
 ## Supply chain and update policy
 

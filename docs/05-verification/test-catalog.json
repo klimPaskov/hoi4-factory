@@ -650,6 +650,19 @@
       ],
       "oracle": "Images rebuild from pinned base digests and lockfiles, contain no coding CLI, game file, credential or user data, and start with Compose on a clean Linux host.",
       "status": "Planned, not executed"
+    },
+    {
+      "id": "T-GH-03",
+      "name": "Issue and pull request hub",
+      "fixtures": [
+        "F-GITHUB-REPO"
+      ],
+      "stages": [
+        "S04",
+        "S06"
+      ],
+      "oracle": "Issues, pull requests, reviews, comments, labels and checks shown in the app match GitHub after normal, delayed, duplicated, missed and forged webhook deliveries. Comments, reviews and merges made in the app appear on GitHub as the acting user, a merge respects branch protection, and turning a comment into a task needs task approval before any edit.",
+      "status": "Planned, not executed"
     }
   ]
 }

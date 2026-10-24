@@ -20,7 +20,7 @@ Support scoped autonomy with meaningful review boundaries. A grant can cover a w
 
 Make correctness claims precise. A source render, a static check, a simulation and an actual game observation are different evidence kinds. Show which files and versions were checked, what remains unknown and how to restore the prior state.
 
-Preserve contribution ownership through intent, source changes, evidence, Git review and GitHub pull requests. Start with one reliable agent writer. Invited human collaborators work on owned branches under the same rules, and parallel agents follow after conflict and recovery tests pass.
+Preserve contribution ownership through intent, source changes, evidence, Git review and GitHub pull requests. Start with one reliable agent writer. All collaboration happens in the application: GitHub issues, pull requests, reviews, comments and merges are available there, so contributors never need to open GitHub. Invited human collaborators work on owned branches under the same rules, and parallel agents follow after conflict and recovery tests pass.
 
 Keep a full game reference copy, the latest build with all DLC, on the server for validation and previews. It is read-only and never leaves the server as raw files. The game-rights review is completed before the service is exposed on a public domain.
 

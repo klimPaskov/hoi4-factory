@@ -12,7 +12,7 @@
   {
     "id": "REQ-002",
     "title": "Provider capability negotiation",
-    "requirement": "API profiles and any server-reachable OpenAI-compatible endpoint declare and probe streaming, tools, structured output, images, context and cancellation.",
+    "requirement": "Anthropic and OpenAI API profiles and any server-reachable OpenAI-compatible endpoint declare and probe streaming, tools, structured output, images, context and cancellation.",
     "spec": "SPEC-002",
     "spec_file": "../03-subsystem-specs/002-native-runtime-and-models.md",
     "stage": "S03",
@@ -22,7 +22,7 @@
   {
     "id": "REQ-003",
     "title": "Authentication, cost and fallback",
-    "requirement": "User API keys and GitHub tokens stay in the server secret store and out of artifacts, subscription access is not assumed, per-user budgets and the operator credit allowance stop new work, and fallback respects data destinations.",
+    "requirement": "User API keys and GitHub tokens stay in the server secret store and out of artifacts, subscription access is not assumed, per-user budgets and the monthly operator allowance stop new work, and fallback respects data destinations and funding source.",
     "spec": "SPEC-002",
     "spec_file": "../03-subsystem-specs/002-native-runtime-and-models.md",
     "stage": "S03",
@@ -452,7 +452,7 @@
   {
     "id": "REQ-046",
     "title": "Accounts and tenant isolation",
-    "requirement": "Public sign-up through GitHub or email, per-account and per-project isolation of workspaces, agent runs, secrets and budgets, project roles for invited collaborators, and abuse and rate limits.",
+    "requirement": "Public sign-up through GitHub or verified email, per-account and per-project isolation of workspaces, agent runs, secrets and budgets, project roles for invited collaborators, private or public projects with license-respecting copies, a 30-day deletion grace period, and abuse and rate limits.",
     "spec": "SPEC-011",
     "spec_file": "../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md",
     "stage": "S02",
@@ -462,7 +462,7 @@
   {
     "id": "REQ-047",
     "title": "GitHub integration",
-    "requirement": "Connect selected repositories, import a mod from GitHub, upload a mod without a repository, push owned branches, open pull requests and create repositories, each separately authorized and reconciled.",
+    "requirement": "Work with GitHub entirely inside the app: connect selected repositories, import or upload mods, create repositories, push branches, and use issues, pull requests, reviews, comments, labels, checks and merges, mirrored from GitHub by verified webhooks, with every write separately authorized and reconciled.",
     "spec": "SPEC-005",
     "spec_file": "../03-subsystem-specs/005-git-collaboration-and-review.md",
     "stage": "S02",

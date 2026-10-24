@@ -15,6 +15,10 @@ Implementation remains deferred. The maintainer stated that the application will
 | ADR-015 | Server-held full game reference copy, latest build with all DLC | Game files read only from the user's machine |
 | ADR-016 | Free use with bring-your-own model keys and an operator credit allowance | Local credentials only |
 | ADR-017 | AGPL-3.0 open-source license with attribution terms | No license chosen |
+| ADR-018 | GitHub issues, pull requests, reviews and merges fully inside the app | Opening GitHub for collaboration |
+| ADR-019 | Claude and OpenAI adapters, monthly allowance on any model, Stripe for credits | Unchosen providers and payments |
+| ADR-020 | gVisor runtime for per-task tool containers | Unchosen sandbox runtime |
+| ADR-021 | Verified email, 30-day deletion grace, private or public projects, license-respecting copies, English with translatable strings | Unchosen account policies |
 
 ADR-001 and ADR-003 through ADR-010 remain in force, with the scope changes noted below. ADR-002 is superseded by ADR-011 and ADR-012.
 
@@ -74,7 +78,7 @@ ADR-001 and ADR-003 through ADR-010 remain in force, with the scope changes note
 
 **Defaults chosen in this record.** GitHub is the only forge in the first release. Other forges are a backlog item.
 
-**Unresolved.** How pull request review comments map to factory tasks.
+**Extended by ADR-018**, which makes GitHub issues, pull requests and reviews fully usable inside the application.
 
 **Reconsideration trigger.** GitHub terms or rate limits block the intended flow, or users need a forge GitHub cannot represent.
 
@@ -102,6 +106,42 @@ ADR-001 and ADR-003 through ADR-010 remain in force, with the scope changes note
 
 **Compatibility.** Reused components are Apache-2.0 (HOI4-Mod-Setup, hoi4-agent-tools, HOI4-Live-Tools, HOIIVUtils) and MIT (CWTools, its HOI4 rules, hoi4-modmaker). Both are compatible with inclusion in an AGPL-3.0 work, and their own notices must be retained. The S08 dependency inventory still verifies every transitive license. Nova remains comparison only.
 
+## Follow-up decisions
+
+The maintainer answered the remaining product questions later on 2026-10-24.
+
+### ADR-018: GitHub as the in-app collaboration hub
+
+**Decision.** Users never need to open GitHub. Everything the project needs from GitHub is available inside the application: issues, pull requests, reviews, comments, labels, assignees, branches, check results and merges. All collaboration on a project happens in one place.
+
+**Scope.** Issues can be listed, filtered, created, edited, commented on, labeled, assigned, closed and reopened, and linked to factory tasks. Pull requests can be opened, viewed with the factory's semantic and raw diff, reviewed with line comments, approved or sent back with requested changes, updated and merged. Check and status results from GitHub are shown beside the factory's own evidence. A member can turn any issue or review comment into an agent task with one click. The task still needs normal approval before an agent edits anything.
+
+**Source of truth.** GitHub remains authoritative for issues, pull requests, reviews and comments. The application mirrors them through GitHub App webhooks with signature verification, plus periodic reconciliation for missed deliveries. It never keeps a second, divergent copy of a discussion. Actions taken in the app are performed on GitHub as the acting user where GitHub supports user-to-server tokens, so authorship stays correct on GitHub.
+
+**Constraints.** Merging, closing, and changing labels or assignees are effects with grants, like push. Merges respect branch protection and required checks and are never forced. Each GitHub write reconciles an uncertain outcome before retrying. App permissions widen to issues and pull requests read and write, checks and statuses read, and metadata, requested only for repositories the user selects. A project without a GitHub repository gets local tasks and reviews until it is published.
+
+**Supersedes.** The narrower operation list in ADR-014 and the open question about mapping review comments to tasks.
+
+### ADR-019: model providers, allowance and payments
+
+**Decision.** The first release ships native adapters for Anthropic (Claude) and OpenAI. The OpenAI-compatible adapter also serves self-hosted endpoints. Each verified user receives a small monthly operator-funded allowance that can be spent on any supported model, after which they bring their own key or later buy credits. Credit purchases will use Stripe. The operator then handles tax registration and compliance, which the backlog item must cover.
+
+### ADR-020: gVisor tool sandbox
+
+**Decision.** Model-directed tools and allowlisted commands on the public service run in per-task containers under the gVisor runtime. EXP-07 still has to demonstrate the boundary with escape and cross-tenant tests before public launch. Plain Docker is acceptable for local development only.
+
+### ADR-021: account and project policies
+
+**Decision.**
+
+| Policy | Rule |
+|---|---|
+| Sign-up abuse | Email must be verified, and GitHub sign-in counts as verified. Rate, task and spend limits apply per account. The free allowance starts only after verification |
+| Account deletion | The account is disabled at once and permanently deleted after a 30-day grace period unless restored. The user's GitHub repositories are never touched. Projects that also have other owners are kept for them |
+| Project visibility | Projects are private by default. An owner may make one public, giving a read-only view of its source, previews and evidence |
+| Copying public projects | Another user may copy a public project into their account only when the project declares a license that permits it. Attribution is kept |
+| Interface language | English at launch, with all interface text in translatable strings so languages can be added later |
+
 ## Effects on existing decisions
 
 | ADR | Effect |
@@ -121,7 +161,7 @@ Existing requirement IDs are kept. Wording changed for REQ-002, REQ-003, REQ-006
 | ID | Requirement | Spec | First stage |
 |---|---|---|---|
 | REQ-046 | Accounts and tenant isolation. Public sign-up through GitHub or email, per-account and per-project isolation of workspaces, agent runs, secrets and budgets, project roles for invited collaborators, abuse and rate limits | SPEC-011 | S02 |
-| REQ-047 | GitHub integration. Connect selected repositories, import a mod from GitHub, upload a mod without a repository, push owned branches, open pull requests and create repositories, each separately authorized and reconciled | SPEC-005 | S02 |
+| REQ-047 | GitHub integration. Work with GitHub entirely inside the app, from repository connection, import and upload through issues, pull requests, reviews, comments, checks and merges, mirrored by verified webhooks, with every write separately authorized and reconciled (extended by ADR-018) | SPEC-005 | S02 |
 | REQ-048 | Server game reference. A read-only full game copy, latest build with all DLC, used for validation and previews, never exported or baked into images, with the rights review completed before public exposure | SPEC-006 | S02 |
 
 ## Remaining open questions
@@ -129,8 +169,7 @@ Existing requirement IDs are kept. Wording changed for REQ-002, REQ-003, REQ-006
 | Question | Owner | Decision point |
 |---|---|---|
 | Hosting provider and production orchestrator | Maintainer | Before S08 deployment |
-| Per-task containers or a stronger sandbox runtime for agent tools | Security owner | EXP-07, before public launch |
+| gVisor containment evidence for agent tools | Security owner | EXP-07, before public launch |
 | Game-rights review for a hosted service with free use and optional credits | Maintainer | Before public domain exposure |
-| Payment provider and credit pricing | Maintainer | When the credits backlog item is scheduled |
-| Mapping pull request review comments to tasks | Collaboration owner | S06 |
-| Privacy policy, data retention and account deletion | Maintainer | Before public launch |
+| Monthly allowance amount and credit pricing | Maintainer | Before public launch and when credits are scheduled |
+| Privacy policy text and hosting jurisdiction | Maintainer | Before public launch |

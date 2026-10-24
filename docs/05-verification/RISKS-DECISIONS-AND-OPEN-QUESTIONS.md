@@ -53,7 +53,7 @@ An experiment that fails should return a narrow proposed correction or an altern
 
 [ADR-001 through ADR-010](../02-architecture/options-and-decisions.md#provisional-decisions) were provisional planning decisions. They cover Setup reuse, Candidate A preference, host authority, storage, focus-first editing, maps, one-writer sequencing, Claude-first engineering, retrieval and license constraints. ADR-002 is superseded.
 
-[ADR-011 through ADR-017](../02-architecture/maintainer-decisions-2026-10-24.md) are maintainer decisions recorded on 2026-10-24. They cover the native Rust agent runtime, the public hosted web application with accounts and invited collaborators, Docker deployment, GitHub integration, the server-held game reference, free use with user keys and an operator allowance, and the AGPL-3.0 license with attribution terms. They also record their effect on ADR-001 and ADR-003 through ADR-010.
+[ADR-011 through ADR-021](../02-architecture/maintainer-decisions-2026-10-24.md) are maintainer decisions recorded on 2026-10-24. They cover the native Rust agent runtime, the public hosted web application with accounts and invited collaborators, Docker deployment, GitHub integration and the in-app GitHub collaboration hub, the server-held game reference, free use with user keys and a monthly allowance, Claude and OpenAI adapters with Stripe for later credits, the gVisor tool sandbox, account and project policies, and the AGPL-3.0 license with attribution terms. They also record their effect on ADR-001 and ADR-003 through ADR-010.
 
 Each accepted ADR must record the approving owner, date, evidence revision, alternatives, constraints, costs, unresolved conditions and reconsideration trigger. S01 may still return evidence against ADR-011 through its reconsideration trigger. That returns the question to the maintainer rather than switching runtimes silently. A documented implementation defect can justify a small upstream contribution or adapter correction before a fork is considered.
 
@@ -66,11 +66,11 @@ Each accepted ADR must record the approving owner, date, evidence revision, alte
 | Should the Rust loop use a third-party provider crate or thin project adapters? | No crate was evaluated against the fault corpus | EXP-04 comparison on the same fixtures |
 | Should the agent loop run in the server process or a supervised worker or container? | Fencing, crash isolation and resource limits differ, none was measured | EXP-03 placement comparison |
 | Which hosting provider and production orchestrator? | The maintainer chose portable Docker images and left the provider open | Maintainer choice during S08 |
-| Which sandbox runtime contains model-directed tools on shared servers? | Plain containers are not proof of isolation, stronger runtimes were not tested | EXP-07 containment evidence before public launch |
+| Does gVisor contain model-directed tools on shared servers? | ADR-020 selects gVisor, which has not been tested against this workload | EXP-07 escape and cross-tenant evidence before public launch |
 | Is a hosted service holding a full game copy, with free use and optional credits, permitted by the publisher's terms? | The maintainer deferred the review | Recorded rights review in S08 before public domain exposure |
-| Which payment provider and credit pricing? | Credit purchasing is a backlog item | Maintainer decision when the item is scheduled |
-| What privacy policy, data retention and account deletion rules apply? | No hosting jurisdiction or provider is chosen | Maintainer decision before public launch |
-| How do GitHub pull request review comments map to factory tasks? | Review objects and task contracts were not designed together | S06 design proposal |
+| What monthly allowance amount and credit prices apply? | ADR-019 selects a small allowance and Stripe without amounts | Maintainer decision before public launch |
+| What privacy policy text and hosting jurisdiction apply? | ADR-021 sets deletion rules, no jurisdiction is chosen | Maintainer decision before public launch |
+| How are GitHub webhook gaps and rate limits handled at scale? | ADR-018 mirrors issues and pull requests, delivery behavior was not measured | T-GH-03 under delayed, duplicated and missed deliveries |
 | Which exact model IDs and endpoints are supported? | Accounts, hardware and provider choices were not available for trials | Record actual permitted profiles and run capability/episode tests |
 | How much visual editing is source-safe at the chosen tool closure? | Existing tests and implementation suggest useful operations without proving this deployment | EXP-02 writable subset and explicit unsupported gestures |
 | What game behavior can be verified at all? | The server does not run the game and audited Live Tools is constrained by OS and executable identity | Record a user-operated scenario procedure |

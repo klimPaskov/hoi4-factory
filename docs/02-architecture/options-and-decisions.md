@@ -79,8 +79,12 @@ Strengths are a richer embedded session system and a broadly TypeScript applicat
 | ADR-015 | Server-held read-only game reference, latest build with all DLC | Maintainer decision, server-side validation and previews | The rights review does not permit it |
 | ADR-016 | Free use, bring-your-own keys and an operator credit allowance | Maintainer decision | Abuse or cost makes the allowance unsustainable |
 | ADR-017 | AGPL-3.0 with attribution and origin terms | Maintainer decision, prevents closed rebranded forks | Maintainer revises the license |
+| ADR-018 | GitHub issues, pull requests, reviews and merges fully inside the app | Maintainer decision, all collaboration in one place | GitHub API or terms cannot support a needed action |
+| ADR-019 | Claude and OpenAI adapters, monthly allowance on any model, Stripe for credits | Maintainer decision | Allowance cost or provider terms change |
+| ADR-020 | gVisor runtime for per-task tool containers | Maintainer decision, stronger isolation than plain Docker | EXP-07 escape or cross-tenant tests fail |
+| ADR-021 | Verified email, 30-day deletion grace, private or public projects, license-respecting copies, English with translatable strings | Maintainer decision | Abuse, privacy or legal review requires changes |
 
-ADR-011 through ADR-017 are recorded maintainer decisions with full records in the [decision record](maintainer-decisions-2026-10-24.md). The others remain proposals. S01 produces decision receipts with evidence and asks for architecture/roadmap review at its end. Approval of S01 does not authorize S02 automatically.
+ADR-011 through ADR-021 are recorded maintainer decisions with full records in the [decision record](maintainer-decisions-2026-10-24.md). The others remain proposals. S01 produces decision receipts with evidence and asks for architecture/roadmap review at its end. Approval of S01 does not authorize S02 automatically.
 
 ## S01 experiment gate
 

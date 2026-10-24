@@ -58,7 +58,7 @@ Server-side commit, branch integration and remote publication are distinct opera
 
 ## GitHub integration
 
-A user connects GitHub in two layers. Signing in with GitHub establishes identity under REQ-046. Granting repository access is separate and selective. Prefer a GitHub App installed on chosen repositories or organizations, which issues short-lived installation tokens scoped to those repositories. An OAuth app or a personal token is a fallback only where the App cannot express a needed permission, and the reason is recorded. Request the narrowest permissions the enabled features need, starting with contents and pull requests.
+A user connects GitHub in two layers. Signing in with GitHub establishes identity under REQ-046. Granting repository access is separate and selective. Prefer a GitHub App installed on chosen repositories or organizations, which issues short-lived installation tokens scoped to those repositories. An OAuth app or a personal token is a fallback only where the App cannot express a needed permission, and the reason is recorded. Request the narrowest permissions the enabled features need: contents, issues and pull requests read and write, checks and statuses read, and metadata.
 
 Tokens live in the server secret store, are minted for one operation or a short window and never appear in workspaces, Git config, mod history, evidence, logs or the browser. Git operations receive credentials through a controlled helper that the host supplies per operation. Revoking the App installation or disconnecting GitHub stops new remote operations immediately and leaves server workspaces intact.
 
@@ -72,7 +72,17 @@ Tokens live in the server secret store, are minted for one operation or a short 
 | Create repository | Publication grant naming owner, name and visibility | Look up the repository by name before creating another |
 | Push to a shared default branch | Separate explicit authorization every time unless a standing rule names it | Same as push, plus branch protection results are reported |
 
-Fetching from GitHub never updates an accepted workspace snapshot silently. Remote changes arrive as a new base, and dependent proposals become stale under the normal rules. A pull request opened by the factory carries the proposal hash, evidence summary and limitations in its body. Review comments on that pull request are visible in the project. Their mapping to factory tasks is decided in S06. GitHub branch protection, required checks and repository rules are reported and never bypassed.
+Fetching from GitHub never updates an accepted workspace snapshot silently. Remote changes arrive as a new base, and dependent proposals become stale under the normal rules. A pull request opened by the factory carries the proposal hash, evidence summary and limitations in its body. GitHub branch protection, required checks and repository rules are reported and never bypassed.
+
+### In-app issues, pull requests and reviews
+
+Under [ADR-018](../02-architecture/maintainer-decisions-2026-10-24.md#adr-018-github-as-the-in-app-collaboration-hub), a member never needs to open GitHub. The project view lists, filters and opens issues and pull requests for the linked repository. Members create, edit, comment on, label, assign, close and reopen issues. They open pull requests, read them with the factory's semantic and raw diff, leave line comments, approve, request changes and merge. GitHub check and status results appear beside the factory's own evidence with their source named, so a passing GitHub check is never presented as factory evidence or the reverse.
+
+GitHub stays authoritative for issues, pull requests, reviews and comments. The server mirrors them from GitHub App webhooks after verifying each delivery signature, de-duplicates by delivery ID and reconciles on a schedule to recover missed deliveries. A mirrored item records the GitHub revision it reflects. An edit made in the app against a stale mirror is refused and refreshed, never silently overwritten. Actions run on GitHub as the acting member through user-to-server tokens where GitHub supports them, so GitHub attribution matches the factory record.
+
+Every write to GitHub is an effect with its own grant class and a reconciliation rule. Merging needs a merge grant, respects branch protection and required reviews, and is never forced. Labels, assignees, closing and comments need the member's role to allow them. A lost reply is resolved by reading the issue, comment or pull request state before any retry. Any issue or review comment can become an agent task with one click. That task carries a link to its source comment and still needs normal task approval before an agent edits anything. A project without a GitHub repository uses local tasks and reviews until it is published.
+
+T-GH-03 covers mirror fidelity under delayed, duplicated, missed and forged webhooks, attribution of in-app actions and protected merges.
 
 GitHub rate limits, outages and permission errors are distinct states. Rate limiting delays remote operations without failing local review. A permission error names the missing grant. Other forges are a backlog item.
 

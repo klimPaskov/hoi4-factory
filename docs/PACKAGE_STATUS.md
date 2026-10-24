@@ -4,9 +4,9 @@ Version: v02, revised 2026-10-24. Phase: **Planning revised by maintainer decisi
 
 ## Revision of 2026-10-24
 
-The maintainer selected a public hosted web application with GitHub or email accounts and invited collaborators, a Rust server with a native Rust agent loop and a React browser client, Docker deployment, native GitHub integration, a server-held read-only game reference with all DLC, free use with bring-your-own keys and a credit allowance, and the AGPL-3.0 license. The full records are ADR-011 through ADR-017 in the [maintainer decision record](02-architecture/maintainer-decisions-2026-10-24.md). ADR-002, the Tauri and Pi worker preference, is superseded.
+The maintainer selected a public hosted web application with GitHub or email accounts and invited collaborators, a Rust server with a native Rust agent loop and a React browser client, Docker deployment, native GitHub integration, a server-held read-only game reference with all DLC, free use with bring-your-own keys and a monthly allowance, GitHub issues and pull requests fully inside the app, Claude and OpenAI adapters, Stripe for later credits, a gVisor tool sandbox, account and project policies, and the AGPL-3.0 license. The full records are ADR-011 through ADR-021 in the [maintainer decision record](02-architecture/maintainer-decisions-2026-10-24.md). ADR-002, the Tauri and Pi worker preference, is superseded.
 
-The master goal, requirements, architecture, contracts, specs, stages, risks, tests and handoffs were revised to match. Ten requirements were reworded and REQ-046 through REQ-048 were added for accounts, GitHub and the game reference. Contract C-10 covers repository links. Six planned tests and three fixtures were added. The research files under `docs/00-research/` are kept as the original evidence record and still describe the desktop candidates.
+The master goal, requirements, architecture, contracts, specs, stages, risks, tests and handoffs were revised to match. Ten requirements were reworded and REQ-046 through REQ-048 were added for accounts, GitHub and the game reference. Contract C-10 covers repository links. Seven planned tests and three fixtures were added. The research files under `docs/00-research/` are kept as the original evidence record and still describe the desktop candidates.
 
 The folder became a Git repository on 2026-10-24. Its first commit is the unmodified v02 package. The revision is the following commit. The validator's requirement count changed from 45 to 48 in the same change.
 
@@ -16,7 +16,7 @@ The v02 ZIP extracts into one `hoi4-factory/` folder for direct use as the proje
 
 ## Completed planning scope
 
-The package contains a source-grounded research recommendation, the 2026-10-24 maintainer decisions, product workflows, 48 stable requirements, 13 subsystem specs, ten proposed integration contracts, seventeen ADRs, eight stages with 48 packets and 47 exit gates, a full test/evaluation design, resumable handoffs and real Claude/Codex starter assets.
+The package contains a source-grounded research recommendation, the 2026-10-24 maintainer decisions, product workflows, 48 stable requirements, 13 subsystem specs, ten proposed integration contracts, twenty-one ADRs, eight stages with 48 packets and 47 exit gates, a full test/evaluation design, resumable handoffs and real Claude/Codex starter assets.
 
 All supplied Project Source text was read before external research. The exact distinct-file coverage and duplicate method are in [the research log](00-research/04-evidence-and-research-log.md) and [source coverage](00-research/supplied-source-coverage.json). Requested public repositories, protocols, official client docs, papers and articles are accounted for in [the registry](00-research/01-research-sources.md).
 
