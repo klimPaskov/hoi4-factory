@@ -38,7 +38,7 @@ The development machine is Windows 11 with Git Bash, PowerShell, Docker Desktop 
 - Git Bash on Windows corrupts non-ASCII text passed on a command line, for example `curl -d` with accents or emoji. Write such payloads to a UTF-8 file and send them with `--data-binary @file`.
 - The dev Compose database runs its role setup only on a fresh volume. After `docker/db-init/` changes, recreate this project's own volume with `docker compose -p hoi4-factory down -v`. Set `HOI4_GAME_DIR` to the game folder before `docker compose up`.
 - A `cd` inside one shell command changes the session's working directory for later tools. Start commands that depend on location with `cd` to an absolute path.
-- The C: drive is nearly full. Share one build cache by pointing `CARGO_TARGET_DIR` at the main checkout's `target/` (an absolute path, the same for every worktree and agent), remove large probe output when its evidence is recorded, and check `df -h /c` before heavy builds.
+- The C: drive is nearly full. Share one build cache by pointing `CARGO_TARGET_DIR` at the main checkout's `target/` (an absolute path, the same for every worktree and agent), remove large probe output when its evidence is recorded, and check `df -h /c` before heavy builds. The shared cache still keeps a separate copy of every crate per worktree path, so after removing worktrees delete `target/release` if unused and every entry in `target/debug/{deps,build,incremental}` older than two hours. Cargo rebuilds whatever an active build still needs.
 - Docker Desktop also runs the maintainer's other projects. Never restart it, prune shared images or volumes, or stop containers you did not start. Ask the maintainer instead. Stop your own test containers when done.
 
 ## Delegation and parallel work
