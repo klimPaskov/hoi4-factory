@@ -1,0 +1,81 @@
+{
+  "repository": "klimPaskov/HOI4-Mod-Setup",
+  "base": { "branch": "main", "sha": "4488a418cad56a158273cb66c4ce7794696b7ed1" },
+  "branch": "fix/placement-temp-recovery",
+  "commit_sha": "a300b90439fcf907b9e684f3df8443322d7b7848",
+  "commit_subject": "fix(transaction): bind placement temporaries so rollback restores exactly",
+  "pr_url": "https://github.com/klimPaskov/HOI4-Mod-Setup/pull/105",
+  "pushed": "feature branch only; main untouched; no merge; no force push",
+  "worktree": "C:\\Users\\klimp\\Documents\\Projects\\hoi4-factory\\.work\\HOI4-Mod-Setup-fix (git worktree of the .work\\HOI4-Mod-Setup clone, created because another session had switched the shared clone to branch feat/service-facade with uncommitted changes)",
+  "files_changed": [
+    "src-tauri/src/safe_fs.rs",
+    "src-tauri/src/transaction.rs",
+    "docs/14_transaction_rollback.md",
+    ".agents/skills/hoi4-mod-setup-transactions/SKILL.md",
+    "CHANGELOG.md"
+  ],
+  "fix": {
+    "summary": "Placement temporary is named .hoi4ms-placing-<txid>-<op>.tmp (locks and rollback steps use the same derivation); rollback removes forward and rollback-transaction temporaries before restoring; a named placement replaces its own stale regular file and refuses links and non-regular entries.",
+    "covered_extra_gap": "temporary left when rollback itself is killed mid-write (retry replaces and cleans it)",
+    "left_as_follow_up": [
+      "empty directories created by an operation beside its destination (only plan.transaction.directories is journaled; needs a journal change)",
+      "placement temporaries of operations outside the project root (external)",
+      "stale temporaries are removed by rollback only, not by forward resume"
+    ]
+  },
+  "regression_test": {
+    "name": "transaction::tests::hard_stop_before_a_placement_rename_is_recovered_without_leftovers",
+    "method": "child process aborts (std::process::abort) at the numbered caller-named placement via cfg(test) hook HOI4_MOD_SETUP_TEST_ABORT_PLACEMENT; parent asserts a .hoi4ms- file was left, runs find_incomplete_transaction + rollback_transaction, requires path+bytes inventory equal to pre-apply and no .hoi4ms- file",
+    "cases": ["create/1", "replace/1", "create/2 (success lock)", "replace/2 (success lock)", "replace/3 (rollback restore killed, then retry)"],
+    "companion_test": "transaction::tests::named_placement_replaces_its_own_stale_temporary_and_refuses_other_entries",
+    "fails_without_fix": {
+      "result": "failed",
+      "assertion": "temporary files survived rollback for create placement 1; left: [\".hoi4ms-d7fbc4d4-f022-46ac-b402-b4266b415b02.tmp\"]",
+      "how": "local revert of the temporary-name derivation to a random uuid name; rollback cleanup neutralized by the random name. Not a run of literal origin/main because the abort hook lives in the changed function.",
+      "log": "scratchpad new-tests-unpatched.log (not committed)"
+    }
+  },
+  "test_runs": [
+    {
+      "host": "Windows 11 Pro 10.0.26200",
+      "toolchain": "1.88.0-x86_64-pc-windows-msvc",
+      "command": "cargo +1.88.0 test --locked --manifest-path src-tauri/Cargo.toml --lib -- transaction:: safe_fs::",
+      "env": "RUST_TEST_THREADS=4",
+      "revision": "a300b90439fcf907b9e684f3df8443322d7b7848 (worktree, clean)",
+      "exit_code": 0,
+      "result": "166 passed, 0 failed, 0 ignored",
+      "duration_s": 929.28,
+      "note": "an earlier run of the same tree before commit also gave 166 passed (288.28 s)"
+    },
+    {
+      "host": "Docker rust:1.88-bookworm (rustc 1.88.0 6b00bc388), libdbus-1-dev and pkg-config installed in container",
+      "command": "cargo test --locked --manifest-path src-tauri/Cargo.toml --lib -- transaction:: safe_fs::",
+      "env": "RUST_TEST_THREADS=4, CARGO_TARGET_DIR=/target (named volume)",
+      "revision": "a300b90439fcf907b9e684f3df8443322d7b7848 (git archive HEAD)",
+      "exit_code": 0,
+      "result": "158 passed, 0 failed, 0 ignored",
+      "duration_s": 1650.29
+    },
+    {
+      "command": "cargo +1.88.0 fmt --check",
+      "exit_code": 0,
+      "result": "clean (worktree)"
+    },
+    {
+      "command": "cargo +1.88.0 clippy --locked --workspace --all-targets --all-features -- -D warnings",
+      "exit_code": 0,
+      "result": "clean"
+    }
+  ],
+  "limitations": [
+    "Upstream GitHub Actions CI on the PR was not awaited or recorded here.",
+    "Frontend commands (pnpm lint, typecheck, test) not run; no TypeScript changed.",
+    "Windows candidate-acceptance recovery run (Kaiserreich E2E with taskkill /F) was not rerun against this revision, so the S01 production-apply block is not cleared by this record alone.",
+    "macOS not tested; ignored offline lifecycle tests not run.",
+    "The 20-trial kill counts in the S01 report came from an earlier form of the fix in a local clone, not from this PR's code.",
+    "Fails-without-fix evidence is a local revert of the fix, not a run on origin/main.",
+    "cargo test of the full workspace (beyond the transaction:: and safe_fs:: filters) was not run.",
+    "Empty directories created beside destinations remain after rollback (follow-up).",
+    "The shared clone C:\\Users\\klimp\\Documents\\Projects\\hoi4-factory\\.work\\HOI4-Mod-Setup is on feat/service-facade with another session's uncommitted edits; this task did not touch it beyond reverting its own two temporary edits to safe_fs.rs and transaction.rs."
+  ]
+}

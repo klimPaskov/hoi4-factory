@@ -1,0 +1,57 @@
+{
+  "repository": "klimPaskov/HOI4-Mod-Setup",
+  "base": {"branch": "main", "sha": "4488a418cad56a158273cb66c4ce7794696b7ed1"},
+  "branch": "feat/service-facade",
+  "head_sha": "3ca23b1eb594b3ae225864c87c21915abbf5be1e",
+  "commits": [
+    "7cd94e5 feat(credentials): make the OS keyring an optional feature",
+    "3ca23b1 feat(service): add a server-usable service facade"
+  ],
+  "pull_request": "https://github.com/klimPaskov/HOI4-Mod-Setup/pull/106",
+  "pushed_to_main": false,
+  "merged": false,
+  "toolchain": "rust 1.88.0 (x86_64-pc-windows-msvc for tests; rust:1.88-bookworm for Linux)",
+  "public_api": {
+    "crate": "hoi4_mod_setup (src-tauri, lib)",
+    "module": "hoi4_mod_setup::service",
+    "items": [
+      "service::SetupService::{new(Arc<dyn CredentialStore+Send+Sync>), with_plan_builder, with_node_runtime, with_post_install_runner, open_session(SessionConfig)}",
+      "service::SessionConfig::{new(workspace_root, state_root), workspace_root, state_root}",
+      "service::SetupSession::{workspace_root, state_root, resolve_project_path, root_identity, inspect, approve_evidence, analysis_turn, analyze, record_analysis, confirm_analysis, build_plan, decide_conflict, approve_plan, apply, inspect_recovery, read_journal, recover}",
+      "service::root_identity(&Path) -> Result<String, AppError>",
+      "service::plan_sha256(&InstallationPlan) -> Result<String, AppError>",
+      "service::PlanBuilder, PlanRequest, BuiltPlan, MergeContext",
+      "service::InspectOptions, RecoveryAction, RecoveryStatus, ApprovedPlan, AnalysisTurn",
+      "service::runtime::{NodeRuntime::{new, linux_system, executable, npm_prefix}, mcp_client_launch, NODE_PUBLISHER}",
+      "service::DeniedCredentialStore (re-export of credentials::DeniedCredentialStore)",
+      "credentials::impl CredentialStore for Arc<T: CredentialStore + ?Sized>",
+      "ai::analysis_turn, ai::analysis_from_reply",
+      "cargo feature os-keyring (default on; implied by desktop)"
+    ]
+  },
+  "gates_kept": [
+    "plan requires an analysis retained and confirmed in this session with the exact reviewed values",
+    "evidence must be core-scanned values from the latest scan of the same root, approved after it",
+    "plan binds scanned root identity; apply refuses a replaced root",
+    "approval bound to the SHA-256 of the reviewed plan; conflict decision withdraws it; apply consumes it",
+    "rollback-only recovery after partial apply; other actions refused",
+    "paths outside workspace root refused; plans writing outside the project root refused; no launcher discovery"
+  ],
+  "tests": {
+    "windows_full_suite": {"command": "cargo test -p hoi4-mod-setup --all-features -- --test-threads=4", "result": "722 passed, 0 failed, 15 ignored", "exit_code": 0, "note": "ran before one trailing Send+Sync test was added"},
+    "windows_clippy": {"command": "cargo clippy --workspace --all-targets --all-features -- -D warnings", "result": "clean"},
+    "windows_fmt": {"command": "cargo fmt --all -- --check", "result": "clean"},
+    "windows_no_default_features": {"command": "cargo test -p hoi4-mod-setup --lib --no-default-features -- service:: credentials::", "result": "39 passed, 0 failed"},
+    "linux_no_libdbus": {"image": "rust:1.88-bookworm", "command": "cargo tree/build/test -p hoi4-mod-setup --lib --no-default-features --locked", "result": "no keyring or dbus crate in tree; build ok; 38 passed, 0 failed, 1 ignored", "libdbus_dev_installed": false},
+    "repo_scripts": "validate_repository.py, check_workflow_security.py, workflow unit tests pass",
+    "not_run": ["macOS", "Playwright and desktop E2E", "new GitHub CI job", "linux contrast check of default features without libdbus (container run did not finish before cleanup)"]
+  },
+  "follow_ups": [
+    "move the desktop build_plan behind PlanBuilder with explicit state root, cache root and NodeRuntime",
+    "context documents and images (process-wide store) are refused through the facade",
+    "maintenance plans (update, repair, remove)",
+    "post-install runner is desktop-only; none runs unless the host supplies one",
+    "account-tool analysis routes (codex, claude_account, gemini, grok) stay desktop-only",
+    "merge: CHANGELOG.md and the transactions skill also changed by PR #105 (fix/placement-temp-recovery); this branch does not touch safe_fs.rs or transaction.rs"
+  ]
+}
