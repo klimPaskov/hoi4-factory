@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "recorded": "2026-10-24",
+  "stage": "S02",
+  "repository": {
+    "remote": "https://github.com/klimPaskov/hoi4-factory",
+    "branch": "main",
+    "base_revision": "4634d93f9fc39dca6ae02ba42cd19d6b98eb0069",
+    "dirty_at_start": []
+  },
+  "host": {
+    "os": "Windows 11 Pro, build 10.0.26200.9711",
+    "arch": "x86_64",
+    "wsl2": {
+      "distribution": "Ubuntu 24.04.1 LTS",
+      "kernel": "6.6.87.2-microsoft-standard-WSL2"
+    }
+  },
+  "clients": {
+    "claude_code": {
+      "version": "2.1.304",
+      "entrypoint": "claude-desktop",
+      "desktop_app": "3.1623.0",
+      "agent_sdk": "0.3.304",
+      "model": "claude-sonnet-5-5 (parent), subagents on Sonnet and Haiku"
+    },
+    "codex_cli": {
+      "version": "0.142.3",
+      "trial": "not performed"
+    }
+  },
+  "toolchains": {
+    "rust": {
+      "stable": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+      "cargo": "1.97.1",
+      "rustup": "1.29.0",
+      "also_installed": [
+        "1.88.0-x86_64-pc-windows-msvc"
+      ],
+      "host_target": "x86_64-pc-windows-msvc"
+    },
+    "docker": {
+      "client": "28.5.2",
+      "server": "28.5.2",
+      "engine_os": "linux/amd64",
+      "compose": "v2.40.3-desktop.1",
+      "runtimes": [
+        "runc",
+        "io.containerd.runc.v2",
+        "nvidia"
+      ],
+      "cpus": 12,
+      "memory_bytes": 10428297216
+    },
+    "node": "24.15.0",
+    "npm": "11.6.2",
+    "pnpm": null,
+    "python": {
+      "used": "3.13.5",
+      "default_python_on_path": "3.9.12, lacks tomllib"
+    },
+    "git": "2.54.0.windows.1",
+    "gh": "2.87.3"
+  },
+  "source_closure": [
+    {
+      "name": "HOI4-Mod-Setup",
+      "url": "https://github.com/klimPaskov/HOI4-Mod-Setup",
+      "revision": "4488a418cad56a158273cb66c4ce7794696b7ed1",
+      "equals_default_head_on_2026-10-24": true,
+      "license": "Apache-2.0",
+      "toolchain_pin": "rust 1.88.0"
+    },
+    {
+      "name": "hoi4-agent-tools",
+      "url": "https://github.com/klimPaskov/hoi4-agent-tools",
+      "revision": "25f5641bbc07c65a822ef576ac6e92bd12666880",
+      "equals_default_head_on_2026-10-24": true,
+      "license": "Apache-2.0"
+    }
+  ],
+  "credentials_present": {
+    "OPENAI_API_KEY": true,
+    "ANTHROPIC_API_KEY": "user environment, working",
+    "github_cli_login": "klimPaskov, scopes delete_repo gist read:org repo workflow"
+  },
+  "capabilities_unavailable_at_start": [
+    "OpenAI live inference (no API balance)",
+    "gVisor runsc runtime",
+    "pnpm",
+    "a production mail service"
+  ],
+  "notes": "No secret values were read or recorded. Credential presence was checked by variable name only.",
+  "game_reference_dev": {
+    "source": "local Steam install, read-only, metadata only",
+    "version": "Operation Postern v1.19.3.0.c01a (5632)",
+    "raw_version": "1.19.3.0",
+    "steam_buildid": "25205862",
+    "hoi4_rev": "c01a3d507f10bd8c713e88234de69ca110618138",
+    "checksum_manifest_sha256": "771814d81faf7bae0f32819380c1114c61bbec1c897b060cecd1592f104f2b76",
+    "dlc_folders": 12,
+    "size_on_disk": "8.2G"
+  }
+}
