@@ -2,7 +2,7 @@
   "schema_version": 1,
   "version": "0.1.1",
   "generator": "scripts/sync_skills.py",
-  "metadata_sha256": "e7ebec0da57df071bf4ab4a9491674f34b8fc3cd71f499ddc85c4d1d09a30af7",
+  "metadata_sha256": "fc0fbdf101ea2faf0d39b2d116423c9918ef982d21c3bb25f705106e53076c96",
   "scope": "Only these repository projections. No personal installation.",
   "skills": [
     {
@@ -35,15 +35,15 @@
     {
       "name": "capture-engineering-lessons",
       "source": "docs/07-developer-workflow/skill-workflows/capture-engineering-lessons/BODY.md",
-      "body_sha256": "9e268bb0c2a1ac6234851e29c29a69897e7ecddeeec811068d038405d7d4e884",
+      "body_sha256": "6fc265dabd6940387ecf8062a2283fd14c5747c00297e5f4afb824af457210b4",
       "generated": [
         {
           "path": ".claude/skills/capture-engineering-lessons/SKILL.md",
-          "sha256": "0a868122eb7676dda6bf49473dd263f76658174f34565df8ca3503949faae9ee"
+          "sha256": "279550e4001d05fd1280a6513644260fa3520ef2f6532cc7f82c08f163f87dc5"
         },
         {
           "path": ".codex/skills/capture-engineering-lessons/SKILL.md",
-          "sha256": "0a868122eb7676dda6bf49473dd263f76658174f34565df8ca3503949faae9ee"
+          "sha256": "279550e4001d05fd1280a6513644260fa3520ef2f6532cc7f82c08f163f87dc5"
         },
         {
           "path": ".codex/skills/capture-engineering-lessons/agents/openai.yaml",
@@ -51,10 +51,37 @@
         },
         {
           "path": ".agents/skills/capture-engineering-lessons/SKILL.md",
-          "sha256": "0a868122eb7676dda6bf49473dd263f76658174f34565df8ca3503949faae9ee"
+          "sha256": "279550e4001d05fd1280a6513644260fa3520ef2f6532cc7f82c08f163f87dc5"
         },
         {
           "path": ".agents/skills/capture-engineering-lessons/agents/openai.yaml",
+          "sha256": "8619a54e8c098122a7f3881394f84ca89b684366e848233a29ad18b6ec363935"
+        }
+      ]
+    },
+    {
+      "name": "delegate-parallel-work",
+      "source": "docs/07-developer-workflow/skill-workflows/delegate-parallel-work/BODY.md",
+      "body_sha256": "b62a7fc7b02a692b05298df3ad63c8fa382f60a7a5ba2d49d44eb8885932fb62",
+      "generated": [
+        {
+          "path": ".claude/skills/delegate-parallel-work/SKILL.md",
+          "sha256": "928ddc01c097df74a32b276710ac3d0a6ad4bd5e36a54e8881439d9c4208ab64"
+        },
+        {
+          "path": ".codex/skills/delegate-parallel-work/SKILL.md",
+          "sha256": "928ddc01c097df74a32b276710ac3d0a6ad4bd5e36a54e8881439d9c4208ab64"
+        },
+        {
+          "path": ".codex/skills/delegate-parallel-work/agents/openai.yaml",
+          "sha256": "8619a54e8c098122a7f3881394f84ca89b684366e848233a29ad18b6ec363935"
+        },
+        {
+          "path": ".agents/skills/delegate-parallel-work/SKILL.md",
+          "sha256": "928ddc01c097df74a32b276710ac3d0a6ad4bd5e36a54e8881439d9c4208ab64"
+        },
+        {
+          "path": ".agents/skills/delegate-parallel-work/agents/openai.yaml",
           "sha256": "8619a54e8c098122a7f3881394f84ca89b684366e848233a29ad18b6ec363935"
         }
       ]

@@ -57,6 +57,7 @@ SKILLS = {
     "start-implementation-stage", "validate-stage",
     "capture-engineering-lessons", "audit-hoi4-integrations",
     "production-readiness-review",
+    "delegate-parallel-work",
 }
 STAGE_SECTIONS = [
     "Objective and non-goals", "Entry conditions", "Read-first sequence and reuse",
@@ -254,8 +255,9 @@ def main() -> int:
             manual = name in {"start-implementation-stage", "audit-hoi4-integrations"}
             if client == ".claude" and (values.get("disable-model-invocation") == "true") != manual:
                 skill_errors.append(f"{name}: Claude invocation mode differs from ADR-023")
-    if "@AGENTS.md" not in (root / "CLAUDE.md").read_text():
-        skill_errors.append("CLAUDE does not import AGENTS")
+    # ADR-024: CLAUDE.md is canonical and AGENTS.md must be its byte-identical copy.
+    if (root / "CLAUDE.md").read_bytes() != (root / "AGENTS.md").read_bytes():
+        skill_errors.append("AGENTS.md differs from canonical CLAUDE.md, run sync_skills.py --write")
     try:
         run = subprocess.run([sys.executable, str(root / "scripts/sync_skills.py"), "--check"],
             cwd=root, capture_output=True, text=True, timeout=30)

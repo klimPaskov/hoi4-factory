@@ -1,28 +1,25 @@
-# Capture and review engineering lessons
+# Capture and apply engineering lessons
 
 ## Trigger and inputs
 
-Use this workflow at an explicitly requested substantive handoff, after a repeated failure or when a tool limitation suggests a reusable improvement. Inputs are the stage/task evidence, relevant accepted guidance, exact versions and the proposed behavioral change. A lesson about product users or mod canon belongs to its separate runtime/design process.
+Use this workflow at every substantive handoff, after a repeated failure, when a tool quirk cost time, when a working pattern is worth reusing, or when the maintainer states a preference about how the project is built. Inputs are the stage or task evidence, the current [instructions](../../../../CLAUDE.md), the existing skills and the [changelog](../../KNOWLEDGE-CHANGELOG.md).
 
-Read [knowledge policy](../../REUSABLE-KNOWLEDGE-POLICY.md), [instruction map](../../SKILLS-AND-INSTRUCTION-MAP.md), [changelog](../../KNOWLEDGE-CHANGELOG.md), and [runtime learning boundaries](../../../03-subsystem-specs/004-context-memory-and-runtime-learning.md).
+Read [knowledge policy](../../REUSABLE-KNOWLEDGE-POLICY.md), [instruction map](../../SKILLS-AND-INSTRUCTION-MAP.md) and [runtime learning boundaries](../../../03-subsystem-specs/004-context-memory-and-runtime-learning.md). Engineering lessons about building the factory belong here. Lessons about product users or mod canon belong to the product's runtime memory and design process.
 
 ## Procedure
 
-1. Review the task's actual outcomes, failed attempts, recovery work and verification gaps. Compare relevant existing lessons before proposing another rule. If no reusable change emerged, record that conclusion with a short reason.
-2. Select a specific observation. Distinguish a reproducible defect, a tool/version limitation, an unclear requirement and a useful workflow improvement. Do not infer broad model performance from one anecdote.
-3. Create a C-07 candidate in `engineering/knowledge/candidates/<id>.md` with domain engineering, evidence, source hashes, reproduction, owner, scope, version bounds, counterexample, proposed diff, review status and rollback.
-4. Remove secrets, unrelated personal data and hidden thought artifacts. Keep enough nonsecret detail to reproduce the claim. Mark unsupported observations captured rather than accepted.
-5. Test the narrow claim where feasible. Use deterministic artifact checks and positive/negative workflow cases. A model trial must record its actual client/model, prompt, trace and outcome. Do not invent a success rate.
-6. Choose one destination: stable rule, focused skill, linked reference, config guide, regression test or task evidence. Keep the smallest useful change. A stage-specific workaround should not become universal policy without justification.
-7. Route the candidate for the applicable review. A change that broadens authority, costs, external effects, product scope or game design needs the appropriate owner decision. Routine corrections within an authorized stage follow normal repository review. Capture and review do not themselves approve a broader change.
-8. For an accepted change, update canonical guidance, regenerate all client skill projections, adjust relevant fixtures, run drift checks, and record the changelog entry. Add supersedes and expiry links. Keep rejected or deferred candidates traceable.
+1. Review what actually happened: failures, retries, recovery work, verification gaps, maintainer corrections and things that went smoothly because of a pattern. Compare with the current CLAUDE.md and skills before adding anything.
+2. For each useful lesson, choose the smallest destination that will reach the next session: a line in CLAUDE.md for a stable project-wide rule, an edit to the skill whose workflow it improves, a new skill when a workflow repeats or a task type needs a written procedure, or a regression test when the lesson is testable.
+3. Apply it now. Edit CLAUDE.md (never AGENTS.md, which is generated), edit or add canonical skill bodies under `docs/07-developer-workflow/skill-workflows/`, add new skills to `skills.json` and the skill sets in `scripts/sync_skills.py` and `scripts/validate_package.py`, add a trigger fixture, and run `PYTHONUTF8=1 py -3.13 scripts/sync_skills.py --write`. Add the regression test where feasible.
+4. Keep each change specific and bounded. State the observation, the rule and when it applies. Avoid broad claims from one anecdote, and keep stage-specific workarounds in stage evidence.
+5. Check the limit: a change must not widen authority, access roots, external data transfer, paid operations, approved product scope or game canon. If it would, write it up as a proposal and ask the maintainer instead of applying it.
+6. Remove secrets, private data and hidden reasoning from anything you write.
+7. Run `PYTHONUTF8=1 py -3.13 scripts/sync_skills.py --check` and the package validator, then add a changelog entry naming what changed and why.
 
 ## Outputs and evidence
 
-Produce `evidence/SNN/learning-review.md` listing observations considered, candidate IDs, accepted changes, rejected or deferred items, affected versions and the next review trigger. Link the actual diff and tests. Update config-review.md if the lesson changes a tool, provider, context assumption, permission or setup procedure.
+Produce `evidence/SNN/learning-review.md` listing the lessons considered, what was applied and where, what was proposed to the maintainer, and what was set aside with the reason. Keep longer candidate records in `engineering/knowledge/candidates/` when a lesson needs reproduction detail. Update config-review.md when a lesson changes a tool, provider, permission or setup step.
 
 ## Stop and error paths
 
-Do not promote a claim without evidence or review. If a tool cannot reproduce the result, keep the candidate bounded and mark its limitation. If a proposed instruction conflicts with accepted authority, record the conflict and route the decision instead of overriding it. Do not modify runtime memory or approved game canon as a side effect.
-
-If new evidence contradicts accepted guidance, mark it for review and preserve history. Recovery uses a reviewed Git revision of canonical sources followed by regeneration and the affected checks. Reverting guidance does not undo remote side effects.
+If a lesson cannot be confirmed, record it as captured with its limitation instead of turning it into a rule. If it conflicts with a maintainer decision, the decision wins until the maintainer changes it. If later evidence contradicts a rule, fix or remove the rule and note the reason in the changelog. Reverting guidance does not undo external side effects.

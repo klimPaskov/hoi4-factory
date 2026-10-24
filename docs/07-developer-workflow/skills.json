@@ -12,7 +12,7 @@
     },
     {
       "name": "capture-engineering-lessons",
-      "description": "Use automatically at every substantive engineering handoff or after a repeatable tooling failure to capture and test reusable guidance, promoting test-backed lessons that change no authority under ADR-023. Keep candidates separate from accepted policy, product runtime memory and game design canon."
+      "description": "Use at every substantive handoff, after a repeated failure or tool quirk, or when the maintainer states a preference about how the project is built. Apply useful lessons directly to CLAUDE.md and the skills, create new skills when a workflow repeats, and ask the maintainer only for changes that would widen authority, cost or scope."
     },
     {
       "name": "audit-hoi4-integrations",
@@ -21,6 +21,10 @@
     {
       "name": "production-readiness-review",
       "description": "Use at a stage handoff, before real users can reach a deployment, or when asked what is worth hardening next. Treat the production readiness checklist as a menu, not requirements, recommend only proportionate low-friction items, and leave enterprise and compliance items alone unless the maintainer asks."
+    },
+    {
+      "name": "delegate-parallel-work",
+      "description": "Use when a stage splits into independent packets for subagents. Create worktrees from the repository root, write self-contained briefs with owned paths and checks, pick Haiku or Sonnet by task, review and merge each branch into main, then remove its worktree and branch."
     }
   ]
 }

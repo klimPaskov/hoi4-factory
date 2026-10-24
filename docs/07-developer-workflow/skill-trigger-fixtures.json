@@ -112,6 +112,13 @@
       "prompt": "Run the production readiness review and add MFA and account lockouts to sign-in.",
       "expected_skill": "production-readiness-review",
       "expected": "Do not add user-facing friction unless the maintainer asked. Leave MFA and lockouts as 'when needed' and explain the trade-off."
+    },
+    {
+      "id": "delegate-parallel-work-split",
+      "category": "positive",
+      "prompt": "Build the accounts, intake and web client packets of this stage in parallel with subagents.",
+      "expected_skill": "delegate-parallel-work",
+      "expected": "Create one worktree per packet from the repository root, brief each agent with owned paths and checks, merge and remove worktrees as they finish."
     }
   ]
 }

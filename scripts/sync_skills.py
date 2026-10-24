@@ -23,6 +23,7 @@ EXPECTED_NAMES = {
     "capture-engineering-lessons",
     "audit-hoi4-integrations",
     "production-readiness-review",
+    "delegate-parallel-work",
 }
 CLIENTS = (".claude", ".codex", ".agents")
 # ADR-023: these workflows stay invocable only by the maintainer. The others run automatically.
@@ -123,6 +124,10 @@ def expected_files() -> tuple[dict[Path, bytes], dict]:
     }
     assert_owned(MANIFEST)
     outputs[MANIFEST] = (json.dumps(manifest, indent=2) + "\n").encode("utf-8")
+    # ADR-024: CLAUDE.md is canonical and AGENTS.md is its byte-identical copy.
+    agents = ROOT / "AGENTS.md"
+    assert_owned(agents)
+    outputs[agents] = (ROOT / "CLAUDE.md").read_bytes()
     return outputs, manifest
 
 

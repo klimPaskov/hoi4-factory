@@ -362,7 +362,7 @@
   {
     "id": "REQ-037",
     "title": "Claude-first portable guidance",
-    "requirement": "Ship AGENTS, importing CLAUDE, real Claude and Codex starter skills, verified discovery paths and no permission escalation by instructions.",
+    "requirement": "Ship canonical CLAUDE.md with an identical generated AGENTS.md, real Claude and Codex skills, verified discovery paths and no permission escalation by instructions.",
     "spec": "SPEC-012",
     "spec_file": "../03-subsystem-specs/012-engineering-guidance-skills-and-learning.md",
     "stage": "S01",
