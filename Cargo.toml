@@ -31,18 +31,18 @@ tracing = "0.1"
 # crates/setup-adapter/build.rs reads both and bakes them into `factory_setup_adapter::SETUP_PIN`,
 # so gates can tell which Setup revision is running and whether it has the PR 105 fix.
 # `default-features = false` drops `os-keyring` (libdbus) and `desktop` (Tauri).
-hoi4-mod-setup = { git = "https://github.com/klimPaskov/HOI4-Mod-Setup", rev = "3ca23b1eb594b3ae225864c87c21915abbf5be1e", default-features = false }
+hoi4-mod-setup = { git = "https://github.com/klimPaskov/HOI4-Mod-Setup", rev = "d490ffc3c1b89a27b9e1057915f80ea7162c26e7", default-features = false }
 # Setup's analysis contract (output schema, provider request builder). Same rev as above; a test checks they agree.
-hoi4-setup-core = { git = "https://github.com/klimPaskov/HOI4-Mod-Setup", rev = "3ca23b1eb594b3ae225864c87c21915abbf5be1e" }
+hoi4-setup-core = { git = "https://github.com/klimPaskov/HOI4-Mod-Setup", rev = "d490ffc3c1b89a27b9e1057915f80ea7162c26e7" }
 
 [workspace.metadata.hoi4-mod-setup-pin]
 repository = "klimPaskov/HOI4-Mod-Setup"
 # The branch and pull request the revision above belongs to (informational).
-branch = "feat/service-facade"
-pull_request = "https://github.com/klimPaskov/HOI4-Mod-Setup/pull/106"
+branch = "feat/plan-builder-facade"
+pull_request = "https://github.com/klimPaskov/HOI4-Mod-Setup/pull/108"
 # Whether the revision contains the PR 105 recovery fix (a300b90439fcf907b9e684f3df8443322d7b7848,
 # placement temporaries bound to the transaction). Set true only for a merged revision that has it.
 contains_pr_105_fix = false
 pr_105_head = "a300b90439fcf907b9e684f3df8443322d7b7848"
 # Whether the revision ships a default PlanBuilder. False until the plan-builder pull request lands.
-default_plan_builder = false
+default_plan_builder = true

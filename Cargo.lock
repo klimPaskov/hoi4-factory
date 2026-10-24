@@ -1507,7 +1507,7 @@ dependencies = [
 [[package]]
 name = "hoi4-mod-setup"
 version = "0.6.3"
-source = "git+https://github.com/klimPaskov/HOI4-Mod-Setup?rev=3ca23b1eb594b3ae225864c87c21915abbf5be1e#3ca23b1eb594b3ae225864c87c21915abbf5be1e"
+source = "git+https://github.com/klimPaskov/HOI4-Mod-Setup?rev=d490ffc3c1b89a27b9e1057915f80ea7162c26e7#d490ffc3c1b89a27b9e1057915f80ea7162c26e7"
 dependencies = [
  "base64 0.22.1",
  "brotli",
@@ -1538,7 +1538,7 @@ dependencies = [
 [[package]]
 name = "hoi4-setup-core"
 version = "0.1.0"
-source = "git+https://github.com/klimPaskov/HOI4-Mod-Setup?rev=3ca23b1eb594b3ae225864c87c21915abbf5be1e#3ca23b1eb594b3ae225864c87c21915abbf5be1e"
+source = "git+https://github.com/klimPaskov/HOI4-Mod-Setup?rev=d490ffc3c1b89a27b9e1057915f80ea7162c26e7#d490ffc3c1b89a27b9e1057915f80ea7162c26e7"
 dependencies = [
  "crc32fast",
  "getrandom 0.3.4",
@@ -4929,7 +4929,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.48.0",
 ]
 
 [[package]]
