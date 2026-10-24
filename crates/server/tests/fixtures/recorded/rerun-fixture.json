@@ -1,0 +1,393 @@
+{
+  "label": "rerun-fixture",
+  "provider": "anthropic",
+  "model": "claude-haiku-5-5",
+  "recorded_at": "2026-10-24T23:23:15.461168889+00:00",
+  "note": "G3: three analyses of one project, before and after setup",
+  "calls": [
+    {
+      "response_id": "msg_011CgMuAx68vk9G9Tdd8RN37",
+      "usage": {
+        "input_tokens": 8611,
+        "output_tokens": 3315
+      },
+      "prompt_sha256": "68ef52a15cf4ecc2b43045858bf9935deb8c4697526aabcd6ecc83fc52e8b597",
+      "reply": {
+        "analysis_id": "gate-fixture-import",
+        "component_recommendations": [],
+        "input_sha256": "2c7485c2f6cc27788b92f0cb58a20b7365ade7386a555bab38ac96dd0e7cd07c",
+        "mode": "existing_project_semantics",
+        "project_summary": "Existing Hearts of Iron IV mod named Gate Fixture, with a descriptor tagged Alternative History. Sampled content includes a national focus file and English localisation saved as UTF-8 with BOM, plus a root README and Markdown documentation in docs/. Only a sampled subset of files was read, so broader gameplay coverage and project-wide conventions are not inferred.",
+        "proposals": [
+          {
+            "confidence": 0.95,
+            "evidence_refs": [
+              "descriptor.name"
+            ],
+            "key": "display_name",
+            "reason": "Taken from the name field of descriptor.mod.",
+            "value": "Gate Fixture"
+          },
+          {
+            "confidence": 0.8,
+            "evidence_refs": [
+              "descriptor.name"
+            ],
+            "key": "project_id",
+            "reason": "Lowercase form of the display name using underscores.",
+            "value": "gate_fixture"
+          },
+          {
+            "confidence": 0.6,
+            "evidence_refs": [
+              "descriptor.name",
+              "profile.identifiers"
+            ],
+            "key": "script_prefix",
+            "reason": "Short lowercase prefix derived from the mod name; it avoids copying the single observed gate identifier prefix.",
+            "value": "gatefix"
+          },
+          {
+            "confidence": 0.6,
+            "evidence_refs": [
+              "descriptor.name",
+              "profile.identifiers"
+            ],
+            "key": "primary_namespace",
+            "reason": "Suggested new namespace matching the mod name; existing identifiers keep their current names.",
+            "value": "gate_fixture"
+          },
+          {
+            "confidence": 0.7,
+            "evidence_refs": [
+              "descriptor.name",
+              "profile.structure"
+            ],
+            "key": "project_description",
+            "reason": "Based on the descriptor name and the sampled content folders.",
+            "value": "Hearts of Iron IV mod named Gate Fixture, currently with a national focus file and English localisation in its sampled content."
+          },
+          {
+            "confidence": 0.8,
+            "evidence_refs": [
+              "codex.agents",
+              "subagent.inventory"
+            ],
+            "key": "agents_profile",
+            "reason": "An AGENTS.md guidance file is present and no Codex subagents were detected.",
+            "value": "Codex guidance file AGENTS.md is present; no Codex subagents were detected."
+          },
+          {
+            "confidence": 0.9,
+            "evidence_refs": [
+              "profile.localisation"
+            ],
+            "key": "localisation_convention",
+            "reason": "Language headers and encodings of the sampled localisation files.",
+            "value": "english; UTF-8 with BOM; versioned keys such as key:0"
+          },
+          {
+            "confidence": 0.8,
+            "evidence_refs": [
+              "profile.documentation",
+              "profile.structure"
+            ],
+            "key": "documentation_convention",
+            "reason": "Documentation files found in the project.",
+            "value": "Markdown documentation in docs/"
+          },
+          {
+            "confidence": 0.9,
+            "evidence_refs": [
+              "descriptor.metadata"
+            ],
+            "key": "descriptor_tags",
+            "reason": "Tag declared in the tags field of descriptor.mod.",
+            "value": [
+              "Alternative History"
+            ]
+          },
+          {
+            "confidence": 0.85,
+            "evidence_refs": [
+              "profile.structure",
+              "profile.coverage"
+            ],
+            "key": "folder_profile",
+            "reason": "Content folders that already hold sampled game files.",
+            "value": [
+              "common/national_focus",
+              "localisation"
+            ]
+          }
+        ],
+        "schema_version": "1.0.0",
+        "warnings": []
+      }
+    },
+    {
+      "response_id": "msg_011CgMuesRsgJV3gGxUXmFQQ",
+      "usage": {
+        "input_tokens": 10983,
+        "output_tokens": 2615
+      },
+      "prompt_sha256": "5b5914d70db014eb7536dd34ec257da0830fabca4aa48821eee9a267533872af",
+      "reply": {
+        "analysis_id": "gate-fixture-existing-import",
+        "component_recommendations": [],
+        "input_sha256": "c3b6cbff710f320f67f01c1e20bf937beaa464aaec9f2318343f2a128af05331",
+        "mode": "existing_project_semantics",
+        "project_summary": "Gate Fixture is an existing HOI4 mod with a descriptor tagged Alternative History and version 0.3.1 targeting HOI4 1.19. The sampled content includes a national focus file under common/national_focus and an English localisation file that uses UTF-8 with BOM and versioned keys. The project also has Markdown documentation in docs/ covering agent tooling, runtimes, and native Linux setup. Inventory shows 6 documentation files and 53 untracked repository files, while sampling covered 7 files. The identifier sample is limited to a single gate prefix, so no project-wide namespace convention is inferred.",
+        "proposals": [
+          {
+            "confidence": 1,
+            "evidence_refs": [
+              "descriptor.name"
+            ],
+            "key": "display_name",
+            "reason": "The name field of descriptor.mod is Gate Fixture.",
+            "value": "Gate Fixture"
+          },
+          {
+            "confidence": 0.9,
+            "evidence_refs": [
+              "installation.managed"
+            ],
+            "key": "project_id",
+            "reason": "The managed install record already uses gate_fixture as the project identifier.",
+            "value": "gate_fixture"
+          },
+          {
+            "confidence": 0.6,
+            "evidence_refs": [
+              "profile.identifiers"
+            ],
+            "key": "script_prefix",
+            "reason": "The only sampled identifier prefix is gate, so it is a reasonable lowercase script prefix suggestion.",
+            "value": "gate"
+          },
+          {
+            "confidence": 0.5,
+            "evidence_refs": [
+              "profile.identifiers"
+            ],
+            "key": "primary_namespace",
+            "reason": "No namespace declarations were sampled, so gate is a new lowercase suggestion and does not rename existing identifiers.",
+            "value": "gate"
+          },
+          {
+            "confidence": 0.7,
+            "evidence_refs": [
+              "profile.structure",
+              "profile.detected",
+              "profile.documentation"
+            ],
+            "key": "project_description",
+            "reason": "Based on the sampled focus file, localisation, and documentation files, the mod has focus and localisation content plus agent-related documentation.",
+            "value": "Gate Fixture is a small HOI4 mod with a sampled national focus file and English localisation, plus Markdown documentation in docs/ covering agent tooling and runtimes."
+          },
+          {
+            "confidence": 0.8,
+            "evidence_refs": [
+              "coding.environments",
+              "codex.config",
+              "installation.managed"
+            ],
+            "key": "agents_profile",
+            "reason": "Codex is the primary coding environment and Claude Code is also detected for this project.",
+            "value": "Codex primary with Claude Code also detected"
+          },
+          {
+            "confidence": 1,
+            "evidence_refs": [
+              "profile.detected",
+              "profile.localisation"
+            ],
+            "key": "localisation_convention",
+            "reason": "Language headers and encodings of the sampled localisation files were detected.",
+            "value": "english; UTF-8 with BOM; versioned keys such as key:0"
+          },
+          {
+            "confidence": 1,
+            "evidence_refs": [
+              "profile.detected",
+              "profile.documentation"
+            ],
+            "key": "documentation_convention",
+            "reason": "The documentation files found in the project are Markdown files in docs/.",
+            "value": "Markdown documentation in docs/"
+          },
+          {
+            "confidence": 1,
+            "evidence_refs": [
+              "descriptor.metadata",
+              "profile.detected"
+            ],
+            "key": "descriptor_tags",
+            "reason": "The tags field of descriptor.mod lists Alternative History.",
+            "value": [
+              "Alternative History"
+            ]
+          },
+          {
+            "confidence": 0.9,
+            "evidence_refs": [
+              "profile.detected",
+              "profile.structure"
+            ],
+            "key": "folder_profile",
+            "reason": "Content folders with game files were detected in common/national_focus and localisation.",
+            "value": [
+              "common/national_focus",
+              "localisation"
+            ]
+          }
+        ],
+        "schema_version": "1.0.0",
+        "warnings": []
+      }
+    },
+    {
+      "response_id": "msg_011CgMvUizxEG3YChSp5Ly4T",
+      "usage": {
+        "input_tokens": 10983,
+        "output_tokens": 2712
+      },
+      "prompt_sha256": "5b5914d70db014eb7536dd34ec257da0830fabca4aa48821eee9a267533872af",
+      "reply": {
+        "analysis_id": "gate-fixture-import",
+        "component_recommendations": [
+          {
+            "component_id": "core.agents",
+            "reason": "The project already has agent configuration at the repository root and should keep shared instructions.",
+            "recommendation": "recommended"
+          },
+          {
+            "component_id": "runtime.codex.agents",
+            "reason": "Codex is the primary coding environment detected in the project configuration.",
+            "recommendation": "recommended"
+          },
+          {
+            "component_id": "runtime.claude",
+            "reason": "Claude Code is also detected, so its runtime files are relevant to this project.",
+            "recommendation": "recommended"
+          },
+          {
+            "component_id": "mcp.hoi4_agent_tools",
+            "reason": "The project registers the HOI4 Agent Tools MCP server in its Codex configuration.",
+            "recommendation": "recommended"
+          }
+        ],
+        "input_sha256": "c3b6cbff710f320f67f01c1e20bf937beaa464aaec9f2318343f2a128af05331",
+        "mode": "existing_project_semantics",
+        "project_summary": "Gate Fixture is an existing HOI4 mod with a sampled national focus file, an English localisation file saved as UTF-8 with BOM, and Markdown documentation under docs/. The sampled content is small, but the project already includes agent configuration for Codex and Claude Code and registers the HOI4 Agent Tools MCP server.",
+        "proposals": [
+          {
+            "confidence": 1,
+            "evidence_refs": [
+              "descriptor.name"
+            ],
+            "key": "display_name",
+            "reason": "The name field in descriptor.mod is Gate Fixture.",
+            "value": "Gate Fixture"
+          },
+          {
+            "confidence": 0.9,
+            "evidence_refs": [
+              "installation.managed"
+            ],
+            "key": "project_id",
+            "reason": "The managed installation record names the project gate_fixture.",
+            "value": "gate_fixture"
+          },
+          {
+            "confidence": 0.7,
+            "evidence_refs": [
+              "profile.identifiers"
+            ],
+            "key": "script_prefix",
+            "reason": "The only sampled identifier prefix is gate, found in one sampled file, so it is a suggestion rather than a project-wide convention.",
+            "value": "gate"
+          },
+          {
+            "confidence": 0.5,
+            "evidence_refs": [
+              "profile.identifiers"
+            ],
+            "key": "primary_namespace",
+            "reason": "No namespace declarations were sampled, so gate is proposed as a new lowercase namespace suggestion that does not rename existing identifiers.",
+            "value": "gate"
+          },
+          {
+            "confidence": 0.8,
+            "evidence_refs": [
+              "profile.structure",
+              "profile.documentation",
+              "descriptor.name"
+            ],
+            "key": "project_description",
+            "reason": "The sampled files show a HOI4 mod with national focus content, localisation, and Markdown documentation, and the README is brief.",
+            "value": "Gate Fixture is a HOI4 mod with national focus content, English localisation, and Markdown documentation in docs/."
+          },
+          {
+            "confidence": 0.9,
+            "evidence_refs": [
+              "coding.environments",
+              "codex.config"
+            ],
+            "key": "agents_profile",
+            "reason": "Codex is the primary coding environment and Claude Code is also detected in the project configuration.",
+            "value": "Codex primary; Claude Code also detected"
+          },
+          {
+            "confidence": 1,
+            "evidence_refs": [
+              "profile.localisation"
+            ],
+            "key": "localisation_convention",
+            "reason": "Language headers and encodings of the sampled localisation files.",
+            "value": "english; UTF-8 with BOM; versioned keys such as key:0"
+          },
+          {
+            "confidence": 1,
+            "evidence_refs": [
+              "profile.detected",
+              "documentation.inventory"
+            ],
+            "key": "documentation_convention",
+            "reason": "The documentation files found in the project are Markdown files in docs/.",
+            "value": "Markdown documentation in docs/"
+          },
+          {
+            "confidence": 0.95,
+            "evidence_refs": [
+              "descriptor.metadata"
+            ],
+            "key": "descriptor_tags",
+            "reason": "The tags field of descriptor.mod lists Alternative History.",
+            "value": [
+              "Alternative History"
+            ]
+          },
+          {
+            "confidence": 0.9,
+            "evidence_refs": [
+              "profile.detected",
+              "profile.structure"
+            ],
+            "key": "folder_profile",
+            "reason": "These content folders already hold game files in the sampled project.",
+            "value": [
+              "common/national_focus",
+              "localisation"
+            ]
+          }
+        ],
+        "schema_version": "1.0.0",
+        "warnings": [
+          "No namespace declarations were sampled, so confirm the suggested primary namespace before using it for new identifiers."
+        ]
+      }
+    }
+  ]
+}

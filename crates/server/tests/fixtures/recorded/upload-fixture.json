@@ -2,39 +2,45 @@
   "label": "upload-fixture",
   "provider": "anthropic",
   "model": "claude-haiku-5-5",
-  "recorded_at": "2026-10-24T21:33:44.158901500+00:00",
+  "recorded_at": "2026-10-24T22:57:36.024462368+00:00",
   "note": "G1/G2/G4 fixture: the uploaded gate mod, existing-mod analysis",
   "calls": [
     {
-      "response_id": "msg_011CgMn8WcphURSVVqFjJrZH",
+      "response_id": "msg_011CgMtXHQB8ix1RXnXCpX3h",
       "usage": {
-        "input_tokens": 8614,
-        "output_tokens": 1947
+        "input_tokens": 8607,
+        "output_tokens": 2333
       },
-      "prompt_sha256": "ebd431cf4408cbf30cfcf93a5876a256a6fe5bed9ad330344be357f7d52c1ea9",
+      "prompt_sha256": "299e9e39baa9b4710f281b1b4e117b7de232098ac8216385ac9ea7154306d839",
       "reply": {
-        "analysis_id": "gate-fixture-existing-import",
-        "component_recommendations": [],
-        "input_sha256": "06803c1821c84a2359cbd1aaf8fd0f9fdd414e2d86fc69e2dc1c98d477a354f8",
+        "analysis_id": "gate-fixture-existing",
+        "component_recommendations": [
+          {
+            "component_id": "core.agents",
+            "reason": "The project already includes AGENTS.md, so the shared agent guidance component fits this mod.",
+            "recommendation": "recommended"
+          }
+        ],
+        "input_sha256": "7ca164df8380d4a0ae8575061e691138a9272453655547ae06d0fe43783146d5",
         "mode": "existing_project_semantics",
-        "project_summary": "Gate Fixture is an existing Hearts of Iron IV mod. The descriptor names it Gate Fixture and tags it Alternative History. The project indexes 8 files across common, docs, gfx, localisation and notes folders. Sampled content includes a national focus file under common/national_focus and an English localisation file with a UTF-8 BOM and versioned keys. Documentation is Markdown in docs/ and the root README. Four files were sampled, so the sampled content describes the project's observed conventions but not every file.",
+        "project_summary": "Gate Fixture is an Alternative History mod with sampled national focus content in common/national_focus, English localisation with a BOM, and Markdown documentation in docs/. The sampled files use the gate prefix. Setup-level inventory shows a small file count, so gameplay coverage and conventions beyond the sampled files are not yet established.",
         "proposals": [
           {
-            "confidence": 0.95,
+            "confidence": 0.98,
             "evidence_refs": [
               "descriptor.name"
             ],
             "key": "display_name",
-            "reason": "The name field of descriptor.mod gives the mod's display name.",
+            "reason": "The name field in descriptor.mod gives the mod's display name.",
             "value": "Gate Fixture"
           },
           {
-            "confidence": 0.8,
+            "confidence": 0.7,
             "evidence_refs": [
-              "descriptor.name"
+              "profile.identifiers"
             ],
             "key": "project_id",
-            "reason": "A lowercase identifier derived from the display name for a new project id.",
+            "reason": "A lowercase project identifier derived from the display name, kept consistent with the observed gate prefix.",
             "value": "gate_fixture"
           },
           {
@@ -52,28 +58,28 @@
               "profile.identifiers"
             ],
             "key": "primary_namespace",
-            "reason": "Matches the observed gate prefix; a suggested namespace that does not rename existing identifiers.",
+            "reason": "Matches the observed gate identifier prefix. Existing identifiers are not renamed by this suggestion.",
             "value": "gate"
           },
           {
             "confidence": 0.6,
             "evidence_refs": [
-              "profile.documentation",
               "profile.structure",
               "profile.detected"
             ],
             "key": "project_description",
-            "reason": "Summarises the sampled content: a national focus file, English localisation and Markdown documentation.",
-            "value": "Hearts of Iron IV mod Gate Fixture with national focus content, English localisation and Markdown documentation in docs/."
+            "reason": "Summarises the sampled content: national focus, localisation, and documentation files.",
+            "value": "Alternative History mod with national focus content, English localisation, and Markdown documentation."
           },
           {
-            "confidence": 0.9,
+            "confidence": 0.85,
             "evidence_refs": [
-              "codex.agents"
+              "codex.agents",
+              "coding.environments"
             ],
             "key": "agents_profile",
-            "reason": "AGENTS.md is present and Codex is the detected primary coding environment.",
-            "value": "Codex primary coding environment with AGENTS.md instructions"
+            "reason": "AGENTS.md is present and Codex is the detected primary coding environment with no additional tools detected.",
+            "value": "Codex primary with AGENTS.md; no additional agent tools detected"
           },
           {
             "confidence": 0.9,
@@ -82,27 +88,26 @@
               "profile.localisation"
             ],
             "key": "localisation_convention",
-            "reason": "Language headers and encodings of the sampled localisation files.",
+            "reason": "Sampled localisation files show an english header, UTF-8 with BOM encoding, and versioned keys.",
             "value": "english; UTF-8 with BOM; versioned keys such as key:0"
           },
           {
-            "confidence": 0.9,
+            "confidence": 0.85,
             "evidence_refs": [
               "profile.detected",
               "profile.documentation"
             ],
             "key": "documentation_convention",
-            "reason": "The documentation files found in the project.",
+            "reason": "Sampled documentation files are Markdown and sit in docs/.",
             "value": "Markdown documentation in docs/"
           },
           {
             "confidence": 0.9,
             "evidence_refs": [
-              "profile.detected",
               "descriptor.metadata"
             ],
             "key": "descriptor_tags",
-            "reason": "The tags field of descriptor.mod.",
+            "reason": "The tags field in descriptor.mod lists Alternative History.",
             "value": [
               "Alternative History"
             ]
@@ -114,7 +119,7 @@
               "profile.structure"
             ],
             "key": "folder_profile",
-            "reason": "Content folders that already hold game files.",
+            "reason": "These content folders already hold game files in the sampled project.",
             "value": [
               "common/national_focus",
               "localisation"
@@ -122,7 +127,9 @@
           }
         ],
         "schema_version": "1.0.0",
-        "warnings": []
+        "warnings": [
+          "thumbnail.png is missing; add one before publishing if you want a Workshop thumbnail."
+        ]
       }
     }
   ]
