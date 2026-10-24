@@ -571,7 +571,85 @@
       ],
       "oracle": "Account for supplied sources and requested references, distinguish retrieval from inspection, record exact pins, limitations and actual investigation results.",
       "status": "Planning check, see actual QA report"
+    },
+    {
+      "id": "T-ACCT-01",
+      "name": "Tenant isolation",
+      "fixtures": [
+        "F-TENANT"
+      ],
+      "stages": [
+        "S02",
+        "S08"
+      ],
+      "oracle": "Two accounts with hostile inputs cannot read, list or change each other's workspaces, runs, secrets, budgets, logs or artifacts through the browser API, agent tools or GitHub tokens.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-ACCT-02",
+      "name": "Sign-in and project roles",
+      "fixtures": [
+        "F-TENANT",
+        "F-COLLAB"
+      ],
+      "stages": [
+        "S02",
+        "S06"
+      ],
+      "oracle": "GitHub and email sign-in, account linking, invitation, role change and removal each grant exactly the documented project actions. A removed collaborator's queued work cannot publish.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-GH-01",
+      "name": "GitHub import preservation",
+      "fixtures": [
+        "F-GITHUB-REPO"
+      ],
+      "stages": [
+        "S01",
+        "S02"
+      ],
+      "oracle": "Importing a disposable repository through the GitHub App keeps every byte, branch and commit, and an uploaded ZIP keeps every byte with a recorded baseline commit.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-GH-02",
+      "name": "Publication reconciliation",
+      "fixtures": [
+        "F-GITHUB-REPO"
+      ],
+      "stages": [
+        "S02",
+        "S04"
+      ],
+      "oracle": "Push, pull request and repository creation each need their own authorization. A lost reply is reconciled against GitHub before retry, so no duplicate branch, pull request or repository appears.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-GAME-01",
+      "name": "Game reference containment",
+      "fixtures": [
+        "F-GAME-REF"
+      ],
+      "stages": [
+        "S02",
+        "S08"
+      ],
+      "oracle": "Tools read the reference read-only, evidence names its build and DLC set, and images, exports, pull requests, logs and API responses contain no raw game files.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-DEPLOY-01",
+      "name": "Reproducible container images",
+      "fixtures": [
+        "F-RELEASE"
+      ],
+      "stages": [
+        "S01",
+        "S08"
+      ],
+      "oracle": "Images rebuild from pinned base digests and lockfiles, contain no coding CLI, game file, credential or user data, and start with Compose on a clean Linux host.",
+      "status": "Planned, not executed"
     }
   ]
 }
-

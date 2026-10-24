@@ -1,12 +1,12 @@
-# S06: Contributor review, task dependencies and content workflows
+# S06: Invited collaborators, task dependencies and content workflows
 
-Status: **Proposed future implementation stage**. Nothing in this packet was executed as product implementation during planning. Primary agent: Claude Code. Delegate only bounded work with explicit file ownership.
+Status: **Proposed future implementation stage**. Nothing in this packet was executed as product implementation during planning. Primary agent: Claude Code. Delegate only bounded work with explicit file ownership. Revised on 2026-10-24 for the [maintainer decisions](../02-architecture/maintainer-decisions-2026-10-24.md). This stage is now required for the first public release.
 
 ## Objective and non-goals
 
-Extend the single-agent workflow to multiple contributors and a small task DAG. Add controlled localization and asset pipelines, then selected event or decision authoring only where adapters support it.
+Extend the single-agent workflow to invited human collaborators and a small task DAG. A project owner invites other accounts into the same server workspace with explicit project roles. Add controlled localization and asset pipelines, then selected event or decision authoring only where adapters support it.
 
-First prove one human and one worker collaborating. A second worker is an experiment with disjoint scopes. Many workers and hosted real-time editing remain deferred.
+First prove one owner, one invited collaborator and one agent collaborating through owned branches and reviewed integration. A second agent worker is an experiment with disjoint scopes. Many workers and real-time co-editing of one file remain deferred. External contributors can still work through GitHub pull requests.
 
 ## Entry conditions
 
@@ -28,7 +28,7 @@ Each packet should produce a reviewable change and evidence before another packe
 | S06-W2 | Git engineer | Conflict and integration | Check textual overlap, symbol/ID collisions, localization keys and asset destinations. Create fresh merged proposals and evidence. Preserve unrelated index entries. |
 | S06-W3 | Content engineer | Localization and assets | Track rights, original hashes, conversion recipes, language coverage and exact consumer references. Preserve source assets and distinguish decode, import, wiring and visible runtime evidence. |
 | S06-W4 | Domain engineer | Selected scripting adapters | Add narrow event/decision content operations with existing source lookup and validation. Keep read-only tool capabilities separate from newly implemented write support. |
-| S06-W5 | Collaboration designer | Role review surfaces | Make lore, art, map and scripting contributions attributable through intent, review and Git. Provide actionable conflict explanations and a source escape hatch. |
+| S06-W5 | Collaboration designer | Invitations, roles and review surfaces | Implement invitations, acceptance, role changes and removal for project members. Roles bound what each member and their agents may grant. Make lore, art, map and scripting contributions attributable through intent, review and Git. Provide actionable conflict explanations and a source escape hatch. Map GitHub pull request review comments to factory review items where the decision record settles it. |
 | S06-W6 | Reviewer | Controlled concurrency study | Run one-human/one-agent then two-disjoint-worker fixtures. Compare accepted output, conflict rate and rework to single writer before expanding. |
 
 ## Packet dependencies and exclusions
@@ -41,12 +41,12 @@ A contract-only dependency permits parallel implementation after that interface 
 | S06-W2 | S06-W1 contract | Text-only merge acceptance |
 | S06-W3 | S05 | Bundling unlicensed game or generated assets |
 | S06-W4 | S06-W2, S06-W3 | Assuming read-only upstream tools already support writes |
-| S06-W5 | S06-W1, S06-W2, S06-W3 | Hosted real-time coediting |
+| S06-W5 | S06-W1, S06-W2, S06-W3 | Real-time co-editing of one file |
 | S06-W6 | S06-W1, S06-W2, S06-W3, S06-W4, S06-W5 | Increasing worker count without measured benefit |
 
 ## Verification plan
 
-Use F-COLLAB, F-ASSET and F-LOCALIZATION. Have a human and worker change the same focus ID, different text spans with coupled semantics, an existing binary path and a shared localization key. Simulate lease loss before commit and a late worker result after ownership changes.
+Use F-COLLAB, F-ASSET and F-LOCALIZATION. Have a human and worker change the same focus ID, different text spans with coupled semantics, an existing binary path and a shared localization key. Simulate lease loss before commit and a late worker result after ownership changes. Remove a member while their agent task is running and confirm no further effect uses their authority. Confirm a viewer role cannot approve or publish.
 
 Exercise missing rights metadata, unsupported conversion, missing consumer registration, failed audio/image decode and partial output cleanup. The production pipeline must return explicit evidence limits instead of accepting a file because it exists.
 
@@ -57,7 +57,7 @@ Use the [test strategy](../05-verification/TEST-STRATEGY.md) and [evaluation mat
 1. Dependency cycles, stale claims and lease-loss publication are rejected without losing work.
 2. Conflict detection catches the required semantic and binary collisions, not only Git text conflicts.
 3. Each accepted asset has provenance, transformation receipt, output hash and consumer wiring evidence.
-4. Contributors can review owned intent and inspect the final source without needing every advanced control.
+4. Invited collaborators act only within their project role, can review owned intent and inspect the final source without needing every advanced control, and lose authority immediately on removal.
 5. A two-worker experiment either demonstrates useful accepted throughput within risk budgets or records a decision to retain one writer.
 6. Merge/review handoff is transactional at its defined store boundary and idempotent under duplicate requests.
 
@@ -75,13 +75,13 @@ Record the result in `evidence/S06/learning-review.md`. Follow [reusable knowled
 
 ## Configuration checkpoint
 
-Review concurrency caps, worker scopes, optional asset-service credentials, network destinations and recurring costs. No inherited domain agent registry is enabled wholesale.
+Review concurrency caps, worker scopes, member roles, optional asset-service credentials, network destinations and recurring costs. No inherited domain agent registry is enabled wholesale.
 
 Record `evidence/S06/config-review.md`, including changed files, verified client or runtime versions, source provenance and any deferred live check. Update the [knowledge changelog](../07-developer-workflow/KNOWLEDGE-CHANGELOG.md) only for material accepted guidance changes.
 
 ## Standalone completion and continuation handoff
 
-Provide supported content operations, contributor authority map, merge receipts, DAG test results and the measured concurrency decision. S07 may run independently from S05 if file ownership is disjoint.
+Provide supported content operations, member role and authority map, merge receipts, DAG test results and the measured concurrency decision. S07 may run independently from S05 if file ownership is disjoint.
 
 Produce `evidence/S06/environment.json`, `scope.md`, `checks.json`, `handoff.md`, `learning-review.md` and `config-review.md`, with artifact hashes or references. Use the [handoff template](../06-agent-handoffs/STAGE-HANDOFF-TEMPLATE.md).
 

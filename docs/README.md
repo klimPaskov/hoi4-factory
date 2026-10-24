@@ -1,6 +1,6 @@
 # HOI4 Factory documentation
 
-This directory contains the complete research and implementation-planning baseline for a native, model-agnostic Hearts of Iron IV modding workspace. **No product implementation has begun.** The leading recommendation is a Tauri/Rust host with a packaged Pi model worker, subject to S01 experiments. An Electron/OpenCode alternative remains fully described.
+This directory contains the complete research and implementation-planning baseline for a hosted, model-agnostic Hearts of Iron IV modding workspace. **No product implementation has begun.** The [2026-10-24 maintainer decisions](02-architecture/maintainer-decisions-2026-10-24.md) select a public web application with a Rust server, a native Rust agent loop, a React browser client, Docker deployment and GitHub integration. The earlier Tauri/Pi and Electron/OpenCode candidates remain in the research record.
 
 Project-folder edition: **v02**. Use the parent `hoi4-factory/` directory as your working root. [The root README](../README.md) explains how to open the project and run its checks. The root client guidance is already in place.
 
@@ -8,12 +8,12 @@ Project-folder edition: **v02**. Use the parent `hoi4-factory/` directory as you
 
 | Reader | Reading order |
 |---|---|
-| Product/architecture reviewer | [Executive recommendation](00-research/00-executive-recommendation.md), [master goal](MASTER_GOAL.md), [architecture options](02-architecture/options-and-decisions.md), [roadmap](04-implementation-stages/ROADMAP.md), [risks](05-verification/RISKS-DECISIONS-AND-OPEN-QUESTIONS.md) |
+| Product/architecture reviewer | [Maintainer decisions](02-architecture/maintainer-decisions-2026-10-24.md), [master goal](MASTER_GOAL.md), [executive recommendation](00-research/00-executive-recommendation.md), [architecture options](02-architecture/options-and-decisions.md), [roadmap](04-implementation-stages/ROADMAP.md), [risks](05-verification/RISKS-DECISIONS-AND-OPEN-QUESTIONS.md) |
 | Research reviewer | [Source registry](00-research/01-research-sources.md), [asset audit](00-research/02-existing-assets-audit.md), [candidate comparison](00-research/03-candidate-comparison.md), [research log](00-research/04-evidence-and-research-log.md) |
 | Future implementation agent | Current target-repository instructions, [AGENTS](../AGENTS.md), [CLAUDE](../CLAUDE.md), [implementation master goal](06-agent-handoffs/IMPLEMENTATION_MASTER_GOAL.md), then the one authorized stage |
 | Verification reviewer | [Traceability](01-product/requirements-traceability.md), [test strategy](05-verification/TEST-STRATEGY.md), [evaluation](05-verification/EVALUATION-MATRIX.md), [acceptance matrix](05-verification/REQUIREMENTS-ACCEPTANCE-MATRIX.md), [actual package QA](05-verification/PLANNING-PACKAGE-QUALITY-REVIEW.md) |
 
-The next implementation action is review of this plan followed by explicit authorization of **S01 only**. The copyable [Claude Code S01 prompt](06-agent-handoffs/CLAUDE-CODE-START-STAGE-01.md) is ready for that future step. Do not infer permission to initialize or implement the product from opening this archive.
+Implementation is deferred by the maintainer. The next implementation action, when it comes, is explicit authorization of **S01 only**. The copyable [Claude Code S01 prompt](06-agent-handoffs/CLAUDE-CODE-START-STAGE-01.md) is ready for that future step. Do not infer permission to initialize or implement the product from opening this archive.
 
 ## Package map
 
@@ -23,8 +23,8 @@ The next implementation action is review of this plan followed by explicit autho
 | Project root | Working-folder README, shared developer instructions and native client configuration |
 | scripts | Planning validator and skill synchronization utilities |
 | docs/00-research | Primary-source audits, exact pins, license/maintenance observations, source coverage and evidence ledgers |
-| docs/01-product | 45 requirements, users, required scenarios, optional visuals/autonomy and traceability |
-| docs/02-architecture | Two coherent candidates, provisional ADRs, state model, nine contracts, deployment and security |
+| docs/01-product | 48 requirements, users, required scenarios, optional visuals/autonomy and traceability |
+| docs/02-architecture | Maintainer decisions, the selected direction and two research candidates, ADRs, state model, ten contracts, deployment and security |
 | docs/03-subsystem-specs | 13 detailed subsystem specifications with functional, failure, recovery and acceptance behavior |
 | docs/04-implementation-stages | Eight stages, 48 work packets, 47 exit gates and prioritized deferred scope |
 | docs/05-verification | Fixtures, test catalog, three-profile evaluation, requirement/gate mappings, risks and executable package QA |

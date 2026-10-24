@@ -203,11 +203,11 @@ def main() -> int:
         tests = read_json("docs/05-verification/test-catalog.json")["tests"]
         req_ids = {r["id"] for r in reqs}
         test_ids = {t["id"] for t in tests}
-        expected = {f"REQ-{i:03d}" for i in range(1,46)}
-        if req_ids != expected or len(reqs) != 45: matrix_errors.append("Requirement inventory is not exactly REQ-001..045")
+        expected = {f"REQ-{i:03d}" for i in range(1,49)}
+        if req_ids != expected or len(reqs) != 48: matrix_errors.append("Requirement inventory is not exactly REQ-001..048")
         if len(test_ids) != len(tests): matrix_errors.append("Duplicate test IDs")
         rows = matrix["requirements"]
-        if {m["requirement"] for m in rows} != expected or len(rows) != 45:
+        if {m["requirement"] for m in rows} != expected or len(rows) != 48:
             matrix_errors.append("Acceptance does not cover each requirement exactly once")
         source = {r["id"]: r for r in reqs}
         for m in rows:

@@ -1,6 +1,6 @@
 # SPEC-003: Orchestration and recovery
 
-Status: **Proposed**. Primary requirements: REQ-014, REQ-016 and REQ-017. S03 establishes durable attempts, S04 proves bounded autonomy, S05 hardens recovery and S06 adds contributor task dependencies.
+Status: **Proposed**. Primary requirements: REQ-014, REQ-016 and REQ-017. Shared requirement: REQ-046. S03 establishes durable attempts, S04 proves bounded autonomy, S05 hardens recovery and S06 adds contributor task dependencies.
 
 Read first: [authority](../02-architecture/data-context-and-state.md), [contracts](../02-architecture/contracts-and-interfaces.md), [runtime](002-native-runtime-and-models.md), [Git review](005-git-collaboration-and-review.md), [permissions](011-extensibility-sandbox-and-permissions.md) and [test strategy](../05-verification/TEST-STRATEGY.md).
 
@@ -8,11 +8,11 @@ Read first: [authority](../02-architecture/data-context-and-state.md), [contract
 
 A modder can delegate a bounded outcome, see what the application is doing, interrupt it and return after a crash without losing the distinction between proposed work and accepted source. The first autonomous workflow is one small focus task with explicit scope, tool limits, budget and acceptance checks. It can work without opening a canvas. The same state machine serves manual and assisted workflows.
 
-The initial scheduler has one mutating owner per workspace boundary. Independent reads may run concurrently. Many workers, remote fleets and automatic merge trains remain later decisions. Complexity is added when a measured bottleneck requires it.
+The initial scheduler has one mutating agent owner per workspace boundary. Independent reads may run concurrently. Invited human collaborators work on their own owned branches or worktrees, so a person and an agent never share a mutating boundary. The hosted service runs tasks for many accounts at once, so admission also enforces per-account concurrency, budget and rate limits. Many agents per project, remote fleets and automatic merge trains remain later decisions. Complexity is added when a measured bottleneck requires it.
 
 ## Evidence and selected patterns
 
-[SRC-B01, Pi durable](https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/durable/src/harness/tool.ts) records final tool intent and separates safe from unsafe replay. Its [recovery tests](https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/durable/test/harness-tools-recovery.test.ts) demonstrate both useful recovery and the hazard of safe replay after a changed working directory. [SRC-B02, OpenCode](https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/src/session/execution/restart.ts) explicitly uses at-least-once recovery and assumes a former owner is dead.
+These runtimes are behavioral references for the Rust host and agent loop, not dependencies. [SRC-B01, Pi durable](https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/durable/src/harness/tool.ts) records final tool intent and separates safe from unsafe replay. Its [recovery tests](https://github.com/earendil-works/pi/blob/8a2ebd38549c3521a02db0e5d758a24320e97f94/packages/durable/test/harness-tools-recovery.test.ts) demonstrate both useful recovery and the hazard of safe replay after a changed working directory. [SRC-B02, OpenCode](https://github.com/anomalyco/opencode/blob/02671e66454260d77fe04d63cf5eb94e76921dee/packages/core/src/session/execution/restart.ts) explicitly uses at-least-once recovery and assumes a former owner is dead.
 
 [SRC-B04, Gas City](https://github.com/gastownhall/gascity/blob/87a47634d0cebe611874df321c723bba95dcffea/cmd/gc/reconcile_effect_lease_test.go) tests refusal after lease takeover. [SRC-B07, Fusion](https://github.com/Runfusion/Fusion/blob/5bdc9ea1132ba4d1e49d0dfc5ea084e0e01eb5c3/packages/core/src/__tests__/postgres/handoff-to-review-atomicity.pg.test.ts) tests review handoff, queue and audit changes in one transaction. Adopt these invariants in the host's smaller task journal. Their upstream tests were inspected, not executed.
 
@@ -22,7 +22,7 @@ A task records objective, requirement IDs, bounded artifact scope, dependencies,
 
 An attempt records model profile, C-01/C-06 snapshots, grant reference, worker generation, budget and outcome. Its states distinguish `running`, `interrupt_requested`, `reconciling`, `succeeded`, `failed`, `cancelled` and `unknown_effect`. An unknown effect blocks conflicting work while reconciliation is pending. It does not turn every unrelated workspace action into a global failure.
 
-Rust owns transitions in a local transactional database. Each accepted transition writes its C-03 event and resulting state together. Updates carry an expected version, making competing commands deterministically succeed once or return `version_conflict`. UI events are projections of committed data. A host restart reloads state before admitting new work.
+The Rust server owns transitions in PostgreSQL. Each accepted transition writes its C-03 event and resulting state together in one database transaction. Every row carries its account and project identity, and queries are scoped by them. Updates carry an expected version, making competing commands deterministically succeed once or return `version_conflict`. UI events are projections of committed data. A server restart reloads state before admitting new work. If more than one server replica runs, workspace ownership is still exclusive through the lease and fencing generation below, never through which replica received a request.
 
 A logical owner has a process incarnation and increasing fencing generation. A timeout may allow replacement, but never authorizes the previous owner to continue. The effect boundary checks the current generation. Liveness failures remain unknown until independent evidence proves an owner stopped.
 
@@ -44,11 +44,11 @@ Dependency edges are typed as prerequisites, artifact inputs or review gates. Re
 
 Before any side effect, the host resolves and validates the final arguments after all model and extension hooks. It checks C-08 immediately before execution, then records an operation ID, normalized argument hash, tool/version, workspace/root identity, input hashes, retry class and reconciliation method.
 
-Execution follows persisted intent. A completion receipt records observed before/after hashes, outcome, evidence and timestamps. Local file operations use recoverable staging and an apply journal. An external process or remote service may finish before its receipt is persisted. That window is classified as `unknown_effect` until observation resolves it.
+Execution follows persisted intent. A completion receipt records observed before/after hashes, outcome, evidence and timestamps. Workspace file operations on the server volume use recoverable staging and an apply journal. An external process or remote service may finish before its receipt is persisted. That window is classified as `unknown_effect` until observation resolves it.
 
 Read-only operations can retry within policy. An idempotent operation must document its key and observed postcondition. A mutating operation is not made replayable by a label alone. Recovery compares exact operation identity, tool version, grant and source snapshot. Changed working directory, configuration or tool implementation invalidates the prior replay decision.
 
-For a known local staged transaction, recovery may finish or restore from the journal according to its actual phase. For an external command with no reliable reconciliation query, preserve logs and partial artifacts, isolate affected paths and request a concrete decision. Never report rollback merely because a process was killed.
+For a known staged workspace transaction, recovery may finish or restore from the journal according to its actual phase. For an external command with no reliable reconciliation query, preserve logs and partial artifacts, isolate affected paths and request a concrete decision. Never report rollback merely because a process was killed.
 
 ## Pause, cancellation and steering
 
@@ -56,19 +56,19 @@ Pause is a durable scheduler condition, recorded with an expected task version a
 
 Interrupt requests immediate cancellation of inference and cooperative tools. Cancellation completion additionally requires observed process/tool settlement or an explicit unknown-effect record. The user sees these as distinct statuses.
 
-The host revokes future effect capability before signalling the worker. A late tool request fails the revocation-epoch check. Process supervision targets the complete owned process tree where supported and records termination evidence. An MCP or remote job may continue after the transport closes. Its receipt stays unresolved until queried or explicitly adjudicated.
+The host revokes future effect capability before signalling the worker. A late tool request fails the revocation-epoch check. Process supervision targets the complete owned process tree or task container and records termination evidence. An MCP or remote job may continue after the transport closes. Its receipt stays unresolved until queried or explicitly adjudicated.
 
 Steering is a visible event tied to the active task. An instruction that narrows scope can take effect at the next boundary. A scope expansion creates a revised plan and checks whether the existing grant covers it. The application should not ask again for actions already authorized within an unchanged bounded scope.
 
 ## Persistence and restart
 
-The authoritative store contains tasks, attempts, operation intents, receipts, grants, event sequence and evidence references. Large logs and artifacts may live in content-addressed files with manifests. A database record cannot claim a required artifact exists before its durable write and hash check.
+The authoritative store contains tasks, attempts, operation intents, receipts, grants, event sequence and evidence references. Large logs and artifacts may live in the content-addressed object store with manifests. A database record cannot claim a required artifact exists before its durable write and hash check.
 
-Startup obtains workspace ownership, scans nonterminal attempts, checks unfinished operations against source and process observations, and emits a recovery report. It does not indiscriminately rerun the last prompt. Event cursors prevent duplicate display after reconnect, while idempotency keys prevent duplicate state transitions.
+Startup obtains workspace ownership, scans nonterminal attempts across accounts, checks unfinished operations against source and process observations, and emits a recovery report. It does not indiscriminately rerun the last prompt. Event cursors prevent duplicate display after reconnect, while idempotency keys prevent duplicate state transitions.
 
 A corrupted journal or missing artifact produces a bounded integrity failure and a preserved forensic copy. Recovery can use a verified backup and replayable host events where available. Rebuilding a search index cannot reconstruct lost authoritative approvals. Database schema migration must be backed up, versioned and restartable.
 
-Pi durable, if selected, stores conversation tasks linked to host operation IDs. It cannot independently approve or repeat filesystem effects. The S01 decision must show how both stores reconcile when one commit succeeds and the other fails. If that protocol adds more complexity than it removes, use Pi core and the host journal.
+The Rust agent loop may keep conversation state for restart, linked to host operation IDs. That state is subordinate. It cannot independently approve or repeat filesystem effects, and it lives in the same PostgreSQL database as the host journal so one transaction can bind them. A second independently authoritative task store is not permitted.
 
 ## Verification and acceptance
 

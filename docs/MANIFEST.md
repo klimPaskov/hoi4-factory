@@ -21,7 +21,7 @@ Distributed file count: **111**. Every v01 planning file is retained at its mapp
 | docs root | 5 | Documentation index, master goal, status and integrity manifests |
 | docs/00-research | 15 | Primary-source evidence, coverage, audits and synthesis |
 | docs/01-product | 5 | Requirements, contributor scenarios, visuals and traceability |
-| docs/02-architecture | 5 | Alternatives, provisional decisions, contracts and security |
+| docs/02-architecture | 6 | Alternatives, provisional and maintainer decisions, contracts and security |
 | docs/03-subsystem-specs | 13 | Thirteen detailed subsystem specifications |
 | docs/04-implementation-stages | 10 | Eight stages, roadmap and deferred scope |
 | docs/05-verification | 11 | Test and evaluation plans, risks, checks and layout review |
@@ -133,6 +133,7 @@ The archive contains authored planning and guidance, evidence metadata and prima
 - [docs/02-architecture/contracts-and-interfaces.md](02-architecture/contracts-and-interfaces.md)
 - [docs/02-architecture/data-context-and-state.md](02-architecture/data-context-and-state.md)
 - [docs/02-architecture/deployment-and-security.md](02-architecture/deployment-and-security.md)
+- [docs/02-architecture/maintainer-decisions-2026-10-24.md](02-architecture/maintainer-decisions-2026-10-24.md)
 - [docs/02-architecture/options-and-decisions.md](02-architecture/options-and-decisions.md)
 - [docs/02-architecture/recommended-architecture.md](02-architecture/recommended-architecture.md)
 

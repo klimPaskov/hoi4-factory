@@ -54,7 +54,7 @@ The upstream public rewrite is a single operation with internal planning and rec
 
 The upstream focus-plan sidecar may retain authored planning information. Treat it as versioned derived data with a source binding, not a second source of gameplay truth. An external edit can make it stale. A mismatched sidecar must be reconciled or regenerated before reuse, with user intent retained as evidence. The source file, not a stale canvas cache, determines the current mod.
 
-Rendering may resolve installed-game or dependency icons under a read-only asset profile. Missing icons use a clearly identified placeholder and diagnostics. Do not silently copy game artwork into a distributable mod. A source preview never asserts that the game's conditional GUI, animation, font, resolution or availability matches every scenario.
+Rendering may resolve game or dependency icons from the read-only server game reference of SPEC-006. The browser receives the rendered preview, not the raw game files. Missing icons use a clearly identified placeholder and diagnostics. Do not silently copy game artwork into the mod, a download or a pull request. A source preview never asserts that the game's conditional GUI, animation, font, resolution or availability matches every scenario.
 
 ## Errors, concurrency and recovery
 
@@ -79,9 +79,9 @@ After a tool timeout, reconcile the C-04 operation and upstream job before repla
 | Repeated layout compaction | Second accepted operation is unchanged on identical source and policy |
 | Missing icon or localization | Explicit diagnostic and named placeholder, no false completeness |
 | Tool crash after candidate write | Reconciliation finds one outcome, no duplicate node or localization entry |
-| Malicious preview artifact | Isolated rendering cannot execute code or access arbitrary local files |
+| Malicious preview artifact | Isolated rendering cannot execute code, read the application session or access files outside its project and the read-only game reference |
 
-S01 measures parser fidelity and render cost on small and large fixtures. S04 acceptance includes an actual rendered artifact inspected by a human or visual-capable reviewer, full final source hashes, static diagnostic delta, grant, receipt and Git review. Performance records name hardware, node count, asset count, cold/warm cache, render duration and memory. Choose initial scale limits from those measurements and expose them honestly.
+S01 measures parser fidelity and render cost on small and large fixtures. S04 acceptance includes an actual rendered artifact inspected by a human or visual-capable reviewer, full final source hashes, static diagnostic delta, grant, receipt and Git review. Performance records name server profile, reference browser, node count, asset count, cold/warm cache, render duration, transfer size and memory. Choose initial scale limits from those measurements and expose them honestly.
 
 ## Other editor roadmap
 

@@ -1,12 +1,12 @@
 # S05: Context, model handoff and recovery hardening
 
-Status: **Proposed future implementation stage**. Nothing in this packet was executed as product implementation during planning. Primary agent: Claude Code. Delegate only bounded work with explicit file ownership.
+Status: **Proposed future implementation stage**. Nothing in this packet was executed as product implementation during planning. Primary agent: Claude Code. Delegate only bounded work with explicit file ownership. Revised on 2026-10-24 for the [maintainer decisions](../02-architecture/maintainer-decisions-2026-10-24.md).
 
 ## Objective and non-goals
 
 Make repeated work reliable across sessions and provider changes. Implement approved canon, provenance-aware context, freshness, reviewable runtime lessons and stronger recovery. Keep engineering learning separate from product memory.
 
-Do not add vector retrieval or hosted memory by default. Do not convert inferred conversation statements into accepted lore.
+Do not add vector retrieval or a separate memory service by default. Canon and memory stay scoped to their project and account. Do not convert inferred conversation statements into accepted lore.
 
 ## Entry conditions
 
@@ -46,7 +46,7 @@ A contract-only dependency permits parallel implementation after that interface 
 
 ## Verification plan
 
-Run CTX-01 through CTX-10 from SPEC-004. Include a source rename, changed game profile, removed permission, duplicate lesson generation, competing reviewers and interrupted index publication. Exercise model A to B, B to local and local to A while preserving local-only restrictions.
+Run CTX-01 through CTX-10 from SPEC-004. Include a source rename, a game reference update to a new build, removed permission, duplicate lesson generation, competing reviewers and interrupted index publication. Exercise model A to B, B to the self-hosted endpoint and that endpoint back to A while preserving data-destination restrictions. Confirm one project's canon and lessons never appear in another project's context.
 
 Use at least ten related tasks on the same fixture to expose accumulated stale context. Compare accepted output and human correction with the S04 baseline. Do not compare only prompt length or summary fluency.
 
@@ -55,7 +55,7 @@ Use the [test strategy](../05-verification/TEST-STRATEGY.md) and [evaluation mat
 ## Measurable exit gates
 
 1. Approved canon, inferred memory, accepted engineering rules and caches remain distinct in storage, context and UI.
-2. Changed source or tool profile makes affected evidence stale before a new apply can rely on it.
+2. Changed source, tool profile or game reference build makes affected evidence stale before a new apply can rely on it.
 3. Cross-model resume preserves task and receipt identity, strips incompatible private provider artifacts and repeats no unsafe effect.
 4. Candidate approval/rejection races have one winner, and superseded memories disappear from active recall.
 5. Retrieval benchmark records correct source selection, missed facts and stale answers. New infrastructure has an evidence-based decision.
@@ -65,7 +65,7 @@ All gates are evaluated against the final stage revision. Changed inputs invalid
 
 ## Risk and rollback
 
-Restore prior index generation or rebuild derived caches from source. Revert a reviewed lesson through supersession, preserving its history. Roll back store migration only through its tested path.
+Restore prior index generation or rebuild derived caches from source and the current game reference. Revert a reviewed lesson through supersession, preserving its history. Roll back store migration only through its tested path.
 
 ## Engineering learning checkpoint
 

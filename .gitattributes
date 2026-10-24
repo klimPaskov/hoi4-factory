@@ -1,0 +1,6 @@
+# Keep repository text files LF on every platform. Windows editors and
+# Python text-mode writes otherwise convert whole files to CRLF.
+* text=auto eol=lf
+
+# The config field map was authored with CRLF and is kept byte-identical.
+*.csv -text

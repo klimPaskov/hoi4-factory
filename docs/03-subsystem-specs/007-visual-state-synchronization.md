@@ -1,6 +1,6 @@
 # SPEC-007: Visual state and source synchronization
 
-Status: **Proposed**. Primary requirements: REQ-009, REQ-010, REQ-011 and REQ-044. Shared requirements: REQ-013, REQ-014, REQ-022 and REQ-023. First implementation is S04.
+Status: **Proposed**. Primary requirements: REQ-009, REQ-010, REQ-011 and REQ-044. Shared requirements: REQ-013, REQ-014, REQ-022, REQ-023, REQ-046 and REQ-047. First implementation is S04.
 
 Read first: [focus editor](009-focus-and-other-editors.md), [Git review](005-git-collaboration-and-review.md), [maps](008-maps.md), [contracts](../02-architecture/contracts-and-interfaces.md) and [user workflows](../01-product/users-and-workflows.md).
 
@@ -8,7 +8,11 @@ Read first: [focus editor](009-focus-and-other-editors.md), [Git review](005-git
 
 A visual contributor and an autonomous agent work on one real mod repository. The canvas is a projection with proposed edits. It is never an independent database of gameplay truth. The same ChangeProposal contract applies to a drag, an inspector edit, an agent task and a source-editor patch.
 
-The user can remain in visual mode, inspect raw source at any time, give high-level feedback on a preview, or close the editor while a bounded task continues. Opening a canvas is not a required checkpoint. Review is required only at the meaningful boundary established by the existing grant and project policy.
+The user can remain in visual mode, inspect raw source at any time, give high-level feedback on a preview, or close the browser tab while a bounded task continues on the server. Opening a canvas is not a required checkpoint. Review is required only at the meaningful boundary established by the existing grant and project policy.
+
+The editor runs in the browser. Projections are produced on the server from a source snapshot and sent to the browser as data and sanitized render artifacts. The browser holds no authority. Every gesture becomes a typed request that the server resolves into a ChangeProposal. Several project members may view the same projection. Each member's gestures produce their own proposals on their own owned branch, and the server pushes stale-projection notices to every open view when the underlying snapshot changes.
+
+The escape hatch in REQ-044 is a ZIP download of native files, a Git clone of the server workspace or a push to the connected GitHub repository. A mod edited outside the factory comes back through a GitHub fetch or a new upload and is treated as an external change.
 
 Five invariants govern every editor:
 
@@ -52,7 +56,7 @@ Multi-file source application needs a journal and recoverable staging. Renaming 
 
 ## External changes and concurrency
 
-Filesystem events are hints. On activation, before apply and before commit, the host verifies hashes and Git state. If an external editor changes a projected file, the UI marks the projection stale and offers refresh, review the external change, or rebase the pending gesture against a new base.
+Server-side change notifications are hints. On activation, before apply and before commit, the host verifies hashes and Git state. If another member, a GitHub fetch or an upload changes a projected file, the UI marks the projection stale and offers refresh, review the external change, or rebase the pending gesture against a new base.
 
 A human moving a node while an agent changes that node's prerequisite is not automatically safe because the text spans differ. Semantic conflict analysis checks object identity, graph invariants and downstream effects. Nonoverlapping, independent changes can form a new combined proposal with fresh evidence. Overlapping identifiers or uncertain semantics require explicit conflict resolution.
 
@@ -92,15 +96,15 @@ These labels are independent of whether the proposal was written by a person or 
 | VIS-08 | Kill the app between two file writes | Recovery journal detects partial state, no complete-preview badge appears prematurely |
 | VIS-09 | Open the resulting mod outside the app | Native files remain editable, required content is not hidden in a proprietary project file |
 | VIS-10 | Keyboard-only select, inspect, move and review | Supported operation can be completed without a pointer |
-| VIS-11 | 500-node and 2,000-node synthetic focus graphs | Record load, interaction p95 and memory on the declared machine, compare with proposed budgets |
+| VIS-11 | 500-node and 2,000-node synthetic focus graphs | Record load, interaction p95 and browser memory on the declared reference browser and server profile, compare with proposed budgets |
 | VIS-12 | Malformed localization or missing icon | Preview identifies the missing dependency and source path without hiding other valid nodes |
 | VIS-13 | Apply one supported edit, undo it, then redo it on unchanged source | Undo restores the prior owned bytes, redo restores intended semantics, unrelated bytes remain identical and all three operations have linked distinct receipts |
 | VIS-14 | After undo, a human edits the same field while an agent proposes a related graph change | Redo refuses stale or semantically conflicting input, preserves both contributions and offers a fresh combined proposal only after explicit conflict resolution |
 | VIS-15 | Restart after undo, then request redo with a revoked grant or an unsettled prior receipt | No automatic write or external job replay occurs. Reconciliation and current authorization are required before one fresh redo operation can settle |
 
-Initial proposed usability targets are a useful preview within 3 seconds for a 500-node cached fixture and visible drag feedback within 100 ms p95 on the declared reference machine. These are experiment targets, not measured performance. S04 may revise them with a recorded benchmark and user impact. A screenshot comparison alone is insufficient to prove write fidelity.
+Initial proposed usability targets are a useful preview within 3 seconds for a 500-node cached fixture and visible drag feedback within 100 ms p95 on the declared reference browser and network profile. Drag feedback is rendered locally in the browser while the proposal round trip completes. These are experiment targets, not measured performance. S04 may revise them with a recorded benchmark and user impact. A screenshot comparison alone is insufficient to prove write fidelity.
 
 ## Open decisions
 
-EXP-02 determines whether the existing parser exposes lossless spans and how inherited/shared focus structures should be edited. EXP-06 measures canvas interaction and map tile costs. Whole-tree automatic relayout, round-trip editing of every script form and live multiplayer editing stay deferred until specific tests justify expansion. Each new writable property adds source-preservation fixtures and conflict rules before it appears as an enabled UI control.
+EXP-02 determines whether the existing parser exposes lossless spans and how inherited/shared focus structures should be edited. EXP-06 measures canvas interaction and map tile costs. Whole-tree automatic relayout, round-trip editing of every script form and real-time co-editing of one file stay deferred until specific tests justify expansion. Shared viewing and per-member proposals are in scope. Each new writable property adds source-preservation fixtures and conflict rules before it appears as an enabled UI control.
 

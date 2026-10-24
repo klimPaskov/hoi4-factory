@@ -1,17 +1,35 @@
 # HOI4 Factory
 
-A native, model-agnostic HOI4 modding workspace with optional visual editing, bounded agent work and collaboration over real mod source files.
+A free, open-source, hosted HOI4 modding workspace with optional visual editing, bounded agent work, GitHub integration and collaboration over real mod source files.
 
-This is the **v02 project-folder edition** of the completed research and planning baseline. Extract the ZIP and use **`hoi4-factory/` as your working project folder**. The application is ready to enter its reviewed implementation stages. Product implementation has not started.
+This repository holds the research and planning baseline, revised on 2026-10-24 by the [maintainer decisions](docs/02-architecture/maintainer-decisions-2026-10-24.md). **Product implementation has not started** and is deferred until the maintainer authorizes S01.
+
+## Planned product
+
+| Part | Choice |
+|---|---|
+| Delivery | Public web application, used in a browser |
+| Server and agent | Rust web server with a native Rust agent loop, no Node worker |
+| Client | React with TypeScript |
+| Deployment | Docker images and Compose, portable to any Linux host |
+| Source of truth | Native mod files and Git history in server workspaces, downloadable or pushed to GitHub |
+| Accounts | Sign in with GitHub or email, invite collaborators to a project |
+| Models | Bring your own API key, an operator credit allowance, or any reachable OpenAI-compatible endpoint |
+| Game data | A server-side read-only reference copy, latest build with all DLC, never redistributed |
+| License | AGPL-3.0 with attribution terms, see [LICENSE](LICENSE) and [NOTICE](NOTICE) |
 
 ## Start here
 
-1. Open this `hoi4-factory/` folder in your editor and launch Claude Code from this root.
+1. Clone this repository, open it in your editor and launch Claude Code from its root.
 2. Read the [documentation index](docs/README.md), [master goal](docs/MASTER_GOAL.md) and [current status](docs/PACKAGE_STATUS.md).
 3. Review the [architecture options](docs/02-architecture/options-and-decisions.md) and [implementation roadmap](docs/04-implementation-stages/ROADMAP.md).
-4. For the first authorized implementation stage, use the [Claude Code S01 prompt](docs/06-agent-handoffs/CLAUDE-CODE-START-STAGE-01.md).
+4. When S01 is authorized, use the [Claude Code S01 prompt](docs/06-agent-handoffs/CLAUDE-CODE-START-STAGE-01.md).
 
-The shared [AGENTS.md](AGENTS.md), importing [CLAUDE.md](CLAUDE.md), project settings and skills are already in their working locations. When using this folder directly, no second starter-copy step is needed. If integrating it into an existing repository, merge its guidance with that repository's instructions.
+The shared [AGENTS.md](AGENTS.md), importing [CLAUDE.md](CLAUDE.md), project settings and skills are already in their working locations.
+
+## Contributing and license
+
+HOI4 Factory is licensed under the GNU Affero General Public License version 3 with two additional terms under its section 7. Modified versions must keep the author attributions in [NOTICE](NOTICE), and must be marked as changed and not presented as the original. If you run a modified version as a network service, you must offer its source to its users. Hearts of Iron IV and its DLC belong to Paradox Interactive. No game files are in this repository.
 
 ## Project organization
 
@@ -30,21 +48,13 @@ Future application source belongs alongside `docs/`, in the structure chosen by 
 
 ## Check the planning and guidance files
 
-Run commands from this project root with Python 3.11 or newer.
-
-For the freshly extracted distribution:
+Run commands from this project root with Python 3.11 or newer. On Windows, set `PYTHONUTF8=1` first, because the validator otherwise reads files in the locale encoding and fails on UTF-8 text.
 
 ```bash
 python scripts/sync_skills.py --check
-python scripts/validate_package.py --root .
-```
-
-Once development has added files or changed the baseline, use:
-
-```bash
 python scripts/validate_package.py --root . --working-tree
 ```
 
-The working-tree check validates the maintained planning and guidance files without comparing them to the frozen distribution hashes or treating unrelated product files as package errors. Run the stage's own tests for product behavior. See the [quality review](docs/05-verification/PLANNING-PACKAGE-QUALITY-REVIEW.md) for exact validation scope.
+The working-tree check validates the maintained planning and guidance files without comparing them to the frozen distribution hashes. The frozen hashes in `docs/MANIFEST.json` describe the original v02 package, which is the first commit of this repository, so the default distribution mode no longer matches the revised files. Run the stage's own tests for product behavior. See the [quality review](docs/05-verification/PLANNING-PACKAGE-QUALITY-REVIEW.md) for exact validation scope.
 
 When an approved workflow-body change is needed, update its canonical source in `docs/07-developer-workflow/skill-workflows/`, then run `python scripts/sync_skills.py --write` and the check again. The generator preserves correct links in all three client locations.

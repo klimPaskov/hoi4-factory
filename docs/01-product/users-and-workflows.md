@@ -13,17 +13,17 @@ Status: **Proposed**. Read [requirements](product-requirements.md), [visual/auto
 | Balancing contributor | Expected behavior and scenario assumptions | Static checks, simulations and clearly scoped game observations | Proposal and scenario review |
 | Maintainer | Project intent, version compatibility and merge policy | Consolidated evidence, conflicts, approvals and restore | Canon, integration and release authority |
 
-These are collaboration responsibilities, not mandatory always-running agent personas. One person may hold several roles. The first product uses local workspaces and Git exchange. Hosted membership, shared identity and real-time coediting require later access-control work.
+These are collaboration responsibilities, not mandatory always-running agent personas. One person may hold several roles. The first public release uses server workspaces, GitHub exchange and invited project members with explicit roles. Real-time co-editing of one file remains later work.
 
 ## Scenario 0: Create or import a mod
 
-The start screen offers the established Mod Setup new-mod and existing-mod paths through the adapter. It inspects game and mod locations, platform conditions, generated descriptors, instruction files and the resolved bootstrap manifest. The user sees discovered values with the ability to correct them.
+After sign-in, the start screen offers three entry paths through the Setup adapter: create a new mod, upload a mod as a ZIP or folder, or import a repository from a connected GitHub account. It inspects the server workspace, the server game reference build, generated descriptors, instruction files and the resolved bootstrap manifest. The user sees discovered values with the ability to correct them.
 
 For a new mod, the app uses Setup's actual planning and generation functions. For an import, it inventories existing source, binary assets, Git state and partial prior setup before suggesting modifications. The app separates mandatory project preparation from optional assistants and integrations. A missing optional dependency produces an actionable limited-capability result.
 
 The review names files to create, preserve, merge or replace and displays the resolved component versions. Applying requires authorization for that concrete plan. The adapter follows the actual transaction state. Verified staging can resume. An interrupted partial apply that Setup marks unsafe to resume requires rollback. Successful-lock finalization has its own reconciliation path. No generic Resume button may conceal those differences.
 
-The workspace handoff contains roots, profile, setup receipt, current source identity and unresolved checks. A pre-existing mod remains usable outside the app. Re-running onboarding should recognize already completed work and refuse to clobber changed generated files.
+The workspace handoff contains roots, profile, setup receipt, current source identity and unresolved checks. A pre-existing mod remains usable outside the app, and the user can download it or push it to GitHub at any time. Re-running onboarding should recognize already completed work and refuse to clobber changed generated files.
 
 ## Scenario 1: Lore writer describes a country
 
@@ -67,9 +67,9 @@ The user can pause, narrow or revoke the grant. The host records the revocation 
 
 ## Scenario 4: Switch model or return after interruption
 
-The user changes provider or reopens the app. The host first reconciles active attempts and verifies source state. It builds a fresh context bundle from approved intent, task state, source pointers and evidence.
+The user changes provider or returns to the app later. The host first reconciles active attempts and verifies source state. It builds a fresh context bundle from approved intent, task state, source pointers and evidence.
 
-If the new provider lacks required tools, images or context capacity, the UI gives a precise option such as text-only inspection or a narrower task. Local-only data cannot move to a cloud provider through automatic fallback. Provider-specific private reasoning and old tool-call identifiers are not transplanted.
+If the new provider lacks required tools, images or context capacity, the UI gives a precise option such as text-only inspection or a narrower task. Data restricted to one provider destination cannot move to another provider through automatic fallback. Provider-specific private reasoning and old tool-call identifiers are not transplanted.
 
 A resumed task presents what is confirmed, what is stale and what remains unresolved. It preserves the same grant or asks for a new grant only if authorization expired or scope changed. It must not repeat a commit, upload or external generation merely because its last response was lost.
 
@@ -77,7 +77,7 @@ A resumed task presents what is confirmed, what is stale and what remains unreso
 
 The contributor reports the visible defect and, where available, supplies a game log or screenshot with game version and DLC profile. The app links the report to the exact generated artifact. It separates parser errors, missing references, unsupported tool coverage, game-specific behavior and intent mismatch.
 
-The agent reproduces the failure at the cheapest relevant layer, proposes a scoped correction, and reruns affected checks plus preservation checks. A game-only issue remains unverified until the corresponding game scenario is observed. If no installed game or live tool is available, source analysis may continue with explicit limits.
+The agent reproduces the failure at the cheapest relevant layer, proposes a scoped correction, and reruns affected checks plus preservation checks. A game-only issue remains unverified until the corresponding game scenario is observed. The server game reference supports source and static checks only. Without a user-operated game observation, analysis continues with explicit limits.
 
 Restore is an ordinary reviewed operation. It returns owned content to the selected accepted snapshot or creates a revert on a shared branch. It preserves subsequent human work and leaves the failed result, evidence and recovery decision attributable. The learning review can produce a tested reusable lesson, a narrow bug regression or a justified no-change outcome.
 

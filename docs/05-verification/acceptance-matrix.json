@@ -11,14 +11,16 @@
       "acceptance": "AC-001",
       "scope": "MVP",
       "decisions": [
-        "ADR-002",
+        "ADR-011",
+        "ADR-012",
         "ADR-003"
       ],
       "tests": [
         "T-RUN-01",
+        "T-DEPLOY-01",
         "T-RELEASE-01"
       ],
-      "oracle": "Clean packaged task succeeds with no coding CLI installed or spawned.",
+      "oracle": "A clean containerized deployment performs a native task with no coding CLI present in the image or spawned.",
       "execution_status": "Planned, not executed."
     },
     {
@@ -31,7 +33,7 @@
       "acceptance": "AC-002",
       "scope": "MVP",
       "decisions": [
-        "ADR-002"
+        "ADR-011"
       ],
       "tests": [
         "T-RUN-05"
@@ -49,13 +51,14 @@
       "acceptance": "AC-003",
       "scope": "MVP",
       "decisions": [
-        "ADR-003"
+        "ADR-003",
+        "ADR-016"
       ],
       "tests": [
         "T-RUN-06",
         "T-SEC-01"
       ],
-      "oracle": "Credentials remain outside artifacts, budget stops dispatch and fallback obeys destination authority.",
+      "oracle": "Keys and tokens remain outside artifacts and other tenants, budget or allowance exhaustion stops dispatch and fallback obeys destination authority.",
       "execution_status": "Planned, not executed."
     },
     {
@@ -110,7 +113,8 @@
       ],
       "tests": [
         "T-SETUP-02",
-        "T-GIT-01"
+        "T-GIT-01",
+        "T-GH-01"
       ],
       "oracle": "Exact protected-byte inventory and unrelated Git index state match the baseline.",
       "execution_status": "Planned, not executed."
@@ -131,7 +135,7 @@
       "tests": [
         "T-SETUP-04"
       ],
-      "oracle": "C-01 carries root identity, resolved manifest/tool closure, receipt and unresolved checks.",
+      "oracle": "C-01 carries workspace identity, resolved manifest/tool closure, game reference build, receipt and unresolved checks.",
       "execution_status": "Planned, not executed."
     },
     {
@@ -396,7 +400,7 @@
       "tests": [
         "T-GIT-01"
       ],
-      "oracle": "Owned worktrees and expected-HEAD commits preserve the user's real index and unrelated files.",
+      "oracle": "Owned worktrees and expected-HEAD commits preserve each collaborator's index and unrelated files.",
       "execution_status": "Planned, not executed."
     },
     {
@@ -503,13 +507,15 @@
       "acceptance": "AC-027",
       "scope": "MVP",
       "decisions": [
-        "ADR-001"
+        "ADR-001",
+        "ADR-015"
       ],
       "tests": [
         "T-SETUP-04",
-        "T-HOI-02"
+        "T-HOI-02",
+        "T-GAME-01"
       ],
-      "oracle": "Game, DLC and load order are recorded or explicitly unknown, with invalidation on change.",
+      "oracle": "Game build, DLC set and load order are recorded or explicitly unknown, a version mismatch warns, and caches invalidate on change.",
       "execution_status": "Planned, not executed."
     },
     {
@@ -637,13 +643,16 @@
       "acceptance": "AC-034",
       "scope": "MVP",
       "decisions": [
-        "ADR-010"
+        "ADR-010",
+        "ADR-013",
+        "ADR-017"
       ],
       "tests": [
         "T-RELEASE-01",
-        "T-RELEASE-03"
+        "T-RELEASE-03",
+        "T-DEPLOY-01"
       ],
-      "oracle": "Package has reproducible dependencies and a reviewed distribution basis excluding restricted code and game files.",
+      "oracle": "Images have reproducible pinned dependencies, a reviewed license basis and no restricted code, game files or credentials, and the rights review is recorded before public exposure.",
       "execution_status": "Planned, not executed."
     },
     {
@@ -656,10 +665,13 @@
       "acceptance": "AC-035",
       "scope": "Later",
       "decisions": [
-        "ADR-007"
+        "ADR-007",
+        "ADR-012",
+        "ADR-014"
       ],
       "tests": [
         "T-GIT-02",
+        "T-ACCT-02",
         "T-RELEASE-04"
       ],
       "oracle": "Each contributor role has attributable intent and source-linked review, conflict and restore paths.",
@@ -770,7 +782,7 @@
       "acceptance": "AC-041",
       "scope": "MVP",
       "decisions": [
-        "ADR-002"
+        "ADR-011"
       ],
       "tests": [
         "T-RUN-05",
@@ -828,13 +840,15 @@
       "scope": "MVP",
       "decisions": [
         "ADR-004",
-        "ADR-005"
+        "ADR-005",
+        "ADR-014"
       ],
       "tests": [
         "T-VIS-03",
+        "T-GH-02",
         "T-RELEASE-01"
       ],
-      "oracle": "Native source opens and remains editable outside the app, with external changes detected on reopen.",
+      "oracle": "Native source downloads or pushes intact and remains editable outside the app, with external changes detected on the next pull.",
       "execution_status": "Planned, not executed."
     },
     {
@@ -854,6 +868,65 @@
       ],
       "oracle": "Actual ZIP includes substantive linked requirements, specs, stages, tests, starter assets, source evidence and passed artifact QA.",
       "execution_status": "Planning artifact checks completed separately. Product or live-client checks remain planned."
+    },
+    {
+      "requirement": "REQ-046",
+      "title": "Accounts and tenant isolation",
+      "spec": "SPEC-011",
+      "spec_file": "../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md",
+      "stage": "S02",
+      "stage_file": "../04-implementation-stages/stage-02-onboarding-and-workspaces.md",
+      "acceptance": "AC-046",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-012",
+        "ADR-003"
+      ],
+      "tests": [
+        "T-ACCT-01",
+        "T-ACCT-02",
+        "T-SEC-01"
+      ],
+      "oracle": "No account can read or change another account's workspace, run, secret or budget, and each role permits exactly its granted project actions.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-047",
+      "title": "GitHub integration",
+      "spec": "SPEC-005",
+      "spec_file": "../03-subsystem-specs/005-git-collaboration-and-review.md",
+      "stage": "S02",
+      "stage_file": "../04-implementation-stages/stage-02-onboarding-and-workspaces.md",
+      "acceptance": "AC-047",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-014"
+      ],
+      "tests": [
+        "T-GH-01",
+        "T-GH-02"
+      ],
+      "oracle": "Import preserves repository bytes and history, and every push, pull request or repository creation has one receipt even after a lost reply.",
+      "execution_status": "Planned, not executed."
+    },
+    {
+      "requirement": "REQ-048",
+      "title": "Server game reference",
+      "spec": "SPEC-006",
+      "spec_file": "../03-subsystem-specs/006-hoi4-tools-and-validation.md",
+      "stage": "S02",
+      "stage_file": "../04-implementation-stages/stage-02-onboarding-and-workspaces.md",
+      "acceptance": "AC-048",
+      "scope": "MVP",
+      "decisions": [
+        "ADR-015"
+      ],
+      "tests": [
+        "T-GAME-01",
+        "T-HOI-02"
+      ],
+      "oracle": "Tools read the mounted reference read-only, evidence names its build and DLC set, and no export, image or API response contains raw game files.",
+      "execution_status": "Planned, not executed."
     }
   ],
   "stage_gates": [
@@ -894,7 +967,9 @@
       "stage": "S01",
       "ordinal": 4,
       "tests": [
-        "T-RUN-01"
+        "T-RUN-01",
+        "T-DEPLOY-01",
+        "T-GH-01"
       ],
       "status": "Planned, not executed"
     },
@@ -914,7 +989,9 @@
       "ordinal": 1,
       "tests": [
         "T-SETUP-01",
-        "T-SETUP-02"
+        "T-SETUP-02",
+        "T-GH-01",
+        "T-ACCT-01"
       ],
       "status": "Planned, not executed"
     },
@@ -951,7 +1028,8 @@
       "stage": "S02",
       "ordinal": 5,
       "tests": [
-        "T-SETUP-04"
+        "T-SETUP-04",
+        "T-GAME-01"
       ],
       "status": "Planned, not executed"
     },
@@ -961,7 +1039,8 @@
       "ordinal": 1,
       "tests": [
         "T-RUN-01",
-        "T-CTX-01"
+        "T-CTX-01",
+        "T-DEPLOY-01"
       ],
       "status": "Planned, not executed"
     },
@@ -999,7 +1078,8 @@
       "ordinal": 5,
       "tests": [
         "T-RUN-06",
-        "T-RUN-04"
+        "T-RUN-04",
+        "T-ACCT-02"
       ],
       "status": "Planned, not executed"
     },
@@ -1008,7 +1088,8 @@
       "stage": "S03",
       "ordinal": 6,
       "tests": [
-        "T-RUN-05"
+        "T-RUN-05",
+        "T-SEC-01"
       ],
       "status": "Planned, not executed"
     },
@@ -1019,7 +1100,8 @@
       "tests": [
         "T-SETUP-01",
         "T-SETUP-02",
-        "T-VIS-02"
+        "T-VIS-02",
+        "T-GH-01"
       ],
       "status": "Planned, not executed"
     },
@@ -1058,7 +1140,8 @@
       "ordinal": 5,
       "tests": [
         "T-GIT-01",
-        "T-GIT-03"
+        "T-GIT-03",
+        "T-GH-02"
       ],
       "status": "Planned, not executed"
     },
@@ -1068,7 +1151,8 @@
       "ordinal": 6,
       "tests": [
         "T-VIS-03",
-        "T-RELEASE-01"
+        "T-RELEASE-01",
+        "T-GH-02"
       ],
       "status": "Planned, not executed"
     },
@@ -1171,7 +1255,8 @@
       "stage": "S06",
       "ordinal": 4,
       "tests": [
-        "T-RELEASE-04"
+        "T-RELEASE-04",
+        "T-ACCT-01"
       ],
       "status": "Planned, not executed"
     },
@@ -1258,7 +1343,8 @@
       "tests": [
         "T-SEC-01",
         "T-VIS-01",
-        "T-SETUP-03"
+        "T-SETUP-03",
+        "T-ACCT-01"
       ],
       "status": "Planned, not executed"
     },
@@ -1268,7 +1354,8 @@
       "ordinal": 2,
       "tests": [
         "T-RUN-01",
-        "T-RELEASE-01"
+        "T-RELEASE-01",
+        "T-DEPLOY-01"
       ],
       "status": "Planned, not executed"
     },
@@ -1287,7 +1374,8 @@
       "stage": "S08",
       "ordinal": 4,
       "tests": [
-        "T-RELEASE-02"
+        "T-RELEASE-02",
+        "T-DEPLOY-01"
       ],
       "status": "Planned, not executed"
     },
@@ -1296,7 +1384,8 @@
       "stage": "S08",
       "ordinal": 5,
       "tests": [
-        "T-RELEASE-03"
+        "T-RELEASE-03",
+        "T-GAME-01"
       ],
       "status": "Planned, not executed"
     },
@@ -1306,10 +1395,11 @@
       "ordinal": 6,
       "tests": [
         "T-RELEASE-04",
-        "T-RUN-06"
+        "T-RUN-06",
+        "T-ACCT-02",
+        "T-SEC-02"
       ],
       "status": "Planned, not executed"
     }
   ]
 }
-

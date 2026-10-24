@@ -1,6 +1,8 @@
 # Executive recommendation
 
-Status: **Proposed, conditional on S01 evidence**. Build a local desktop workspace around reused HOI4 Mod Setup services, a small replaceable native model adapter and host-owned integrity. The leading candidate is Tauri/React with a Rust workspace host and packaged Node worker embedding Pi. Preserve Electron with embedded OpenCode and the same Rust workspace service as a credible alternative.
+Status: **Research recommendation, partly superseded**. This page records the v02 research recommendation. On 2026-10-24 the maintainer selected a public hosted web application with a Rust server, a native Rust agent loop, a React browser client, Docker deployment and GitHub integration. See the [maintainer decision record](../02-architecture/maintainer-decisions-2026-10-24.md). The findings below still apply. The desktop and Pi worker parts of the original recommendation do not.
+
+Original recommendation: build a local desktop workspace around reused HOI4 Mod Setup services, a small replaceable native model adapter and host-owned integrity. The leading candidate was Tauri/React with a Rust workspace host and packaged Node worker embedding Pi, with Electron and embedded OpenCode as the alternative.
 
 This is a research-backed recommendation, not a completed implementation or measured runtime winner. The [architecture comparison](03-candidate-comparison.md) and [ADR table](../02-architecture/options-and-decisions.md) retain the tradeoffs and reversal triggers.
 

@@ -1,6 +1,6 @@
 # Architecture options and decisions
 
-Status: **Proposed recommendation for review**. No product architecture has been implemented or approved by this planning package. The recommendation follows current source inspection, with explicit S01 experiments before commitment.
+Status: **Revised by maintainer decisions on 2026-10-24**. The [maintainer decision record](maintainer-decisions-2026-10-24.md) selects a native Rust agent runtime, a public hosted web application deployed as Docker images, native GitHub integration, a server-held game reference and an AGPL-3.0 license. ADR-002 is superseded. Candidates A and B below are kept as the research record and as behavioral reference designs. No product architecture has been implemented. S01 experiments still verify the selected direction before dependencies are committed.
 
 Read [candidate comparison](../00-research/03-candidate-comparison.md), [existing assets](../00-research/02-existing-assets-audit.md), [risks and experiments](../05-verification/RISKS-DECISIONS-AND-OPEN-QUESTIONS.md) and [roadmap](../04-implementation-stages/ROADMAP.md).
 
@@ -10,7 +10,13 @@ The most important criteria are reuse of Mod Setup, independent model access, so
 
 The comparison below is an engineering judgment based on inspected interfaces. “Lower” or “higher” describes relative integration scope. It is not a measured cost or benchmark.
 
-## Candidate A: Tauri host with a narrow Pi adapter
+## Selected direction: Rust server, Rust agent and browser client
+
+The Rust server owns workspace identity, grants, receipts, Git, GitHub and recovery. A Rust agent crate in the same Cargo workspace runs the model loop and requests every effect through the host tool broker. A React and TypeScript browser client presents projections and submits typed requests. The service ships as Docker images, uses PostgreSQL for operational state, an object store or volume for artifacts, and persistent volumes for Git repositories and the read-only game reference. Mod Setup's portable core runs on the server, as ADR-001 requires. The [recommended architecture](recommended-architecture.md) describes the components.
+
+This direction keeps the strongest property of Candidate A, direct Rust reuse of Setup with a narrow runtime boundary, and removes its Node worker. It inherits the costs of the small custom loop described below. Those costs are accepted by ADR-011 and measured in S01.
+
+## Candidate A (research record): Tauri host with a narrow Pi adapter
 
 Use a Tauri desktop shell and React/TypeScript UI, a Rust workspace service that reuses Mod Setup's portable planning core plus extracted or adapted desktop scanner and transaction services, and a packaged Node worker embedding Pi libraries. Keep the host's SQLite state, approvals and filesystem transaction journal authoritative. Reuse existing HOI4 Agent Tools behind versioned adapters.
 
@@ -20,7 +26,7 @@ Source evidence: [Pi embedding and durable tool handling](https://github.com/ear
 
 Strengths are direct reuse of Rust onboarding, a narrow runtime API and a clear trusted mutation boundary. Costs are a Rust/Node process boundary, signed binaries per supported platform, protocol evolution and two-language debugging. Node worker isolation must be designed and tested. Tauri's frontend capabilities do not sandbox every arbitrary sidecar operation.
 
-## Candidate B: Electron application with embedded OpenCode
+## Candidate B (research record): Electron application with embedded OpenCode
 
 Use an Electron application with an isolated React renderer, an embedded OpenCode SDK in a controlled Node process, and the same Rust Setup/workspace service reached through a versioned local interface. Persist OpenCode's database explicitly and keep effect authorization and workspace receipts in the host contract.
 
@@ -57,21 +63,28 @@ Strengths are a richer embedded session system and a broadly TypeScript applicat
 | ADR | Proposed decision | Why | Reversal trigger |
 |---|---|---|---|
 | ADR-001 | Reuse Mod Setup's portable planning core and adapt desktop scanner and transaction services | Existing new/import workflow is a required asset | Recovery experiment cannot preserve the fixture at a supportable pin |
-| ADR-002 | Prefer Candidate A | Narrow runtime replacement boundary and direct onboarding reuse | Packaging, provider or isolation experiment fails while B passes with lower total cost |
+| ADR-002 | Superseded by ADR-011 and ADR-012. Previously preferred Candidate A | Narrow runtime replacement boundary and direct onboarding reuse | Not applicable |
 | ADR-003 | Host owns grants and mutation receipts | Runtime hooks and transcript stores do not enforce all product invariants | A tested runtime supplies the same contract without split authority |
-| ADR-004 | Git source plus SQLite operations plus hashed artifacts | Different authority and lifetime requirements | Measured collaboration needs require a server, with an explicit migration design |
+| ADR-004 | Git source plus a transactional operations database plus hashed artifacts. PostgreSQL on the server since ADR-012 | Different authority and lifetime requirements | Measured needs require a different store, with an explicit migration design |
 | ADR-005 | Focus tree is first visual editor | Small valuable vertical slice with source-level assertions | Existing parser cannot safely support even bounded fields |
 | ADR-006 | Maps begin with inspection and structured import | Map dependency closure and topology are substantial | A separately validated existing editor meets preservation and licensing gates |
 | ADR-007 | One writer before parallel agents | Reduces conflicting effects while core correctness is established | Controlled two-worker trials improve accepted output without more loss or rework |
 | ADR-008 | Claude-first engineering, portable shared rules | User's implementation preference with handoff continuity | User revises the development-tool preference |
 | ADR-009 | Exact/domain retrieval before vectors | Rebuildable low-complexity baseline | EXP-05 demonstrates a material recall gap after simpler improvements |
 | ADR-010 | No unlicensed or restricted UI/editor code reuse | Distribution terms vary independently from visual appeal | Separate written permission or a verified compatible license |
+| ADR-011 | Native Rust agent runtime, no Node worker | Maintainer decision, one language for host and runtime | Adapter maintenance or fault handling costs materially more than an adapted library |
+| ADR-012 | Public hosted web application with GitHub or email accounts and invited collaborators | Maintainer decision | Hosting cost, isolation or terms make a public service infeasible |
+| ADR-013 | Docker images and Compose, portable Linux hosting | Maintainer decision, reproducible deployment | A chosen platform cannot run the images or per-task containers are impractical |
+| ADR-014 | Native GitHub integration for sign-in, import, publication and pull requests | Maintainer decision | GitHub terms or rate limits block the flow |
+| ADR-015 | Server-held read-only game reference, latest build with all DLC | Maintainer decision, server-side validation and previews | The rights review does not permit it |
+| ADR-016 | Free use, bring-your-own keys and an operator credit allowance | Maintainer decision | Abuse or cost makes the allowance unsustainable |
+| ADR-017 | AGPL-3.0 with attribution and origin terms | Maintainer decision, prevents closed rebranded forks | Maintainer revises the license |
 
-These ADRs are proposals. S01 produces decision receipts with evidence and asks for architecture/roadmap review at its end. Approval of S01 does not authorize S02 automatically.
+ADR-011 through ADR-017 are recorded maintainer decisions with full records in the [decision record](maintainer-decisions-2026-10-24.md). The others remain proposals. S01 produces decision receipts with evidence and asks for architecture/roadmap review at its end. Approval of S01 does not authorize S02 automatically.
 
 ## S01 experiment gate
 
-EXP-01 must reproduce the observed Setup recovery mismatch or explain it with artifact evidence, then verify the selected pin's new/import/recovery fixtures. EXP-02 tests source preservation and supported focus edits. EXP-03 tests unsafe replay, revocation and model handoff. EXP-04 packages a native provider loop and demonstrates that no external coding CLI is needed.
+EXP-01 must reproduce the observed Setup recovery mismatch or explain it with artifact evidence, then verify the selected pin's new/import/recovery fixtures. EXP-02 tests source preservation and supported focus edits. EXP-03 tests the Rust agent loop for unsafe replay, revocation and model handoff. EXP-04 runs a native provider request from a Docker image with no external coding CLI and probes a GitHub App connection on a disposable repository.
 
 A failed probe is useful evidence. Preserve the alternative and record a bounded next decision. Do not turn the planning recommendation into an irreversible dependency commitment before these gates.
 

@@ -2,6 +2,15 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.1.2, 2026-10-24, maintainer revision and repository setup
+
+- The package validator now expects REQ-001 through REQ-048, after the maintainer decisions added three requirements.
+- The README says to set `PYTHONUTF8=1` on Windows. Without it the validator reads files in the locale encoding and fails on UTF-8 text. This was observed with Python 3.13 on Windows 11. The default `python` on that machine was 3.9, which also lacks `tomllib`.
+- Added `.gitattributes` to keep text files LF. Python text-mode writes and some editors on Windows converted whole files to CRLF during the revision.
+- Distribution-mode validation no longer matches the revised files. The frozen manifest describes the original v02 package, kept as the first commit.
+
+Evidence: validator runs recorded in the revision session, the [maintainer decision record](../02-architecture/maintainer-decisions-2026-10-24.md) and the repository history. Scope: planning tooling and repository hygiene. No runtime, provider or game result is implied.
+
 ## 0.1.1, 2026-10-23, working project layout
 
 - Organized the project under one stable `hoi4-factory/` root with all planning documentation in `docs/` and maintenance utilities in `scripts/`.

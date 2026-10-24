@@ -20,14 +20,16 @@ The first version uses exact identifiers, paths, dependency lookup and full-text
 
 | Information | Authority | Storage proposal | Mutation rule |
 |---|---|---|---|
-| Editable scripts, localization and original assets | Mod repository | Native paths in Git, optional Git LFS policy for large owned assets | Reviewed source proposal |
+| Editable scripts, localization and original assets | Mod repository in the server workspace, optionally mirrored to GitHub | Native paths in Git, optional Git LFS policy for large owned assets | Reviewed source proposal |
 | Approved lore and requirements | Named project owner | Versioned Markdown or JSON under a configurable canon root | Explicit canon approval |
 | Accepted engineering policy | Repository maintainer | AGENTS, skills, architecture decisions and tests | SPEC-012 promotion policy |
-| Task state, grants and attempt outcomes | Native host | Local transactional database | Validated state transition |
-| Candidate runtime memories | Evidence-backed suggestion | Local database with optional review export | Candidate review |
-| Search index, summaries and dependency graph | Derived projection | Rebuildable local cache | Recompute from identified inputs |
+| Task state, grants and attempt outcomes | Server host | PostgreSQL, scoped by account and project | Validated state transition |
+| Candidate runtime memories | Evidence-backed suggestion | PostgreSQL, scoped by project, with optional review export | Candidate review |
+| Search index, summaries and dependency graph | Derived projection | Rebuildable server cache per project | Recompute from identified inputs |
 
-Default proposed project metadata is `.hoi4factory/project.json`. If that path already exists with an unknown schema, onboarding produces a conflict instead of replacing it. Runtime databases and credentials live in user application data, outside the mod's normal Git history. An explicit export may include redacted run evidence and a manifest of omitted private fields.
+Default proposed project metadata is `.hoi4factory/project.json`. If that path already exists with an unknown schema, onboarding produces a conflict instead of replacing it. Operational state and credentials live in the server database and secret store, outside the mod's Git history and never pushed to GitHub. An explicit export may include redacted run evidence and a manifest of omitted private fields.
+
+Project memory and canon belong to one project. Context assembly never selects canon, memories or source from another project or account, even when the same user owns both. Invited collaborators see the project's approved canon and candidates according to their project role.
 
 ## ContextBundle contract, C-06
 
@@ -57,9 +59,9 @@ Approval of a runtime lesson does not approve a canon change. A suggestion that 
 
 Each derived item records its source set, extractor version, profile and build timestamp. A source edit, renamed identifier, changed load order, DLC change or tool upgrade invalidates only the affected closure where that closure is known. Unknown dependencies invalidate the broader relevant index. Time-to-live alone is inadequate because source can change immediately after a successful lookup.
 
-If indexing dies mid-build, the previous complete index remains readable but is labelled stale where inputs changed. Partial new rows cannot appear as current. A cancelled embedding or conversion job must not publish orphan search results. Reopening the app checks index manifest hashes against current source before serving authoritative-looking results.
+If indexing dies mid-build, the previous complete index remains readable but is labelled stale where inputs changed. Partial new rows cannot appear as current. A cancelled embedding or conversion job must not publish orphan search results. Server restart or project reopening checks index manifest hashes against current source before serving authoritative-looking results.
 
-When switching models, pause at an attempt boundary, reconcile in-flight effects, persist a new provider profile and construct a fresh bundle. Preserve tool receipts, approval scope and task identity. If the new provider cannot handle images, tools or the required context, expose a specific degraded mode or stop that operation. A model switch cannot broaden file scope or send local-only material to a remote endpoint.
+When switching models, pause at an attempt boundary, reconcile in-flight effects, persist a new provider profile and construct a fresh bundle. Preserve tool receipts, approval scope and task identity. If the new provider cannot handle images, tools or the required context, expose a specific degraded mode or stop that operation. A model switch cannot broaden file scope or send material marked as restricted to an endpoint outside its approved data destinations.
 
 ## Observable acceptance tests
 
@@ -68,12 +70,12 @@ When switching models, pause at an attempt boundary, reconcile in-flight effects
 | CTX-01 | Approved lore says monarchy, an unreviewed conversation proposes republic | Planning can show both, generated accepted changes follow approved monarchy until canon review |
 | CTX-02 | Modify a scripted effect used by a focus after indexing | Its prior semantic evidence becomes stale before the next proposal is applied |
 | CTX-03 | Switch from API profile A to B after a tool result | New request contains task facts and receipt references, no provider-private reasoning or repeated write |
-| CTX-04 | Switch to local profile with a smaller context limit | Builder stays within the measured profile budget or returns a specific narrowing request |
+| CTX-04 | Switch to a self-hosted endpoint profile with a smaller context limit | Builder stays within the measured profile budget or returns a specific narrowing request |
 | CTX-05 | Inject failure between candidate review writes | No approved memory appears without its matching review transition |
 | CTX-06 | Two reviewers approve and reject the same candidate concurrently | Exactly one expected-version transition succeeds and both actions remain attributable |
 | CTX-07 | Cancel index build after derived records are produced | Previous index remains consistent, cancelled generation contributes no current search hit |
 | CTX-08 | Remove source or revoke its data-sharing permission | Next context excludes it, cached provider-ready payloads are invalidated |
-| CTX-09 | Change project root or use a linked worktree | Stable workspace identity remains explicit, unrelated project memory is never selected |
+| CTX-09 | Change project root, use a linked worktree or open a second project of the same account | Stable workspace identity remains explicit, unrelated project memory is never selected |
 | CTX-10 | A plausible lesson lacks repeatable evidence | It remains a candidate or is rejected, with no instruction or canon mutation |
 
 S05 must run these against production storage and context assembly. Mocks may replace remote transport and clocks, not the authority checks being evaluated. Report source coverage, context omissions, retrieval precision on fixture answers and human corrections. Proposed targets are in the [evaluation matrix](../05-verification/EVALUATION-MATRIX.md). No product acceptance test has run in this planning assignment.

@@ -1,6 +1,6 @@
 # SPEC-013: Configuration reuse and developer environment
 
-Status: Proposed. Owner: developer environment maintainer. Primary stages: S01 bootstrap and S08 maintenance audit. Requirements: REQ-038 and REQ-043. Acceptance: AC-038 and AC-043.
+Status: Proposed, revised for the Rust, Docker and hosted-service decisions in [maintainer decisions of 2026-10-24](../02-architecture/maintainer-decisions-2026-10-24.md). Owner: developer environment maintainer. Primary stages: S01 bootstrap and S08 maintenance audit. Requirements: REQ-038 and REQ-043. Acceptance: AC-038 and AC-043.
 
 Read first: [shared instructions](../../AGENTS.md), [configuration migration report](../07-developer-workflow/CONFIG-MIGRATION-REPORT.md), [complete field map](../07-developer-workflow/CONFIG-FIELD-MAP.csv), [source inventory](../07-developer-workflow/CONFIG-SOURCE-INVENTORY.json), [bootstrap checks](../07-developer-workflow/ENVIRONMENT-BOOTSTRAP-AND-CHECKS.md), and [permissions specification](011-extensibility-sandbox-and-permissions.md).
 
@@ -8,9 +8,17 @@ Read first: [shared instructions](../../AGENTS.md), [configuration migration rep
 
 A maintainer should be able to adopt the planning starter without inheriting another project's secrets, machine paths, broad tool permissions or unsupported client options. The environment must support Claude Code first, preserve a usable Codex alternative and make unresolved dependencies visible. Configuration should explain behavior instead of silently relying on a developer's global setup.
 
-This subsystem owns project instruction loading, skill discovery, developer-client settings, MCP connection definitions, configuration provenance and version checks. It does not define the future in-app harness configuration. That harness needs its own provider capabilities, authentication, scoped roots, C-08 ApprovalGrants and C-04 tool receipts. Developer configuration can supply integration evidence, but it cannot become the product's authorization database or a universal context limit.
+This subsystem owns project instruction loading, skill discovery, developer-client settings, MCP connection definitions, configuration provenance and version checks. It does not define the hosted service's runtime configuration. The Rust server and agent crate need their own provider capabilities, account authentication, tenant-scoped roots, secret store references, C-08 ApprovalGrants and C-04 tool receipts. Developer configuration can supply integration evidence, but it cannot become the product's authorization database or a universal context limit.
 
 The extracted `hoi4-factory/` folder is the working project root, with client files already in place and documentation under `docs/`. S01 verifies and adapts those files in place. Adoption into a different existing repository uses a reviewable merge that preserves team configuration. Extraction does not install tools, trust a directory, connect remote services or modify global client settings. Once a user authorizes a concrete bounded bootstrap stage, normal inspections and reversible in-scope edits proceed without redundant confirmation.
+
+## Product build and container environment
+
+The product is a Rust Cargo workspace for the server and agent crate plus a React and TypeScript browser client, built into Docker images under [ADR-013](../02-architecture/maintainer-decisions-2026-10-24.md#adr-013-docker-deployment). The developer environment therefore pins the Rust toolchain through a toolchain file, commits `Cargo.lock` and the frontend lockfile, and pins base images by digest. Local development runs the same images through Docker Compose with PostgreSQL, an object store or volume, a Git volume and a read-only game reference mount supplied by the developer.
+
+Development configuration is separate from production configuration. A Compose override for development may expose debugging ports and seed fixture accounts. It never contains real provider keys, GitHub App private keys or game files. Those are supplied at run time from the developer's own secret source and are excluded from Git by ignore rules and from images by the build context exclusions.
+
+The environment inventory records Rust, Cargo, Node and the frontend package manager, Docker Engine and Compose versions, the container runtime, and whether a game reference build is available to the developer. A developer without a game copy can still run source-only fixtures, with game-dependent checks reported unavailable.
 
 ## Verified source and compatibility findings
 
@@ -32,7 +40,7 @@ Every mapping row records source path and revision, key, observed value category
 
 ## Operations and state transitions
 
-`inspect_environment` receives the repository root and approved stage. It returns a nonsecret inventory of OS, architecture, executable paths relative to the selected environment, versions, current branch and dirtiness, loaded guidance, available skills and effective configuration sources. It never dumps credential environment variables. Missing optional tools are unavailable capabilities, not an automatic project failure.
+`inspect_environment` receives the repository root and approved stage. It returns a nonsecret inventory of OS, architecture, executable paths relative to the selected environment, versions including Rust, Docker and Compose, current branch and dirtiness, loaded guidance, available skills and effective configuration sources. It never dumps credential environment variables. Missing optional tools are unavailable capabilities, not an automatic project failure.
 
 `plan_config_merge` receives current project settings, the pinned starter and the field map. It produces a diff classified as preserved, adapted, added, removed or locally unresolved. It detects conflicting keys, broadened permissions and existing instruction ownership. A schema mismatch or unsupported field blocks that setting's activation, while unrelated checks may continue. A merge must not replace a whole file merely because it parses.
 
@@ -40,7 +48,7 @@ Every mapping row records source path and revision, key, observed value category
 
 `activate_connection` starts from a reviewed dependency and exact connection definition. The owner confirms installation, auth source, data destination, cost implications, resolved workspace and allowed effects. Activation changes only the chosen project connection and records the previous configuration. A harmless capability inventory precedes any domain operation. A timeout with uncertain effects enters reconciliation, not blind retry. Deactivation restores the disabled state without deleting evidence.
 
-`upgrade_environment` records old and new versions, compatibility claims, schema changes, meaningful regression cases and rollback. A model change also rechecks actual context and tool capabilities. An accepted engineering knowledge change updates setup instructions and the changelog. No upgrade silently alters user-level configuration or approved game design.
+`upgrade_environment` records old and new versions, including base image digests and the Rust toolchain, compatibility claims, schema changes, meaningful regression cases and rollback. A model change also rechecks actual context and tool capabilities. An accepted engineering knowledge change updates setup instructions and the changelog. No upgrade silently alters user-level configuration or approved game design.
 
 ## Tests, evidence and failure recovery
 
@@ -52,8 +60,8 @@ Recovery tests interrupt activation, change the server binary after validation, 
 
 This planning package can perform syntax, known-shape, path and mirror checks. Neither developer client, a full schema engine nor the MCP services are available here. Accordingly live client loading, actual server inventory, OS containment and context measurements remain explicit S01 experiments. The source projection comparison that did run is not described as the upstream test suite or a client integration test.
 
-Run `python scripts/validate_package.py --root . --working-tree` from the project root during development, and `python scripts/sync_skills.py --check` for deterministic skill projections. The validator's default mode is the frozen distribution check against `docs/MANIFEST.json`. Working-tree mode skips distribution hashes and permits later evidence, Git metadata and product files while preserving authored planning and guidance checks. Product checks remain the approved stage's responsibility.
+Run `python scripts/validate_package.py --root . --working-tree` from the project root during development, and `python scripts/sync_skills.py --check` for deterministic skill projections. The validator needs Python 3.11 or newer. On Windows with a non-UTF-8 locale, set `PYTHONUTF8=1`, as observed on 2026-10-24 when the default code page failed to decode the package text. The validator's default mode is the frozen distribution check against `docs/MANIFEST.json`. Working-tree mode skips distribution hashes and permits later evidence, Git metadata and product files while preserving authored planning and guidance checks. Product checks remain the approved stage's responsibility.
 
 ## Ownership and roadmap
 
-S01 owns environment adoption and EXP-01 through EXP-04 as bounded by its stage packet. A failed critical architectural probe must be resolved or explicitly change the decision before production work proceeds. S02 and S03 add only the tools required for setup and native runtime integration. S08 reviews version pins, licenses, stale settings, optional client support and rollback documentation. The developer environment maintainer owns configuration integrity, the security owner reviews broadened effects, and the product architecture owner decides changes to the future runtime contract.
+S01 owns environment adoption and EXP-01 through EXP-04 as bounded by its stage packet. A failed critical architectural probe must be resolved or explicitly change the decision before production work proceeds. S02 and S03 add only the tools required for setup and native runtime integration. S08 reviews version pins, image digests, licenses, stale settings, optional client support and rollback documentation. The developer environment maintainer owns configuration integrity, the security owner reviews broadened effects, and the product architecture owner decides changes to the future runtime contract.

@@ -2,7 +2,7 @@
   {
     "id": "REQ-001",
     "title": "Independent native product",
-    "requirement": "End users run the factory without Claude Code, Codex or another coding CLI.",
+    "requirement": "End users use the hosted factory in a browser without Claude Code, Codex or another coding CLI, and the service invokes none.",
     "spec": "SPEC-002",
     "spec_file": "../03-subsystem-specs/002-native-runtime-and-models.md",
     "stage": "S03",
@@ -12,7 +12,7 @@
   {
     "id": "REQ-002",
     "title": "Provider capability negotiation",
-    "requirement": "API and local profiles declare and probe streaming, tools, structured output, images, context and cancellation.",
+    "requirement": "API profiles and any server-reachable OpenAI-compatible endpoint declare and probe streaming, tools, structured output, images, context and cancellation.",
     "spec": "SPEC-002",
     "spec_file": "../03-subsystem-specs/002-native-runtime-and-models.md",
     "stage": "S03",
@@ -22,7 +22,7 @@
   {
     "id": "REQ-003",
     "title": "Authentication, cost and fallback",
-    "requirement": "Credentials stay local, subscription access is not assumed, budgets stop new work and fallback respects data destinations.",
+    "requirement": "User API keys and GitHub tokens stay in the server secret store and out of artifacts, subscription access is not assumed, per-user budgets and the operator credit allowance stop new work, and fallback respects data destinations.",
     "spec": "SPEC-002",
     "spec_file": "../03-subsystem-specs/002-native-runtime-and-models.md",
     "stage": "S03",
@@ -52,7 +52,7 @@
   {
     "id": "REQ-006",
     "title": "Preserve existing content",
-    "requirement": "Keep source, binary assets, Git state and existing instruction files unless an exact reviewed change authorizes replacement.",
+    "requirement": "Keep source, binary assets, Git history and existing instruction files of uploaded and GitHub-imported mods unless an exact reviewed change authorizes replacement.",
     "spec": "SPEC-001",
     "spec_file": "../03-subsystem-specs/001-onboarding-and-mod-setup.md",
     "stage": "S02",
@@ -62,7 +62,7 @@
   {
     "id": "REQ-007",
     "title": "Validated workspace handoff",
-    "requirement": "Pass resolved roots, version closure, capabilities, setup receipt and unresolved checks into the editor and native agent.",
+    "requirement": "Pass resolved server workspace roots, version closure, game reference build, capabilities, setup receipt and unresolved checks into the editor and native agent.",
     "spec": "SPEC-001",
     "spec_file": "../03-subsystem-specs/001-onboarding-and-mod-setup.md",
     "stage": "S02",
@@ -202,7 +202,7 @@
   {
     "id": "REQ-021",
     "title": "Git isolation",
-    "requirement": "Give write tasks owned worktrees or branches and preserve the user's staged and unstaged work.",
+    "requirement": "Give write tasks owned worktrees or branches in the server workspace and preserve collaborators' uncommitted work.",
     "spec": "SPEC-005",
     "spec_file": "../03-subsystem-specs/005-git-collaboration-and-review.md",
     "stage": "S02",
@@ -262,7 +262,7 @@
   {
     "id": "REQ-027",
     "title": "Game and DLC compatibility",
-    "requirement": "Record local game build, DLC and ordered content roots, with unknown compatibility and stale caches visible.",
+    "requirement": "Record the server game reference build, DLC set and ordered content roots, warn when a mod targets another game version, and keep unknown compatibility and stale caches visible.",
     "spec": "SPEC-006",
     "spec_file": "../03-subsystem-specs/006-hoi4-tools-and-validation.md",
     "stage": "S02",
@@ -332,7 +332,7 @@
   {
     "id": "REQ-034",
     "title": "Licensing and distribution",
-    "requirement": "Separate code licensing, game rights, provider terms, private data and redistribution decisions, with a reproducible local deployment.",
+    "requirement": "Separate the AGPL-3.0 code license, game rights, provider terms, private data and redistribution decisions, with reproducible pinned Docker images.",
     "spec": "SPEC-011",
     "spec_file": "../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md",
     "stage": "S08",
@@ -342,7 +342,7 @@
   {
     "id": "REQ-035",
     "title": "Contributor collaboration",
-    "requirement": "Support attributable lore, art, maps and scripting contributions with Git review first and explicit later hosted collaboration.",
+    "requirement": "Support attributable lore, art, maps and scripting contributions through invited project collaborators and GitHub pull requests, with Git review first.",
     "spec": "SPEC-005",
     "spec_file": "../03-subsystem-specs/005-git-collaboration-and-review.md",
     "stage": "S06",
@@ -402,7 +402,7 @@
   {
     "id": "REQ-041",
     "title": "Evaluation matrix",
-    "requirement": "Plan all required scenarios across two API providers and one local configuration, measuring accepted output, rework, failures, time and cost.",
+    "requirement": "Plan all required scenarios across two API providers and one self-hosted OpenAI-compatible endpoint, measuring accepted output, rework, failures, time and cost.",
     "spec": "SPEC-002",
     "spec_file": "../03-subsystem-specs/002-native-runtime-and-models.md",
     "stage": "S08",
@@ -432,7 +432,7 @@
   {
     "id": "REQ-044",
     "title": "Editable export and escape hatch",
-    "requirement": "Allow the mod to be edited and continued outside the factory, with valid native files and no proprietary source lock-in.",
+    "requirement": "Allow the mod to be downloaded, cloned or pushed to GitHub and continued outside the factory, with valid native files and no proprietary source lock-in.",
     "spec": "SPEC-007",
     "spec_file": "../03-subsystem-specs/007-visual-state-synchronization.md",
     "stage": "S04",
@@ -448,5 +448,35 @@
     "stage": "S01",
     "stage_file": "../04-implementation-stages/stage-01-bootstrap-and-probes.md",
     "acceptance": "AC-045"
+  },
+  {
+    "id": "REQ-046",
+    "title": "Accounts and tenant isolation",
+    "requirement": "Public sign-up through GitHub or email, per-account and per-project isolation of workspaces, agent runs, secrets and budgets, project roles for invited collaborators, and abuse and rate limits.",
+    "spec": "SPEC-011",
+    "spec_file": "../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md",
+    "stage": "S02",
+    "stage_file": "../04-implementation-stages/stage-02-onboarding-and-workspaces.md",
+    "acceptance": "AC-046"
+  },
+  {
+    "id": "REQ-047",
+    "title": "GitHub integration",
+    "requirement": "Connect selected repositories, import a mod from GitHub, upload a mod without a repository, push owned branches, open pull requests and create repositories, each separately authorized and reconciled.",
+    "spec": "SPEC-005",
+    "spec_file": "../03-subsystem-specs/005-git-collaboration-and-review.md",
+    "stage": "S02",
+    "stage_file": "../04-implementation-stages/stage-02-onboarding-and-workspaces.md",
+    "acceptance": "AC-047"
+  },
+  {
+    "id": "REQ-048",
+    "title": "Server game reference",
+    "requirement": "A read-only full game copy, latest build with all DLC, used for validation and previews, never exported or baked into images, with the rights review completed before public exposure.",
+    "spec": "SPEC-006",
+    "spec_file": "../03-subsystem-specs/006-hoi4-tools-and-validation.md",
+    "stage": "S02",
+    "stage_file": "../04-implementation-stages/stage-02-onboarding-and-workspaces.md",
+    "acceptance": "AC-048"
   }
 ]
