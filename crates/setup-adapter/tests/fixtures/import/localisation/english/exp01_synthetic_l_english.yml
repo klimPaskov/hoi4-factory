@@ -1,0 +1,4 @@
+l_english:
+ EXP01_harbor_survey:0 "Survey the Harbors"
+ EXP01_harbor_survey_desc:0 "Synthetic fixture text with a non-ASCII mark: café."
+ EXP01_coastal_rail:0 "Coastal Rail Link"
