@@ -1,0 +1,17 @@
+[package]
+name = "factory-game-ref"
+description = "HOI4 Factory server game reference. Reads identity metadata of a read-only game directory and nothing else."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
