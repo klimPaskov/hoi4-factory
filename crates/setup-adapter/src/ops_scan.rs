@@ -126,6 +126,7 @@ impl SetupAdapter {
         let before_hash = before.as_ref().map(|i| i.content_hash());
         let after_hash = after.as_ref().map(|i| i.content_hash());
 
+        SetupAdapter::note_scan(active, &scan);
         let raw = serde_json::to_value(&scan).map_err(|e| SetupError::Internal(e.to_string()))?;
         let scan_sha256 = sha256_json(&raw);
         let redacted_value = active.redactor.value(&raw);

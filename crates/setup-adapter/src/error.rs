@@ -88,6 +88,9 @@ pub enum SetupError {
     /// What the caller reviewed is no longer what exists.
     #[error("{message}")]
     Stale { code: &'static str, message: String },
+    /// A value the person entered cannot be used. `field` names it for the form.
+    #[error("{message}")]
+    InvalidValues { field: &'static str, message: String },
     /// Setup itself refused or failed.
     #[error("setup {}: {message}", kind.as_str())]
     Native { kind: NativeKind, message: String },
@@ -123,6 +126,7 @@ impl SetupError {
             Self::RecoveryRequired { .. } => "recovery_required",
             Self::ApplyInterrupted { .. } => "apply_interrupted",
             Self::Precondition { code, .. } | Self::Stale { code, .. } => code,
+            Self::InvalidValues { .. } => "invalid_request",
             Self::Native { .. } => "setup_refused",
             Self::Model(_) => "analysis_model_failed",
             Self::ReadOnlyViolated(_) => "read_only_violated",
@@ -144,7 +148,7 @@ impl SetupError {
             Self::ApplyInterrupted { .. } => RetryClass::ReconcileFirst,
             Self::Precondition { .. } => RetryClass::RefreshPreconditions,
             Self::Stale { .. } => RetryClass::RefreshPreconditions,
-            Self::Native { .. } => RetryClass::Terminal,
+            Self::Native { .. } | Self::InvalidValues { .. } => RetryClass::Terminal,
             Self::Model(_) => RetryClass::SafeSameInputs,
             Self::ReadOnlyViolated(_) => RetryClass::ReconcileFirst,
             Self::IdempotencyReplay { .. } => RetryClass::ReconcileFirst,
@@ -206,7 +210,9 @@ impl From<SetupError> for ApiError {
             | SetupError::Precondition { .. }
             | SetupError::Stale { .. }
             | SetupError::Workspace(_) => (StatusCode::CONFLICT, err.to_string()),
-            SetupError::Native { .. } => (StatusCode::UNPROCESSABLE_ENTITY, err.to_string()),
+            SetupError::Native { .. } | SetupError::InvalidValues { .. } => {
+                (StatusCode::UNPROCESSABLE_ENTITY, err.to_string())
+            }
             SetupError::Model(_) => (StatusCode::BAD_GATEWAY, err.to_string()),
             SetupError::ReadOnlyViolated(_) | SetupError::UnknownEffect(_) => {
                 (StatusCode::INTERNAL_SERVER_ERROR, err.to_string())
@@ -226,6 +232,7 @@ impl From<SetupError> for ApiError {
             SetupError::IdempotencyReplay { receipt_id } => {
                 out = out.with_id("receipt_id", receipt_id)
             }
+            SetupError::InvalidValues { field, .. } => out = out.with_id("field", field),
             _ => {}
         }
         out

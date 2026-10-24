@@ -40,6 +40,9 @@ tracing-subscriber = { version = "0.3", default-features = false, features = ["s
 url = "2"
 
 [dev-dependencies]
+# The gate tests drive Setup's transaction engine and plan builder directly (fault injection, a
+# child process that applies), next to the HTTP flow.
+hoi4-mod-setup.workspace = true
 http-body-util = "0.1"
 # The GitHub test double and the raw ZIP writer are the intake crate's own test support
 # (crates/intake/tests/common), included by path; these are the crates it needs.

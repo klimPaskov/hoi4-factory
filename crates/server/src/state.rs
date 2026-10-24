@@ -1,13 +1,12 @@
 //! Shared state of the running server.
 
-use std::collections::HashMap;
 use std::path::PathBuf;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 
 use axum::extract::FromRef;
 use factory_accounts::{AccountsState, Database};
 use factory_intake::{IntakeLimits, IntakeService};
-use factory_setup_adapter::{OnboardingSessionId, SetupAdapter};
+use factory_setup_adapter::SetupAdapter;
 use factory_workspace::StorageRoot;
 
 use crate::game_reference::GameReferenceHandle;
@@ -38,24 +37,12 @@ pub struct IntakeState {
     pub incoming_dir: PathBuf,
 }
 
-/// The onboarding session of one account on one project, as the scan route opened it.
-#[derive(Debug, Clone)]
-pub struct ActiveSetup {
-    pub session: OnboardingSessionId,
-    /// `create` or `existing`, as the scan was asked for.
-    pub mode: String,
-    /// The brief of a new mod. Kept for the analysis step.
-    pub description: Option<String>,
-}
-
-/// The Setup adapter and the registry of live onboarding sessions. The adapter keeps the Setup
-/// gates of a session in memory, so a restart ends every session: the next scan opens a new one.
+/// The Setup adapter. It keeps the Setup gates of every onboarding session in memory and the
+/// session rows in PostgreSQL, so a restart ends the in-memory sessions and the routes answer
+/// `setup_session_expired` for them (see `setup_api`).
 #[derive(Clone)]
 pub struct SetupState {
     pub adapter: SetupAdapter,
-    pub sessions: Arc<
-        Mutex<HashMap<(factory_accounts::AccountId, factory_accounts::ProjectId), ActiveSetup>>,
-    >,
 }
 
 /// Everything a handler can reach. Cloning shares the underlying pools and handles.

@@ -242,6 +242,15 @@ pub struct ScanRow {
     pub created_at: DateTime<Utc>,
 }
 
+/// A session row as the database holds it.
+#[derive(Debug, Clone)]
+pub struct SessionRow {
+    pub id: Uuid,
+    pub mod_root: String,
+    pub client_state: Value,
+    pub opened_at: DateTime<Utc>,
+}
+
 /// An analysis row to insert.
 pub struct AnalysisInsert {
     pub id: Uuid,
@@ -470,6 +479,56 @@ impl Store {
         .bind(id)
         .bind(scope.project.0)
         .bind(self.now())
+        .execute(&mut *tx)
+        .await?;
+        tx.commit().await?;
+        Ok(())
+    }
+
+    /// The newest session this actor left open on the project, as the database holds it. After a
+    /// restart the row exists but the facade session does not (see [`SessionRow`]).
+    pub async fn latest_open_session(
+        &self,
+        scope: &Scope,
+    ) -> Result<Option<SessionRow>, SetupError> {
+        let mut tx = self.db.scoped(scope.actor).begin().await?;
+        let row = sqlx::query(
+            "SELECT id, mod_root, client_state, opened_at FROM setup_sessions
+             WHERE project_id = $1 AND opened_by_account_id = $2 AND state = 'open'
+             ORDER BY opened_at DESC LIMIT 1",
+        )
+        .bind(scope.project.0)
+        .bind(scope.actor.0)
+        .fetch_optional(&mut *tx)
+        .await?;
+        tx.commit().await?;
+        row.map(|r| {
+            Ok(SessionRow {
+                id: r.try_get("id")?,
+                mod_root: r.try_get("mod_root")?,
+                client_state: r.try_get("client_state")?,
+                opened_at: r.try_get("opened_at")?,
+            })
+        })
+        .transpose()
+        .map_err(|e: sqlx::Error| e.into())
+    }
+
+    /// Replaces the bounded, non-secret intent kept with the session.
+    pub async fn update_session_state(
+        &self,
+        scope: &Scope,
+        id: Uuid,
+        client_state: &Value,
+    ) -> Result<(), SetupError> {
+        let mut tx = self.db.scoped(scope.actor).begin().await?;
+        sqlx::query(
+            "UPDATE setup_sessions SET client_state = $3
+             WHERE id = $1 AND project_id = $2 AND state = 'open'",
+        )
+        .bind(id)
+        .bind(scope.project.0)
+        .bind(client_state)
         .execute(&mut *tx)
         .await?;
         tx.commit().await?;

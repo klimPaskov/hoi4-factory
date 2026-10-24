@@ -28,6 +28,7 @@ mod migrate;
 mod model;
 mod ops_apply;
 mod ops_plan;
+mod ops_review;
 mod ops_scan;
 mod pin;
 mod recovery;
@@ -36,7 +37,7 @@ mod store;
 mod views;
 mod workspace_view;
 
-pub use adapter::{STATE_DIR_NAME, SetupAdapter, SetupAdapterDeps};
+pub use adapter::{AnalysisRoute, STATE_DIR_NAME, SetupAdapter, SetupAdapterDeps};
 pub use error::{NativeKind, SetupError};
 pub use ids::{
     AccountId, AnalysisId, JournalId, OnboardingSessionId, OpContext, PlanId, ProjectId, ReceiptId,
@@ -49,6 +50,11 @@ pub use model::{
     analysis_contract, json_object_from_text, strip_schema_keywords,
 };
 pub use ops_scan::confirmation_values;
+pub use ops_review::{
+    ConfirmedView, EvidenceCandidate, EvidenceCandidates, ProposalView, RecommendationView,
+    ReviewConventions, ReviewDefaults, ReviewDraft, ReviewIdentity, ReviewSnapshot, ReviewValues,
+    SetupMode, SourceSummary, values_from_analysis,
+};
 pub use pin::{SETUP_PIN, SetupPin};
 pub use recovery::{RecoveryVariant, RecoveryView, classify as classify_recovery, journal_sha256};
 pub use redact::Redactor;
@@ -65,10 +71,14 @@ pub use views::{
 
 /// Re-exports the server needs to implement the traits this crate takes.
 pub mod setup {
+    pub use hoi4_mod_setup::AppError;
     pub use hoi4_mod_setup::credentials::{CredentialStore, DeniedCredentialStore};
     pub use hoi4_mod_setup::models::CredentialReference;
     pub use hoi4_mod_setup::service::{
-        BuiltPlan, NodeRuntime, PlanBuilder, PlanRequest, RecoveryAction, root_identity,
+        BuiltPlan, DefaultPlanBuilder, NodeRuntime, PlanBuilder, PlanRequest, RecoveryAction,
+        root_identity,
     };
-    pub use hoi4_mod_setup::source::SourceResolution;
+    pub use hoi4_mod_setup::source::{
+        HttpSourceClient, SourceFetcher, SourceRequest, SourceResolution, resolve_source,
+    };
 }

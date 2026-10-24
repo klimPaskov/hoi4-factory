@@ -62,8 +62,13 @@ impl SetupAdapter {
             return Err(SetupError::CapabilityUnavailable {
                 capability: "plan_builder",
                 reason: format!(
-                    "no PlanBuilder is configured: Setup revision {} ships no default builder (its extraction pull request is not merged) and the host injected none",
-                    crate::pin::SETUP_PIN.short()
+                    "no PlanBuilder is configured: the host injected none (Setup revision {}{})",
+                    crate::pin::SETUP_PIN.short(),
+                    if crate::pin::SETUP_PIN.default_plan_builder {
+                        ""
+                    } else {
+                        ", which ships no default builder"
+                    }
                 ),
             });
         }
