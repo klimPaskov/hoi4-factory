@@ -1,0 +1,54 @@
+{
+  "task": "Upstream source-preservation fixes for HOI4 Factory S01 EXP-02 findings 3 and 4",
+  "repository": "klimPaskov/hoi4-agent-tools",
+  "pullRequest": "https://github.com/klimPaskov/hoi4-agent-tools/pull/42",
+  "branch": "fix/source-preservation-guards",
+  "commit": "b3813b9ba895fd63f7de5e24474b9af2062751e0",
+  "baseCommit": "602a6b8 (origin/main at the time; S01 pin was 25f5641)",
+  "evidenceReport": "https://github.com/klimPaskov/hoi4-factory/blob/main/evidence/S01/exp02/report.md",
+  "currentMainAlreadyFixed": {
+    "invalidUtf8Windows1252Rewrite": false,
+    "staleSemanticFocusRewrite": false,
+    "basis": "git diff 25f5641..origin/main shows no change under src/hoi4_agent_tools/focus, core/source or mcp; encoding.ts and the plan-authority call sites are unchanged; the new regression tests fail on origin/main sources"
+  },
+  "fixes": {
+    "defect1": "decodeSource records Windows-1252 bytes that do not round-trip (0x81 0x8D 0x8F 0x90 0x9D). Reads add warning SOURCE_ENCODING_NOT_ROUND_TRIPPABLE; every rewrite (applyReplacements, map encodeTextDocument) is refused with the same code; encodeSource also refuses U+FFFD for windows-1252.",
+    "defect2": "hoi4.focus_rewrite (national and continuous) passes onSemanticSourceDrift=refuse and fails with FOCUS_SOURCE_CHANGED_SINCE_PLAN when the source changed in meaning since the plan was imported (including a removed tree). Formatting-only changes and a source equal to the plan still apply. No override and no public schema change; library callers keep the old default."
+  },
+  "docker": {
+    "image": "node:22-bookworm-slim",
+    "imageDigest": "sha256:53ada149d435c38b14476cb57e4a7da73c15595aba79bd6971b547ceb6d018bf",
+    "runtime": "Debian 12.14, Node v22.23.1, npm 10.9.8",
+    "install": "npm ci from npm-shrinkwrap.json inside the container; git 2.39.5 installed in the container only for the fixtures:check and schemas:check steps",
+    "hostNpm": "none; nothing installed or built on the Windows host",
+    "container": "hoi4at, created by this task, stopped and removed after the work"
+  },
+  "tests": {
+    "newFiles": [
+      "tests/unit/source-encoding-guards.test.ts (11 tests)",
+      "tests/unit/focus-source-drift-guard.test.ts (4 tests)",
+      "tests/integration/mcp-focus-source-guards.test.ts (9 tests)"
+    ],
+    "newTestsOnFinalTree": "24 of 24 passed",
+    "newTestsOnBaseSources": "integration file: 6 of 9 failed (stale semantic edit and the five byte cases); the 3 passing are controls (re-inspect then edit, formatting-only change, valid Windows-1252)",
+    "checks": {
+      "prettier --check": "pass",
+      "eslint .": "pass",
+      "tsc typecheck": "pass",
+      "fixtures:check": "pass (no generated drift)",
+      "schemas:check": "pass (no generated drift)",
+      "build": "pass",
+      "pack:check": "pass",
+      "registry:validate": "pass",
+      "vitest shard 1/8": "26 of 26 files passed",
+      "vitest shards 2/8 3/8 4/8": "exit 0"
+    },
+    "shards5to8": "each shard had one failing file under heavy host load; individual re-runs: mcp-map-jobs, mcp-technology-jobs pass; package-install passes when the checkout path is not /work; mcp-event-jobs 'finishes a persisted job after its real launcher exits' fails identically on unmodified origin/main in the same container (PID 1 sleep does not reap the killed worker)"
+  },
+  "limitations": [
+    "Final tree was not run as one uninterrupted npm run check: the docker engine hung mid-run and was restarted by the maintainer, so checks ran in pieces (results above).",
+    "Shards 5 to 8 were not re-run whole; failing files were re-run individually, and one failure is a container artifact also present on origin/main.",
+    "Semantic drift is detected by comparing the current source import with the plan's imported baseline hash; sources the importer cannot model (unmodelled keys are raw passthrough) may be classified as formatting-only.",
+    "No game run; synthetic fixtures only. PR is open and unmerged."
+  ]
+}
