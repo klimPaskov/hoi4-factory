@@ -27,6 +27,8 @@ flowchart TD
 | [S07](stage-07-maps-and-structured-import.md) | Map inspection, bounded structured import and one supported source-preserving edit | S05, plus S06 only for reused content facilities | Expanded map scope, deferrable by review |
 | [S08](stage-08-packaging-and-pilot.md) | Docker deployment on staging, tenant and security validation, backup and upgrade, provider comparison, rights and license gate, observed pilot | S04, S05, S06, and S07 unless explicitly deferred | Reviewable public release decision |
 
+**UI design track (ADR-025).** Between S03 and S04, a separate interactive session redesigns the browser client. The maintainer picks each page's design from working variants in a development-only design lab. It is not a numbered stage and has no exit gates beyond the maintainer's choices and passing client checks. Its goal prompt is [GOAL-UI](../06-agent-handoffs/GOAL-UI.md). Later stages use the resulting design system and send new pages through the same loop.
+
 Every stage contains six work packets with conceptual owners, deliverables, dependencies, explicit non-goals and evidence gates. There are 48 packets in this baseline. Owners describe responsibilities. They are not a prescription to run 48 agents.
 
 ## Smallest credible product

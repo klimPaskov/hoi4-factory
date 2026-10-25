@@ -87,6 +87,7 @@ One limit stays: a guidance or skill edit must never widen authority, access roo
 | `capture-engineering-lessons` | Agent, at every handoff | Record lessons and update guidance |
 | `production-readiness-review` | Agent, at handoffs | Suggest proportionate, low-friction hardening |
 | `delegate-parallel-work` | Agent, when splitting work | Worktrees, subagent briefs, merging and cleanup |
+| `ui-design-iteration` | Agent, for any client page design | Working variants in the design lab, the maintainer chooses, then implement |
 
 ## Client notes
 

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "version": "0.1.1",
   "generator": "scripts/sync_skills.py",
-  "metadata_sha256": "fc0fbdf101ea2faf0d39b2d116423c9918ef982d21c3bb25f705106e53076c96",
+  "metadata_sha256": "5a09b03fe39638f4c5396acd209d18efa3a985cbcf36d4bb0d645bad88928a20",
   "scope": "Only these repository projections. No personal installation.",
   "skills": [
     {
@@ -137,6 +137,33 @@
         {
           "path": ".agents/skills/start-implementation-stage/agents/openai.yaml",
           "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94"
+        }
+      ]
+    },
+    {
+      "name": "ui-design-iteration",
+      "source": "docs/07-developer-workflow/skill-workflows/ui-design-iteration/BODY.md",
+      "body_sha256": "c4a27c3f98216fda74944c2e4a9fe4383354dc5222bcf48eef3900ae794fcc6b",
+      "generated": [
+        {
+          "path": ".claude/skills/ui-design-iteration/SKILL.md",
+          "sha256": "9d9de0ad833ea6b81f75f177248e8d429a88306e306695ad970fe7604aac72be"
+        },
+        {
+          "path": ".codex/skills/ui-design-iteration/SKILL.md",
+          "sha256": "9d9de0ad833ea6b81f75f177248e8d429a88306e306695ad970fe7604aac72be"
+        },
+        {
+          "path": ".codex/skills/ui-design-iteration/agents/openai.yaml",
+          "sha256": "8619a54e8c098122a7f3881394f84ca89b684366e848233a29ad18b6ec363935"
+        },
+        {
+          "path": ".agents/skills/ui-design-iteration/SKILL.md",
+          "sha256": "9d9de0ad833ea6b81f75f177248e8d429a88306e306695ad970fe7604aac72be"
+        },
+        {
+          "path": ".agents/skills/ui-design-iteration/agents/openai.yaml",
+          "sha256": "8619a54e8c098122a7f3881394f84ca89b684366e848233a29ad18b6ec363935"
         }
       ]
     },

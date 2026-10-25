@@ -24,6 +24,7 @@ EXPECTED_NAMES = {
     "audit-hoi4-integrations",
     "production-readiness-review",
     "delegate-parallel-work",
+    "ui-design-iteration",
 }
 CLIENTS = (".claude", ".codex", ".agents")
 # ADR-023: these workflows stay invocable only by the maintainer. The others run automatically.

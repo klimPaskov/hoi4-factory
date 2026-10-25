@@ -2,6 +2,13 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.3, 2026-10-25, UI design track
+
+- New skill `ui-design-iteration` for designing client pages from working variants that the maintainer chooses in a development-only design lab, by maintainer decision ADR-025. Generator, validator, CLAUDE.md and the instruction map list it.
+- New goal prompt [GOAL-UI](../06-agent-handoffs/GOAL-UI.md) for the interactive design session that runs after S03.
+
+Evidence: the maintainer's answers of 2026-10-25 recorded as ADR-025. Rollback: revert this commit and regenerate.
+
 ## 0.2.2, 2026-10-25, S02 handoff
 
 - New [developer setup guide](DEVELOPER-SETUP.md) for a fresh machine, with `.env.example` and a readiness checklist. CLAUDE.md links it.

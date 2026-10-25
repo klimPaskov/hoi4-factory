@@ -25,6 +25,10 @@
     {
       "name": "delegate-parallel-work",
       "description": "Use when a stage splits into independent packets for subagents. Create worktrees from the repository root, write self-contained briefs with owned paths and checks, pick Haiku or Sonnet by task, review and merge each branch into main, then remove its worktree and branch."
+    },
+    {
+      "name": "ui-design-iteration",
+      "description": "Use when a browser client page is designed or redesigned. Build three or four working variants in the development-only design lab, let the maintainer choose, implement the chosen one with i18n and accessibility intact, record the decision, and move to the next page."
     }
   ]
 }

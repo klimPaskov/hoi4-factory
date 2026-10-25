@@ -58,6 +58,7 @@ SKILLS = {
     "capture-engineering-lessons", "audit-hoi4-integrations",
     "production-readiness-review",
     "delegate-parallel-work",
+    "ui-design-iteration",
 }
 STAGE_SECTIONS = [
     "Objective and non-goals", "Entry conditions", "Read-first sequence and reuse",

@@ -25,7 +25,7 @@ cd hoi4-factory
 git config core.autocrlf false
 ```
 
-The clone contains everything tracked: code, evidence, the six skills under `.claude`, `.codex` and `.agents`, CLAUDE.md and its generated copy AGENTS.md. Nothing under `.work/` is tracked. It holds local clones, credentials and scratch output.
+The clone contains everything tracked: code, evidence, the seven skills under `.claude`, `.codex` and `.agents`, CLAUDE.md and its generated copy AGENTS.md. Nothing under `.work/` is tracked. It holds local clones, credentials and scratch output.
 
 ## 3. Create the local configuration
 
@@ -111,5 +111,5 @@ The machine is ready when all of these hold:
 - [ ] Signing up at http://127.0.0.1:8080, confirming the email from Mailpit and creating a project works
 - [ ] The package validator and `sync_skills.py --check` pass
 - [ ] The workspace Rust tests and the web checks pass
-- [ ] Claude Code, launched from the repository root, lists the six project skills
+- [ ] Claude Code, launched from the repository root, lists the seven project skills
 - [ ] You have read the latest stage handoff and its goal prompt in `docs/06-agent-handoffs/`
