@@ -1,0 +1,85 @@
+{
+  "anthropic_version": "2026-10-21",
+  "cancel_at_ms": null,
+  "captured_utc": "2026-10-24T11:22:52Z",
+  "chunk_sizes": [
+    25,
+    811,
+    150,
+    136,
+    73,
+    374
+  ],
+  "endpoint": "https://api.anthropic.com/v1/messages",
+  "events_at_cancel": null,
+  "evidence_kind": "live",
+  "model_reported": "claude-haiku-5-5",
+  "model_requested": "claude-haiku-5-5",
+  "name": "anthropic-text-turn",
+  "outcome": {
+    "ok": true,
+    "turn": {
+      "bytes": 1569,
+      "events": 9,
+      "finish_reason": "end_turn",
+      "model": "claude-haiku-5-5",
+      "provider": "anthropic-messages",
+      "response_id": "msg_011CgLyZR1xQBp3DwmiGTwkP",
+      "text": "Hearts of Iron IV script files use the `.txt` extension.",
+      "tool_calls": [],
+      "usage": {
+        "cached_input_tokens": 0,
+        "input_tokens": 37,
+        "output_tokens": 24,
+        "reasoning_tokens": 0
+      }
+    }
+  },
+  "provider": "anthropic-messages",
+  "redaction": "x-api-key is never recorded. Response headers other than status and content-type are dropped, including request-id and anthropic-organization-id. The body is byte-for-byte. Message IDs (msg_...) inside the body are kept because altering them would break byte fidelity, and they are not credentials.",
+  "request_body": {
+    "max_tokens": 60,
+    "messages": [
+      {
+        "content": "What file extension do Hearts of Iron IV script files use?",
+        "role": "user"
+      }
+    ],
+    "model": "claude-haiku-5-5",
+    "stream": true,
+    "system": "Answer in one short sentence.",
+    "thinking": {
+      "type": "disabled"
+    }
+  },
+  "response": {
+    "content_type": "text/event-stream; charset=utf-8",
+    "status": 200
+  },
+  "spend": {
+    "call": "anthropic-text-turn",
+    "estimate": {
+      "kind": "estimated",
+      "price": {
+        "cached_input_per_mtok": 0.01,
+        "input_per_mtok": 0.1,
+        "model_prefix": "claude-haiku-5-5",
+        "output_per_mtok": 0.5,
+        "retrieved": "2026-10-24",
+        "source": "https://platform.claude.com/docs/en/about-claude/pricing (Claude Haiku 5.5, prompts up to 100,000 tokens)"
+      },
+      "usage": {
+        "cached_input_tokens": 0,
+        "input_tokens": 37,
+        "output_tokens": 24,
+        "reasoning_tokens": 0
+      },
+      "usd": 0.0000157
+    },
+    "model": "claude-haiku-5-5"
+  },
+  "sse_bytes": 1569,
+  "sse_sha256": "cc061e0bc1151d0ad1727e806cbae8bb19a8bdf893ab7cdae924daf70c946e89",
+  "total_ms": 864.9281,
+  "ttfb_ms": 622.5455
+}
