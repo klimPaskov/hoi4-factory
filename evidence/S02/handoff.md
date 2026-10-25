@@ -35,7 +35,7 @@ HOI4-Mod-Setup, all merged into its main as `c28198bb9b4d3fd90cea294cf136cad357e
 - #107: a recovery dead end at finalization and an Anthropic schema rejection.
 - #108: a plan builder, and tests that no longer need a Windows-only Node runtime.
 
-The merges used `gh pr merge --squash --admin` only for the code-owner review rule, after every required check passed. hoi4-agent-tools #42 (source-preservation guards) was authorized for merging on 2026-10-25. Its branch was brought up to date with main (one changelog conflict, both entries kept) and was waiting for CI when this handoff was written. The merge result is recorded in the next commit.
+The merges used `gh pr merge --squash --admin` only for the code-owner review rule, after every required check passed. hoi4-agent-tools #42 (source-preservation guards) was merged on 2026-10-25 with the maintainer's authorization. Its branch was first brought up to date with main (one changelog conflict, both entries kept), then squash-merged after all five checks passed (container, and tests on Ubuntu and Windows with Node 22 and 24). The merge commit on its main is `731e64f5b5c964bd1b33adad9c085bd3168b1940`, with no admin override. The S01 Agent Tools pin `25f5641` lacks these guards. S03 and S04 pin `731e64f` or later.
 
 ## Changed artifacts
 
@@ -78,7 +78,6 @@ Model spend: live `claude-haiku-5-5` calls were used for the recorded fixtures, 
 Accepted decisions are in [scope.md](scope.md) and ADR-011 to ADR-024 in the [decision record](../../docs/02-architecture/maintainer-decisions-2026-10-24.md). Open items, none blocking:
 
 - The GitHub App email permission and installation scope ([maintainer questions](../maintainer-questions.md) 1 and 2).
-- The hoi4-agent-tools #42 merge, after CI. S04 pins the merged revision.
 - The maintainer's GitHub App changes (email permission, installation narrowed to the test repository) and deleting the old probe App and repositories.
 - RustSec advisories against `rustls-webpki` and the webpki root crates, which a version bump can address.
 - Per-route rate limits for upload and Setup routes (PR-098).

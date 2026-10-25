@@ -24,7 +24,7 @@ Recorded 2026-10-25. Under ADR-024 lessons were applied to CLAUDE.md and the ski
 
 ## Upstream defects found and fixed
 
-HOI4-Mod-Setup: placement temp files surviving rollback (#105), a recovery dead end at finalization and an Anthropic schema rejection (#107), and a test suite that depended on a Windows-only Node runtime (#108). hoi4-agent-tools: silent byte rewrites on invalid UTF-8 and stale-base reverts (#42, open).
+HOI4-Mod-Setup: placement temp files surviving rollback (#105), a recovery dead end at finalization and an Anthropic schema rejection (#107), and a test suite that depended on a Windows-only Node runtime (#108). hoi4-agent-tools: silent byte rewrites on invalid UTF-8 and stale-base reverts (#42, merged as `731e64f`).
 
 ## Open
 

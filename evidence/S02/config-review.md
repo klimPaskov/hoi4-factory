@@ -25,7 +25,7 @@ Server: `FACTORY_ENV`, `DATABASE_URL`, `DATABASE_MIGRATION_URL`, `FACTORY_LISTEN
 |---|---|
 | GitHub App HOI4 Factory Dev (ID 5453675) | Permissions: contents, issues and pull requests write, checks and statuses read, metadata. The email permission and the installation scope still need the maintainer (see [maintainer questions](../maintainer-questions.md)) |
 | HOI4-Mod-Setup | PRs #105, #106, #107 and #108 merged by the agent with the maintainer's authorization, using the admin override only for the code-owner review rule after all required checks passed |
-| hoi4-agent-tools | PR #42 authorized for merging on 2026-10-25, branch updated onto main, merge after CI |
+| hoi4-agent-tools | PR #42 squash-merged on 2026-10-25 as `731e64f5b5c964bd1b33adad9c085bd3168b1940` after all checks passed, with the maintainer's authorization |
 | Anthropic | `claude-haiku-5-5` used for live Setup analysis tests |
 
 ## Development client configuration
