@@ -29,7 +29,13 @@ The clone contains everything tracked: code, evidence, the seven skills under `.
 
 ## 3. Create the local configuration
 
-Three things never go into Git. Create them on each machine.
+Three things never go into Git. Create them on each machine. The quickest way is one command, which asks for each secret (paste it, or press Enter to keep a saved one), saves it in every place below, checks the Anthropic key with a free API call, then starts the stack and checks `/readyz`:
+
+```bash
+scripts/setup-local.sh
+```
+
+It never prints a secret, and running it again is safe. The rest of this section describes what it does.
 
 | Item | Where it goes | How to get it |
 |---|---|---|
