@@ -191,11 +191,13 @@ pub async fn create_task(conn: &mut PgConnection, new: NewTask) -> Result<Task, 
 }
 
 pub async fn get_task(conn: &mut PgConnection, id: TaskId) -> Result<Task, TaskError> {
-    let row = sqlx::query(&format!("SELECT {TASK_COLUMNS} FROM agent_tasks WHERE id = $1"))
-        .bind(id)
-        .fetch_optional(&mut *conn)
-        .await?
-        .ok_or(TaskError::NotFound)?;
+    let row = sqlx::query(&format!(
+        "SELECT {TASK_COLUMNS} FROM agent_tasks WHERE id = $1"
+    ))
+    .bind(id)
+    .fetch_optional(&mut *conn)
+    .await?
+    .ok_or(TaskError::NotFound)?;
     task_from_row(&row)
 }
 
@@ -333,7 +335,11 @@ pub async fn set_paused(
         id,
         EventDraft::new(
             actor,
-            if paused { "task_paused" } else { "task_resumed" },
+            if paused {
+                "task_paused"
+            } else {
+                "task_resumed"
+            },
             json!({"reason": reason, "state": task.state}),
         ),
     )

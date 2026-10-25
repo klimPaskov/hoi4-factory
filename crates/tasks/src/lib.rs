@@ -43,8 +43,8 @@ pub use context::{
     ContextBundle, ContextError, ContextInputs, Manifest, TokenBudget, build_context,
 };
 pub use enums::{
-    Actor, AttemptState, EffectClass, Funding, ParseEnumError, ReceiptStatus, RetryClass,
-    TaskMode, TaskState,
+    Actor, AttemptState, EffectClass, Funding, ParseEnumError, ReceiptStatus, RetryClass, TaskMode,
+    TaskState,
 };
 pub use error::TaskError;
 pub use events::{EventDraft, Gap, RunEvent, append_event, check_contiguous, events_after};

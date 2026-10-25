@@ -192,8 +192,8 @@ pub async fn admit_attempt(
              funding, user_key_id)
          SELECT $1, t.id, t.project_id, t.owner_account_id,
                 COALESCE((SELECT max(attempt_no) FROM agent_attempts WHERE task_id = t.id), 0) + 1,
-                'admitted', $2, $3, $4, $5, $6, $7, $8, $9, $10
-         FROM agent_tasks t WHERE t.id = $11
+                'admitted', $2, $3, $4, $5, $6, $7, $8, $9
+         FROM agent_tasks t WHERE t.id = $10
          RETURNING {ATTEMPT_COLUMNS}"
     ))
     .bind(id)

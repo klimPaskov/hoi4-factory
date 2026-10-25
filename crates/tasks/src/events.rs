@@ -103,15 +103,13 @@ pub struct Gap {
 
 /// Checks that `events` continue directly after `after_seq` with no gap, duplicate or reorder.
 pub fn check_contiguous(after_seq: i64, events: &[RunEvent]) -> Result<(), Gap> {
-    let mut expected = after_seq + 1;
-    for event in events {
+    for (expected, event) in (after_seq + 1..).zip(events) {
         if event.seq != expected {
             return Err(Gap {
                 expected,
                 found: event.seq,
             });
         }
-        expected += 1;
     }
     Ok(())
 }

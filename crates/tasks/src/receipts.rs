@@ -281,10 +281,7 @@ fn require_text(name: &str, value: &str, max: usize) -> Result<(), IntentError> 
 /// Records the intent of one operation, before its effect. Returns `Duplicate` with the existing
 /// intent when the task already recorded this idempotency key. Refused when the task is paused
 /// or the attempt is not `admitted`/`running`.
-pub async fn record_intent(
-    conn: &mut PgConnection,
-    new: NewIntent,
-) -> Result<Intent, IntentError> {
+pub async fn record_intent(conn: &mut PgConnection, new: NewIntent) -> Result<Intent, IntentError> {
     require_text("request_id", &new.request_id, 200)?;
     require_text("idempotency_key", &new.idempotency_key, 200)?;
     require_text("tool", &new.replay.tool, 200)?;
@@ -482,12 +479,8 @@ pub async fn mark_started(
     append_event(
         conn,
         receipt.task_id,
-        EventDraft::new(
-            Actor::Host,
-            "tool_started",
-            json!({"operation_id": op}),
-        )
-        .for_attempt(attempt),
+        EventDraft::new(Actor::Host, "tool_started", json!({"operation_id": op}))
+            .for_attempt(attempt),
     )
     .await?;
     Ok(receipt)
@@ -515,11 +508,13 @@ fn check_hash(name: &str, value: &Option<String>) -> Result<(), ReceiptError> {
 }
 
 async fn attempt_of(conn: &mut PgConnection, op: OperationId) -> Result<AttemptId, ReceiptError> {
-    sqlx::query_scalar::<_, AttemptId>("SELECT attempt_id FROM tool_intents WHERE operation_id = $1")
-        .bind(op)
-        .fetch_optional(&mut *conn)
-        .await?
-        .ok_or(ReceiptError::NotFound)
+    sqlx::query_scalar::<_, AttemptId>(
+        "SELECT attempt_id FROM tool_intents WHERE operation_id = $1",
+    )
+    .bind(op)
+    .fetch_optional(&mut *conn)
+    .await?
+    .ok_or(ReceiptError::NotFound)
 }
 
 async fn status_conflict(
@@ -730,9 +725,14 @@ pub async fn reconcile(
         return Err(ReceiptError::ReconcileByWorker);
     }
     if reconciliation.method.is_empty() || reconciliation.method.len() > 200 {
-        return Err(ReceiptError::Invalid("method must be 1 to 200 bytes".into()));
+        return Err(ReceiptError::Invalid(
+            "method must be 1 to 200 bytes".into(),
+        ));
     }
-    check_hash("observed_after_sha256", &reconciliation.observed_after_sha256)?;
+    check_hash(
+        "observed_after_sha256",
+        &reconciliation.observed_after_sha256,
+    )?;
     let attempt = attempt_of(conn, op).await?;
     let to = reconciliation.decision.status();
     let record = json!({

@@ -6,8 +6,6 @@ use std::str::FromStr;
 
 use serde::{Deserialize, Serialize};
 
-
-
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 #[error("unknown {kind} value {value:?}")]
 pub struct ParseEnumError {
@@ -295,10 +293,18 @@ mod tests {
             assert!(TaskState::ALL.iter().all(|to| !from.can_transition_to(*to)));
         }
         for from in AttemptState::ALL.iter().filter(|s| s.is_terminal()) {
-            assert!(AttemptState::ALL.iter().all(|to| !from.can_transition_to(*to)));
+            assert!(
+                AttemptState::ALL
+                    .iter()
+                    .all(|to| !from.can_transition_to(*to))
+            );
         }
         for from in [ReceiptStatus::Succeeded, ReceiptStatus::ReconciledApplied] {
-            assert!(ReceiptStatus::ALL.iter().all(|to| !from.can_transition_to(*to)));
+            assert!(
+                ReceiptStatus::ALL
+                    .iter()
+                    .all(|to| !from.can_transition_to(*to))
+            );
         }
     }
 

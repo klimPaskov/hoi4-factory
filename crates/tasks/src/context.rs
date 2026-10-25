@@ -11,8 +11,9 @@
 //! out is recorded in `manifest.omissions` with a reason.
 //!
 //! Priority of optional content, highest first: approved references, optional source locators
-//! (by their `priority`, then path), recent messages (newest first), completed receipt
-//! summaries. Lower priority content is dropped first because it is the most derived.
+//! (by their `priority`, then path), recent messages (a contiguous newest suffix), completed
+//! receipt summaries (only when every recent message fit). Lower priority content is dropped
+//! first because it is the most derived.
 //!
 //! Token counts are estimates: `ceil(bytes / 4)` of each item's canonical JSON. The manifest says
 //! so. The bundle has no field for credential values or provider-private reasoning, so it
@@ -311,7 +312,9 @@ fn validate_locator(l: &SourceLocator) -> Result<(), ContextError> {
     if l.path.is_empty()
         || l.path.starts_with('/')
         || l.path.contains('\\')
-        || l.path.split('/').any(|s| s.is_empty() || s == "." || s == "..")
+        || l.path
+            .split('/')
+            .any(|s| s.is_empty() || s == "." || s == "..")
     {
         return bad("the path must be relative with forward slashes and no . or .. segment");
     }
@@ -394,7 +397,12 @@ pub fn build_context_with_id(
             reason,
         });
     };
-    mandatory(ItemKind::Scope, "scope".into(), estimate_tokens(&scope), String::new());
+    mandatory(
+        ItemKind::Scope,
+        "scope".into(),
+        estimate_tokens(&scope),
+        String::new(),
+    );
     mandatory(
         ItemKind::SafetyConstraints,
         "safety_constraints".into(),
@@ -529,11 +537,14 @@ pub fn build_context_with_id(
         }
     }
 
-    // Messages: newest first so the oldest are dropped first, restored to conversation order.
+    // Messages: newest first so the oldest are dropped first. The kept messages are one
+    // contiguous recent suffix (a conversation with a hole in the middle misleads), so the first
+    // message that does not fit ends the walk.
     let mut messages_out: Vec<(usize, VisibleMessage)> = Vec::new();
+    let mut messages_dropped = false;
     for (index, m) in recent_messages.into_iter().enumerate().rev() {
         let tokens = estimate_tokens(&m);
-        if room(optional_tokens, tokens) {
+        if !messages_dropped && room(optional_tokens, tokens) {
             optional_tokens += tokens;
             included.push(IncludedItem {
                 kind: ItemKind::RecentMessage,
@@ -544,6 +555,7 @@ pub fn build_context_with_id(
             });
             messages_out.push((index, m));
         } else {
+            messages_dropped = true;
             omissions.push(Omission {
                 kind: ItemKind::RecentMessage,
                 id: format!("message:{index}"),
@@ -555,9 +567,11 @@ pub fn build_context_with_id(
     messages_out.sort_by_key(|(i, _)| *i);
 
     let mut receipts_out = Vec::new();
+    // Receipt summaries are the most derived content: they only get room once every recent
+    // message did.
     for r in completed_receipts {
         let tokens = estimate_tokens(&r);
-        if room(optional_tokens, tokens) {
+        if !messages_dropped && room(optional_tokens, tokens) {
             optional_tokens += tokens;
             included.push(IncludedItem {
                 kind: ItemKind::CompletedReceipt,
