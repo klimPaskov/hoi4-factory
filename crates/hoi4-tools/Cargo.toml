@@ -1,0 +1,10 @@
+[package]
+name = "factory-hoi4-tools"
+description = "HOI4 Factory tool adapters: configured profiles over MCP stdio (HOI4 Agent Tools)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]

@@ -1,0 +1,10 @@
+[package]
+name = "factory-tasks"
+description = "HOI4 Factory task ledger: C-03 events, attempts, leases and fencing, C-06 context bundles, C-04 receipts"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
