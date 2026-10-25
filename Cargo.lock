@@ -1033,6 +1033,19 @@ dependencies = [
 [[package]]
 name = "factory-broker"
 version = "0.0.0"
+dependencies = [
+ "chrono",
+ "factory-accounts",
+ "factory-workspace",
+ "jsonschema 0.60.1",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "sqlx",
+ "thiserror",
+ "tokio",
+ "uuid",
+]
 
 [[package]]
 name = "factory-game-ref"
