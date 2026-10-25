@@ -5,7 +5,7 @@ upload a mod as a ZIP, scan, approve the offered excerpts, analyze (the server c
 model), confirm the proposed values, plan, decide the conflicts, approve the exact plan, apply and
 read the C-01 descriptor. Prints one line per step and writes a JSON result file.
 
-Run with `py -3.13 scripts/live_flow.py --base http://127.0.0.1:18080 --mailpit http://127.0.0.1:18025
+Run with `scripts/py.sh scripts/live_flow.py --base http://127.0.0.1:18080 --mailpit http://127.0.0.1:18025
 --out .work/live-flow.json`. Standard library only. All JSON is sent as UTF-8 bytes.
 """
 

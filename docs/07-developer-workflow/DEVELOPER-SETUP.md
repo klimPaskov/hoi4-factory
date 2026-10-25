@@ -52,7 +52,7 @@ scripts/py.sh -c "import json; json.dump({'id': 5453675, 'pem': open('.work/gith
 scripts/compose.sh up -d --build --wait
 ```
 
-`scripts/compose.sh` resolves the game folder for this machine and passes every argument to `docker compose`. Plain `docker compose` also works when `HOI4_GAME_DIR` is set for this machine. This builds the server image (Rust server, browser client and Debian Node) and starts PostgreSQL, Mailpit and the server.
+`scripts/compose.sh` resolves the game folder for this machine and passes every argument to `docker compose`. Plain `docker compose` also works when `HOI4_GAME_DIR` is set for this machine. This builds the server image (Rust server, browser client and Debian Node) and starts PostgreSQL, Mailpit and the server. If the first start reports `No such image` for Mailpit or PostgreSQL, run `scripts/compose.sh pull --ignore-buildable` once and start again (seen on a fresh macOS machine on 2026-10-25).
 
 | Address | What |
 |---|---|

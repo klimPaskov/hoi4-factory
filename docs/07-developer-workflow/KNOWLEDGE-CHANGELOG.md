@@ -10,7 +10,9 @@ This is the versioned index of accepted engineering guidance changes. Detailed c
 - Shell scripts are committed with the executable bit. macOS refused to run `scripts/linux-tests.sh` and `web/scripts/docker-npm.sh` without it.
 - The first macOS run found that an uploaded repository with `include.path = /etc/passwd` was reported as not a repository instead of unsafe config, because Git follows includes while it discovers a repository and that file exists on macOS and Linux. `GitRepo::config_findings` now reads `.git/config` without discovery, and a platform-independent regression test covers it.
 
-Evidence: the macOS session of 2026-10-25 (workspace and upload tests on macOS). Rollback: revert this commit and regenerate.
+- CLAUDE.md notes that Docker Desktop on the Mac can hang with its VM unreachable until it is restarted, and the setup guide notes a one-time `scripts/compose.sh pull` when a fresh machine reports `No such image`.
+
+Evidence: the macOS session of 2026-10-25 on Apple Silicon. `cargo test --no-fail-fast --workspace --exclude factory-runtime-probe` passed 384, failed 0, ignored 8 (live) on macOS against PostgreSQL 17.6, and the same on Linux through `scripts/linux-tests.sh`. The web checks passed (63 tests and the build). `scripts/compose.sh up -d --build --wait` found the game in the Mac's Steam library, `/readyz` reported `status: ok` with the game reference available and read-only, and `scripts/live_flow.py` completed every step through apply with one real `claude-haiku-5-5` analysis call (the server does not report token counts). Rollback: revert this commit and regenerate.
 
 ## 0.2.3, 2026-10-25, UI design track
 
