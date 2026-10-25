@@ -1,12 +1,14 @@
 {
-  "check": "S03-G6 M-LOCAL-C self-hosted OpenAI-compatible profile: connection, model listing and the outbound destination policy only (maintainer decision). No model pulled, no inference.",
+  "check": "S03-G6 M-LOCAL-C self-hosted OpenAI-compatible profile: connection, model listing, the outbound destination policy, and (after the maintainer's answer of 2026-10-25) one inference probe with the smallest local model.",
   "recorded": "2026-10-25",
   "endpoint": {
     "image": "ollama/ollama:0.40.0@sha256:1bef639749741b375e9a1eb2c1346fb57ce52f5432de1f74846e44ccc18e1687",
     "compose_file": "compose.selfhosted.yaml",
     "url": "http://ollama:11434/v1",
     "resolved_address": "172.20.0.5 (Compose network 172.20.0.0/16)",
-    "models_pulled": 0
+    "models_pulled": [
+      "smollm2:135m (270 MB, Ollama id 9077fe9d2ae1)"
+    ]
   },
   "default_policy": {
     "FACTORY_OUTBOUND_ALLOW_CIDRS": "",
@@ -62,6 +64,72 @@
   "endpoint_access_log_from_server": [
     "[GIN] 2026/10/25 - 14:49:05 | 200 |     834.917\u00b5s |      172.20.0.4 | GET      \"/v1/models\""
   ],
-  "inference_requests_observed": 0,
-  "limitation": "The endpoint is an Ollama server with an empty model list, so the listing proves connection and the listing route only. Text, tool calls, streaming and usage stay unknown by design; an agent task on this profile is refused with capability_unsatisfied until an inference probe is run, which the maintainer excluded."
+  "inference_requests_observed": "2 in the inference probe (one refused tool request, one text request); 0 in the listing-only checks",
+  "limitation": "smollm2:135m does not support tools, so an agent task on this profile is refused with capability_unsatisfied. That is the truthful outcome for the smallest model. A model with tool support would have to be probed the same way before agent tasks can use it.",
+  "inference_probe_smallest_model": {
+    "recorded": "2026-10-25T16:11:23Z",
+    "command": "scripts/py.sh scripts/live_agent_flow.py --base http://127.0.0.1:8080 --mailpit http://127.0.0.1:8025 --out .work/selfhosted-inference.json --selfhosted-url http://ollama:11434/v1 --selfhosted-only --selfhosted-inference",
+    "FACTORY_OUTBOUND_ALLOW_CIDRS": "172.20.0.0/16",
+    "probe": {
+      "profile_id": "compatible:smollm2:135m@http://ollama:11434/v1",
+      "model": "smollm2:135m",
+      "connection": {
+        "basis": "probe",
+        "evidence": "model listing answered HTTP 200",
+        "observed_at": "2026-10-25T16:11:23Z",
+        "state": "supported"
+      },
+      "models": [
+        "smollm2:135m"
+      ],
+      "capabilities": {
+        "cancellation": "unknown",
+        "image_input": "unknown",
+        "model_listing": "supported",
+        "parallel_tool_calls": "unknown",
+        "streaming": "supported",
+        "strict_json_schema": "unknown",
+        "text": "supported",
+        "tool_calls": "unsupported",
+        "usage_accounting": "supported"
+      },
+      "capability_evidence": {
+        "cancellation": "not probed",
+        "image_input": "image input is not used and not probed",
+        "model_listing": "1 models listed",
+        "parallel_tool_calls": "not probed",
+        "streaming": "41 stream events assembled",
+        "strict_json_schema": "not probed",
+        "text": "141 characters of text",
+        "tool_calls": "tool request refused: registry.ollama.ai/library/smollm2:135m does not support tools",
+        "usage_accounting": "usage reported: 43 in, 39 out"
+      },
+      "usage": {
+        "cached_input_tokens": 0,
+        "input_tokens": 43,
+        "output_tokens": 39,
+        "reasoning_tokens": 0
+      },
+      "error": null,
+      "notes": [
+        "the model refused tools; text was probed without tools"
+      ],
+      "refusal": {
+        "class": "invalid_request",
+        "message": "registry.ollama.ai/library/smollm2:135m does not support tools",
+        "provider_code": null,
+        "provider_type": "invalid_request_error",
+        "status": 400
+      },
+      "mode": "inference",
+      "probed_at": "2026-10-25T16:11:23Z"
+    },
+    "endpoint_access_log_from_server": [
+      "[GIN] 2026/10/25 - 16:11:23 | 200 |     456.833\u00b5s |      172.20.0.4 | GET      \"/v1/models\"",
+      "[GIN] 2026/10/25 - 16:11:23 | 200 |     584.542\u00b5s |      172.20.0.4 | GET      \"/v1/models\"",
+      "[GIN] 2026/10/25 - 16:11:23 | 400 |      1.4485ms |      172.20.0.4 | POST     \"/v1/chat/completions\"",
+      "[GIN] 2026/10/25 - 16:11:25 | 200 |  2.283464876s |      172.20.0.4 | POST     \"/v1/chat/completions\""
+    ],
+    "first_attempt": "The first run of this probe found two probe defects: a tool refusal left text untested and downgraded the connection. Both were fixed in crates/agent/src/probe.rs with the regression test a_model_that_refuses_tools_is_recorded_unsupported_and_text_is_still_probed, then this run was made."
+  }
 }

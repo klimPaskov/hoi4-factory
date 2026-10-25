@@ -266,11 +266,35 @@ fn profile_for_key(record: &factory_broker::KeyRecord) -> ModelProfile {
     }
 }
 
+#[derive(Deserialize, Default)]
+#[serde(deny_unknown_fields)]
+struct ProbeRequest {
+    /// `listing` (default, spends nothing) or `inference` (one tiny request with one tool, paid
+    /// by the key's owner).
+    #[serde(default)]
+    mode: Option<String>,
+    /// The model an inference probe uses on a self-hosted endpoint. Default: the first listed.
+    #[serde(default)]
+    model: Option<String>,
+}
+
 async fn probe_key(
     principal: Principal,
     State(state): State<ServerState>,
     Path(key): Path<String>,
+    body: axum::body::Bytes,
 ) -> Result<Json<Value>, Fail> {
+    // The body is optional: an empty one means a listing probe.
+    let request: ProbeRequest = if body.iter().all(u8::is_ascii_whitespace) {
+        ProbeRequest::default()
+    } else {
+        serde_json::from_slice(&body).map_err(|e| Fail::from(ApiError::invalid_request(format!("Invalid probe request: {e}"))))?
+    };
+    let mode = match request.mode.as_deref() {
+        None | Some("listing") => ProbeMode::Listing,
+        Some("inference") => ProbeMode::Inference,
+        Some(_) => return Err(ApiError::invalid_request("Mode is listing or inference.").with_id("field", "mode").into()),
+    };
     let rt = runtime(&state)?;
     let Some(keys) = rt.inner.keys.as_ref() else {
         return Err(keys_unavailable());
@@ -286,15 +310,23 @@ async fn probe_key(
         .ok_or_else(ApiError::not_found)?;
     let secret = keys.open_for_owner(&mut tx, principal.account_id(), id).await.map_err(key_error)?;
     tx.commit().await?;
-    let profile = profile_for_key(&record);
-    // Listing only: connection, model list and the destination policy. Never inference.
-    let report = probe(
-        &profile,
-        factory_agent::openai::ApiKey::new(secret.expose().to_owned()),
-        rt.policy(),
-        ProbeMode::Listing,
-    )
-    .await;
+    let mut profile = profile_for_key(&record);
+    let key = || factory_agent::openai::ApiKey::new(secret.expose().to_owned());
+    // Listing probes spend nothing. An inference probe is the owner's explicit choice and sends
+    // one tiny request; on a self-hosted endpoint it needs a model the endpoint lists.
+    if mode == ProbeMode::Inference && record.provider == KeyProvider::OpenaiCompatible {
+        let model = match request.model {
+            Some(m) => m,
+            None => probe(&profile, key(), rt.policy(), ProbeMode::Listing)
+                .await
+                .models
+                .into_iter()
+                .next()
+                .ok_or_else(|| Fail::from(ApiError::conflict("no_model_listed", "The endpoint lists no model to probe.")))?,
+        };
+        profile = ModelProfile::openai_compatible(record.base_url.as_deref().unwrap_or(""), &model);
+    }
+    let report = probe(&profile, key(), rt.policy(), mode).await;
     let (caps, evidence) = profiles::capability_summary(&report.capabilities);
     Ok(Json(json!({
         "profile_id": report.profile_id,
@@ -306,7 +338,9 @@ async fn probe_key(
         "refusal": report.refusal,
         "error": report.error,
         "notes": report.notes,
-        "mode": "listing",
+        "model": profile.model,
+        "usage": report.usage,
+        "mode": if mode == ProbeMode::Inference { "inference" } else { "listing" },
         "probed_at": report.probed_at,
     })))
 }

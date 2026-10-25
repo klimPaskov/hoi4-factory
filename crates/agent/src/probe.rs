@@ -271,11 +271,56 @@ pub async fn probe(
                 }
                 report.usage = turn.usage;
             }
+            Err(TurnError::Http(h))
+                if h.class == HttpClass::InvalidRequest
+                    && h.message.as_deref().is_some_and(|m| m.to_ascii_lowercase().contains("tool")) =>
+            {
+                // The endpoint answered and refused tools for this model (observed with Ollama:
+                // "... does not support tools"). That is evidence: tool calls are unsupported.
+                // Text and streaming are then measured with one request without tools.
+                report.capabilities.set(
+                    Capability::ToolCalls,
+                    CapabilityOutcome::probed(
+                        CapabilityState::Unsupported,
+                        format!("tool request refused: {}", h.message.clone().unwrap_or_default()),
+                        &at,
+                    ),
+                );
+                report.notes.push("the model refused tools; text was probed without tools".into());
+                report.refusal = Some(h);
+                let (_keep_open, cancel) = watch::channel(false);
+                let mut text_only = probe_request();
+                text_only.tools.clear();
+                match client.run_turn(&text_only, cancel, None).await {
+                    Ok(turn) => {
+                        report.error = None;
+                        let sup = |ev: String| CapabilityOutcome::probed(CapabilityState::Supported, ev, &at);
+                        if turn.events > 1 {
+                            report.capabilities.set(Capability::Streaming, sup(format!("{} stream events assembled", turn.events)));
+                        }
+                        if !turn.text.is_empty() {
+                            report.capabilities.set(Capability::Text, sup(format!("{} characters of text", turn.text.chars().count())));
+                        }
+                        if let Some(u) = turn.usage.as_ref().filter(|u| u.output_tokens > 0) {
+                            report.capabilities.set(Capability::UsageAccounting, sup(format!("usage reported: {} in, {} out", u.input_tokens, u.output_tokens)));
+                        }
+                        report.usage = turn.usage;
+                    }
+                    Err(e) => {
+                        report.notes.push(format!("the text-only request failed: {}", e.class()));
+                        report.error = Some(e.normalized());
+                    }
+                }
+            }
             Err(e) => {
                 if let TurnError::Http(h) = &e {
                     report.refusal = Some(h.clone());
                 }
-                report.connection = connection_for(&e, &at);
+                // A request-level HTTP refusal is an answer: a connection the listing proved stays
+                // proven. Account-level refusals (auth, quota) still mean it cannot be used.
+                if !(matches!(e, TurnError::Http(_)) && !account_level(&e) && report.connection.is_supported()) {
+                    report.connection = connection_for(&e, &at);
+                }
                 if !account_level(&e)
                     && !matches!(e, TurnError::Destination(_) | TurnError::Http(_))
                 {

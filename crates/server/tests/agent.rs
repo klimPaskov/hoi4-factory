@@ -880,3 +880,33 @@ async fn a_read_only_agent_tools_call_runs_through_the_broker_and_changes_no_sou
     // The tool kept its index outside the mod: the worktree is byte-identical to the source.
     assert_eq!(tree(&a.worktree(&id)), tree(&a.source()));
 }
+
+#[tokio::test]
+async fn an_inference_probe_is_opt_in_and_records_what_it_observed() {
+    // Synthetic OpenAI-compatible stream (the agent crate's labelled synthetic fixture); the real
+    // self-hosted run is evidence/S03/selfhosted-profile.json.
+    let synthetic = std::fs::read(
+        std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../agent/tests/fixtures/synthetic/openai-synthetic-probe-turn.sse"),
+    )
+    .unwrap();
+    let a = agent(Setup::default()).await;
+    let replay = ReplayServer::start(vec![
+        ("/models", Reply::json(r#"{"object":"list","data":[{"id":"tiny-model","object":"model"}]}"#)),
+        ("/chat/completions", Reply::sse(synthetic, None, Fault::None)),
+    ])
+    .await;
+    let key = a.alice.client.post("/api/v1/account/api-keys", json!({ "provider": "openai_compatible", "label": "local", "api_key": "local-key-0001", "base_url": replay.base_url })).await;
+    assert_eq!(key.status, 201, "{}", key.text);
+    let id = key.body["id"].as_str().unwrap();
+    let listing = a.alice.client.post(&format!("/api/v1/account/api-keys/{id}/probe"), json!({})).await;
+    assert_eq!(listing.body["mode"], "listing");
+    assert_eq!(replay.request_count("/chat/completions"), 0, "a listing probe never infers");
+    let inference = a.alice.client.post(&format!("/api/v1/account/api-keys/{id}/probe"), json!({ "mode": "inference" })).await;
+    assert_eq!(inference.status, 200, "{}", inference.text);
+    assert_eq!(inference.body["mode"], "inference");
+    assert_eq!(inference.body["model"], "tiny-model", "the first listed model is probed");
+    assert_eq!(replay.request_count("/chat/completions"), 1);
+    assert_eq!(inference.body["capabilities"]["text"], "supported", "{:#}", inference.body);
+    let bad = a.alice.client.post(&format!("/api/v1/account/api-keys/{id}/probe"), json!({ "mode": "everything" })).await;
+    assert_eq!(bad.status, 400, "{}", bad.text);
+}

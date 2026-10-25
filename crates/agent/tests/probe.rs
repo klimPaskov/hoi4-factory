@@ -290,3 +290,32 @@ async fn an_unreachable_endpoint_is_unsupported() {
         Some("provider_unreachable")
     );
 }
+
+/// Ollama refused tools for `smollm2:135m` on 2026-10-25 with HTTP 400 and this message. The
+/// probe records tool calls as unsupported, keeps the connection the listing proved, and measures
+/// text with one request without tools (here a labelled synthetic stream).
+#[tokio::test]
+async fn a_model_that_refuses_tools_is_recorded_unsupported_and_text_is_still_probed() {
+    let refusal = r#"{"error":{"message":"registry.ollama.ai/library/smollm2:135m does not support tools","type":"invalid_request_error","param":null,"code":null}}"#;
+    let server = ReplayServer::start(vec![
+        ("/models", Reply::json(r#"{"object":"list","data":[{"id":"smollm2:135m","object":"model"}]}"#)),
+        (
+            "/chat/completions",
+            Reply::Sequence(vec![
+                Reply::refusal(400, refusal),
+                Reply::sse(synthetic("openai-synthetic-text-turn.sse"), None, Fault::None),
+            ]),
+        ),
+    ])
+    .await;
+    let profile = compat_profile(&server.base_url);
+    let r = probe(&profile, key(), &loopback_policy(), ProbeMode::Inference).await;
+    assert_eq!(r.connection.state, CapabilityState::Supported, "the listing proved the connection");
+    assert_eq!(r.capabilities.get(Capability::ToolCalls).state, CapabilityState::Unsupported);
+    assert!(r.capabilities.get(Capability::ToolCalls).evidence.contains("does not support tools"));
+    assert_eq!(r.capabilities.get(Capability::Text).state, CapabilityState::Supported);
+    assert_eq!(server.request_count("/chat/completions"), 2, "one tool request, one text request");
+    let bodies = server.request_bodies("/chat/completions");
+    assert!(bodies[0].contains("\"tools\""));
+    assert!(!bodies[1].contains("\"tools\""), "the second request has no tools");
+}

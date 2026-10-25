@@ -4,7 +4,8 @@ Sign up, verify the email through Mailpit, create a project, upload a small mod,
 task limited to one folder, start an attempt (the server's worker calls the real model through
 the Rust loop), wait for the attempt to end, then read its events, receipts summary and the
 account's usage. With --selfhosted-url it also saves a self-hosted OpenAI-compatible key for that
-address and probes it (connection and model listing only, never inference); the destination
+address and probes it (connection and model listing; one tiny inference request only with
+--selfhosted-inference); the destination
 policy is expected to refuse a private address unless the operator allowed its range.
 
 Run with `scripts/py.sh scripts/live_agent_flow.py --base http://127.0.0.1:8080 --mailpit
@@ -90,6 +91,7 @@ def main() -> int:
     parser.add_argument("--out", required=True)
     parser.add_argument("--selfhosted-url", help="probe a self-hosted OpenAI-compatible endpoint (listing only)")
     parser.add_argument("--selfhosted-only", action="store_true", help="skip the agent task")
+    parser.add_argument("--selfhosted-inference", action="store_true", help="also run one tiny inference probe on the self-hosted endpoint")
     args = parser.parse_args()
     log: list[dict] = []
 
@@ -130,6 +132,11 @@ def main() -> int:
         if status == 201:
             probe = expect("probe self-hosted (listing only)", client.call("POST", f"/api/v1/account/api-keys/{body['id']}/probe", {}))
             result["selfhosted"]["probe"] = probe
+            if args.selfhosted_inference:
+                result["selfhosted"]["inference_probe"] = expect(
+                    "probe self-hosted (one inference request)",
+                    client.call("POST", f"/api/v1/account/api-keys/{body['id']}/probe", {"mode": "inference"}),
+                )
     if args.selfhosted_only:
         with open(args.out, "w", encoding="utf-8", newline="\n") as handle:
             json.dump(result, handle, ensure_ascii=False, indent=2)
