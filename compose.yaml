@@ -45,6 +45,11 @@ services:
       # Without the key file's content the GitHub routes report unavailable and nothing else changes.
       FACTORY_GITHUB_APP_ID: "5453675"
       FACTORY_GITHUB_APP_PRIVATE_KEY_FILE: /run/secrets/github-app-key.pem
+      # GitHub sign-in uses the same App's user authorization. The client ID is public and is set only
+      # when a client secret is given, so the server never starts with half of the pair. Callback URL
+      # to register on the App: <FACTORY_PUBLIC_URL>/api/v1/auth/github/callback.
+      FACTORY_GITHUB_CLIENT_ID: "${FACTORY_GITHUB_CLIENT_SECRET:+Iv23livHYmk20NUtVFue}"
+      FACTORY_GITHUB_CLIENT_SECRET: "${FACTORY_GITHUB_CLIENT_SECRET:-}"
       # Setup analysis model. The key is passed from the host environment (never baked into the image,
       # never logged); an empty value leaves analysis unavailable. Model default: claude-haiku-5-5.
       FACTORY_ANTHROPIC_API_KEY: "${FACTORY_ANTHROPIC_API_KEY:-}"
