@@ -3,7 +3,7 @@
 //! | Path | Auth | Purpose |
 //! |---|---|---|
 //! | `GET /healthz` | none | Liveness: the process answers |
-//! | `GET /readyz` | none | Readiness: database, migrations, storage layout, game reference status |
+//! | `GET /readyz` | none | Readiness: database, migrations, storage layout, game reference and agent status |
 //! | `GET /api/v1/game-reference` | signed in | Manifest summary of the server game reference |
 //! | `/api/v1/auth/*`, `/api/v1/projects`, `/api/v1/projects/{id}`, `.../restore` | see `factory_accounts::router` | Accounts and projects |
 //! | `/api/v1/projects/{id}/uploads`, `.../github/*`, `.../workspace` | signed in, project role | See [`crate::intake_api`] |
@@ -122,6 +122,16 @@ async fn readyz(State(state): State<ServerState>) -> Response {
                 "available": game_summary.available,
                 "read_only": game_summary.read_only,
                 "reason": game_summary.reason,
+            },
+            // Informational: a missing part disables only its own feature.
+            "agent": match &state.agent {
+                Some(agent) => json!({
+                    "available": true,
+                    "user_keys": agent.keys_available(),
+                    "agent_tools": agent.agent_tools_installed(),
+                    "operator_allowance": agent.operator_allowance_available(),
+                }),
+                None => json!({ "available": false }),
             },
         },
     });

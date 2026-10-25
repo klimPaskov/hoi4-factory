@@ -1470,7 +1470,7 @@ async fn the_setup_migrations_run_in_order_after_intake() {
         .iter()
         .map(|c| c.name)
         .collect();
-    assert_eq!(names, ["accounts", "intake", "setup-adapter"]);
+    assert_eq!(names, ["accounts", "intake", "setup-adapter", "tasks", "broker"]);
     let latest: Vec<i64> = h
         .state
         .migrations

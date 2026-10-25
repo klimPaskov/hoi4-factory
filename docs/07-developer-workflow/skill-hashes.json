@@ -62,15 +62,15 @@
     {
       "name": "delegate-parallel-work",
       "source": "docs/07-developer-workflow/skill-workflows/delegate-parallel-work/BODY.md",
-      "body_sha256": "604f1ab2412f0ec6caca7e21050f75b9496396bab3377bfcebbe8170b4765320",
+      "body_sha256": "aa9fe0632e1423d609096c3e7d17c52c53d6f04325248ab2f5a693f4485f0fcf",
       "generated": [
         {
           "path": ".claude/skills/delegate-parallel-work/SKILL.md",
-          "sha256": "85f4ba85f611f9ab207417e2ed94fa3aad76d385f5687efe49f10f84b5fe6f84"
+          "sha256": "32249d04cf072ee77b7f7d81759cdc0faa822b734834566f5f993271b8ff26f8"
         },
         {
           "path": ".codex/skills/delegate-parallel-work/SKILL.md",
-          "sha256": "85f4ba85f611f9ab207417e2ed94fa3aad76d385f5687efe49f10f84b5fe6f84"
+          "sha256": "32249d04cf072ee77b7f7d81759cdc0faa822b734834566f5f993271b8ff26f8"
         },
         {
           "path": ".codex/skills/delegate-parallel-work/agents/openai.yaml",
@@ -78,7 +78,7 @@
         },
         {
           "path": ".agents/skills/delegate-parallel-work/SKILL.md",
-          "sha256": "85f4ba85f611f9ab207417e2ed94fa3aad76d385f5687efe49f10f84b5fe6f84"
+          "sha256": "32249d04cf072ee77b7f7d81759cdc0faa822b734834566f5f993271b8ff26f8"
         },
         {
           "path": ".agents/skills/delegate-parallel-work/agents/openai.yaml",

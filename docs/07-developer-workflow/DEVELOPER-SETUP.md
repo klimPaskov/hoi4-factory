@@ -1,6 +1,6 @@
 # Developer setup on a new machine
 
-This guide takes a fresh computer from nothing to a running HOI4 Factory stack, with every check green and the repository ready for the next stage. It was written at the end of S02 on 2026-10-25 and covers Windows 11 (Git Bash) and macOS (checked on Apple Silicon). Run every command below from a POSIX shell: Git Bash on Windows, the default zsh on macOS. Project rules live in [CLAUDE.md](../../CLAUDE.md), and the current stage state is in the latest `evidence/SNN/handoff.md`.
+This guide takes a fresh computer from nothing to a running HOI4 Factory stack, with every check green and the repository ready for the next stage. It was written at the end of S02 on 2026-10-25, updated for S03 the same day, and covers Windows 11 (Git Bash) and macOS (checked on Apple Silicon). Run every command below from a POSIX shell: Git Bash on Windows, the default zsh on macOS. Project rules live in [CLAUDE.md](../../CLAUDE.md), and the current stage state is in the latest `evidence/SNN/handoff.md`.
 
 ## 1. Install the prerequisites
 
@@ -13,7 +13,7 @@ This guide takes a fresh computer from nothing to a running HOI4 Factory stack, 
 | GitHub CLI `gh` | 2.87 | Signed in to the maintainer's account, for upstream pull requests and GitHub checks |
 | Claude Code | current | The development client. Launch it from the repository root |
 
-Node is not needed on the host. The browser client builds inside a pinned Node image (`web/scripts/docker-npm.sh`), and the server image installs Debian's Node package itself.
+Node is not needed on the host for the stack. The browser client builds inside a pinned Node image (`web/scripts/docker-npm.sh`), and the server image installs Debian's Node package itself (for Setup) plus Node 22 for HOI4 Agent Tools. Node 22 or 24 on the host is needed only to run the Agent Tools integration tests outside Docker (section 5).
 
 Keep at least 30 GB free. Rust build caches grow quickly, and a full disk causes misleading test failures. CLAUDE.md explains how to prune them.
 
@@ -42,6 +42,7 @@ It never prints a secret, and running it again is safe. The rest of this section
 | Hearts of Iron IV game folder | Found automatically by `scripts/compose.sh`, or `HOI4_GAME_DIR` in `.env` | A local Steam installation. The script looks in this machine's Steam libraries (Windows `C:/Program Files (x86)/Steam`, macOS `~/Library/Application Support/Steam`, Linux `~/.local/share/Steam`, plus any extra library in `libraryfolders.vdf`). Set `HOI4_GAME_DIR` only for an install outside Steam. A value that does not exist on the current machine is ignored, so one `.env` works on both. It is mounted read-only and only its metadata is read |
 | Anthropic API key | `FACTORY_ANTHROPIC_API_KEY` in `.env`, and `ANTHROPIC_API_KEY` in the shell for live tests | The maintainer's Anthropic Console, using a key created inside a workspace. Without it, Setup analysis and live model tests are unavailable and everything else works |
 | GitHub App private key | `.work/github-app/private-key.pem` | The app is **HOI4 Factory Dev** (App ID `5453675`, slug `hoi4-factory-dev`). At https://github.com/settings/apps/hoi4-factory-dev choose **Generate a private key**, save the downloaded file under that path, and revoke older keys you no longer use. Without it, GitHub import is reported as unavailable |
+| Key encryption key (S03) | `.work/secrets/factory-secret.key` | Created automatically by `scripts/compose.sh` on first use: 32 random bytes in base64, used to encrypt the model API keys users save. Each machine has its own, so keys saved in one machine's database cannot be opened with another's. Keep it if you want saved keys to survive; delete it only together with the database volume |
 | GitHub App client secret | `FACTORY_GITHUB_CLIENT_SECRET` in `.env` | On the same App's settings, open the **Credentials** tab in the left sidebar (since October 2026 client secrets are no longer on the General page), choose **Generate a new client secret** and copy it at once, because GitHub shows it only once. If the tab shows a loading error, reload once. The App's **Callback URL**, on the General page under **Identifying and authorizing users**, must be `http://127.0.0.1:8080/api/v1/auth/github/callback` (use your port if you changed `FACTORY_HOST_PORT`). Without the secret, "Sign in with GitHub" is off and email sign-in works |
 
 Copy `.env.example` to `.env` and fill it in. The same `.env` can be copied between Windows and macOS unchanged. If your copy of `.env.example` has no `FACTORY_GITHUB_CLIENT_SECRET=` line, add it. `.env` is git-ignored, and Claude Code is configured not to read it.
@@ -96,6 +97,17 @@ web/scripts/docker-npm.sh install
 web/scripts/docker-npm.sh run check
 ```
 
+The S03 HOI4 Agent Tools tests run against a local build of the pinned Agent Tools when these variables are set, and print `SKIPPED` otherwise. Build it once into `.work/` (Node 22 or 24 on the host):
+
+```bash
+git clone https://github.com/klimPaskov/hoi4-agent-tools.git .work/hoi4-agent-tools
+git -C .work/hoi4-agent-tools -c core.autocrlf=false checkout 731e64f5b5c964bd1b33adad9c085bd3168b1940
+(cd .work/hoi4-agent-tools && npm ci && npm run build)
+export FACTORY_AGENT_TOOLS_NODE="$(command -v node)" FACTORY_AGENT_TOOLS_ENTRY="$PWD/.work/hoi4-agent-tools/dist/bin/stdio.js" FACTORY_AGENT_TOOLS_FIXTURE="$PWD/.work/hoi4-agent-tools/fixtures/focus/workspace"
+```
+
+The agent tests (`cargo test -p factory-server --test agent`) start the real worker process and replay recorded real Anthropic streams from a local server, so they need no key. `scripts/live_agent_flow.py` runs one real agent task against a running stack. The self-hosted endpoint check uses `compose.selfhosted.yaml` (an Ollama container with no model, about 2.8 GB to pull).
+
 Tests marked `#[ignore]` call the real Anthropic API. Run them with `ANTHROPIC_API_KEY` set and `cargo test -- --ignored`. `scripts/live_flow.py` drives the whole onboarding flow against a running stack, including one real analysis call.
 
 ## 6. Optional upstream clones
@@ -113,7 +125,7 @@ The factory pins HOI4-Mod-Setup by commit in the root `Cargo.toml`, so these clo
 
 The machine is ready when all of these hold:
 
-- [ ] `scripts/compose.sh up -d --build --wait` reports the server healthy, and `/readyz` shows `status: ok` with the game reference available and read-only
+- [ ] `scripts/compose.sh up -d --build --wait` reports the server healthy, and `/readyz` shows `status: ok` with the game reference available and read-only, and `checks.agent` with `available`, `user_keys`, `agent_tools` and `operator_allowance` all true
 - [ ] Signing up at http://127.0.0.1:8080, confirming the email from Mailpit and creating a project works
 - [ ] The package validator and `sync_skills.py --check` pass
 - [ ] The workspace Rust tests and the web checks pass

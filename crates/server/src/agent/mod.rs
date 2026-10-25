@@ -183,6 +183,11 @@ impl AgentRuntime {
         self.inner.keys.is_some()
     }
 
+    /// Whether the server holds a provider key that funds the monthly allowance.
+    pub fn operator_allowance_available(&self) -> bool {
+        self.inner.operator_keys.anthropic.is_some() || self.inner.operator_keys.openai.is_some()
+    }
+
     pub fn agent_tools_installed(&self) -> bool {
         self.inner.agent_tools.is_some()
     }
