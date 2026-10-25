@@ -17,8 +17,16 @@
 # bind-mounted read-only at /run/secrets/github-app-key.pem. To use another location set
 # FACTORY_GITHUB_APP_KEY_FILE; to run without GitHub, point it at any empty file.
 #
-# Optional: FACTORY_ANTHROPIC_API_KEY (host environment, for Setup analysis) and
-# FACTORY_ANTHROPIC_MODEL.
+# Optional: FACTORY_ANTHROPIC_API_KEY (host environment, for Setup analysis and the operator-funded
+# agent allowance) and FACTORY_ANTHROPIC_MODEL.
+#
+# Key encryption: ./.work/secrets/factory-secret.key (git-ignored, 32 random bytes in base64)
+# encrypts the model API keys users save. scripts/compose.sh creates it on first use. Mounted
+# read-only at /run/secrets/factory-secret.key; set FACTORY_SECRET_KEY_SOURCE for another location.
+#
+# Optional: FACTORY_OUTBOUND_ALLOW_CIDRS, comma-separated address ranges that custom model
+# endpoints may use although they are private (for example a self-hosted model server on this
+# network). Empty by default: private, loopback, link-local and metadata addresses are refused.
 #
 # Optional: FACTORY_HOST_PORT (default 8080), MAILPIT_UI_PORT (default 8025),
 # FACTORY_ALLOWED_ORIGINS (default: a Vite dev server on port 5173).
@@ -58,11 +66,22 @@ services:
       # never logged); an empty value leaves analysis unavailable. Model default: claude-haiku-5-5.
       FACTORY_ANTHROPIC_API_KEY: "${FACTORY_ANTHROPIC_API_KEY:-}"
       FACTORY_ANTHROPIC_MODEL: "${FACTORY_ANTHROPIC_MODEL:-}"
+      # Agent (S03): user key encryption, the outbound destination policy and the monthly allowance
+      # per verified account in micro-dollars (1000000 = $1, the maintainer's setting).
+      FACTORY_SECRET_KEY_FILE: /run/secrets/factory-secret.key
+      FACTORY_OUTBOUND_ALLOW_CIDRS: "${FACTORY_OUTBOUND_ALLOW_CIDRS:-}"
+      FACTORY_ALLOWANCE_MICROS: "${FACTORY_ALLOWANCE_MICROS:-1000000}"
     volumes:
       - workspace-data:/data
       - type: bind
         source: "${FACTORY_GITHUB_APP_KEY_FILE:-./.work/github-app/private-key.pem}"
         target: /run/secrets/github-app-key.pem
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: "${FACTORY_SECRET_KEY_SOURCE:-./.work/secrets/factory-secret.key}"
+        target: /run/secrets/factory-secret.key
         read_only: true
         bind:
           create_host_path: false
