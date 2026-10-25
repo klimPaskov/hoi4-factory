@@ -437,6 +437,29 @@ impl Runner {
     }
 
     async fn run(&mut self, conversation: Option<Conversation>, first: Option<String>) {
+        // The lease must outlive any single step: a turn can take longer than its TTL. The
+        // heartbeat renews it in the background; if renewal fails the next fence check refuses
+        // every effect and the next boundary stops the attempt.
+        let _heartbeat = {
+            let rt = self.rt.clone();
+            let (account, project, generation) = (self.plan.account, self.plan.project, self.plan.generation);
+            let ttl = self.rt.inner.settings.lease_ttl;
+            AbortOnDrop(tokio::spawn(async move {
+                loop {
+                    tokio::time::sleep(ttl / 3).await;
+                    let Ok(mut tx) = rt.tx(account).await else { continue };
+                    match factory_tasks::renew_lease(&mut tx, project, rt.inner.incarnation, generation, ttl).await {
+                        Ok(_) => {
+                            let _ = tx.commit().await;
+                        }
+                        Err(e) => {
+                            tracing::warn!(error = %e, "lease renewal failed; the attempt is fenced");
+                            break;
+                        }
+                    }
+                }
+            }))
+        };
         let end = self.run_inner(conversation, first).await;
         if let Some(tools) = self.tools.as_mut() {
             tools.shutdown().await;
@@ -509,6 +532,13 @@ impl Runner {
             if let Err(end) = self.preflight().await {
                 return end;
             }
+            if !conv.pending_tool_use_ids().is_empty() {
+                match self.run_pending(&mut conv).await {
+                    Ok(Some(report)) => return End::Succeeded { report },
+                    Ok(None) => continue,
+                    Err(end) => return end,
+                }
+            }
             let specs = self.tools.as_ref().map(|t| t.specs.clone()).unwrap_or_default();
             let request = match conv.request(&specs, self.plan.profile.max_output_tokens) {
                 Ok(r) => r,
@@ -541,15 +571,17 @@ impl Runner {
             };
             let request_id = format!("{}:{}", self.plan.attempt, conv.turns + 1);
             let attempt_id = self.plan.attempt.to_string();
-            let timeout = self.rt.inner.settings.turn_timeout
-                .max(Duration::from_secs(u64::from(self.plan.profile.timeout_secs)));
+            let timeout = self.rt.inner.settings.turn_timeout;
             let result = {
                 let worker = self.worker.as_mut().expect("worker spawned above");
                 let mut control = self.control.clone();
                 let turn = worker.run_turn(&request_id, &attempt_id, &payload, timeout);
                 tokio::pin!(turn);
                 loop {
+                    // Biased: the turn is polled first, so its request is on the wire (and the
+                    // supervisor knows it is in flight) before an interrupt is acted on.
                     tokio::select! {
+                        biased;
                         r = &mut turn => break Some(r),
                         changed = control.changed() => {
                             if changed.is_err() || *control.borrow() == Control::Interrupt {
@@ -568,7 +600,13 @@ impl Runner {
                         Some(w) => w.cancel(grace).await,
                         None => CancelOutcome::AlreadyExited { exit: None, signal: None },
                     };
-                    let evidence = cancel_evidence(&cancel);
+                    let mut evidence = cancel_evidence(&cancel);
+                    if !matches!(cancel, CancelOutcome::Cooperative { .. })
+                        && let Some(w) = self.worker.as_ref()
+                    {
+                        // Worker diagnostics, never parsed as frames.
+                        evidence["worker_stderr_tail"] = json!(excerpt(&w.stderr_tail(), 2000));
+                    }
                     if let CancelOutcome::Cooperative { outcome } = &cancel {
                         self.settle_outcome(reservation, outcome, input_bound).await;
                     } else {
@@ -640,45 +678,63 @@ impl Runner {
                     conv.structured_repairs += 1;
                     conv.push_user_text("Call the finish tool now with your summary, the files you changed and any open questions.");
                 }
-                Step::ToolCalls(calls) => {
-                    let mut results = Vec::new();
-                    let mut report = None;
-                    for call in calls {
-                        if call.name == FINISH {
-                            let tools = self.tools.as_ref().expect("tools built above");
-                            match tools.registry.prepare(FINISH, &call.arguments) {
-                                Ok(prepared) => {
-                                    report = Some(prepared.normalized_arguments);
-                                    results.push(ToolResultEntry::ok(call.id.clone(), "Report recorded."));
-                                }
-                                Err(refusal) => {
-                                    let issues = refusal_issues(&refusal);
-                                    self.emit("structured_invalid", "The final report did not match its schema", json!({ "issues": issues })).await;
-                                    results.push(ToolResultEntry::structured_invalid(call.id.clone(), &issues));
-                                }
-                            }
-                            continue;
-                        }
-                        let entry = self.tool_call(&call.id, &call.name, &call.arguments).await;
-                        results.push(entry);
-                    }
-                    let stop = conv.push_tool_results(results);
-                    if let Err(end) = self.save(&conv).await {
-                        return end;
-                    }
-                    if let Err(stop) = stop {
-                        return End::Failed { code: "loop_limit", detail: stop.to_string() };
-                    }
-                    if let Some(report) = report {
-                        return End::Succeeded { report };
-                    }
-                    continue;
+                Step::ToolCalls(_) => {
+                    // The calls run at the top of the loop, after the boundary checks, so a
+                    // pause that arrived during the turn defers them instead of refusing them.
                 }
             }
             if let Err(end) = self.save(&conv).await {
                 return end;
             }
         }
+    }
+
+    /// Runs the tool calls of the last model turn that have no result yet. Returns the final
+    /// report when `finish` was called with a valid one.
+    async fn run_pending(&mut self, conv: &mut Conversation) -> Result<Option<Value>, End> {
+        let pending: Vec<String> = conv.pending_tool_use_ids().to_vec();
+        let calls: Vec<(String, String, Value)> = conv
+            .messages
+            .last()
+            .map(|m| {
+                m.parts
+                    .iter()
+                    .filter_map(|p| match p {
+                        factory_agent::request::Part::ToolUse { id, name, input } if pending.contains(id) => {
+                            Some((id.clone(), name.clone(), input.clone()))
+                        }
+                        _ => None,
+                    })
+                    .collect()
+            })
+            .unwrap_or_default();
+        let mut results = Vec::new();
+        let mut report = None;
+        for (id, name, args) in calls {
+            if name == FINISH {
+                let tools = self.tools.as_ref().expect("tools built above");
+                match tools.registry.prepare(FINISH, &args) {
+                    Ok(prepared) => {
+                        report = Some(prepared.normalized_arguments);
+                        results.push(ToolResultEntry::ok(id, "Report recorded."));
+                    }
+                    Err(refusal) => {
+                        let issues = refusal_issues(&refusal);
+                        self.emit("structured_invalid", "The final report did not match its schema", json!({ "issues": issues })).await;
+                        results.push(ToolResultEntry::structured_invalid(id, &issues));
+                    }
+                }
+                continue;
+            }
+            let entry = self.tool_call(&id, &name, &args).await;
+            results.push(entry);
+        }
+        let stop = conv.push_tool_results(results);
+        self.save(conv).await?;
+        if let Err(stop) = stop {
+            return Err(End::Failed { code: "loop_limit", detail: stop.to_string() });
+        }
+        Ok(report)
     }
 
     async fn transition(&mut self, to: AttemptState, outcome: Option<Value>, code: Option<&str>) -> Result<(), String> {
@@ -848,9 +904,8 @@ impl Runner {
         if let Ok(v) = std::env::var("RUST_LOG") {
             cmd.env("RUST_LOG", v);
         }
-        #[cfg(debug_assertions)]
-        if let Ok(v) = std::env::var("FACTORY_AGENT_WORKER_TEST_FAULT") {
-            cmd.env("FACTORY_AGENT_WORKER_TEST_FAULT", v);
+        for (k, v) in &launcher.env {
+            cmd.env(k, v);
         }
         match WorkerProcess::spawn(cmd, self.worker_generation, self.rt.inner.settings.handshake_timeout).await {
             Ok(w) => {
@@ -1029,8 +1084,9 @@ impl Runner {
                     ReceiptStatus::Started,
                     Outcome {
                         status: executed.status,
-                        before: executed.before.clone(),
-                        after: executed.after.clone(),
+                        // A missing file has no hash; the artifact records "absent".
+                        before: executed.before.clone().filter(|h| h != ws::ABSENT),
+                        after: executed.after.clone().filter(|h| h != ws::ABSENT),
                         result_artifact: Some(executed.artifact.clone()),
                         partial: executed.partial,
                     },
@@ -1107,38 +1163,59 @@ impl Runner {
                 "The attempt was cancelled".to_owned(),
             ),
         };
-        let current = self.reload_attempt().await.map(|a| a.state);
-        if let (Some(to), Some(from)) = (attempt_to, current) {
-            let to = match (from, to) {
-                // Running -> Cancelled is not a transition; an interrupt first records the request.
-                (AttemptState::Running, AttemptState::Cancelled) => {
-                    let _ = self.transition(AttemptState::InterruptRequested, None, None).await;
-                    AttemptState::Cancelled
+        // The attempt's end and the task's next state commit together (ORCH-08): neither half
+        // is ever visible alone.
+        let Ok(mut tx) = self.tx().await else {
+            tracing::error!("could not record the attempt's end: no database connection");
+            return;
+        };
+        let result: Result<(), TaskError> = async {
+            let mut attempt = factory_tasks::get_attempt(&mut tx, self.plan.attempt).await?;
+            if let Some(to) = attempt_to
+                && !attempt.state.is_terminal()
+            {
+                if attempt.state == AttemptState::Running && to == AttemptState::Cancelled {
+                    // Running -> Cancelled is not a transition: the request is recorded first.
+                    attempt = factory_tasks::transition_attempt(&mut tx, attempt.id, attempt.version, AttemptState::InterruptRequested, None, None, Actor::Host).await?;
                 }
-                (_, to) => to,
-            };
-            if !from.is_terminal() && let Err(e) = self.transition(to, outcome, code.as_deref()).await {
-                tracing::error!(error = %e, "could not record the attempt's end");
+                if attempt.state != to {
+                    factory_tasks::transition_attempt(&mut tx, attempt.id, attempt.version, to, outcome, code.as_deref(), Actor::Host).await?;
+                }
             }
-        }
-        if let Some(to) = task_to
-            && let Ok(mut tx) = self.tx().await
-            && let Ok(task) = factory_tasks::get_task(&mut tx, self.plan.task).await
-            && task.state == TaskState::Running
-        {
-            let ok = factory_tasks::transition_task(
-                &mut tx,
-                self.plan.task,
-                task.version,
-                to,
-                event(Some(self.plan.attempt), Actor::Host, &format!("task_{}", to.as_str()), &summary, json!({ "code": code })),
-            )
-            .await
-            .is_ok();
-            if ok && tx.commit().await.is_ok() {
-                self.rt.notify(self.plan.task);
+            let task = factory_tasks::get_task(&mut tx, self.plan.task).await?;
+            if let Some(to) = task_to
+                && task.state == TaskState::Running
+            {
+                factory_tasks::transition_task(
+                    &mut tx,
+                    self.plan.task,
+                    task.version,
+                    to,
+                    event(Some(self.plan.attempt), Actor::Host, &format!("task_{}", to.as_str()), &summary, json!({ "code": code })),
+                )
+                .await?;
             }
+            Ok(())
         }
+        .await;
+        match result {
+            Ok(()) => {
+                if tx.commit().await.is_ok() {
+                    self.rt.notify(self.plan.task);
+                }
+            }
+            Err(e) => tracing::error!(error = %e, "could not record the attempt's end"),
+        }
+    }
+}
+
+/// Aborts a background task when its owner is dropped, including when the owner's own task is
+/// aborted (a host dying mid-step must not leave a heartbeat renewing its lease).
+struct AbortOnDrop(tokio::task::JoinHandle<()>);
+
+impl Drop for AbortOnDrop {
+    fn drop(&mut self) {
+        self.0.abort();
     }
 }
 

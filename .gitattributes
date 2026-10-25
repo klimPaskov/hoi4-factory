@@ -14,3 +14,4 @@ Cargo.toml -text
 crates/agent/src/cost.rs -text
 crates/agent/src/types.rs -text
 crates/agent/tests/fixtures/** -text
+crates/server/tests/fixtures/recorded/agent-* -text

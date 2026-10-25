@@ -235,9 +235,13 @@ impl ToolSet {
                         } else {
                             factory_tasks::ReceiptStatus::Unchanged
                         },
-                        before: Some(outcome.before_sha256),
-                        after: Some(outcome.after_sha256),
-                        artifact: json!({ "path": args["path"] }),
+                        before: Some(outcome.before_sha256.clone()),
+                        after: Some(outcome.after_sha256.clone()),
+                        artifact: json!({
+                            "path": args["path"],
+                            "before": outcome.before_sha256,
+                            "after": outcome.after_sha256,
+                        }),
                         partial: false,
                     },
                     Ok(Err(failure)) => refused(failure.code(), &failure.to_string()),

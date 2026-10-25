@@ -1,0 +1,45 @@
+{
+  "anthropic_version": "2026-10-21",
+  "captured_utc": "2026-10-25T13:51:38Z",
+  "endpoint": "https://api.anthropic.com/v1/messages",
+  "evidence_kind": "live",
+  "model_reported": "claude-haiku-5-5",
+  "model_requested": "claude-haiku-5-5",
+  "name": "agent-finish-turn",
+  "outcome": {
+    "finish_reason": "tool_use",
+    "response_id": "msg_011CgP4i9wBki1ALMeYVGVEL",
+    "tool_calls": [
+      {
+        "arguments": {
+          "changed_files": [
+            "common/ideas/agent_test.txt"
+          ],
+          "open_questions": [],
+          "summary": "Created common/ideas/agent_test.txt containing the line \"# written by the HOI4 Factory agent test\" followed by a newline. The write succeeded with expected_sha256 \"absent\"; no other files were read or changed."
+        },
+        "id": "toolu_01FPVztL6cDstrc6iq7D41oi",
+        "index": 0,
+        "name": "finish",
+        "raw_arguments": "{\"changed_files\": [\"common/ideas/agent_test.txt\"], \"open_questions\": [], \"summary\": \"Created common/ideas/agent_test.txt containing the line \\\"# written by the HOI4 Factory agent test\\\" followed by a newline. The write succeeded with expected_sha256 \\\"absent\\\"; no other files were read or changed.\"}"
+      }
+    ],
+    "usage": {
+      "cached_input_tokens": 0,
+      "input_tokens": 1338,
+      "output_tokens": 181,
+      "reasoning_tokens": 0
+    }
+  },
+  "redaction": "x-api-key is never recorded; only the response body bytes are kept.",
+  "request_summary": {
+    "messages": 3,
+    "system": "factory_server::agent::runner::SYSTEM_PROMPT",
+    "tools": [
+      "list_files",
+      "read_file",
+      "write_file",
+      "finish"
+    ]
+  }
+}

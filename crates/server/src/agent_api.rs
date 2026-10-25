@@ -578,7 +578,9 @@ async fn task_detail(
     let rt = runtime(&state)?;
     let project = project_for(&state, &principal, &id, Permission::ReadProject).await?;
     let task = load_task(rt, &principal, &project, &task).await?;
-    let mut tx = rt.tx(principal.account_id()).await?;
+    // Task, attempts and effects from one snapshot, so the pair is always consistent.
+    let mut tx = rt.snapshot(principal.account_id()).await?;
+    let task = factory_tasks::get_task(&mut tx, task.id).await.map_err(task_error)?;
     let attempts = factory_tasks::list_attempts(&mut tx, task.id).await.map_err(task_error)?;
     let mut list = Vec::new();
     for a in &attempts {
@@ -770,19 +772,29 @@ async fn resume(
     let rt = runtime(&state)?;
     let project = active_project_for(&state, &principal, &id, Permission::CreateTask).await?;
     let task = load_task(rt, &principal, &project, &task).await?;
+    if task.version != body.expected_version {
+        return Err(task_error(factory_tasks::TaskError::VersionConflict { current: task.version }).into());
+    }
+    // A suspended attempt continues from its saved conversation once its lease is retaken; a
+    // busy workspace is refused before the pause is cleared.
+    let active = active_attempt(rt, principal.account_id(), task.id).await?;
+    let resumable = match &active {
+        Some(a) if !rt.is_running(a.id) && matches!(a.state, AttemptState::Running | AttemptState::Admitted) => {
+            Some(recovery::prepare_resume(rt, principal.account_id(), &task, a).await?)
+        }
+        _ => None,
+    };
     let mut tx = rt.tx(principal.account_id()).await?;
     let task = factory_tasks::set_paused(&mut tx, task.id, body.expected_version, false, None, Actor::user(principal.account_id()))
         .await
         .map_err(task_error)?;
     tx.commit().await?;
-    if let Some(a) = active_attempt(rt, principal.account_id(), task.id).await? {
-        if rt.is_running(a.id) {
+    match (active, resumable) {
+        (_, Some(r)) => recovery::start_resumed(rt, r),
+        (Some(a), None) if rt.is_running(a.id) => {
             rt.signal(a.id, Control::Run);
-        } else if matches!(a.state, AttemptState::Running | AttemptState::Admitted) {
-            // A suspended attempt continues from its saved conversation, after the grant,
-            // lease and worktree checks that a fresh start makes.
-            recovery::resume(rt, principal.account_id(), &task, &a).await?;
         }
+        _ => {}
     }
     rt.notify(task.id);
     Ok(Json(task_json(rt, principal.account_id(), &task).await))

@@ -1,0 +1,43 @@
+{
+  "anthropic_version": "2026-10-21",
+  "captured_utc": "2026-10-25T13:51:41Z",
+  "endpoint": "https://api.anthropic.com/v1/messages",
+  "evidence_kind": "live",
+  "model_reported": "claude-haiku-5-5",
+  "model_requested": "claude-haiku-5-5",
+  "name": "agent-write-outside-turn",
+  "outcome": {
+    "finish_reason": "tool_use",
+    "response_id": "msg_011CgP4iKHW6HoqxRoxjZM93",
+    "tool_calls": [
+      {
+        "arguments": {
+          "content": "outside\n",
+          "expected_sha256": "absent",
+          "path": "events/outside.txt"
+        },
+        "id": "toolu_01HWqnr1bGcf41h2NytwGX6p",
+        "index": 1,
+        "name": "write_file",
+        "raw_arguments": "{\"content\": \"outside\\n\", \"expected_sha256\": \"absent\", \"path\": \"events/outside.txt\"}"
+      }
+    ],
+    "usage": {
+      "cached_input_tokens": 0,
+      "input_tokens": 1088,
+      "output_tokens": 196,
+      "reasoning_tokens": 0
+    }
+  },
+  "redaction": "x-api-key is never recorded; only the response body bytes are kept.",
+  "request_summary": {
+    "messages": 1,
+    "system": "factory_server::agent::runner::SYSTEM_PROMPT",
+    "tools": [
+      "list_files",
+      "read_file",
+      "write_file",
+      "finish"
+    ]
+  }
+}

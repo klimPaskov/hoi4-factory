@@ -137,7 +137,8 @@ async fn recover_one(rt: &AgentRuntime, item: &RecoveryItem) -> Result<bool, Str
                     } else {
                         ReconciliationDecision::Conflict
                     };
-                    (decision, json!({ "path": path, "observed_sha256": hash, "expected_before": expected, "intended_after": intended }), Some(hash))
+                    let observed = (hash != ABSENT).then(|| hash.clone());
+                    (decision, json!({ "path": path, "observed_sha256": hash, "expected_before": expected, "intended_after": intended }), observed)
                 }
                 Err(why) => (ReconciliationDecision::Conflict, json!({ "path": path, "error": why }), None),
             }
@@ -247,11 +248,22 @@ pub fn tool_state_dir(rt: &AgentRuntime, task: &Task) -> std::path::PathBuf {
         .join(task.project_id.to_string())
 }
 
-/// Resumes a suspended attempt from its persisted conversation (after the pause is cleared).
-pub async fn resume(rt: &AgentRuntime, account: AccountId, task: &Task, attempt: &Attempt) -> Result<(), ApiError> {
-    if rt.is_running(attempt.id) {
-        return Ok(());
-    }
+/// A suspended attempt ready to continue: its lease is taken, its plan rebuilt.
+pub struct Resumable {
+    plan: AttemptPlan,
+    conversation: Option<Conversation>,
+    first: Option<String>,
+}
+
+/// Starts a prepared attempt (after the pause is cleared).
+pub fn start_resumed(rt: &AgentRuntime, r: Resumable) {
+    launch(rt, r.plan, r.conversation, r.first);
+}
+
+/// Takes the lease and rebuilds the plan of a suspended attempt from what the ledger holds. A
+/// busy workspace is refused here, before anything about the task changes.
+pub async fn prepare_resume(rt: &AgentRuntime, account: AccountId, task: &Task, attempt: &Attempt) -> Result<Resumable, ApiError> {
+    let _ = account;
     let mut tx = rt.tx(account).await?;
     let grant = get_grant(&mut tx, GrantId(attempt.grant_id))
         .await
@@ -311,8 +323,7 @@ pub async fn resume(rt: &AgentRuntime, account: AccountId, task: &Task, attempt:
         budget_micros: task.budget_micros,
         max_turns: u32::try_from(task.max_turns).unwrap_or(20),
     };
-    launch(rt, plan, conversation.filter(|_| first.is_none()), first);
-    Ok(())
+    Ok(Resumable { plan, conversation: conversation.filter(|_| first.is_none()), first })
 }
 
 /// The worktree's HEAD commit, as the source snapshot of a replay identity.

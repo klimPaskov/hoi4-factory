@@ -55,6 +55,40 @@ pub fn tool(name: &str, description: &str, schema: &Value, strict: bool) -> Valu
 
 /// Render a provider-neutral request as a Messages body, with the profile's
 /// starting capabilities.
+/// Keywords Anthropic's strict tool mode refuses (observed 2026-10-25: "For 'array' type,
+/// property 'maxItems' is not supported", HTTP 400, no charge). The provider receives the schema
+/// without them; the host still validates the full closed schema on the final arguments, so the
+/// bounds hold either way.
+pub const STRICT_UNSUPPORTED: &[&str] = &[
+    "maxItems", "minItems", "maxLength", "minLength", "pattern", "format", "minimum", "maximum",
+    "exclusiveMinimum", "exclusiveMaximum", "multipleOf", "uniqueItems",
+];
+
+/// `schema` without the keywords strict mode refuses, at every depth.
+pub fn strict_schema(schema: &Value) -> Value {
+    match schema {
+        Value::Object(map) => Value::Object(
+            map.iter()
+                .filter(|(k, _)| !STRICT_UNSUPPORTED.contains(&k.as_str()))
+                .map(|(k, v)| {
+                    // Property names are data, not keywords: keep every name, condition the values.
+                    let v = if k == "properties" || k == "$defs" {
+                        match v {
+                            Value::Object(props) => Value::Object(props.iter().map(|(n, s)| (n.clone(), strict_schema(s))).collect()),
+                            other => other.clone(),
+                        }
+                    } else {
+                        strict_schema(v)
+                    };
+                    (k.clone(), v)
+                })
+                .collect(),
+        ),
+        Value::Array(items) => Value::Array(items.iter().map(strict_schema).collect()),
+        other => other.clone(),
+    }
+}
+
 pub fn render(req: &ModelRequest, profile: &ModelProfile) -> Value {
     render_with(req, profile, &profile.starting_capabilities())
 }
@@ -92,7 +126,8 @@ pub fn render_with(req: &ModelRequest, profile: &ModelProfile, caps: &Capabiliti
         .tools
         .iter()
         .map(|t| {
-            let mut v = tool(&t.name, &t.description, &t.input_schema, strict);
+            let schema = if strict { strict_schema(&t.input_schema) } else { t.input_schema.clone() };
+            let mut v = tool(&t.name, &t.description, &schema, strict);
             if !strict {
                 v.as_object_mut().map(|o| o.remove("strict"));
             }
@@ -530,6 +565,27 @@ mod tests {
             v["tools"][0]["strict"], true,
             "strict recorded as supported for this model"
         );
+    }
+
+    #[test]
+    fn strict_mode_gets_a_conditioned_schema() {
+        let schema = json!({
+            "type": "object",
+            "properties": {
+                "maxItems": {"type": "string", "maxLength": 3},
+                "list": {"type": "array", "items": {"type": "string", "pattern": "^a"}, "maxItems": 2}
+            },
+            "required": ["list"],
+            "additionalProperties": false
+        });
+        let s = strict_schema(&schema);
+        // A property that happens to be called maxItems stays; the keyword goes.
+        assert!(s["properties"]["maxItems"].get("maxLength").is_none());
+        assert_eq!(s["properties"]["maxItems"]["type"], "string");
+        assert!(s["properties"]["list"].get("maxItems").is_none());
+        assert!(s["properties"]["list"]["items"].get("pattern").is_none());
+        assert_eq!(s["additionalProperties"], false);
+        assert_eq!(s["required"], json!(["list"]));
     }
 
     #[test]

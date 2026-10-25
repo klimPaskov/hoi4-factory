@@ -54,6 +54,9 @@ pub struct WorkerLauncher {
     pub program: PathBuf,
     /// Arguments before `--generation N`.
     pub args: Vec<String>,
+    /// Extra environment of the worker (its environment is otherwise cleared). Tests use it for
+    /// the debug-build worker faults.
+    pub env: Vec<(String, String)>,
 }
 
 impl WorkerLauncher {
@@ -62,6 +65,7 @@ impl WorkerLauncher {
         Some(Self {
             program: std::env::current_exe().ok()?,
             args: vec!["agent-worker".into()],
+            env: Vec::new(),
         })
     }
 }
@@ -194,6 +198,20 @@ impl AgentRuntime {
     /// A transaction with row-level security scoped to `account`.
     pub async fn tx(&self, account: AccountId) -> Result<Transaction<'static, Postgres>, ApiError> {
         self.inner.db.scoped(account).begin().await
+    }
+
+    /// A read-only transaction scoped to `account` that sees one snapshot for all its
+    /// statements (REPEATABLE READ), for answers that combine several tables.
+    pub async fn snapshot(&self, account: AccountId) -> Result<Transaction<'static, Postgres>, ApiError> {
+        let mut tx = self.inner.db.pool().begin().await?;
+        sqlx::query("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY")
+            .execute(&mut *tx)
+            .await?;
+        sqlx::query("SELECT set_config('app.account_id', $1, true)")
+            .bind(account.to_string())
+            .execute(&mut *tx)
+            .await?;
+        Ok(tx)
     }
 
     /// Wakes the event streams of `task`.

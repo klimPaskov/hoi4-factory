@@ -40,6 +40,10 @@ pub enum Reply {
         status: u16,
         location: String,
     },
+    /// The n-th request on the path gets the n-th reply; the last one repeats.
+    Sequence(Vec<Reply>),
+    /// Waits, then answers with the inner reply (a slow provider).
+    Delayed(std::time::Duration, Box<Reply>),
 }
 
 impl Reply {
@@ -217,13 +221,24 @@ async fn handle(
     }
     let target = head.split_whitespace().nth(1).unwrap_or("/");
     let path = target.split('?').next().unwrap_or("/").to_owned();
+    let mut nth = 0;
     if let (Ok(mut c), Ok(mut b)) = (counts.lock(), bodies.lock()) {
-        *c.entry(path.clone()).or_default() += 1;
+        let count = c.entry(path.clone()).or_default();
+        *count += 1;
+        nth = (*count - 1) as usize;
         b.entry(path.clone())
             .or_default()
             .push(String::from_utf8_lossy(&buf[header_end..]).into_owned());
     }
-    let Some(reply) = routes.get(&path) else {
+    let mut reply = match routes.get(&path) {
+        Some(Reply::Sequence(list)) => list.get(nth).or_else(|| list.last()),
+        other => other,
+    };
+    if let Some(Reply::Delayed(wait, inner)) = reply {
+        tokio::time::sleep(*wait).await;
+        reply = Some(inner.as_ref());
+    }
+    let Some(reply) = reply else {
         return s
             .write_all(b"HTTP/1.1 404 Not Found\r\ncontent-length: 0\r\nconnection: close\r\n\r\n")
             .await;
@@ -237,6 +252,10 @@ async fn handle(
             s.write_all(head.as_bytes()).await?;
             s.write_all(body.as_bytes()).await?;
             s.shutdown().await
+        }
+        Reply::Sequence(_) | Reply::Delayed(..) => {
+            s.write_all(b"HTTP/1.1 500 X\r\ncontent-length: 0\r\nconnection: close\r\n\r\n")
+                .await
         }
         Reply::Redirect { status, location } => {
             let head = format!(

@@ -185,6 +185,30 @@ struct Options {
     model: Option<Arc<dyn factory_setup_adapter::ModelClient>>,
     /// Replaces where Setup fetches its workflow package from.
     setup_source: Option<Arc<dyn factory_setup_adapter::setup::SourceFetcher>>,
+    /// More configuration variables (the agent tests point the model API at a replay server).
+    extra_vars: Vec<(&'static str, String)>,
+    agent: AgentOptions,
+}
+
+/// Agent host replacements, kept for restarts.
+#[derive(Default, Clone)]
+struct AgentOptions {
+    worker: Option<factory_server::agent::WorkerLauncher>,
+    settings: Option<factory_server::agent::RunnerSettings>,
+    tools: Option<Option<factory_server::agent::AgentToolsSettings>>,
+    skip_recovery: bool,
+}
+
+impl AgentOptions {
+    fn apply(&self, overrides: Overrides) -> Overrides {
+        Overrides {
+            agent_worker: self.worker.clone(),
+            agent_settings: self.settings.clone(),
+            agent_tools: self.tools.clone(),
+            agent_skip_recovery: self.skip_recovery,
+            ..overrides
+        }
+    }
 }
 
 struct Harness {
@@ -199,6 +223,7 @@ struct Harness {
     vars: BTreeMap<&'static str, String>,
     model: Option<Arc<dyn factory_setup_adapter::ModelClient>>,
     setup_source: Option<Arc<dyn factory_setup_adapter::setup::SourceFetcher>>,
+    agent: AgentOptions,
 }
 
 fn test_config(vars: &BTreeMap<&'static str, String>) -> ServerConfig {
@@ -247,6 +272,9 @@ impl Harness {
         if let Some(key) = options.anthropic_key {
             vars.insert("FACTORY_ANTHROPIC_API_KEY", key.to_owned());
         }
+        for (k, v) in &options.extra_vars {
+            vars.insert(*k, v.clone());
+        }
         if let Some(limit) = options.upload_max_bytes {
             vars.insert("FACTORY_UPLOAD_MAX_BYTES", limit.to_string());
         }
@@ -281,7 +309,7 @@ impl Harness {
                 app_installations: Some(installations.clone()),
                 model_client: options.model.clone(),
                 setup_source: options.setup_source.clone(),
-                ..Overrides::default()
+                ..options.agent.apply(Overrides::default())
             },
         )
         .await
@@ -299,6 +327,7 @@ impl Harness {
             vars,
             model: options.model,
             setup_source: options.setup_source,
+            agent: options.agent,
         }
     }
 
@@ -324,7 +353,7 @@ impl Harness {
                 app_installations: Some(self.installations.clone()),
                 model_client: self.model.clone(),
                 setup_source: self.setup_source.clone(),
-                ..Overrides::default()
+                ..self.agent.apply(Overrides::default())
             },
         )
         .await
