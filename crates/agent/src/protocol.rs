@@ -7,9 +7,16 @@
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+
+use crate::destination::DestinationPolicy;
+use crate::errors::NormalizedError;
+use crate::profile::ModelProfile;
+use crate::request::ModelRequest;
+use crate::types::{Turn, TurnError};
 use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt};
 
-pub const PROTOCOL_VERSION: u32 = 1;
+/// Version 2 adds `Cancel` and the typed `RunTurnPayload` / `TurnOutcome`.
+pub const PROTOCOL_VERSION: u32 = 2;
 pub const SCHEMA_VERSION: u32 = 1;
 pub const MAX_FRAME: usize = 1024 * 1024;
 
@@ -32,10 +39,70 @@ pub enum Body {
         adapters: Vec<String>,
     },
     /// Host asks the worker to run one model turn.
-    RunTurn { payload: Value },
+    RunTurn {
+        payload: Value,
+    },
     /// Worker returns the turn outcome. The host still validates any tool call.
-    TurnResult { payload: Value },
+    TurnResult {
+        payload: Value,
+    },
+    /// Host asks the worker to stop the turn named by the frame's request and
+    /// attempt IDs. A cooperative worker answers with a `TurnResult` whose
+    /// error is `Cancelled`; the host kills a worker that does not.
+    Cancel,
     Shutdown,
+}
+
+/// The API credential for one turn. It travels inside the `RunTurn` frame
+/// (never in argv or the environment of the worker), so it serializes, but it
+/// never prints.
+#[derive(Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct Credential(String);
+
+impl Credential {
+    pub fn new(secret: impl Into<String>) -> Self {
+        Self(secret.into())
+    }
+    pub fn into_api_key(self) -> crate::openai::ApiKey {
+        crate::openai::ApiKey::new(self.0)
+    }
+}
+
+impl std::fmt::Debug for Credential {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("[REDACTED]")
+    }
+}
+
+/// Payload of `Body::RunTurn`.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct RunTurnPayload {
+    pub profile: ModelProfile,
+    pub credential: Credential,
+    pub request: ModelRequest,
+    pub policy: DestinationPolicy,
+    pub max_response_bytes: u64,
+}
+
+/// A failed turn with both the detailed error and its envelope view.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct TurnErrorReport {
+    pub error: TurnError,
+    pub normalized: NormalizedError,
+}
+
+impl From<TurnError> for TurnErrorReport {
+    fn from(error: TurnError) -> Self {
+        let normalized = error.normalized();
+        Self { error, normalized }
+    }
+}
+
+/// Payload of `Body::TurnResult`.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct TurnOutcome {
+    pub result: Result<Turn, TurnErrorReport>,
+    pub elapsed_ms: u64,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -101,6 +168,46 @@ mod tests {
         let back = read_frame(&mut buf.as_slice()).await.unwrap();
         assert_eq!(back, f);
         let junk = b"hello world\n".to_vec();
-        assert!(matches!(read_frame(&mut junk.as_slice()).await, Err(FrameError::TooLarge(_))));
+        assert!(matches!(
+            read_frame(&mut junk.as_slice()).await,
+            Err(FrameError::TooLarge(_))
+        ));
+    }
+
+    #[test]
+    fn credential_serializes_but_never_prints() {
+        let p = RunTurnPayload {
+            profile: ModelProfile::anthropic_haiku(),
+            credential: Credential::new("sk-test-secret-value"),
+            request: ModelRequest {
+                system: String::new(),
+                messages: vec![],
+                tools: vec![],
+                max_output_tokens: 1,
+            },
+            policy: DestinationPolicy::default(),
+            max_response_bytes: 1,
+        };
+        assert!(!format!("{p:?}").contains("sk-test-secret-value"));
+        assert!(format!("{p:?}").contains("[REDACTED]"));
+        let wire = serde_json::to_value(&p).unwrap();
+        assert_eq!(wire["credential"], "sk-test-secret-value");
+        let back: RunTurnPayload = serde_json::from_value(wire).unwrap();
+        assert_eq!(back, p);
+    }
+
+    #[test]
+    fn outcome_roundtrips_both_arms() {
+        let err = TurnOutcome {
+            result: Err(TurnError::Cancelled {
+                partial: Default::default(),
+            }
+            .into()),
+            elapsed_ms: 5,
+        };
+        let back: TurnOutcome =
+            serde_json::from_value(serde_json::to_value(&err).unwrap()).unwrap();
+        assert_eq!(back, err);
+        assert_eq!(back.result.unwrap_err().normalized.code, "cancelled");
     }
 }

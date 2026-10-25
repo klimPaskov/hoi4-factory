@@ -9,8 +9,10 @@
 
 use serde_json::{Value, json};
 
+use crate::profile::{Capabilities, Capability, ModelProfile};
+use crate::request::{ModelRequest, Part, Role};
 use crate::sse::SseParser;
-use crate::transport::{ByteSource, TransportError};
+use crate::transport::ByteSource;
 use crate::types::*;
 
 pub const PROVIDER: &str = "openai-chat-completions";
@@ -77,6 +79,108 @@ pub fn request_body(
     b
 }
 
+/// Render a provider-neutral request as a Chat Completions body, with the
+/// profile's starting capabilities. Assistant tool uses become `tool_calls`
+/// and tool results become `role: "tool"` messages.
+pub fn render(req: &ModelRequest, profile: &ModelProfile) -> Value {
+    render_with(req, profile, &profile.starting_capabilities())
+}
+
+/// Render with explicit capabilities. The tool `strict` flag is sent only when
+/// strict JSON schema is `Supported`; it is never inferred from compatibility.
+pub fn render_with(req: &ModelRequest, profile: &ModelProfile, caps: &Capabilities) -> Value {
+    let strict = caps.is_supported(Capability::StrictJsonSchema);
+    let mut messages: Vec<Value> = Vec::new();
+    if !req.system.is_empty() {
+        messages.push(json!({"role": "system", "content": req.system}));
+    }
+    for m in &req.messages {
+        match m.role {
+            Role::User => {
+                let mut text = String::new();
+                for p in &m.parts {
+                    match p {
+                        Part::Text { text: t } => {
+                            if !text.is_empty() {
+                                text.push('\n');
+                            }
+                            text.push_str(t);
+                        }
+                        Part::ToolResult {
+                            tool_use_id,
+                            content,
+                            is_error,
+                        } => {
+                            let content = if *is_error && !content.starts_with("Error:") {
+                                format!("Error: {content}")
+                            } else {
+                                content.clone()
+                            };
+                            messages.push(json!({"role": "tool", "tool_call_id": tool_use_id, "content": content}));
+                        }
+                        Part::ToolUse { .. } => {}
+                    }
+                }
+                if !text.is_empty() {
+                    messages.push(json!({"role": "user", "content": text}));
+                }
+            }
+            Role::Assistant => {
+                let text: String = m
+                    .parts
+                    .iter()
+                    .filter_map(|p| {
+                        if let Part::Text { text } = p {
+                            Some(text.as_str())
+                        } else {
+                            None
+                        }
+                    })
+                    .collect::<Vec<_>>()
+                    .join("\n");
+                let calls: Vec<Value> = m
+                    .parts
+                    .iter()
+                    .filter_map(|p| match p {
+                        Part::ToolUse { id, name, input } => Some(json!({
+                            "id": id, "type": "function",
+                            "function": {"name": name, "arguments": input.to_string()}
+                        })),
+                        _ => None,
+                    })
+                    .collect();
+                if text.is_empty() && calls.is_empty() {
+                    continue;
+                }
+                let mut msg = json!({"role": "assistant", "content": if text.is_empty() { Value::Null } else { json!(text) }});
+                if !calls.is_empty() {
+                    msg["tool_calls"] = Value::Array(calls);
+                }
+                messages.push(msg);
+            }
+        }
+    }
+    let tools: Vec<Value> = req
+        .tools
+        .iter()
+        .map(|t| {
+            let mut v = function_tool(&t.name, &t.description, &t.input_schema, strict);
+            if !strict {
+                v["function"].as_object_mut().map(|o| o.remove("strict"));
+            }
+            v
+        })
+        .collect();
+    request_body(
+        &profile.model,
+        messages,
+        &tools,
+        None,
+        req.max_output_tokens.min(profile.max_output_tokens),
+        None,
+    )
+}
+
 /// Map an OpenAI function tool definition from a closed JSON Schema.
 pub fn function_tool(name: &str, description: &str, schema: &Value, strict: bool) -> Value {
     json!({
@@ -90,7 +194,10 @@ pub fn function_tool(name: &str, description: &str, schema: &Value, strict: bool
 /// 2026-10-24 with code `credit_balance_exhausted`) or the code names quota.
 pub fn classify_status(status: u16, error_type: Option<&str>, code: Option<&str>) -> HttpClass {
     let quota = error_type == Some("insufficient_quota")
-        || matches!(code, Some("insufficient_quota" | "credit_balance_exhausted" | "billing_hard_limit_reached"));
+        || matches!(
+            code,
+            Some("insufficient_quota" | "credit_balance_exhausted" | "billing_hard_limit_reached")
+        );
     match status {
         401 => HttpClass::Auth,
         403 => HttpClass::Permission,
@@ -122,21 +229,39 @@ pub struct OpenAiClient {
     http: reqwest::Client,
     base_url: String,
     key: ApiKey,
+    max_response_bytes: u64,
 }
 
 #[cfg(feature = "http")]
 impl OpenAiClient {
+    /// A plain client without the destination policy. Production code uses
+    /// [`OpenAiClient::with_client`] with [`crate::destination::outbound_client`].
     pub fn new(base_url: &str, key: ApiKey, timeout: std::time::Duration) -> reqwest::Result<Self> {
         let http = reqwest::Client::builder()
             .connect_timeout(std::time::Duration::from_secs(10))
             .read_timeout(timeout)
             .redirect(reqwest::redirect::Policy::none())
             .build()?;
-        Ok(Self {
+        Ok(Self::with_client(
+            http,
+            base_url,
+            key,
+            crate::transport::DEFAULT_MAX_RESPONSE_BYTES,
+        ))
+    }
+
+    pub fn with_client(
+        http: reqwest::Client,
+        base_url: &str,
+        key: ApiKey,
+        max_response_bytes: u64,
+    ) -> Self {
+        Self {
             http,
             base_url: base_url.trim_end_matches('/').to_owned(),
             key,
-        })
+            max_response_bytes,
+        }
     }
 
     /// Send the request. Returns the body as a byte source once a 2xx status is
@@ -155,14 +280,7 @@ impl OpenAiClient {
             .body(serde_json::to_vec(body).unwrap_or_default())
             .send()
             .await
-            .map_err(|e| {
-                let (error, acceptance) = if e.is_connect() {
-                    (TransportError::ConnectFailed(redact(&e.to_string())), Acceptance::NotAccepted)
-                } else {
-                    (TransportError::AfterSend(redact(&e.to_string())), Acceptance::Uncertain)
-                };
-                TurnError::Transport { error, acceptance, partial: Partial::default() }
-            })?;
+            .map_err(crate::transport::map_send_error)?;
         let h = resp.headers();
         let hv = |k: &str| h.get(k).and_then(|v| v.to_str().ok()).map(str::to_owned);
         let meta = ResponseMeta {
@@ -171,18 +289,17 @@ impl OpenAiClient {
             processing_ms: hv("openai-processing-ms"),
             content_type: hv("content-type"),
         };
+        crate::transport::redirect_check(meta.status)?;
         if !resp.status().is_success() {
             let status = meta.status;
-            let body = resp.bytes().await.unwrap_or_default();
-            let body = &body[..body.len().min(64 * 1024)];
-            return Err(TurnError::Http(refusal_from_body(status, body)));
+            let body = crate::transport::read_capped(resp, 64 * 1024)
+                .await
+                .unwrap_or_default();
+            return Err(TurnError::Http(refusal_from_body(status, &body)));
         }
-        Ok((ByteSource::Live { resp, tee }, meta))
+        Ok((ByteSource::live(resp, tee, self.max_response_bytes), meta))
     }
-}
 
-#[cfg(feature = "http")]
-impl OpenAiClient {
     /// Inspect-provider operation: list model IDs (no inference, no spend).
     pub async fn list_models(&self) -> Result<(u16, Vec<String>), TurnError> {
         let resp = self
@@ -191,18 +308,28 @@ impl OpenAiClient {
             .bearer_auth(&self.key.0)
             .send()
             .await
-            .map_err(|e| TurnError::Transport {
-                error: TransportError::ConnectFailed(redact(&e.to_string())),
-                acceptance: if e.is_connect() { Acceptance::NotAccepted } else { Acceptance::Uncertain },
+            .map_err(crate::transport::map_send_error)?;
+        let status = resp.status().as_u16();
+        crate::transport::redirect_check(status)?;
+        let body = crate::transport::read_capped(resp, self.max_response_bytes.min(1024 * 1024))
+            .await
+            .map_err(|error| TurnError::Transport {
+                error,
+                acceptance: Acceptance::Accepted,
                 partial: Partial::default(),
             })?;
-        let status = resp.status().as_u16();
-        let body = resp.bytes().await.unwrap_or_default();
         if !(200..300).contains(&status) {
             return Err(TurnError::Http(refusal_from_body(status, &body)));
         }
         let v: Value = serde_json::from_slice(&body).unwrap_or(Value::Null);
-        let ids = v["data"].as_array().map(|a| a.iter().filter_map(|m| m["id"].as_str().map(str::to_owned)).collect()).unwrap_or_default();
+        let ids = v["data"]
+            .as_array()
+            .map(|a| {
+                a.iter()
+                    .filter_map(|m| m["id"].as_str().map(str::to_owned))
+                    .collect()
+            })
+            .unwrap_or_default();
         Ok((status, ids))
     }
 }
@@ -286,7 +413,9 @@ fn apply_event(st: &mut State, data: &str) -> Result<(), TurnError> {
     if let Some(u) = v.get("usage").filter(|u| u.is_object()) {
         st.p.usage = Some(Usage {
             input_tokens: u["prompt_tokens"].as_u64().unwrap_or(0),
-            cached_input_tokens: u["prompt_tokens_details"]["cached_tokens"].as_u64().unwrap_or(0),
+            cached_input_tokens: u["prompt_tokens_details"]["cached_tokens"]
+                .as_u64()
+                .unwrap_or(0),
             output_tokens: u["completion_tokens"].as_u64().unwrap_or(0),
             reasoning_tokens: u["completion_tokens_details"]["reasoning_tokens"]
                 .as_u64()
@@ -308,7 +437,10 @@ fn apply_event(st: &mut State, data: &str) -> Result<(), TurnError> {
                     let slot = match st.p.tool_calls.iter_mut().position(|x| x.index == idx) {
                         Some(i) => &mut st.p.tool_calls[i],
                         None => {
-                            st.p.tool_calls.push(PartialToolCall { index: idx, ..Default::default() });
+                            st.p.tool_calls.push(PartialToolCall {
+                                index: idx,
+                                ..Default::default()
+                            });
                             st.p.tool_calls.last_mut().unwrap()
                         }
                     };
@@ -333,7 +465,10 @@ fn apply_event(st: &mut State, data: &str) -> Result<(), TurnError> {
 
 fn finish(st: State, tail: crate::sse::SseTail) -> Result<Turn, TurnError> {
     let p = st.p;
-    let incomplete = |detail: &str, p: Partial| TurnError::IncompleteOutput { detail: detail.into(), partial: p };
+    let incomplete = |detail: &str, p: Partial| TurnError::IncompleteOutput {
+        detail: detail.into(),
+        partial: p,
+    };
     if !tail.is_clean() {
         return Err(incomplete(
             &format!(
@@ -350,7 +485,10 @@ fn finish(st: State, tail: crate::sse::SseTail) -> Result<Turn, TurnError> {
         return Err(incomplete("stream ended without [DONE] marker", p));
     }
     if fr == "length" || fr == "content_filter" {
-        return Err(incomplete(&format!("finish_reason={fr}, output was cut by the provider"), p));
+        return Err(incomplete(
+            &format!("finish_reason={fr}, output was cut by the provider"),
+            p,
+        ));
     }
     let mut calls = Vec::new();
     for tc in &p.tool_calls {
@@ -392,8 +530,14 @@ mod tests {
     #[test]
     fn status_classes() {
         assert_eq!(classify_status(401, None, None), HttpClass::Auth);
-        assert_eq!(classify_status(429, None, Some("insufficient_quota")), HttpClass::Quota);
-        assert_eq!(classify_status(429, Some("requests"), Some("rate_limit_exceeded")), HttpClass::RateLimited);
+        assert_eq!(
+            classify_status(429, None, Some("insufficient_quota")),
+            HttpClass::Quota
+        );
+        assert_eq!(
+            classify_status(429, Some("requests"), Some("rate_limit_exceeded")),
+            HttpClass::RateLimited
+        );
         assert_eq!(classify_status(503, None, None), HttpClass::Overloaded);
     }
 
@@ -411,7 +555,14 @@ mod tests {
 
     #[test]
     fn body_shape() {
-        let b = request_body("m", vec![json!({"role":"user","content":"x"})], &[], None, 16, None);
+        let b = request_body(
+            "m",
+            vec![json!({"role":"user","content":"x"})],
+            &[],
+            None,
+            16,
+            None,
+        );
         assert_eq!(b["stream"], true);
         assert_eq!(b["stream_options"]["include_usage"], true);
         assert!(b.get("tools").is_none());
