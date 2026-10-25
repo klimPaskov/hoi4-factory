@@ -47,6 +47,14 @@ const FIXED_PATH: &str = "/usr/local/bin:/usr/bin:/bin";
 #[cfg(not(unix))]
 const FIXED_PATH: &str = "C:\\Windows\\System32";
 
+/// Creates `state_dir` and returns its canonical path. Agent Tools refuses a state root that
+/// contains a symbolic link or junction (`SERVER_STATE_UNSAFE`), and macOS temp folders sit
+/// behind one, so the host passes the result of this function to [`agent_tools_spec`].
+pub fn prepare_state_dir(state_dir: &Path) -> std::io::Result<PathBuf> {
+    std::fs::create_dir_all(state_dir)?;
+    state_dir.canonicalize()
+}
+
 /// Builds the launch spec. `state_dir` must be outside the mod so the server's caches and
 /// artifacts never land in mod source.
 pub fn agent_tools_spec(

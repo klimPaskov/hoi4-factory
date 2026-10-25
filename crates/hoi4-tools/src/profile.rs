@@ -500,7 +500,17 @@ pub fn agent_tools_read_only() -> ToolProfile {
 }
 
 /// Input-schema hashes of the pinned server (4.4.0, commit 731e64f), in profile order.
-const SCHEMA_HASHES: [Option<&str>; 9] = [None; 9];
+const SCHEMA_HASHES: [Option<&str>; 9] = [
+    Some("939462b1642f19d2753b6b192e5458be0745a41ffc38056047e613a58afb0a7c"),
+    Some("ae6435313935a25847456a6fd057bbabe373150fbd8433012d22210affd20287"),
+    Some("077ffc26f39c6510fbed9700a4885c05e8b4b6b79f6a038b4b8b9b5a38c2ae61"),
+    Some("d86e10b44856dae435eb5b67a900c7e13218e52faedccb80c9a073630f3096ec"),
+    Some("6b51bfb51884acc7bac95b3a77e750f059459b752c6758d8583385756e86fbed"),
+    Some("5159991d7d1b98d3f274530ebe8ca4bcb5b77122d9580f5dcff7fd99ff97a7d8"),
+    Some("b0abf49e379a42e76060b17190330e3483320f3f2cddf054de681b5b3b7200d9"),
+    Some("3f93693404b4e038cb91472437e7d6865c4b51c74001606f7815121088527b81"),
+    Some("b2135ab776f8fb9de86dd9d96d01799dba999f88c5010d5a89ce53f62f59ea04"),
+];
 
 #[cfg(test)]
 mod tests {

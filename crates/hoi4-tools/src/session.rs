@@ -463,10 +463,11 @@ fn bound_output(output: &mut ToolOutput, max_bytes: usize) -> bool {
         return false;
     }
     let mut budget = max_bytes;
-    // Structured content is kept whole or dropped: a cut JSON document would mislead.
+    // Structured content carries the real payload (content is a summary); it is kept whole or
+    // dropped: a cut JSON document would mislead.
     if let Some(structured) = output.structured.take() {
         let n = size(&structured);
-        if n <= budget / 2 {
+        if n <= budget {
             budget -= n;
             output.structured = Some(structured);
         }

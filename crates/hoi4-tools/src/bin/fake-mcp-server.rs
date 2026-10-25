@@ -57,10 +57,10 @@ fn main() {
     let mut keys: Vec<String> = std::env::vars().map(|(k, _)| k).collect();
     keys.sort();
     log(&format!("env {}", keys.join(",")));
-    if mode == "stubborn" {
-        if let Ok(child) = std::process::Command::new("sleep").arg("300").spawn() {
-            log(&format!("helper {}", child.id()));
-        }
+    if mode == "stubborn"
+        && let Ok(child) = std::process::Command::new("sleep").arg("300").spawn()
+    {
+        log(&format!("helper {}", child.id()));
     }
 
     let stdin = std::io::stdin();
@@ -145,10 +145,10 @@ fn main() {
             }
             ("", Some(id)) if id == json!("srv-1") || id == json!("srv-2") => {
                 log(&format!("roots_reply {}", line));
-                if id == json!("srv-2") {
-                    if let Some(call) = pending_call.take() {
-                        send(&answer(&call["id"], &call));
-                    }
+                if id == json!("srv-2")
+                    && let Some(call) = pending_call.take()
+                {
+                    send(&answer(&call["id"], &call));
                 }
             }
             _ => {}
