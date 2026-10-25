@@ -326,7 +326,7 @@ async fn real_analysis_then_plan_approve_apply_with_receipts() {
     );
     assert_eq!(ok.journal_state, "completed");
     assert_eq!(ok.setup.revision, SETUP_PIN.revision);
-    assert!(!ok.setup.contains_pr_105_fix);
+    assert_eq!(ok.setup.contains_pr_105_fix, SETUP_PIN.contains_pr_105_fix);
 
     // Preservation: nothing that existed changed except the descriptor edit we made before
     // `before`... which was captured after it, so nothing at all may differ except additions.

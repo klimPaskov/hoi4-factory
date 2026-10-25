@@ -21,6 +21,9 @@
 //! | `FACTORY_GITHUB_APP_API_BASE`, `FACTORY_GITHUB_CLONE_BASE` | GitHub REST and Git transport bases (tests; `https`, or `http` on loopback) | `https://api.github.com`, `https://github.com` |
 //! | `FACTORY_ANTHROPIC_API_KEY` | API key for setup analysis. Analysis is unavailable when absent. Never logged | none |
 //! | `FACTORY_ANTHROPIC_MODEL`, `FACTORY_ANTHROPIC_BASE_URL` | Model id and API base | `claude-haiku-5-5`, `https://api.anthropic.com` |
+//! | `FACTORY_SETUP_CACHE` | Cache of verified Setup workflow package files. Must be outside every workspace; created when missing | `<FACTORY_DATA_ROOT>/setup-cache` |
+//! | `FACTORY_NODE_EXECUTABLE` | The Node runtime Setup registers in generated coding-client configuration. Verified by Setup (on Linux it must be the Debian `nodejs` package). Without it, plans that need Node are refused | none |
+//! | `FACTORY_NODE_PREFIX` | npm prefix named in that configuration. Not created or read | `<FACTORY_DATA_ROOT>/node-prefix` |
 //! | `RUST_LOG` | Log filter | `info,sqlx=warn` |
 //!
 //! Pool limits (`FACTORY_DB_*`) are read by [`factory_accounts::PoolSettings`].
@@ -47,6 +50,15 @@ pub struct ServerConfig {
     pub github_app: Option<GithubAppSettings>,
     /// `None` when `FACTORY_ANTHROPIC_API_KEY` is absent: analysis is then unavailable.
     pub anthropic: Option<AnthropicSettings>,
+    pub setup: SetupSettings,
+}
+
+/// Where Setup keeps its package cache and which Node runtime it may register.
+#[derive(Debug, Clone)]
+pub struct SetupSettings {
+    pub cache_dir: PathBuf,
+    pub node_executable: Option<PathBuf>,
+    pub node_prefix: PathBuf,
 }
 
 /// The model provider the server routes analysis to.
@@ -118,14 +130,23 @@ impl ServerConfig {
         let intake = intake_settings(&non_empty)?;
         let github_app = github_app_settings(&non_empty)?;
         let anthropic = anthropic_settings(&non_empty)?;
+        let data_root =
+            PathBuf::from(non_empty("FACTORY_DATA_ROOT").unwrap_or_else(|| "/data".into()));
+        let setup = SetupSettings {
+            cache_dir: non_empty("FACTORY_SETUP_CACHE")
+                .map(PathBuf::from)
+                .unwrap_or_else(|| data_root.join("setup-cache")),
+            node_executable: non_empty("FACTORY_NODE_EXECUTABLE").map(PathBuf::from),
+            node_prefix: non_empty("FACTORY_NODE_PREFIX")
+                .map(PathBuf::from)
+                .unwrap_or_else(|| data_root.join("node-prefix")),
+        };
         Ok(Self {
             listen: non_empty("FACTORY_LISTEN").unwrap_or_else(|| "0.0.0.0:8080".to_owned()),
             database_url: Redacted(database_url),
             migration_database_url: non_empty("DATABASE_MIGRATION_URL").map(Redacted),
             pool: PoolSettings::from_lookup(&get)?,
-            data_root: PathBuf::from(
-                non_empty("FACTORY_DATA_ROOT").unwrap_or_else(|| "/data".into()),
-            ),
+            data_root,
             game_ref_dir: PathBuf::from(
                 non_empty("FACTORY_GAME_REF").unwrap_or_else(|| "/game".into()),
             ),
@@ -134,6 +155,7 @@ impl ServerConfig {
             intake,
             github_app,
             anthropic,
+            setup,
             accounts,
         })
     }
@@ -320,6 +342,27 @@ mod tests {
         assert!(cfg.web_dist.is_none() && cfg.migration_database_url.is_none());
         assert_eq!(cfg.max_body_bytes, 1024 * 1024);
         assert!(!format!("{cfg:?}").contains("postgres://"));
+    }
+
+    #[test]
+    fn setup_paths_default_under_the_data_root() {
+        let cfg =
+            ServerConfig::from_lookup(lookup(&base(&[("FACTORY_DATA_ROOT", "/srv/d")]))).unwrap();
+        assert_eq!(cfg.setup.cache_dir, PathBuf::from("/srv/d/setup-cache"));
+        assert_eq!(cfg.setup.node_prefix, PathBuf::from("/srv/d/node-prefix"));
+        assert!(cfg.setup.node_executable.is_none());
+        let cfg = ServerConfig::from_lookup(lookup(&base(&[
+            ("FACTORY_SETUP_CACHE", "/cache"),
+            ("FACTORY_NODE_EXECUTABLE", "/usr/bin/node"),
+            ("FACTORY_NODE_PREFIX", "/npm"),
+        ])))
+        .unwrap();
+        assert_eq!(cfg.setup.cache_dir, PathBuf::from("/cache"));
+        assert_eq!(
+            cfg.setup.node_executable,
+            Some(PathBuf::from("/usr/bin/node"))
+        );
+        assert_eq!(cfg.setup.node_prefix, PathBuf::from("/npm"));
     }
 
     #[test]

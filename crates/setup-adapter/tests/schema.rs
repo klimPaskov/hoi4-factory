@@ -1,4 +1,4 @@
-//! Migrations 0400 and 0401: reversible, indexed, minimal privileges, forced row-level security.
+//! Migrations 0400 to 0402: reversible, indexed, minimal privileges, forced row-level security.
 //! Also the Setup pin: one place, and it agrees with Cargo.lock.
 
 mod common;
@@ -35,9 +35,17 @@ async fn migrations_are_idempotent_and_reversible() {
             .fetch_all(&env.db.admin)
             .await
             .unwrap();
-    assert_eq!(versions, vec![100, 101, 400, 401]);
+    assert_eq!(versions, vec![100, 101, 400, 401, 402]);
 
     // Undo the newest, then everything of this crate; the accounts tables stay.
+    let has_state = "SELECT count(*) FROM information_schema.columns                      WHERE table_name = 'setup_sessions' AND column_name = 'client_state'";
+    assert_eq!(env.count(has_state).await, 1);
+    migrator()
+        .undo(&env.db.owner, 401)
+        .await
+        .expect("undo 0402");
+    assert_eq!(env.count(has_state).await, 0);
+    assert_eq!(env.count(&count_tables).await, 7);
     migrator()
         .undo(&env.db.owner, 400)
         .await
@@ -183,11 +191,15 @@ fn the_pin_agrees_with_cargo_lock_and_is_a_single_place() {
     ] {
         assert!(!lock.contains(banned), "{banned} is in Cargo.lock");
     }
-    // Declared state at this revision: the PR 105 fix and a default plan builder are absent.
+    // The flags are the maintainer's statement in Cargo.toml and are never hard-coded here, so
+    // bumping the pin to a merged revision is a change of that one place. The derived rule must
+    // follow the flag, and this build uses Setup's DefaultPlanBuilder, so the flag must be true.
     let pin = std::hint::black_box(SETUP_PIN);
-    assert!(!pin.contains_pr_105_fix);
-    assert!(!pin.counts_for_recovery_gates());
-    assert!(!pin.default_plan_builder);
+    assert_eq!(pin.counts_for_recovery_gates(), pin.contains_pr_105_fix);
+    assert!(
+        pin.default_plan_builder,
+        "the server plans with DefaultPlanBuilder"
+    );
     assert_eq!(pin.pr_105_head, "a300b90439fcf907b9e684f3df8443322d7b7848");
     assert_eq!(pin.repository, "klimPaskov/HOI4-Mod-Setup");
 }

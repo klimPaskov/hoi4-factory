@@ -1,0 +1,126 @@
+{
+  "label": "github-import",
+  "provider": "anthropic",
+  "model": "claude-haiku-5-5",
+  "recorded_at": "2026-10-24T23:31:34.242530996+00:00",
+  "note": "G1: the GitHub-imported test mod, existing-mod analysis",
+  "calls": [
+    {
+      "response_id": "msg_011CgMw7Zx1o9mtvNm1yavcV",
+      "usage": {
+        "input_tokens": 8366,
+        "output_tokens": 2398
+      },
+      "prompt_sha256": "aa493cd66feb9a324065e00f3b2e09c416ac9d4dbad33e2f8770c227854a0794",
+      "reply": {
+        "analysis_id": "gate-fixture-import",
+        "component_recommendations": [],
+        "input_sha256": "f3ca92bde741df7637e666075d1cbcc7cd2dd0683cabf189999ec745bd146fb8",
+        "mode": "existing_project_semantics",
+        "project_summary": "Gate Fixture is a small Hearts of Iron IV mod with descriptor metadata tagged Alternative History, an interface folder with a GUI asset, and a root README. No localisation files, identifier prefixes, or namespace declarations have been observed yet, so those conventions are not established.",
+        "proposals": [
+          {
+            "confidence": 0.97,
+            "evidence_refs": [
+              "descriptor.name"
+            ],
+            "key": "display_name",
+            "reason": "Taken from the name field in descriptor.mod.",
+            "value": "Gate Fixture"
+          },
+          {
+            "confidence": 0.9,
+            "evidence_refs": [
+              "descriptor.name"
+            ],
+            "key": "project_id",
+            "reason": "Lowercase identifier derived from the mod name.",
+            "value": "gate_fixture"
+          },
+          {
+            "confidence": 0.8,
+            "evidence_refs": [
+              "descriptor.name"
+            ],
+            "key": "script_prefix",
+            "reason": "Suggested script prefix derived from the mod name; no existing prefixes were observed.",
+            "value": "gate_fixture"
+          },
+          {
+            "confidence": 0.8,
+            "evidence_refs": [
+              "descriptor.name"
+            ],
+            "key": "primary_namespace",
+            "reason": "Suggested primary namespace derived from the mod name; no existing namespaces were observed.",
+            "value": "gate_fixture"
+          },
+          {
+            "confidence": 0.6,
+            "evidence_refs": [
+              "profile.structure",
+              "profile.documentation"
+            ],
+            "key": "project_description",
+            "reason": "Describes the fixture from its name, its interface content, and its README.",
+            "value": "A small Hearts of Iron IV fixture mod with descriptor metadata, interface assets, and a root README."
+          },
+          {
+            "confidence": 0.85,
+            "evidence_refs": [
+              "codex.agents",
+              "coding.environments"
+            ],
+            "key": "agents_profile",
+            "reason": "Agent guidance is present in AGENTS.md and Codex is the primary coding environment.",
+            "value": "Codex is the primary coding environment, with AGENTS.md guidance at the project root."
+          },
+          {
+            "confidence": 0.3,
+            "evidence_refs": [
+              "profile.localisation"
+            ],
+            "key": "localisation_convention",
+            "reason": "No localisation files were observed, so no convention can be inferred yet.",
+            "value": "No localisation files observed yet; no convention established."
+          },
+          {
+            "confidence": 0.9,
+            "evidence_refs": [
+              "profile.detected",
+              "documentation.inventory"
+            ],
+            "key": "documentation_convention",
+            "reason": "The documentation files found in the project.",
+            "value": "A README at the project root"
+          },
+          {
+            "confidence": 0.95,
+            "evidence_refs": [
+              "descriptor.metadata"
+            ],
+            "key": "descriptor_tags",
+            "reason": "Matches the tag already present in descriptor.mod.",
+            "value": [
+              "Alternative History"
+            ]
+          },
+          {
+            "confidence": 0.9,
+            "evidence_refs": [
+              "profile.detected",
+              "profile.structure"
+            ],
+            "key": "folder_profile",
+            "reason": "Content folder that already holds game files.",
+            "value": [
+              "interface"
+            ]
+          }
+        ],
+        "schema_version": "1.0.0",
+        "warnings": []
+      }
+    }
+  ]
+}

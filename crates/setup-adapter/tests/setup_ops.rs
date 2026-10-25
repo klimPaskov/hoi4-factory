@@ -497,7 +497,6 @@ async fn planning_is_reported_unavailable_not_faked() {
         plan.reason
     );
     assert!(!caps.get("applySetupPlan").unwrap().available);
-    assert!(!std::hint::black_box(SETUP_PIN).default_plan_builder);
 
     let err = adapter
         .plan_setup(

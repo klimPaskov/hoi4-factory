@@ -125,6 +125,7 @@ impl SetupAdapter {
                 reason: o.reason.clone(),
             })
             .collect();
+        inputs.capabilities.extend(options.extra_capabilities);
         inputs.setup_receipt = setup_receipt;
         let mut unresolved = vec![UnresolvedCheck {
             check: "In-game behaviour of the installed files was not observed".into(),

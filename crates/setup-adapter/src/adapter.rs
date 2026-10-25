@@ -23,6 +23,7 @@ use hoi4_mod_setup::credentials::{CredentialStore, DeniedCredentialStore};
 use hoi4_mod_setup::service::{
     NodeRuntime, PlanBuilder, SessionConfig, SetupService, SetupSession,
 };
+use hoi4_mod_setup::source::SourceFetcher;
 use hoi4_mod_setup::transaction::PostInstallActionRunner;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
@@ -55,8 +56,37 @@ pub struct SetupAdapterDeps {
     pub node: Option<NodeRuntime>,
     /// Runs reviewed post-install actions. None runs without it.
     pub post_install_runner: Option<PostInstallActionRunner>,
+    /// Where the workflow package comes from. Analysis resolves the source revision through it
+    /// and the default plan builder fetches the files through the same client, so both agree on
+    /// one revision. Without it, [`SetupAdapter::analyze_session`] is unavailable.
+    pub source: Option<Arc<dyn SourceFetcher>>,
+    /// Which provider, model and endpoint the server's [`ModelClient`] stands for. The analysis
+    /// record, the plan and the receipts all carry exactly this identity.
+    pub analysis_route: Option<AnalysisRoute>,
     /// Compare workspace inventories around read-only operations. On by default.
     pub verify_read_only: bool,
+}
+
+/// The provider route the server's model client implements. Recorded in the analysis and checked
+/// again when the plan is built, so the model named at confirmation is the model that answered.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AnalysisRoute {
+    pub provider: String,
+    pub model: String,
+    pub reasoning_effort: String,
+    pub endpoint: String,
+}
+
+impl AnalysisRoute {
+    /// The Anthropic Messages API route (Setup's `claude` provider).
+    pub fn anthropic(model: impl Into<String>) -> Self {
+        Self {
+            provider: "claude".into(),
+            model: model.into(),
+            reasoning_effort: "high".into(),
+            endpoint: "https://api.anthropic.com/v1/messages".into(),
+        }
+    }
 }
 
 impl SetupAdapterDeps {
@@ -69,6 +99,8 @@ impl SetupAdapterDeps {
             plan_builder: None,
             node: None,
             post_install_runner: None,
+            source: None,
+            analysis_route: None,
             verify_read_only: true,
         }
     }
@@ -97,6 +129,16 @@ impl SetupAdapterDeps {
         self.post_install_runner = Some(runner);
         self
     }
+
+    pub fn with_source(mut self, source: Arc<dyn SourceFetcher>) -> Self {
+        self.source = Some(source);
+        self
+    }
+
+    pub fn with_analysis_route(mut self, route: AnalysisRoute) -> Self {
+        self.analysis_route = Some(route);
+        self
+    }
 }
 
 type SessionKey = (AccountId, ProjectId, OnboardingSessionId);
@@ -109,6 +151,8 @@ pub(crate) struct ActiveSession {
     pub mod_root_rel: String,
     pub mod_root: PathBuf,
     pub redactor: Redactor,
+    /// What the review steps of this session have established so far (see `ops_review.rs`).
+    pub review: Mutex<crate::ops_review::ReviewState>,
 }
 
 /// Authorization result: who acts on which workspace.
@@ -125,6 +169,8 @@ pub(crate) struct Inner {
     pub service: SetupService,
     pub model: Option<Arc<dyn ModelClient>>,
     pub has_plan_builder: bool,
+    pub source: Option<Arc<dyn SourceFetcher>>,
+    pub analysis_route: Option<AnalysisRoute>,
     pub sessions: Mutex<HashMap<SessionKey, Arc<ActiveSession>>>,
     /// Identifies this adapter instance in transaction rows and logs.
     pub holder: String,
@@ -163,6 +209,8 @@ impl SetupAdapter {
                 service,
                 model: deps.model,
                 has_plan_builder,
+                source: deps.source,
+                analysis_route: deps.analysis_route,
                 sessions: Mutex::new(HashMap::new()),
                 holder: format!("{}:{}", std::process::id(), Uuid::new_v4().simple()),
                 verify_read_only: deps.verify_read_only,
@@ -185,13 +233,18 @@ impl SetupAdapter {
 
     /// What this deployment can do, with reasons for what it cannot.
     pub fn capabilities(&self) -> SetupCapabilities {
-        let analysis = if self.inner.model.is_some() {
-            (true, None)
-        } else {
+        let analysis = if self.inner.model.is_none() {
             (
                 false,
                 Some("no ModelClient was supplied by the server".to_owned()),
             )
+        } else if self.inner.analysis_route.is_none() || self.inner.source.is_none() {
+            (
+                false,
+                Some("the server named no analysis route or Setup source".to_owned()),
+            )
+        } else {
+            (true, None)
         };
         let plan = if self.inner.has_plan_builder {
             (true, None)
@@ -330,6 +383,7 @@ impl SetupAdapter {
             mod_root_rel: rel.clone(),
             mod_root: root,
             redactor,
+            review: Mutex::default(),
         });
         self.inner
             .sessions
@@ -530,6 +584,7 @@ fn receipt_status_for(err: &SetupError, op: SetupOperation) -> ReceiptStatus {
         | SetupError::RecoveryRequired { .. }
         | SetupError::Precondition { .. }
         | SetupError::Stale { .. }
+        | SetupError::InvalidValues { .. }
         | SetupError::IdempotencyReplay { .. } => ReceiptStatus::Refused,
         SetupError::Native { .. } if op.effect_class() != "project_write" => ReceiptStatus::Refused,
         _ => ReceiptStatus::Failed,

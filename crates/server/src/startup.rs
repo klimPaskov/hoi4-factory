@@ -16,7 +16,10 @@ use factory_intake::{
     FileTypePolicy, GithubConfig, GithubImporter, HttpGithubApi, IntakeError, IntakeService,
     IntakeStore, SecretString, UploadIntake,
 };
-use factory_setup_adapter::{SetupAdapter, SetupAdapterDeps};
+use factory_setup_adapter::setup::{
+    DefaultPlanBuilder, HttpSourceClient, NodeRuntime, SourceFetcher,
+};
+use factory_setup_adapter::{AnalysisRoute, ModelClient, SetupAdapter, SetupAdapterDeps};
 use factory_workspace::{StorageRoot, WorkspaceError};
 use tokio::net::TcpListener;
 
@@ -59,6 +62,11 @@ pub struct Overrides {
     pub clock: Option<Arc<dyn Clock>>,
     /// Replaces the HTTP lookup of the App's installations.
     pub app_installations: Option<Arc<dyn AppInstallations>>,
+    /// Replaces the model client of Setup analysis. The route (provider, model) still comes from
+    /// the configuration, so the analysis record names the model the configuration names.
+    pub model_client: Option<Arc<dyn ModelClient>>,
+    /// Replaces where the Setup workflow package comes from (the public repository by default).
+    pub setup_source: Option<Arc<dyn SourceFetcher>>,
 }
 
 pub async fn initialize(config: ServerConfig) -> Result<ServerState, StartupError> {
@@ -123,7 +131,14 @@ pub async fn initialize_with(
     let accounts = AccountsState::new(db.clone(), config.accounts.clone(), deps)?;
 
     let intake = build_intake(&config, &db, &storage, overrides.app_installations)?;
-    let setup = build_setup(&config, &db, &storage);
+    let setup = build_setup(
+        &config,
+        &db,
+        &storage,
+        overrides.model_client,
+        overrides.setup_source,
+    )
+    .await;
 
     let web = config.web_dist.as_deref().and_then(StaticSite::open);
     match (&config.web_dist, &web) {
@@ -149,24 +164,158 @@ pub async fn initialize_with(
     })
 }
 
-/// The Setup adapter. Analysis needs the model key; without it that one operation reports itself
-/// unavailable. No plan builder is injected until the extraction lands upstream, so planning
-/// reports `capability_unavailable`.
-fn build_setup(config: &ServerConfig, db: &Database, storage: &StorageRoot) -> SetupState {
+/// The Setup adapter: analysis through the server's model, planning through Setup's
+/// `DefaultPlanBuilder`.
+///
+/// * Analysis needs the model key; without it that one operation reports itself unavailable.
+/// * Planning needs a cache directory for the verified workflow package, outside every
+///   workspace. The package is fetched by the server process only, from the public Setup source
+///   repository, and every file is checked against the manifest's size and SHA-256 before it is
+///   planned. When the cache cannot be set up, planning reports `capability_unavailable` with
+///   the reason in the log instead of failing the server.
+/// * A Node runtime is registered when `FACTORY_NODE_EXECUTABLE` names one Setup accepts.
+async fn build_setup(
+    config: &ServerConfig,
+    db: &Database,
+    storage: &StorageRoot,
+    model_client: Option<Arc<dyn ModelClient>>,
+    source_override: Option<Arc<dyn SourceFetcher>>,
+) -> SetupState {
     let mut deps = SetupAdapterDeps::new(db.clone(), storage.clone());
-    match &config.anthropic {
-        Some(settings) => {
+    match (&config.anthropic, model_client) {
+        (Some(settings), client) => {
             tracing::info!(model = %settings.model, "setup analysis model configured");
-            deps = deps.with_model(Arc::new(AnthropicModel::new(settings)));
+            deps = deps
+                .with_model(client.unwrap_or_else(|| Arc::new(AnthropicModel::new(settings))))
+                .with_analysis_route(AnalysisRoute::anthropic(settings.model.clone()));
         }
-        None => {
+        (None, _) => {
             tracing::info!("setup analysis is unavailable: FACTORY_ANTHROPIC_API_KEY is not set")
+        }
+    }
+
+    let source: Option<Arc<dyn SourceFetcher>> = match source_override {
+        Some(source) => Some(source),
+        None => {
+            let cache = config.setup.cache_dir.clone();
+            // Setup's source client is built on a blocking HTTP client, which must not be created
+            // (or dropped) on the async runtime.
+            let built = tokio::task::spawn_blocking(move || {
+                prepare_setup_cache(&cache).and_then(|dir| {
+                    HttpSourceClient::for_cache_root(dir).map_err(|e| e.to_string())
+                })
+            })
+            .await
+            .map_err(|e| e.to_string())
+            .and_then(|r| r);
+            match built {
+                Ok(client) => Some(Arc::new(DetachedSource::new(client))),
+                Err(why) => {
+                    tracing::error!(
+                        reason = %why,
+                        "setup planning is unavailable: the package cache cannot be used"
+                    );
+                    None
+                }
+            }
+        }
+    };
+    if let Some(source) = source {
+        deps = deps
+            .with_source(source.clone())
+            .with_plan_builder(Arc::new(DefaultPlanBuilder::with_source(source)));
+        tracing::info!("setup planning is available");
+    }
+
+    if let Some(executable) = &config.setup.node_executable {
+        match NodeRuntime::new(executable, &config.setup.node_prefix) {
+            Ok(node) => deps = deps.with_node_runtime(node),
+            Err(err) => tracing::warn!(
+                error = %err,
+                "the configured Node runtime was not accepted; plans that register an MCP server will be refused"
+            ),
         }
     }
     SetupState {
         adapter: SetupAdapter::new(deps),
-        sessions: Arc::default(),
     }
+}
+
+/// Drops its value on a plain thread. Setup's source client owns a blocking HTTP client whose
+/// internal runtime panics when it is dropped inside an async context, such as the server's own
+/// shutdown or a test's end.
+pub struct DetachedDrop<T: Send + 'static>(Option<T>);
+
+impl<T: Send + 'static> DetachedDrop<T> {
+    pub fn new(value: T) -> Self {
+        Self(Some(value))
+    }
+}
+
+impl<T: Send + 'static> std::ops::Deref for DetachedDrop<T> {
+    type Target = T;
+    fn deref(&self) -> &T {
+        self.0.as_ref().expect("value is present until drop")
+    }
+}
+
+impl<T: Send + 'static> Drop for DetachedDrop<T> {
+    fn drop(&mut self) {
+        if let Some(value) = self.0.take() {
+            std::thread::spawn(move || drop(value));
+        }
+    }
+}
+
+/// Setup's HTTP source client, safe to hold and drop inside the server.
+pub struct DetachedSource(DetachedDrop<HttpSourceClient>);
+
+impl DetachedSource {
+    pub fn new(client: HttpSourceClient) -> Self {
+        Self(DetachedDrop::new(client))
+    }
+}
+
+impl SourceFetcher for DetachedSource {
+    fn resolve_commit(
+        &self,
+        request: &factory_setup_adapter::setup::SourceRequest,
+    ) -> Result<(String, Option<String>, Option<String>), factory_setup_adapter::setup::AppError>
+    {
+        SourceFetcher::resolve_commit(&*self.0, request)
+    }
+
+    fn fetch_manifest(
+        &self,
+        revision: &str,
+    ) -> Result<Vec<u8>, factory_setup_adapter::setup::AppError> {
+        SourceFetcher::fetch_manifest(&*self.0, revision)
+    }
+
+    fn fetch_verified_file(
+        &self,
+        revision: &str,
+        path: &str,
+        expected_sha256: &str,
+        expected_size: Option<u64>,
+    ) -> Result<Vec<u8>, factory_setup_adapter::setup::AppError> {
+        SourceFetcher::fetch_verified_file(&*self.0, revision, path, expected_sha256, expected_size)
+    }
+
+    fn prefetch_verified_files(&self, revision: &str, files: &[(String, String, Option<u64>)]) {
+        SourceFetcher::prefetch_verified_files(&*self.0, revision, files)
+    }
+
+    fn shares_process_cache(&self) -> bool {
+        SourceFetcher::shares_process_cache(&*self.0)
+    }
+}
+
+/// Creates the package cache directory (0755 on Unix) and returns its absolute path. Setup
+/// itself checks that it is outside every workspace and free of links.
+fn prepare_setup_cache(dir: &std::path::Path) -> Result<std::path::PathBuf, String> {
+    std::fs::create_dir_all(dir).map_err(|e| format!("cannot create the cache directory: {e}"))?;
+    std::fs::canonicalize(dir).map_err(|e| format!("cannot resolve the cache directory: {e}"))
 }
 
 /// Intake: upload limits, the spool directory and the GitHub importer. A GitHub App that is not
