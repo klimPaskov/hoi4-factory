@@ -122,6 +122,35 @@ Known limitations:
 - **Repeated live runs.** The live C-06 manifest hash was identical across two runs with identical inputs, as intended, but bundle IDs differ.
 - **Readiness recommendations.** Operator spend alerts, dependency scanning and per-account rate limits on task routes.
 
+## Follow-up after the maintainer's answers (2026-10-25)
+
+The maintainer answered questions 7 to 10 and added ADR-026 (a desktop companion app, synced with the web app) and ADR-027 (queue priority, plan tiers, full Agent Tools on the server, an optional local MCP). They also asked for an issue system. In the same session:
+
+- **Self-hosted check with the smallest local model.** The probe gained an opt-in inference mode. The run used `smollm2:135m` (270 MB) in Ollama. The local model connects: text, streaming and usage are measured as supported. Tool calls are measured as unsupported, because the model refuses tools. The first run exposed two probe defects, which were fixed with a regression test. See [selfhosted-profile.json](selfhosted-profile.json).
+- **Fixed limitations:**
+  - Per-account rate limits on the agent, upload, GitHub import and Setup routes (PR-098 done).
+  - `allowance_exhausted` and `usage_unknown` warnings for the operator.
+  - Worker frames raised to 16 MiB.
+  - The grant lifetime scales with the task's turn limit, and resuming after an expired or revoked grant is refused with no side effects.
+  - Translated error texts for the new codes.
+- **Dependency audit:** `scripts/audit-deps.sh` (cargo audit and npm audit, PR-032 done). The only Rust advisory is a dev-only `rsa`, recorded with its reason in `.cargo/audit.toml`. The Agent Tools npm advisories are fixed upstream in https://github.com/klimPaskov/hoi4-agent-tools/pull/49, which waits for the maintainer's merge.
+- **Issue system:** the `track-issues` skill, a CLAUDE.md section, and repository labels.
+
+Issues that could not be fixed in this session, filed on GitHub:
+
+| Issue | Why it waits |
+|---|---|
+| [#2](https://github.com/klimPaskov/hoi4-factory/issues/2) Verify the OpenAI adapter live | Needs an OpenAI account with balance |
+| [#3](https://github.com/klimPaskov/hoi4-factory/issues/3) Run the S03 tests on Windows and kill process trees there | Needs the Windows machine |
+| [#4](https://github.com/klimPaskov/hoi4-factory/issues/4) Bump the Agent Tools pin after hoi4-agent-tools#49 | Needs the maintainer's upstream merge |
+| [#5](https://github.com/klimPaskov/hoi4-factory/issues/5) Let the agent read Agent Tools artifacts | S04 preview and review design |
+| [#6](https://github.com/klimPaskov/hoi4-factory/issues/6) Make the full Agent Tools surface usable on the server | S04 guarded proposal path |
+| [#7](https://github.com/klimPaskov/hoi4-factory/issues/7) Use probed self-hosted endpoints as agent profiles | Feature beyond S03's gate |
+| [#8](https://github.com/klimPaskov/hoi4-factory/issues/8) Optionally connect a locally installed MCP server | Needs a local bridge or the desktop app |
+| [#9](https://github.com/klimPaskov/hoi4-factory/issues/9) Desktop companion app, synced with the web app | Backlog scope, ADR-026 |
+| [#10](https://github.com/klimPaskov/hoi4-factory/issues/10) Queue priority for new users and plan tiers | Needs plans and the maintainer's fairness rules |
+| [#11](https://github.com/klimPaskov/hoi4-factory/issues/11) Alert the operator about spend | Needs the maintainer's channel and thresholds |
+
 ## Effects, recovery and rollback
 
 External effects:

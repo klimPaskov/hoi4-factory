@@ -97,6 +97,8 @@ web/scripts/docker-npm.sh install
 web/scripts/docker-npm.sh run check
 ```
 
+`scripts/audit-deps.sh` scans the Rust and client dependencies for advisories (cargo-audit is installed into `.work/tools` on first use).
+
 The S03 HOI4 Agent Tools tests run against a local build of the pinned Agent Tools when these variables are set, and print `SKIPPED` otherwise. Build it once into `.work/` (Node 22 or 24 on the host):
 
 ```bash

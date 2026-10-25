@@ -2,6 +2,13 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.6, 2026-10-25, issue tracking
+
+- New skill `track-issues`. Problems that cannot be fixed in the current session become GitHub issues on `klimPaskov/hoi4-factory`, each with evidence, the reason and an acceptance check, and are later closed with `Fixes #N` and test results. Everything else is fixed in the session. CLAUDE.md has an "Issues" section, the generator and validator list the skill, and the repository has the labels `blocked`, `verification`, `backlog` and `stage:SNN`.
+- New `scripts/audit-deps.sh` for the dependency scan, with ignores and their reasons in `.cargo/audit.toml`.
+
+Evidence: issues #2 to #11 and the S03 handoff's follow-up section. Rollback: revert this commit and regenerate.
+
 ## 0.2.5, 2026-10-25, S03 agent runtime
 
 - CLAUDE.md has a new section, "Agent runtime rules (learned in S03)". It covers:

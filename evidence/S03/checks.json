@@ -199,6 +199,42 @@
       "kind": "guidance drift",
       "command": "scripts/py.sh scripts/sync_skills.py --check",
       "result": "drift: []"
+    },
+    {
+      "id": "workspace-macos-followup",
+      "kind": "automated tests, after the maintainer-answer follow-up fixes",
+      "command": "same as workspace-macos",
+      "revision": "1efeedd plus the follow-up documentation commit",
+      "exit": 0,
+      "result": {
+        "passed": 616,
+        "failed": 0,
+        "ignored": 13
+      }
+    },
+    {
+      "id": "G6-selfhosted-smallest-model",
+      "kind": "live self-hosted inference probe (maintainer answer 8)",
+      "artifact": "evidence/S03/selfhosted-profile.json",
+      "result": {
+        "model": "smollm2:135m",
+        "text": "supported",
+        "streaming": "supported",
+        "usage_accounting": "supported",
+        "tool_calls": "unsupported (model refuses tools)",
+        "connection": "supported"
+      }
+    },
+    {
+      "id": "dependency-audit",
+      "kind": "advisory scan",
+      "command": "scripts/audit-deps.sh",
+      "exit": 0,
+      "result": {
+        "cargo": "0 advisories after the documented dev-only ignore RUSTSEC-2023-0071",
+        "web_npm": "0 vulnerabilities",
+        "agent_tools_npm": "8 moderate at the pin 731e64f, fixed upstream in hoi4-agent-tools#49 (local build, typecheck, lint, 2033 unit and 258 integration tests pass), pin bump tracked as #4"
+      }
     }
   ],
   "gates": {
@@ -257,7 +293,7 @@
         "agent.rs::custom_endpoints_to_blocked_destinations_are_refused",
         "crates/agent/tests/destination.rs"
       ],
-      "limitation": "OpenAI live inference unavailable (no API balance); the self-hosted profile is verified by connection, listing and destination policy only, both by maintainer decision."
+      "limitation": "OpenAI live inference unavailable (no API balance, issue #2). The self-hosted profile is verified by connection, listing, destination policy and one inference probe with the smallest model, smollm2:135m, which supports text but refuses tools, so agent tasks on it are refused truthfully."
     }
   },
   "w6_cases": {
@@ -276,5 +312,17 @@
       "live_compose_runs": 0.0042
     },
     "openai": 0
-  }
+  },
+  "issues_filed": [
+    "https://github.com/klimPaskov/hoi4-factory/issues/2",
+    "https://github.com/klimPaskov/hoi4-factory/issues/3",
+    "https://github.com/klimPaskov/hoi4-factory/issues/4",
+    "https://github.com/klimPaskov/hoi4-factory/issues/5",
+    "https://github.com/klimPaskov/hoi4-factory/issues/6",
+    "https://github.com/klimPaskov/hoi4-factory/issues/7",
+    "https://github.com/klimPaskov/hoi4-factory/issues/8",
+    "https://github.com/klimPaskov/hoi4-factory/issues/9",
+    "https://github.com/klimPaskov/hoi4-factory/issues/10",
+    "https://github.com/klimPaskov/hoi4-factory/issues/11"
+  ]
 }

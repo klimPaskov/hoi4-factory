@@ -28,10 +28,23 @@ You are the implementing agent for HOI4 Factory, a free, open-source hosted web 
   - OpenAI-compatible self-hosted: connection and model listing only, capabilities unknown, so agent tasks on it are refused with `capability_unsatisfied`.
 - Minimal task and API key screens. Rebuild them with the design system when S04 touches them.
 
+## Tracked issues for S04
+
+Pick up the GitHub issues labelled `stage:S04` with the `track-issues` skill, and close each with `Fixes #N` and its test results:
+
+- #4: bump the Agent Tools pin after hoi4-agent-tools#49 merges.
+- #5: let the agent read Agent Tools artifacts.
+- #6: make the full Agent Tools surface usable on the server, behind the guarded proposal path.
+- #7: use probed self-hosted endpoints as agent profiles.
+
+Check `gh issue list -R klimPaskov/hoi4-factory --label stage:S04` first, because the list may have changed.
+
 ## Maintainer decisions to respect
 
 - Free use with the $1 operator allowance per verified user per month, or the user's own key. No enterprise features, MFA or extra sign-up steps.
-- OpenAI live inference stays unavailable until an OpenAI organization with balance exists. The self-hosted profile is verified by connection, listing and the destination policy only, unless the maintainer has answered otherwise in `evidence/maintainer-questions.md` (check items 7 to 10 there first).
+- The web app comes first and must be very easy to use. A desktop companion app comes later (ADR-026), so keep the server the single authority for everything a desktop client would need to sync.
+- Agent Tools run on the server and must be fully usable there (ADR-027).
+- OpenAI live inference stays unavailable until an OpenAI organization with balance exists (#2). The self-hosted profile is tested with the smallest local model (`smollm2:135m` in `compose.selfhosted.yaml`). Use a small tool-capable local model if S04 needs a self-hosted agent run.
 - Automated GitHub writes go only to `klimPaskov/hoi4-factory-test-mod`. Pushes and pull requests need their own publication grant (`push_owned_branch`, `open_pull_request`). Never integrate into a default branch.
 - The UI design track's design system is the base for every new or changed page. Send each new page through the `ui-design-iteration` skill: build three or four working variants in the design lab, ask the maintainer to choose, then implement the choice. Batch these questions so the maintainer answers several at once, and keep building non-UI parts while waiting.
 
