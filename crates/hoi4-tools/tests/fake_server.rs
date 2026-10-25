@@ -91,11 +91,20 @@ fn soon() -> Instant {
 }
 
 #[cfg(unix)]
+/// A killed process whose parent has not reaped it yet. In a container without an init process
+/// an orphan is never reaped, so "gone" means dead, not absent.
+fn is_zombie(pid: i32) -> bool {
+    std::fs::read_to_string(format!("/proc/{pid}/stat"))
+        .ok()
+        .and_then(|s| s.rsplit_once(')').map(|(_, rest)| rest.trim_start().starts_with('Z')))
+        .unwrap_or(false)
+}
+
 fn pid_gone(pid: i32) -> bool {
     for _ in 0..40 {
         // SAFETY: signal 0 only checks that the process exists.
         let alive = unsafe { libc::kill(pid, 0) } == 0;
-        if !alive {
+        if !alive || is_zombie(pid) {
             return true;
         }
         std::thread::sleep(Duration::from_millis(100));

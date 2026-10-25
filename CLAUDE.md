@@ -85,6 +85,7 @@ Delegate independent, bounded packets to subagents with explicit owned paths, in
 - Pause defers a turn's tool calls instead of refusing them. The calls stay pending in the saved conversation and run after resume, so a resumed attempt neither repeats the model turn nor loses its effect.
 - Ledger hash fields hold real SHA-256 values. Record a missing file as `None` in the receipt and as `"absent"` in the artifact.
 - Test faults for the worker go through `WorkerLauncher::env`, never the test process's environment, because tests in one binary run in parallel. The faults exist only in debug builds.
+- A container whose PID 1 is our own binary never reaps orphans, so a killed process group leaves zombies that still answer `kill(pid, 0)`. The server service runs with `init: true`, `scripts/linux-tests.sh` runs with `--init`, and tests treat a zombie as gone.
 - HOI4 Agent Tools needs Node 22 or 24, while Setup accepts only Debian's `/usr/bin/node` (18). The server image carries both, with Agent Tools under `/opt`. Agent Tools refuses a state directory reached through a symlink, such as a macOS temporary directory, so pass it through `prepare_state_dir`.
 
 ## Verification and handoff

@@ -92,6 +92,9 @@ services:
         bind:
           create_host_path: false
     read_only: true
+    # An init process reaps the agent's workers and tool processes (and anything they leave
+    # behind when a process group is killed); factory-server as PID 1 would leave zombies.
+    init: true
     tmpfs:
       - /tmp
     cap_drop:
