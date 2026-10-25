@@ -310,39 +310,16 @@ fn event_inspect_schema() -> Value {
     })
 }
 
-fn scalar() -> Value {
-    json!({"anyOf": [
-        {"type": "string", "maxLength": 4096}, {"type": "number"}, {"type": "boolean"}, {"type": "null"}
-    ]})
-}
 
+/// Scenario inputs are left out: they are keyed maps (`state`, `eventTargets`), which the
+/// host's closed-schema rule does not accept, and inventory or inspection without them is the
+/// read-only use S03 needs.
 fn decision_inspect_schema() -> Value {
     json!({
         "type": "object",
         "properties": {
             "mode": {"type": "string", "enum": ["inventory", "inspect"]},
-            "id": text(512),
-            "scenarios": {
-                "type": "array", "maxItems": 64,
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "id": text(512),
-                        "actor": {"type": "string", "maxLength": 256},
-                        "date": {"type": "string", "maxLength": 64},
-                        "state": {"type": "object", "additionalProperties": {"anyOf": [
-                            scalar(),
-                            {"type": "array", "maxItems": 10000, "items": scalar()}
-                        ]}},
-                        "flags": {"type": "array", "maxItems": 10000, "items": text(512)},
-                        "eventTargets": {"type": "object", "additionalProperties": {"type": "string", "maxLength": 512}},
-                        "candidateOverrides": {"type": "object", "additionalProperties": {"type": "boolean"}},
-                        "closedFlags": {"type": "boolean"}
-                    },
-                    "required": ["id", "state"],
-                    "additionalProperties": false
-                }
-            }
+            "id": text(512)
         },
         "additionalProperties": false
     })

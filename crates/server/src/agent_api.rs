@@ -888,6 +888,30 @@ async fn revoke(
 
 // ---- events ----
 
+/// A short human summary: the host's own when it wrote one, otherwise one derived from the
+/// ledger's event type and payload.
+fn summary(e: &RunEvent) -> String {
+    if let Some(s) = e.payload.get("summary").and_then(Value::as_str) {
+        return s.to_owned();
+    }
+    let p = &e.payload;
+    let text = |k: &str| p.get(k).and_then(Value::as_str).unwrap_or("").to_owned();
+    match e.event_type.as_str() {
+        "task_created" => "Task created".into(),
+        "task_paused" => "Task paused".into(),
+        "task_resumed" => "Task resumed".into(),
+        "tool_intent" => format!("{} requested ({})", text("tool"), text("effect_class")),
+        "tool_started" => "Tool call started".into(),
+        "tool_settled" => format!("Tool call {}", text("status")),
+        "tool_unknown_effect" => "Tool outcome unknown: it will be reconciled before anything else".into(),
+        "tool_reconciled" => format!("Tool outcome reconciled: {}", text("status")),
+        other => match other.strip_prefix("attempt_") {
+            Some(state) => format!("Attempt {}", state.replace('_', " ")),
+            None => other.replace('_', " "),
+        },
+    }
+}
+
 fn event_json(e: &RunEvent) -> Value {
     json!({
         "seq": e.seq,
@@ -895,7 +919,7 @@ fn event_json(e: &RunEvent) -> Value {
         "attempt_id": e.attempt_id,
         "type": e.event_type,
         "actor": e.actor,
-        "summary": e.payload.get("summary").and_then(Value::as_str).unwrap_or(&e.event_type),
+        "summary": summary(e),
         "payload": e.payload,
         "payload_sha256": e.payload_sha256,
         "created_at": e.created_at,

@@ -1,0 +1,186 @@
+{
+  "fixture": "C-06 ContextBundle of the live S03 run (evidence/S03/live-agent-flow.json), exported from the Compose database. The server stored it immutably before admitting the attempt and the model's first request rendered it.",
+  "exported": "2026-10-25",
+  "row": {
+    "id": "63c302fa-4ac8-4816-829c-f1356686747d",
+    "task_id": "f739667f-3f44-4a83-ba29-e7e799c08850",
+    "manifest_sha256": "f06c0cc580dcfc15ea39754b47656dca4c773d917daa6d49c86f841977db12ae",
+    "created_at": "2026-10-25T14:37:12.439097+00:00",
+    "bundle": {
+      "id": "63c302fa-4ac8-4816-829c-f1356686747d",
+      "content": {
+        "scope": {
+          "mode": "edit",
+          "objective": "Add a new file common/ideas/live_agent_ideas.txt that defines one country idea named live_agent_idea with modifier stability_factor = 0.02, in the same style as the existing ideas file. Look at the existing ideas file first. Change nothing else, then finish.",
+          "allowed_paths": [
+            "common/ideas"
+          ],
+          "requirement_ids": []
+        },
+        "sources": [
+          {
+            "path": "descriptor.mod",
+            "bytes": 70,
+            "reason": "mod descriptor",
+            "region": null,
+            "sha256": "f8215ba9fd2554b52ab4df67865a98f0d5489cc7e542becfebc90fdab5830434",
+            "content": "name=\"Live Agent Fixture\"\r\nversion=\"0.1\"\r\nsupported_version=\"1.19.*\"\r\n",
+            "priority": 1,
+            "required": true
+          },
+          {
+            "path": "common/national_focus/live_focus.txt",
+            "bytes": 71,
+            "reason": "file in the mod",
+            "region": null,
+            "sha256": "213c55af140bd1b637b9feff04b327439383f2e5adaea537885b805fa6426213",
+            "content": null,
+            "priority": 1,
+            "required": false
+          },
+          {
+            "path": "notes.txt",
+            "bytes": 22,
+            "reason": "file in the mod",
+            "region": null,
+            "sha256": "c815178a1e3664e03222c45ba81c1fd9aaf7a9be2be93967c64e2eaf9c6bfc32",
+            "content": null,
+            "priority": 1,
+            "required": false
+          },
+          {
+            "path": "common/ideas/existing_ideas.txt",
+            "bytes": 106,
+            "reason": "under an allowed path",
+            "region": null,
+            "sha256": "3a92a875bf9d12ba19a5af2105521ef7f4292629a614de028b990a9b7a3dfd07",
+            "content": null,
+            "priority": 10,
+            "required": false
+          }
+        ],
+        "recent_messages": [],
+        "capability_profile": {
+          "profile": "anthropic:claude-haiku-5-5",
+          "capabilities": {
+            "text": "supported",
+            "streaming": "supported",
+            "tool_calls": "supported",
+            "image_input": "unknown",
+            "cancellation": "supported",
+            "model_listing": "supported",
+            "usage_accounting": "supported",
+            "strict_json_schema": "supported",
+            "parallel_tool_calls": "unknown"
+          }
+        },
+        "completed_receipts": [],
+        "safety_constraints": [
+          "This bundle grants no authority. Tools run only under a grant checked by the host immediately before each effect.",
+          "Writes are limited to the task's allowed paths inside its own worktree; the mod's main source tree is never written.",
+          "A task is not complete because the model says so. A successful attempt produces a draft for review.",
+          "An operation with an unresolved effect must be reconciled before it is repeated; never repeat it blindly.",
+          "Do not invent file contents, hashes or tool results. Cite source locators from this bundle."
+        ],
+        "unresolved_effects": [],
+        "approved_references": []
+      },
+      "manifest": {
+        "budget": {
+          "available": 75904,
+          "remaining": 75379,
+          "context_tokens": 100000,
+          "reserved_tools": 20000,
+          "optional_tokens": 160,
+          "reserved_output": 4096,
+          "mandatory_tokens": 365
+        },
+        "included": [
+          {
+            "id": "scope",
+            "kind": "scope",
+            "reason": "",
+            "tokens": 86,
+            "mandatory": true
+          },
+          {
+            "id": "safety_constraints",
+            "kind": "safety_constraints",
+            "reason": "",
+            "tokens": 135,
+            "mandatory": true
+          },
+          {
+            "id": "capability_profile",
+            "kind": "capability_profile",
+            "reason": "",
+            "tokens": 75,
+            "mandatory": true
+          },
+          {
+            "id": "descriptor.mod",
+            "kind": "source_locator",
+            "reason": "mod descriptor",
+            "tokens": 69,
+            "mandatory": true
+          },
+          {
+            "id": "common/national_focus/live_focus.txt",
+            "kind": "source_locator",
+            "reason": "file in the mod",
+            "tokens": 55,
+            "mandatory": false
+          },
+          {
+            "id": "notes.txt",
+            "kind": "source_locator",
+            "reason": "file in the mod",
+            "tokens": 49,
+            "mandatory": false
+          },
+          {
+            "id": "common/ideas/existing_ideas.txt",
+            "kind": "source_locator",
+            "reason": "under an allowed path",
+            "tokens": 56,
+            "mandatory": false
+          }
+        ],
+        "omissions": [],
+        "content_sha256": "21242127a0dd1c2352961eb23079ffca2199ad972cfacf78878e8d6b70800a1f",
+        "schema_version": 1,
+        "token_estimate": {
+          "method": "ceil(canonical_json_bytes / 4)",
+          "is_estimate": true
+        },
+        "source_versions": [
+          {
+            "path": "descriptor.mod",
+            "bytes": 70,
+            "region": null,
+            "sha256": "f8215ba9fd2554b52ab4df67865a98f0d5489cc7e542becfebc90fdab5830434"
+          },
+          {
+            "path": "common/national_focus/live_focus.txt",
+            "bytes": 71,
+            "region": null,
+            "sha256": "213c55af140bd1b637b9feff04b327439383f2e5adaea537885b805fa6426213"
+          },
+          {
+            "path": "notes.txt",
+            "bytes": 22,
+            "region": null,
+            "sha256": "c815178a1e3664e03222c45ba81c1fd9aaf7a9be2be93967c64e2eaf9c6bfc32"
+          },
+          {
+            "path": "common/ideas/existing_ideas.txt",
+            "bytes": 106,
+            "region": null,
+            "sha256": "3a92a875bf9d12ba19a5af2105521ef7f4292629a614de028b990a9b7a3dfd07"
+          }
+        ]
+      },
+      "manifest_sha256": "f06c0cc580dcfc15ea39754b47656dca4c773d917daa6d49c86f841977db12ae"
+    }
+  }
+}

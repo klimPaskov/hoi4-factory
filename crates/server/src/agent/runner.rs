@@ -405,10 +405,6 @@ impl Runner {
         }
     }
 
-    fn actor_worker(&self) -> Actor {
-        Actor::Worker(self.worker_generation as i64)
-    }
-
     async fn tx(&self) -> Result<sqlx::Transaction<'static, sqlx::Postgres>, String> {
         self.rt.tx(self.plan.account).await.map_err(|e| e.message)
     }
@@ -1021,19 +1017,6 @@ impl Runner {
                 Err(IntentError::AttemptNotActive { state }) => return Err(("attempt_not_active", format!("the attempt is {state}"))),
                 Err(e) => return Err(("ledger_failed", e.to_string())),
             };
-            factory_tasks::append_event(
-                &mut tx,
-                self.plan.task,
-                event(Some(self.plan.attempt), self.actor_worker(), "tool_intent", &format!("{name} requested"), json!({
-                    "operation_id": intent.operation_id,
-                    "tool": name,
-                    "effect_class": effect,
-                    "args_sha256": intent.args_sha256,
-                    "path": prepared.normalized_arguments.get("path"),
-                })),
-            )
-            .await
-            .map_err(|e| ("ledger_failed", e.to_string()))?;
             tx.commit().await.map_err(|e| ("ledger_failed", e.to_string()))?;
             Ok::<_, (&'static str, String)>(intent)
         }
@@ -1094,20 +1077,6 @@ impl Runner {
                 .await
                 .map_err(|e| e.to_string())?;
             }
-            factory_tasks::append_event(
-                &mut tx,
-                self.plan.task,
-                event(Some(self.plan.attempt), Actor::Host, "tool_settled", &format!("{name}: {}", executed.status), json!({
-                    "operation_id": intent.operation_id,
-                    "tool": name,
-                    "status": executed.status,
-                    "before_sha256": executed.before,
-                    "after_sha256": executed.after,
-                    "partial": executed.partial,
-                })),
-            )
-            .await
-            .map_err(|e| e.to_string())?;
             tx.commit().await.map_err(|e| e.to_string())
         }
         .await;

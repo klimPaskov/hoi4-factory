@@ -122,8 +122,13 @@ impl ToolSet {
                                 ProfileEffect::DerivedJob => EffectClass::DerivedJob,
                                 _ => continue,
                             };
-                            let Ok(input) = ClosedSchema::compile(&tool.input_schema) else {
-                                continue;
+                            let input = match ClosedSchema::compile(&tool.input_schema) {
+                                Ok(input) => input,
+                                Err(e) => {
+                                    // Withheld: the host cannot enforce this schema.
+                                    tracing::warn!(tool = %tool.name, error = %e, "tool withheld: its host schema is not closed");
+                                    continue;
+                                }
                             };
                             let version = s
                                 .inventory()
@@ -376,6 +381,15 @@ async fn start_agent_tools(
 mod tests {
     use super::super::workspace_tools::FINISH;
     use super::*;
+
+    #[test]
+    fn every_agent_tools_profile_schema_is_enforceable_by_the_broker() {
+        // A tool whose host schema the broker refuses would be withheld silently at runtime.
+        for tool in agent_tools_read_only().tools {
+            ClosedSchema::compile(&tool.host_schema)
+                .unwrap_or_else(|e| panic!("{}: {e}", tool.exposed_name));
+        }
+    }
 
     #[tokio::test]
     async fn built_in_schemas_are_closed_and_read_only_has_no_write() {

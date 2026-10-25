@@ -1,0 +1,67 @@
+{
+  "check": "S03-G6 M-LOCAL-C self-hosted OpenAI-compatible profile: connection, model listing and the outbound destination policy only (maintainer decision). No model pulled, no inference.",
+  "recorded": "2026-10-25",
+  "endpoint": {
+    "image": "ollama/ollama:0.40.0@sha256:1bef639749741b375e9a1eb2c1346fb57ce52f5432de1f74846e44ccc18e1687",
+    "compose_file": "compose.selfhosted.yaml",
+    "url": "http://ollama:11434/v1",
+    "resolved_address": "172.20.0.5 (Compose network 172.20.0.0/16)",
+    "models_pulled": 0
+  },
+  "default_policy": {
+    "FACTORY_OUTBOUND_ALLOW_CIDRS": "",
+    "save_key_status": 422,
+    "error": {
+      "affected_ids": {},
+      "code": "destination_blocked",
+      "evidence_refs": [],
+      "message": "That server address is not allowed: blocked_address: ollama resolves to 172.20.0.5 is a Private address and is not in an allowed range",
+      "retry_class": "terminal"
+    }
+  },
+  "operator_allowed_range": {
+    "FACTORY_OUTBOUND_ALLOW_CIDRS": "172.20.0.0/16",
+    "save_key_status": 201,
+    "probe": {
+      "profile_id": "compatible:listing@http://ollama:11434/v1",
+      "connection": {
+        "basis": "probe",
+        "evidence": "model listing answered HTTP 200",
+        "observed_at": "2026-10-25T14:49:05Z",
+        "state": "supported"
+      },
+      "models": [],
+      "capabilities": {
+        "cancellation": "unknown",
+        "image_input": "unknown",
+        "model_listing": "supported",
+        "parallel_tool_calls": "unknown",
+        "streaming": "unknown",
+        "strict_json_schema": "unknown",
+        "text": "unknown",
+        "tool_calls": "unknown",
+        "usage_accounting": "unknown"
+      },
+      "capability_evidence": {
+        "cancellation": "not probed",
+        "image_input": "image input is not used and not probed",
+        "model_listing": "0 models listed",
+        "parallel_tool_calls": "not probed",
+        "streaming": "not probed",
+        "strict_json_schema": "not probed",
+        "text": "not probed",
+        "tool_calls": "not probed",
+        "usage_accounting": "not probed"
+      },
+      "refusal": null,
+      "error": null,
+      "mode": "listing",
+      "probed_at": "2026-10-25T14:49:05Z"
+    }
+  },
+  "endpoint_access_log_from_server": [
+    "[GIN] 2026/10/25 - 14:49:05 | 200 |     834.917\u00b5s |      172.20.0.4 | GET      \"/v1/models\""
+  ],
+  "inference_requests_observed": 0,
+  "limitation": "The endpoint is an Ollama server with an empty model list, so the listing proves connection and the listing route only. Text, tool calls, streaming and usage stay unknown by design; an agent task on this profile is refused with capability_unsatisfied until an inference probe is run, which the maintainer excluded."
+}
