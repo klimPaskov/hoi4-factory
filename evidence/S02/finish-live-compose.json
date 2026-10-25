@@ -1,0 +1,179 @@
+{
+  "email_domain": "example.org",
+  "account_id": "43428feb-2b9c-4a9b-9dab-c3f3f4b5561b",
+  "project_id": "ac627962-2e19-477e-8503-6a7cdf4be710",
+  "uploaded_files": 8,
+  "evidence_offered": 19,
+  "model": "claude-haiku-5-5",
+  "analysis_attempts": 1,
+  "source_revision": "856940f2a629e0e2f3e03fc484cb0c0309c96734",
+  "plan_operations": 1464,
+  "plan_summary": {
+    "change": 3,
+    "conflict": 0,
+    "create": 1458,
+    "preserve": 3
+  },
+  "apply_status": "applied",
+  "journal_state": "completed",
+  "unplanned_changes": [],
+  "c01": {
+    "schema_version": 1,
+    "workspace_id": "ac627962-2e19-477e-8503-6a7cdf4be710",
+    "tenant": {
+      "account_id": "43428feb-2b9c-4a9b-9dab-c3f3f4b5561b",
+      "member_roles": [
+        {
+          "account_id": "43428feb-2b9c-4a9b-9dab-c3f3f4b5561b",
+          "role": "owner"
+        }
+      ],
+      "project_id": "ac627962-2e19-477e-8503-6a7cdf4be710"
+    },
+    "setup_receipt_state": "completed",
+    "generated_files": 1464,
+    "setup_revision": "c28198bb9b4d3fd90cea294cf136cad357ed5bbc",
+    "game_profile": {
+      "compatibility": {
+        "reason": "the mod declares no supported_version",
+        "status": "unknown"
+      },
+      "content_order": [],
+      "declared_supported_version": null,
+      "reference": {
+        "branch": "None",
+        "checksum_manifest_sha256": "771814d81faf7bae0f32819380c1114c61bbec1c897b060cecd1592f104f2b76",
+        "dlc_ids": [
+          "dlc001_german_historical_portraits",
+          "dlc002_polish_content_pack",
+          "dlc003_rocket_launcher_unit_pack",
+          "dlc014_wallpaper",
+          "dlc021_anniversary_pack",
+          "dlc023_man_the_guns",
+          "dlc028_la_resistance",
+          "dlc034_no_step_back",
+          "dlc036_by_blood_alone",
+          "dlc038_arms_against_tyranny",
+          "dlc043_gotterdammerung",
+          "dlc049_no_compromise_no_surrender"
+        ],
+        "manifest_hash": "88d939a6589a3a1dd2d045481db2ca4c6e448c0e10521d3beb8261f1c98f75b9",
+        "mount_locator": "/game",
+        "numeric_version": [
+          1,
+          19,
+          3,
+          0
+        ],
+        "raw_version": "1.19.3.0",
+        "rev": "c01a3d507f10bd8c713e88234de69ca110618138",
+        "schema_version": 1,
+        "version": "Operation Postern v1.19.3.0.c01a (5632)",
+        "warnings": []
+      },
+      "unknowns": [
+        "the mod declares no supported_version"
+      ]
+    },
+    "capabilities": [
+      "setup.inspectProject",
+      "setup.confirmSetupEvidence",
+      "setup.analyzeSetup",
+      "setup.confirmSetupAnalysis",
+      "setup.planSetup",
+      "setup.resolveSetupConflicts",
+      "setup.approveSetupPlan",
+      "setup.applySetupPlan",
+      "setup.inspectRecovery",
+      "setup.recoverSetup",
+      "setup.openWorkspace",
+      "game_reference"
+    ]
+  },
+  "setup": {
+    "blockers": [],
+    "contains_pr_105_fix": true,
+    "ready": true,
+    "revision": "c28198bb9b4d3fd90cea294cf136cad357ed5bbc"
+  },
+  "steps": [
+    {
+      "step": "signup",
+      "status": 201,
+      "seconds": 0.4,
+      "detail": ""
+    },
+    {
+      "step": "verify email",
+      "status": 200,
+      "seconds": 0.0,
+      "detail": ""
+    },
+    {
+      "step": "create project",
+      "status": 201,
+      "seconds": 0.1,
+      "detail": ""
+    },
+    {
+      "step": "upload zip",
+      "status": 201,
+      "seconds": 0.3,
+      "detail": ""
+    },
+    {
+      "step": "scan",
+      "status": 200,
+      "seconds": 0.3,
+      "detail": ""
+    },
+    {
+      "step": "approve excerpts",
+      "status": 200,
+      "seconds": 0.1,
+      "detail": ""
+    },
+    {
+      "step": "analyze (real model)",
+      "status": 200,
+      "seconds": 13.4,
+      "detail": ""
+    },
+    {
+      "step": "confirm values",
+      "status": 200,
+      "seconds": 0.1,
+      "detail": ""
+    },
+    {
+      "step": "plan",
+      "status": 200,
+      "seconds": 35.5,
+      "detail": ""
+    },
+    {
+      "step": "keep the author's files",
+      "status": 200,
+      "seconds": 0.2,
+      "detail": ""
+    },
+    {
+      "step": "approve plan",
+      "status": 200,
+      "seconds": 0.1,
+      "detail": ""
+    },
+    {
+      "step": "apply",
+      "status": 200,
+      "seconds": 164.9,
+      "detail": ""
+    },
+    {
+      "step": "workspace (C-01)",
+      "status": 200,
+      "seconds": 0.3,
+      "detail": ""
+    }
+  ]
+}

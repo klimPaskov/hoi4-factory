@@ -1237,7 +1237,9 @@ fn kill_window(_destination: &std::path::Path, index: usize, barrier: LiveMutati
         LiveMutationBarrier::AfterQuarantineVerified => "quarantine",
         LiveMutationBarrier::AfterPlacement => "placement",
     };
-    if index == want_index && here == want {
+    // The first operation at or after the wanted index that really changes the project: an
+    // operation the plan only preserves never reaches the window.
+    if index >= want_index && here == want {
         if let Ok(signal) = std::env::var("HF_G4_SIGNAL") {
             std::fs::write(signal, b"ready").unwrap();
         }
@@ -1767,12 +1769,27 @@ async fn two_accounts_cannot_see_each_others_setup_records_over_http() {
         ),
     ] {
         let r = bflow.post(tail, body).await;
-        assert_eq!(
-            (r.status, r.error_code()),
-            (404, "not_found"),
-            "Alice's plan id is nothing in Bob's session ({tail}): {}",
-            r.text
-        );
+        if tail == "apply" {
+            // The facade refuses an apply for a plan nobody approved in this session before it
+            // looks the plan up, so Alice's plan is indistinguishable from an unknown one.
+            let unknown = bflow
+                .post("apply", json!({"plan_id": Uuid::new_v4()}))
+                .await;
+            assert_eq!(
+                (r.status, r.error_code()),
+                (409, "plan_not_approved"),
+                "{}",
+                r.text
+            );
+            assert_eq!(r.body, unknown.body, "no hint that the plan exists");
+        } else {
+            assert_eq!(
+                (r.status, r.error_code()),
+                (404, "not_found"),
+                "Alice's plan id is nothing in Bob's session ({tail}): {}",
+                r.text
+            );
+        }
     }
     // Alice is unaffected: her session, her plan and her bytes.
     let status = aflow.get("status").await;

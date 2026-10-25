@@ -2,94 +2,93 @@
   "label": "github-import",
   "provider": "anthropic",
   "model": "claude-haiku-5-5",
-  "recorded_at": "2026-10-24T22:57:36.521068896+00:00",
+  "recorded_at": "2026-10-24T23:31:34.242530996+00:00",
   "note": "G1: the GitHub-imported test mod, existing-mod analysis",
   "calls": [
     {
-      "response_id": "msg_011CgMtXHVt9sQugzdkENgda",
+      "response_id": "msg_011CgMw7Zx1o9mtvNm1yavcV",
       "usage": {
-        "input_tokens": 8081,
-        "output_tokens": 2435
+        "input_tokens": 8366,
+        "output_tokens": 2398
       },
-      "prompt_sha256": "e7eb0639d0183c12fce01e92ce6d59187ea29d11c9a9541f9d78e5cdc1808a8c",
+      "prompt_sha256": "aa493cd66feb9a324065e00f3b2e09c416ac9d4dbad33e2f8770c227854a0794",
       "reply": {
         "analysis_id": "gate-fixture-import",
-        "component_recommendations": [
-          {
-            "component_id": "core.agents",
-            "reason": "AGENTS.md is present and Codex is the detected primary coding environment.",
-            "recommendation": "recommended"
-          }
-        ],
-        "input_sha256": "71fc443aa072b204473b5a6cb084298d25736475751626334d313ff77e0c3f01",
+        "component_recommendations": [],
+        "input_sha256": "f3ca92bde741df7637e666075d1cbcc7cd2dd0683cabf189999ec745bd146fb8",
         "mode": "existing_project_semantics",
-        "project_summary": "Gate Fixture is an existing Hearts of Iron IV mod project whose descriptor declares the Alternative History tag. The project has a root README and sampled interface and gfx content, with data and other root directories present in the inventory. The sampled files show a UTF-8 README and a UTF-8 BOM interface file. Gameplay categories beyond the sampled files have not been confirmed, and no localisation or identifier conventions were inferred from the sample.",
+        "project_summary": "Gate Fixture is a small Hearts of Iron IV mod with descriptor metadata tagged Alternative History, an interface folder with a GUI asset, and a root README. No localisation files, identifier prefixes, or namespace declarations have been observed yet, so those conventions are not established.",
         "proposals": [
           {
-            "confidence": 0.95,
+            "confidence": 0.97,
             "evidence_refs": [
               "descriptor.name"
             ],
             "key": "display_name",
-            "reason": "Taken from the name field of descriptor.mod.",
+            "reason": "Taken from the name field in descriptor.mod.",
             "value": "Gate Fixture"
           },
           {
-            "confidence": 0.6,
+            "confidence": 0.9,
             "evidence_refs": [
               "descriptor.name"
             ],
             "key": "project_id",
-            "reason": "Lowercase identifier derived from the existing display name for future tooling.",
+            "reason": "Lowercase identifier derived from the mod name.",
             "value": "gate_fixture"
-          },
-          {
-            "confidence": 0.55,
-            "evidence_refs": [],
-            "key": "script_prefix",
-            "reason": "Suggested new lowercase script prefix derived from the display name; existing prefixes were not sampled.",
-            "value": "gate_fixture"
-          },
-          {
-            "confidence": 0.55,
-            "evidence_refs": [],
-            "key": "primary_namespace",
-            "reason": "Suggested new lowercase primary namespace derived from the display name; existing namespaces were not sampled.",
-            "value": "gate_fixture"
-          },
-          {
-            "confidence": 0.7,
-            "evidence_refs": [
-              "profile.documentation",
-              "profile.structure"
-            ],
-            "key": "project_description",
-            "reason": "Based on the README heading and the sampled project structure.",
-            "value": "Gate Fixture is a Hearts of Iron IV mod project tagged Alternative History, with a root README and interface and gfx content folders."
           },
           {
             "confidence": 0.8,
+            "evidence_refs": [
+              "descriptor.name"
+            ],
+            "key": "script_prefix",
+            "reason": "Suggested script prefix derived from the mod name; no existing prefixes were observed.",
+            "value": "gate_fixture"
+          },
+          {
+            "confidence": 0.8,
+            "evidence_refs": [
+              "descriptor.name"
+            ],
+            "key": "primary_namespace",
+            "reason": "Suggested primary namespace derived from the mod name; no existing namespaces were observed.",
+            "value": "gate_fixture"
+          },
+          {
+            "confidence": 0.6,
+            "evidence_refs": [
+              "profile.structure",
+              "profile.documentation"
+            ],
+            "key": "project_description",
+            "reason": "Describes the fixture from its name, its interface content, and its README.",
+            "value": "A small Hearts of Iron IV fixture mod with descriptor metadata, interface assets, and a root README."
+          },
+          {
+            "confidence": 0.85,
             "evidence_refs": [
               "codex.agents",
               "coding.environments"
             ],
             "key": "agents_profile",
-            "reason": "AGENTS.md is present and Codex is the detected primary coding environment with no additional environments.",
-            "value": "Codex primary; AGENTS.md present; no additional coding environments detected"
+            "reason": "Agent guidance is present in AGENTS.md and Codex is the primary coding environment.",
+            "value": "Codex is the primary coding environment, with AGENTS.md guidance at the project root."
           },
           {
-            "confidence": 0.8,
+            "confidence": 0.3,
             "evidence_refs": [
               "profile.localisation"
             ],
             "key": "localisation_convention",
-            "reason": "No localisation files were sampled, so no language header or encoding convention can be stated.",
-            "value": "No localisation files sampled; no language headers or encoding convention inferred"
+            "reason": "No localisation files were observed, so no convention can be inferred yet.",
+            "value": "No localisation files observed yet; no convention established."
           },
           {
-            "confidence": 0.95,
+            "confidence": 0.9,
             "evidence_refs": [
-              "profile.detected"
+              "profile.detected",
+              "documentation.inventory"
             ],
             "key": "documentation_convention",
             "reason": "The documentation files found in the project.",
@@ -98,11 +97,10 @@
           {
             "confidence": 0.95,
             "evidence_refs": [
-              "profile.detected",
               "descriptor.metadata"
             ],
             "key": "descriptor_tags",
-            "reason": "The tags field of descriptor.mod.",
+            "reason": "Matches the tag already present in descriptor.mod.",
             "value": [
               "Alternative History"
             ]
@@ -114,16 +112,14 @@
               "profile.structure"
             ],
             "key": "folder_profile",
-            "reason": "Content folders that already hold game files.",
+            "reason": "Content folder that already holds game files.",
             "value": [
               "interface"
             ]
           }
         ],
         "schema_version": "1.0.0",
-        "warnings": [
-          "The project has no thumbnail.png; add one if you want a Workshop preview image."
-        ]
+        "warnings": []
       }
     }
   ]

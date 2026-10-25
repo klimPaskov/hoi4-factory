@@ -1,0 +1,106 @@
+{
+  "label": "new-mod",
+  "provider": "anthropic",
+  "model": "claude-haiku-5-5",
+  "recorded_at": "2026-10-24T23:31:22.990278633+00:00",
+  "note": "G1: a new mod from a brief",
+  "calls": [
+    {
+      "response_id": "msg_011CgMw6vLLLQNgtXhivNK4E",
+      "usage": {
+        "input_tokens": 5141,
+        "output_tokens": 1589
+      },
+      "prompt_sha256": "ca9ea699554436839f65b8c1b6b9bac61d3020b03e86c15a09360e7cd8df801a",
+      "reply": {
+        "analysis_id": "divided-europe-setup",
+        "component_recommendations": [],
+        "input_sha256": "2b535a0f6cadaa29cae51a96cb5fe4ad46bd105f39bf41c47292da4907afed77",
+        "mode": "new_project_identity",
+        "project_summary": "A small alternate-history mod about a divided Europe, centred on a handful of political events and two national focuses that show how the continent's politics might have split.",
+        "proposals": [
+          {
+            "confidence": 0.8,
+            "evidence_refs": [],
+            "key": "display_name",
+            "reason": "The brief describes a divided Europe alternate-history mod, so a short title that names that premise fits.",
+            "value": "Divided Europe"
+          },
+          {
+            "confidence": 0.8,
+            "evidence_refs": [],
+            "key": "project_id",
+            "reason": "A lowercase identifier derived from the suggested display name.",
+            "value": "divided_europe"
+          },
+          {
+            "confidence": 0.7,
+            "evidence_refs": [],
+            "key": "script_prefix",
+            "reason": "A short lowercase prefix for event and focus identifiers, avoiding uppercase country tags.",
+            "value": "de"
+          },
+          {
+            "confidence": 0.7,
+            "evidence_refs": [],
+            "key": "primary_namespace",
+            "reason": "A lowercase namespace matching the project name for the mod's events and focuses.",
+            "value": "divided_europe"
+          },
+          {
+            "confidence": 0.8,
+            "evidence_refs": [],
+            "key": "project_description",
+            "reason": "Restates the brief's premise and content in user-facing terms.",
+            "value": "A small alternate-history mod in which Europe remains divided, with political events and two national focuses exploring that division."
+          },
+          {
+            "confidence": 0.6,
+            "evidence_refs": [],
+            "key": "agents_profile",
+            "reason": "A lightweight profile suits a small event and focus mod with no existing project files to inspect.",
+            "value": "Lightweight profile for a small HOI4 event and national focus mod"
+          },
+          {
+            "confidence": 0.6,
+            "evidence_refs": [],
+            "key": "localisation_convention",
+            "reason": "Standard HOI4 localisation layout suggested for event and focus text in a new project.",
+            "value": "English l_english YAML files encoded as UTF-8 with BOM"
+          },
+          {
+            "confidence": 0.6,
+            "evidence_refs": [],
+            "key": "documentation_convention",
+            "reason": "A short README is enough to explain the premise and the included content.",
+            "value": "Short README describing the alternate-history premise and included events and focuses"
+          },
+          {
+            "confidence": 0.7,
+            "evidence_refs": [],
+            "key": "descriptor_tags",
+            "reason": "Official categories matching the brief's alternate-history premise, events, and national focuses.",
+            "value": [
+              "Alternative History",
+              "Events",
+              "National Focuses"
+            ]
+          },
+          {
+            "confidence": 0.7,
+            "evidence_refs": [],
+            "key": "folder_profile",
+            "reason": "Folders needed for the planned events, national focuses, and localisation.",
+            "value": [
+              "events",
+              "common/national_focus",
+              "localisation"
+            ]
+          }
+        ],
+        "schema_version": "1.0.0",
+        "warnings": []
+      }
+    }
+  ]
+}

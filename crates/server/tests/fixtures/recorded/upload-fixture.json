@@ -2,84 +2,76 @@
   "label": "upload-fixture",
   "provider": "anthropic",
   "model": "claude-haiku-5-5",
-  "recorded_at": "2026-10-24T22:57:36.024462368+00:00",
+  "recorded_at": "2026-10-24T23:31:27.144097444+00:00",
   "note": "G1/G2/G4 fixture: the uploaded gate mod, existing-mod analysis",
   "calls": [
     {
-      "response_id": "msg_011CgMtXHQB8ix1RXnXCpX3h",
+      "response_id": "msg_011CgMw72zgTBscoikqLrtgk",
       "usage": {
-        "input_tokens": 8607,
-        "output_tokens": 2333
+        "input_tokens": 8883,
+        "output_tokens": 2408
       },
-      "prompt_sha256": "299e9e39baa9b4710f281b1b4e117b7de232098ac8216385ac9ea7154306d839",
+      "prompt_sha256": "c731893ecfd8a39855004f6f433cfa2ed4f558e2c710a6203e534590ea79c1ed",
       "reply": {
-        "analysis_id": "gate-fixture-existing",
-        "component_recommendations": [
-          {
-            "component_id": "core.agents",
-            "reason": "The project already includes AGENTS.md, so the shared agent guidance component fits this mod.",
-            "recommendation": "recommended"
-          }
-        ],
-        "input_sha256": "7ca164df8380d4a0ae8575061e691138a9272453655547ae06d0fe43783146d5",
+        "analysis_id": "gate-fixture-import",
+        "component_recommendations": [],
+        "input_sha256": "771ca01c3b68ad18438517fefcb7987d0be6f933fe3e2e188bee3437bd3a8cda",
         "mode": "existing_project_semantics",
-        "project_summary": "Gate Fixture is an Alternative History mod with sampled national focus content in common/national_focus, English localisation with a BOM, and Markdown documentation in docs/. The sampled files use the gate prefix. Setup-level inventory shows a small file count, so gameplay coverage and conventions beyond the sampled files are not yet established.",
+        "project_summary": "Gate Fixture is an existing Hearts of Iron IV mod with a small sampled footprint: one national focus file under common/national_focus, one English localisation file with a UTF-8 BOM, and a Markdown docs/ folder. The descriptor declares the Alternative History tag and supports HOI4 1.19. The README is a brief placeholder, and the sampled identifiers use the gate prefix. The inventory counts describe the whole project, while the sampled content covers only a few files, so no wider gameplay or convention claims are made.",
         "proposals": [
           {
-            "confidence": 0.98,
+            "confidence": 0.95,
             "evidence_refs": [
               "descriptor.name"
             ],
             "key": "display_name",
-            "reason": "The name field in descriptor.mod gives the mod's display name.",
+            "reason": "The name is taken directly from the descriptor.",
             "value": "Gate Fixture"
-          },
-          {
-            "confidence": 0.7,
-            "evidence_refs": [
-              "profile.identifiers"
-            ],
-            "key": "project_id",
-            "reason": "A lowercase project identifier derived from the display name, kept consistent with the observed gate prefix.",
-            "value": "gate_fixture"
           },
           {
             "confidence": 0.8,
             "evidence_refs": [
-              "profile.identifiers"
+              "descriptor.name"
             ],
+            "key": "project_id",
+            "reason": "A lowercase identifier derived from the descriptor name.",
+            "value": "gate_fixture"
+          },
+          {
+            "confidence": 0.6,
+            "evidence_refs": [],
             "key": "script_prefix",
-            "reason": "The sampled identifier prefix observed in the project is gate.",
-            "value": "gate"
+            "reason": "A new lowercase script prefix proposed from the project name, distinct from the sampled gate prefix.",
+            "value": "gatefix"
+          },
+          {
+            "confidence": 0.6,
+            "evidence_refs": [],
+            "key": "primary_namespace",
+            "reason": "A new primary namespace proposed from the project name; existing identifiers are not renamed.",
+            "value": "gate_fixture"
+          },
+          {
+            "confidence": 0.5,
+            "evidence_refs": [
+              "profile.structure",
+              "profile.documentation"
+            ],
+            "key": "project_description",
+            "reason": "Summarises the sampled content; the README is only a placeholder.",
+            "value": "Alternative History fixture mod for Hearts of Iron IV with a national focus file and English localisation."
           },
           {
             "confidence": 0.7,
             "evidence_refs": [
-              "profile.identifiers"
-            ],
-            "key": "primary_namespace",
-            "reason": "Matches the observed gate identifier prefix. Existing identifiers are not renamed by this suggestion.",
-            "value": "gate"
-          },
-          {
-            "confidence": 0.6,
-            "evidence_refs": [
-              "profile.structure",
-              "profile.detected"
-            ],
-            "key": "project_description",
-            "reason": "Summarises the sampled content: national focus, localisation, and documentation files.",
-            "value": "Alternative History mod with national focus content, English localisation, and Markdown documentation."
-          },
-          {
-            "confidence": 0.85,
-            "evidence_refs": [
               "codex.agents",
-              "coding.environments"
+              "codex.config",
+              "skill.inventory",
+              "subagent.inventory"
             ],
             "key": "agents_profile",
-            "reason": "AGENTS.md is present and Codex is the detected primary coding environment with no additional tools detected.",
-            "value": "Codex primary with AGENTS.md; no additional agent tools detected"
+            "reason": "AGENTS.md is present, one skill is installed, no subagents are defined, and no project MCP configuration is enabled.",
+            "value": "AGENTS.md guidance present; one skill installed; no subagents; no project MCP servers configured"
           },
           {
             "confidence": 0.9,
@@ -88,26 +80,27 @@
               "profile.localisation"
             ],
             "key": "localisation_convention",
-            "reason": "Sampled localisation files show an english header, UTF-8 with BOM encoding, and versioned keys.",
+            "reason": "Language headers and encodings of the sampled localisation files.",
             "value": "english; UTF-8 with BOM; versioned keys such as key:0"
           },
           {
-            "confidence": 0.85,
+            "confidence": 0.9,
             "evidence_refs": [
               "profile.detected",
               "profile.documentation"
             ],
             "key": "documentation_convention",
-            "reason": "Sampled documentation files are Markdown and sit in docs/.",
+            "reason": "The documentation files found in the project.",
             "value": "Markdown documentation in docs/"
           },
           {
             "confidence": 0.9,
             "evidence_refs": [
-              "descriptor.metadata"
+              "descriptor.metadata",
+              "profile.detected"
             ],
             "key": "descriptor_tags",
-            "reason": "The tags field in descriptor.mod lists Alternative History.",
+            "reason": "The tags field of the descriptor.",
             "value": [
               "Alternative History"
             ]
@@ -119,7 +112,7 @@
               "profile.structure"
             ],
             "key": "folder_profile",
-            "reason": "These content folders already hold game files in the sampled project.",
+            "reason": "Content folders that already hold game files.",
             "value": [
               "common/national_focus",
               "localisation"
@@ -128,7 +121,7 @@
         ],
         "schema_version": "1.0.0",
         "warnings": [
-          "thumbnail.png is missing; add one before publishing if you want a Workshop thumbnail."
+          "No thumbnail.png is present; add one before publishing if you want a Workshop thumbnail."
         ]
       }
     }
