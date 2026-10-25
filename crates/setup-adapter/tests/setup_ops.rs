@@ -117,7 +117,7 @@ async fn inspect_leaves_every_byte_mode_and_the_git_index_identical() {
     );
     assert_eq!(r.id, out.receipt_id);
     assert_eq!(r.setup_revision, SETUP_PIN.revision);
-    assert!(!r.setup_has_pr105_fix);
+    assert_eq!(r.setup_has_pr105_fix, SETUP_PIN.contains_pr_105_fix);
     assert_eq!(r.before_inventory_sha256, r.after_inventory_sha256);
     assert!(r.finished_at.is_some());
 }

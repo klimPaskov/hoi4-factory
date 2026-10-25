@@ -2,6 +2,16 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.2, 2026-10-25, S02 handoff
+
+- New [developer setup guide](DEVELOPER-SETUP.md) for a fresh machine, with `.env.example` and a readiness checklist. CLAUDE.md links it.
+- `scripts/linux-tests.sh` is self-contained: it builds `docker/test-runner.Dockerfile` (Rust 1.97.1, git, Debian Node) and starts its own database when `FACTORY_TEST_ADMIN_URL` is unset.
+- CLAUDE.md: run workspace tests with `--no-fail-fast`, because `cargo test` stops at the first failing test binary, and treat failures on a nearly full disk as suspect.
+- CLAUDE.md: assert pinned upstream behavior against `SETUP_PIN` instead of fixed values, and rerun the whole workspace after a pin change. The Linux test note now names the self-built test image.
+- The server image now builds the browser client in a pinned Node stage and serves it from `FACTORY_WEB_DIST`.
+
+Evidence: [S02 learning review](../../evidence/S02/learning-review.md) and [checks](../../evidence/S02/checks.json). Rollback: revert this commit and regenerate.
+
 ## 0.2.1, 2026-10-24, S02 finish
 
 - CLAUDE.md gained three tool quirks found while finishing S02: apply gates run on Linux through `scripts/linux-tests.sh` (Setup's readiness and Node trust differ by platform), Setup's source client must be built and dropped off the async runtime, and Python heredocs with backslashes can fail silently in this shell.

@@ -2,7 +2,7 @@
 
 A free, open-source, hosted HOI4 modding workspace with optional visual editing, bounded agent work, GitHub integration and collaboration over real mod source files.
 
-This repository holds the research and planning baseline, revised on 2026-10-24 by the [maintainer decisions](docs/02-architecture/maintainer-decisions-2026-10-24.md). **Product implementation has not started** and is deferred until the maintainer authorizes S01.
+**Status, 2026-10-25:** stages S01 (bootstrap and architecture probes) and S02 (accounts, server workspaces, Mod Setup and GitHub import) are implemented. A user can sign up, create or upload a mod or import it from GitHub, and run HOI4 Mod Setup on it in a per-account server workspace. The next stage is S03, the native agent loop. See [package status](docs/PACKAGE_STATUS.md) and the [S02 handoff](evidence/S02/handoff.md). The planning baseline and the [maintainer decisions](docs/02-architecture/maintainer-decisions-2026-10-24.md) still define the full product.
 
 ## Planned product
 
@@ -21,12 +21,12 @@ This repository holds the research and planning baseline, revised on 2026-10-24 
 
 ## Start here
 
-1. Clone this repository, open it in your editor and launch Claude Code from its root.
+1. Follow the [developer setup](docs/07-developer-workflow/DEVELOPER-SETUP.md) to install the tools, create the local configuration and start the stack with `docker compose up -d --build --wait`. The app runs at http://127.0.0.1:8080.
 2. Read the [documentation index](docs/README.md), [master goal](docs/MASTER_GOAL.md) and [current status](docs/PACKAGE_STATUS.md).
 3. Review the [architecture options](docs/02-architecture/options-and-decisions.md) and [implementation roadmap](docs/04-implementation-stages/ROADMAP.md).
-4. When S01 is authorized, use the [Claude Code S01 prompt](docs/06-agent-handoffs/CLAUDE-CODE-START-STAGE-01.md).
+4. To continue development, launch Claude Code from the repository root, run `/start-implementation-stage S03` and use the [S03 goal prompt](docs/06-agent-handoffs/GOAL-S03.md).
 
-The shared [AGENTS.md](AGENTS.md), importing [CLAUDE.md](CLAUDE.md), project settings and skills are already in their working locations.
+[CLAUDE.md](CLAUDE.md) holds the project instructions. [AGENTS.md](AGENTS.md) is its generated identical copy for clients that read that name. Project settings and skills are already in their working locations.
 
 ## Contributing and license
 
@@ -37,15 +37,21 @@ HOI4 Factory is licensed under the GNU Affero General Public License version 3 w
 | Location | Purpose |
 |---|---|
 | `docs/` | All research, goals, requirements, architecture, specifications, stage packets, verification plans, handoffs and engineering documentation |
-| `scripts/` | Planning validation and deterministic skill synchronization utilities |
-| `AGENTS.md` | Shared project instructions |
-| `CLAUDE.md` | Claude Code entry point with the shared instructions imported |
-| `.claude/` | Claude project settings and four reusable skills |
+| `crates/` | Rust workspace: `accounts`, `workspace`, `game-ref`, `intake`, `setup-adapter`, `server` and `agent` |
+| `web/` | React and TypeScript browser client, built with Vite |
+| `migrations/` | PostgreSQL migrations, numbered by owning crate |
+| `docker/`, `compose.yaml` | Server image, Linux test image, database setup and the development stack |
+| `probes/` | S01 architecture probes, kept byte-exact because evidence records their hashes |
+| `evidence/` | Stage evidence, handoffs and the maintainer question list |
+| `scripts/` | Package validator, skill synchronization, Linux test runner and the live onboarding flow |
+| `CLAUDE.md` | Canonical project instructions |
+| `AGENTS.md` | Generated identical copy of CLAUDE.md |
+| `.claude/` | Claude project settings and six skills |
 | `.codex/` | Codex project settings and portable skill copies |
-| `.agents/` | Codex discovery copies of the same four skills |
+| `.agents/` | Codex discovery copies of the same six skills |
 | `.mcp.json` | Claude MCP definitions, disabled until their setup is reviewed |
 
-Future application source belongs alongside `docs/`, in the structure chosen by the implementation stage. Stage evidence is written to project-root `evidence/SNN/` when work actually occurs. Detailed navigation and the full file inventory are in [docs/README.md](docs/README.md) and [docs/MANIFEST.md](docs/MANIFEST.md).
+Stage evidence is written to project-root `evidence/SNN/`. Detailed navigation and the full file inventory are in [docs/README.md](docs/README.md) and [docs/MANIFEST.md](docs/MANIFEST.md).
 
 ## Check the planning and guidance files
 

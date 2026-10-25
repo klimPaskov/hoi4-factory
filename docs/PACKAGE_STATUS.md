@@ -1,6 +1,19 @@
 # Package status and continuation
 
-Version: v02, revised 2026-10-24. Phase: **Planning revised by maintainer decisions, implementation deferred**. Product implementation has not started. The maintainer stated that the application will be developed later, so no stage is authorized.
+Version: v02, revised 2026-10-25. Phase: **implementation, S01 and S02 complete, S03 next**.
+
+## Current state
+
+| Stage | State | Evidence |
+|---|---|---|
+| S01 bootstrap and architecture probes | Complete and accepted. Rust host and native Rust agent loop selected, Setup binding proven, GitHub App and memory decisions recorded | [S01 handoff](../evidence/S01/handoff.md) |
+| S02 accounts, server workspaces, Mod Setup and GitHub import | Complete. Email and GitHub sign-in, per-account workspaces with row-level security, ZIP and folder upload, GitHub import, the full Setup flow over HTTP against merged HOI4-Mod-Setup `c28198b`, and the browser Setup wizard. Gates G1 to G4 pass. G5 passes with the limitation recorded in the handoff | [S02 handoff](../evidence/S02/handoff.md), [checks](../evidence/S02/checks.json) |
+| S03 native agent and durability | Authorized inputs recorded, not started | [goal prompt](06-agent-handoffs/GOAL-S03.md), [draft scope](../evidence/S03/scope.md) |
+| S04 to S08 | Not authorized | [roadmap](04-implementation-stages/ROADMAP.md) |
+
+A new machine is set up with the [developer setup guide](07-developer-workflow/DEVELOPER-SETUP.md). Open questions for the maintainer are in [maintainer questions](../evidence/maintainer-questions.md). Under ADR-024, CLAUDE.md and the skills are maintained by the implementing agent, and AGENTS.md is generated from CLAUDE.md.
+
+The sections below describe the planning baseline. Statements in them that implementation has not started are historical.
 
 ## Revision of 2026-10-24
 
@@ -59,7 +72,6 @@ These are future stage gates, not missing planning sections. Their owners and ex
 
 ## Exact continuation
 
-Review the maintainer decision record, revised architecture, risk register and roadmap. When the maintainer later authorizes S01, open the extracted `hoi4-factory/` working folder, read its local instructions, and use [CLAUDE-CODE-START-STAGE-01](06-agent-handoffs/CLAUDE-CODE-START-STAGE-01.md). Use the guidance already in place. If integrating into another repository, merge its existing guidance carefully. Record environment and source pins, run bounded probes and return the decision receipt.
+On a new machine, follow the [developer setup guide](07-developer-workflow/DEVELOPER-SETUP.md) to its readiness checklist. Then launch Claude Code from the repository root, run `/start-implementation-stage S03`, and give it the [S03 goal prompt](06-agent-handoffs/GOAL-S03.md). The goal prompt is self-contained and lists what to read, the S03 maintainer decisions, what to build and how to finish.
 
-Do not begin S02 automatically. The next reviewer should receive S01's actual scope, revision, checks, failures, selected bindings, supported operations, remaining limits, learning review and configuration review. The package stands alone without this conversation.
-
+Do not begin S04 automatically. S03 ends with its own handoff and a goal prompt for S04. The package stands alone without any earlier conversation.

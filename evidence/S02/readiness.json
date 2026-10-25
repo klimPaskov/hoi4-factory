@@ -1,0 +1,82 @@
+{
+  "stage": "S02",
+  "date": "2026-10-25",
+  "reviewed": [
+    "PR-001",
+    "PR-002",
+    "PR-003",
+    "PR-005",
+    "PR-006",
+    "PR-007",
+    "PR-008",
+    "PR-009",
+    "PR-011",
+    "PR-012",
+    "PR-016",
+    "PR-017",
+    "PR-018",
+    "PR-019",
+    "PR-020",
+    "PR-027",
+    "PR-029",
+    "PR-033",
+    "PR-034",
+    "PR-035",
+    "PR-036",
+    "PR-037",
+    "PR-040",
+    "PR-083",
+    "PR-084",
+    "PR-088",
+    "PR-096",
+    "PR-098",
+    "PR-101"
+  ],
+  "done": [
+    "PR-001",
+    "PR-002",
+    "PR-003",
+    "PR-005",
+    "PR-006",
+    "PR-007",
+    "PR-008",
+    "PR-009",
+    "PR-011",
+    "PR-012",
+    "PR-016",
+    "PR-017",
+    "PR-018",
+    "PR-019",
+    "PR-020",
+    "PR-027",
+    "PR-029",
+    "PR-034",
+    "PR-035",
+    "PR-036",
+    "PR-037",
+    "PR-040",
+    "PR-083",
+    "PR-084",
+    "PR-088",
+    "PR-096",
+    "PR-101"
+  ],
+  "in_progress": [
+    "PR-033",
+    "PR-098"
+  ],
+  "recommendations": [
+    {
+      "item": "PR-032 dependency scanning",
+      "why": "RustSec advisories exist for rustls-webpki and webpki-roots, which the factory also uses",
+      "cost": "small: run cargo audit and bump the TLS crates"
+    },
+    {
+      "item": "PR-098 API rate limits",
+      "why": "upload and setup routes are unthrottled per account",
+      "cost": "small: reuse the accounts RateLimiter"
+    }
+  ],
+  "fit_changes": [],
+  "new_rows": []
+}

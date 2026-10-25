@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "stage": "S02",
+  "recorded": "2026-10-25",
+  "base_revision": "4634d93f9fc39dca6ae02ba42cd19d6b98eb0069",
+  "tested_revision": "78ffc1a1889ef6cb04cf3c0088a31084ef66eda6",
+  "tested_revision_note": "HEAD plus the uncommitted handoff changes, which include the three setup-adapter test updates below; everything is committed in the handoff commit that follows",
+  "setup_pin": {
+    "repository": "klimPaskov/HOI4-Mod-Setup",
+    "revision": "c28198bb9b4d3fd90cea294cf136cad357ed5bbc",
+    "contains": [
+      "#105",
+      "#106",
+      "#107",
+      "#108"
+    ],
+    "merged": true
+  },
+  "toolchain": {
+    "rust": "1.97.1",
+    "postgres": "17.6 (postgres@sha256:f3bd19c6...e6e3)",
+    "node_web": "node:22-bookworm-slim@sha256:de170b39...38d",
+    "node_setup": "Debian nodejs 18.20.4+dfsg-1~deb12u3"
+  },
+  "checks": [
+    {
+      "id": "windows-workspace-tests",
+      "kind": "automated tests on real PostgreSQL and real Setup code",
+      "command": "cargo test -q --no-fail-fast --workspace --exclude factory-runtime-probe",
+      "env": "FACTORY_TEST_ADMIN_URL pointing at a disposable postgres container; Windows 11, x86_64-pc-windows-msvc",
+      "result": {
+        "binaries": 41,
+        "passed": 359,
+        "failed": 3,
+        "ignored": 18,
+        "failed_tests": [
+          "a_finalizing_journal_without_a_committed_lock_ends_in_manual_review_not_a_loop",
+          "a_partial_apply_is_rollback_only_and_rollback_restores_every_byte",
+          "inspect_leaves_every_byte_mode_and_the_git_index_identical"
+        ]
+      },
+      "log_sha256": "4954f57a63474a451bda1883abba6dc39e35444fb7fa978ddf12103746a6c1d8",
+      "note": "The three failures were stale assertions written for the pre-merge Setup pin: two expected setup_has_pr105_fix to be false and one expected the finalization dead end that HOI4-Mod-Setup #107 fixed. The tests now follow SETUP_PIN, and the finalization test asserts the fixed behavior: a partial apply that rolls back exactly. Setup apply gates are ignored on Windows by design and run on Linux below"
+    },
+    {
+      "id": "windows-setup-adapter-rerun",
+      "kind": "automated tests",
+      "command": "cargo test -q -p factory-setup-adapter --no-fail-fast",
+      "result": {
+        "binaries": 7,
+        "passed": 38,
+        "failed": 0,
+        "ignored": 1
+      },
+      "note": "after the test updates; the ignored test is the live model test"
+    },
+    {
+      "id": "linux-setup-gates",
+      "kind": "automated tests on Linux with real Setup apply and recorded-real model replies",
+      "command": "scripts/linux-tests.sh -p factory-server --test setup_gates -- --nocapture",
+      "image": "hoi4-factory-test-runner:1 from docker/test-runner.Dockerfile",
+      "result": {
+        "binaries": 1,
+        "passed": 13,
+        "failed": 0,
+        "ignored": 5,
+        "failed_tests": []
+      },
+      "passed_tests": [
+        "a_lost_new_mod_session_keeps_its_brief_for_the_next_scan",
+        "a_revoked_installation_during_import_leaves_the_workspace_untouched",
+        "g1_import_replayed",
+        "g1_new_replayed",
+        "g1_upload_replayed",
+        "g2_a_reviewed_replacement_changes_exactly_that_file",
+        "g2_preserves_everything_unless_a_reviewed_change_covers_it",
+        "g3_rerun_is_clean_and_an_edited_generated_file_is_a_conflict",
+        "g4_a_killed_process_leaves_a_recoverable_state",
+        "g4_graceful_interruptions_are_classified_and_recoverable",
+        "g4_post_install_and_finalization_boundaries_are_classified",
+        "the_gates_hold_in_order_and_a_restart_expires_the_session",
+        "two_accounts_cannot_see_each_others_setup_records_over_http"
+      ],
+      "log_sha256": "0abdd0424a2db35a4d7ada206cfcd69cc9011b0dc996d7b1c05277c430117488"
+    },
+    {
+      "id": "web-check",
+      "kind": "static checks, unit tests and production build of the browser client",
+      "command": "web/scripts/docker-npm.sh ci && web/scripts/docker-npm.sh run check",
+      "result": {
+        "exit_code": 0,
+        "vitest_tests_passed": null
+      },
+      "log_sha256": "3fcd5be0632cf9fd60932aff227a0b1cd57d1eb7349b1705586fa7b8f1bf928d"
+    },
+    {
+      "id": "compose-build-and-readyz",
+      "kind": "image build and running service check",
+      "command": "docker compose up -d --build --wait; GET /readyz; GET /",
+      "result": {
+        "exit_code": 0,
+        "server_image": "sha256:d1fdec5f1f7c9a22d3b0372618bcf2246e3acb0fda04c82e9441ff0b05ca5775",
+        "test_runner_image": "sha256:9203ad4d88e8c9811fe9957da8fde4736955788ddfcf1f1e6a7d9678188c62b1",
+        "services": "server, db, mailpit healthy",
+        "readyz": "status ok; database ok; migrations latest 402 ok; storage ok; game_reference available, read_only",
+        "root": "200 text/html, title HOI4 Factory, /assets/index-Bn4dHxRw.js (same bundle hash as the web check build)",
+        "image_scan": "/app/web present; /usr/bin/node v18.20.4; no /game; no claude or codex binary",
+        "game_build_evidence": "evidence/S02/finish-live-compose.json records HOI4 1.19.3.0 and 12 DLC ids from /api/v1/game-reference"
+      }
+    },
+    {
+      "id": "live-compose-flow",
+      "kind": "one live run through the whole stack with a real claude-haiku-5-5 analysis",
+      "evidence": "evidence/S02/finish-live-compose.json",
+      "evidence_sha256": "4467535ea496c92ee71551dd250df427e1e488417dffc294bbab45cc9fb759ba",
+      "result": "upload, scan, analysis, plan of 1464 operations (create 1458, change 3, preserve 3, conflict 0), apply completed, C-01 descriptor with setup revision c28198b"
+    },
+    {
+      "id": "package-validator",
+      "kind": "static validation",
+      "command": "PYTHONUTF8=1 py -3.13 scripts/validate_package.py --root . --working-tree; PYTHONUTF8=1 py -3.13 scripts/sync_skills.py --check",
+      "result": {
+        "validate_package": "pass, 11 of 11 checks",
+        "sync_skills": "pass, 6 skills, 32 generated files, no drift",
+        "agents_md_equals_claude_md": true
+      }
+    }
+  ],
+  "gates": {
+    "S02-G1": {
+      "status": "pass",
+      "evidence": [
+        "linux-setup-gates: g1_new_replayed, g1_upload_replayed, g1_import_replayed",
+        "live-compose-flow",
+        "windows-workspace-tests: tenant isolation and cross-account 404 tests"
+      ]
+    },
+    "S02-G2": {
+      "status": "pass",
+      "evidence": [
+        "linux-setup-gates: g2_preserves_everything_unless_a_reviewed_change_covers_it, g2_a_reviewed_replacement_changes_exactly_that_file"
+      ]
+    },
+    "S02-G3": {
+      "status": "pass",
+      "evidence": [
+        "linux-setup-gates: g3_rerun_is_clean_and_an_edited_generated_file_is_a_conflict"
+      ]
+    },
+    "S02-G4": {
+      "status": "pass",
+      "evidence": [
+        "linux-setup-gates: g4_graceful_interruptions_are_classified_and_recoverable, g4_post_install_and_finalization_boundaries_are_classified, g4_a_killed_process_leaves_a_recoverable_state",
+        "windows-setup-adapter-rerun: recovery tests"
+      ]
+    },
+    "S02-G5": {
+      "status": "pass",
+      "limitation": "no single dedicated G5 test; the evidence is the parts below",
+      "evidence": [
+        "compose-build-and-readyz: game reference reported read-only with build and DLC set",
+        "C-01 component closure records the Setup revision (setup-adapter descriptor tests, live-compose-flow)",
+        "server image filesystem listing: no game file, coding CLI or credential (evidence/S02/live-compose.json)",
+        "crates/game-ref tests: metadata only, read-only mount"
+      ]
+    }
+  },
+  "gates_note": "The Linux gate tests use recorded real model replies (recorded-real replay). The live variants are #[ignore] and call Anthropic",
+  "model_spend": {
+    "provider": "Anthropic",
+    "model": "claude-haiku-5-5",
+    "recorded_call_tokens": {
+      "input": 53801,
+      "output": 15948
+    },
+    "total_usd": "not tallied; a few cents at most, visible in the Anthropic Console"
+  },
+  "not_run": [
+    {
+      "check": "game execution",
+      "reason": "S02 reads only game metadata; no game behavior is claimed"
+    },
+    {
+      "check": "OpenAI live",
+      "reason": "the OpenAI keys have no API balance"
+    }
+  ]
+}

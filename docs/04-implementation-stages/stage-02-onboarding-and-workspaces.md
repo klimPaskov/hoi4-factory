@@ -1,6 +1,6 @@
 # S02: Accounts, server workspaces, Mod Setup and GitHub import
 
-Status: **Proposed future implementation stage**. Nothing in this packet was executed as product implementation during planning. Primary agent: Claude Code. Delegate only bounded work with explicit file ownership. Revised on 2026-10-24 for the [maintainer decisions](../02-architecture/maintainer-decisions-2026-10-24.md).
+Status: **Executed 2026-10-24 to 2026-10-25, complete**. The result is in [the S02 handoff](../../evidence/S02/handoff.md) and the authorized scope in [the S02 scope](../../evidence/S02/scope.md). Primary agent: Claude Code. Delegate only bounded work with explicit file ownership. Revised on 2026-10-24 for the [maintainer decisions](../02-architecture/maintainer-decisions-2026-10-24.md).
 
 ## Objective and non-goals
 

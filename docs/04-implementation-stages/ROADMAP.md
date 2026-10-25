@@ -1,6 +1,6 @@
 # Implementation roadmap
 
-Status: **Proposed, awaiting review and bounded stage authorization**. This package completes planning. It does not authorize product implementation. The maintainer has deferred implementation. [MASTER_GOAL](../MASTER_GOAL.md) defines the product, the [maintainer decisions](../02-architecture/maintainer-decisions-2026-10-24.md) of 2026-10-24 set the hosted web, Rust runtime, Docker, GitHub and licensing direction, and each stage below defines a separately reviewable unit of work.
+Status: **In implementation**. S01 and S02 are complete, S03 is next. Each stage still needs its own authorization. [MASTER_GOAL](../MASTER_GOAL.md) defines the product, the [maintainer decisions](../02-architecture/maintainer-decisions-2026-10-24.md) of 2026-10-24 set the hosted web, Rust runtime, Docker, GitHub and licensing direction, and each stage below defines a separately reviewable unit of work.
 
 ## Dependency order and release checkpoints
 

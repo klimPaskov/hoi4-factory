@@ -231,7 +231,7 @@ async fn a_partial_apply_is_rollback_only_and_rollback_restores_every_byte() {
         .expect("recovery receipt");
     assert!(recover.fence_generation.is_some());
     assert_eq!(recover.setup_revision, SETUP_PIN.revision);
-    assert!(!recover.setup_has_pr105_fix);
+    assert_eq!(recover.setup_has_pr105_fix, SETUP_PIN.contains_pr_105_fix);
     assert!(
         t.adapter
             .unsettled_receipts(t.fx.account, t.fx.project)
@@ -252,10 +252,12 @@ async fn a_partial_apply_is_rollback_only_and_rollback_restores_every_byte() {
         d.component_closure.setup_revision.as_deref(),
         Some(SETUP_PIN.revision)
     );
-    assert!(
+    // The PR 105 check stays unresolved only on a Setup revision without the fix.
+    assert_eq!(
         d.unresolved_checks
             .iter()
-            .any(|c| c.check.contains("PR 105"))
+            .any(|c| c.check.contains("PR 105")),
+        !SETUP_PIN.contains_pr_105_fix
     );
     assert!(
         d.root_handles
@@ -361,74 +363,40 @@ async fn unfinished_staging_can_only_be_discarded() {
     );
 }
 #[tokio::test]
-async fn a_finalizing_journal_without_a_committed_lock_ends_in_manual_review_not_a_loop() {
+async fn a_finalizing_journal_without_a_committed_lock_is_rolled_back_exactly() {
     // Stage 11 is the rollback record. Failing after it leaves the transaction finalizing, with
-    // the rollback record durable and the success lock never committed. Setup's facade offers
-    // only `resume` for it, and that resume refuses ("rollback or manual review is required"),
-    // while the facade also refuses to run a rollback. The adapter must not offer the dead end
-    // again and again.
+    // the rollback record durable and the success lock never committed. Before HOI4-Mod-Setup
+    // #107 the facade offered only a `resume` that refused, a dead end. The pinned revision
+    // classifies it as a partial apply that must be rolled back, and the rollback is exact.
     let t = interrupted(|o| o.fail_after_stage = Some(11)).await;
     let v = view(&t).await;
     assert_eq!(v.journal_state, "finalizing");
-    assert_eq!(v.variant, RecoveryVariant::VerifiableFinalization);
-    assert_eq!(v.allowed_action, Some("resume"));
+    assert_eq!(v.variant, RecoveryVariant::RollbackRequiredPartialApply);
+    assert_eq!(v.allowed_action, Some("rollback"));
 
-    let err = t
+    let out = t
         .adapter
         .recover_setup(
             t.fx.account,
             t.fx.project,
             t.plan_id,
-            RecoveryVariant::VerifiableFinalization,
+            RecoveryVariant::RollbackRequiredPartialApply,
             OpContext::default(),
         )
         .await
-        .unwrap_err();
-    assert_eq!(err.code(), "setup_refused", "{err}");
-    assert!(err.to_string().contains("manual review"), "{err}");
-
-    // From now on the view is manual review with no action, and the row says so.
-    let v = view(&t).await;
-    assert_eq!(v.variant, RecoveryVariant::ManualReview);
-    assert_eq!(v.allowed_action, None);
-    let status = t
-        .adapter
-        .setup_status(t.fx.account, t.fx.project, None)
-        .await
-        .unwrap();
-    let row = status.unfinished_transaction.expect("still unfinished");
-    assert_eq!(row.recovery_variant.as_deref(), Some("manual_review"));
-    assert_eq!(row.allowed_action, None);
-    // The earlier variant can no longer be requested, and nothing else is accepted either.
-    for requested in [
-        RecoveryVariant::VerifiableFinalization,
-        RecoveryVariant::RollbackRequiredPartialApply,
-    ] {
-        let err = t
-            .adapter
-            .recover_setup(
-                t.fx.account,
-                t.fx.project,
-                t.plan_id,
-                requested,
-                OpContext::default(),
-            )
+        .expect("rollback");
+    assert_eq!(out.action, "rollback");
+    assert_eq!(out.journal_state, "rolled_back");
+    let diff = t.before.diff(&inventory(&t.env, &t.fx));
+    assert!(diff.is_empty(), "rollback did not restore exactly: {diff:?}");
+    assert_eq!(out.restoration.as_ref().map(|r| r.exact), Some(true));
+    assert!(
+        t.adapter
+            .inspect_recovery(t.fx.account, t.fx.project)
             .await
-            .unwrap_err();
-        assert_eq!(
-            err.code(),
-            "recovery_variant_changed",
-            "{requested:?}: {err}"
-        );
-    }
-    // Handoff stays blocked, and new applies are refused.
-    let handoff = t
-        .adapter
-        .open_workspace(t.fx.account, t.fx.project, OpenWorkspaceOptions::default())
-        .await
-        .unwrap();
-    assert!(!handoff.ready && handoff.descriptor.is_none());
-    // Every attempt is a settled receipt: one failed resume and the refusals.
+            .unwrap()
+            .is_none()
+    );
     assert!(
         t.adapter
             .unsettled_receipts(t.fx.account, t.fx.project)

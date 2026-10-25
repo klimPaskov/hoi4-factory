@@ -12,12 +12,14 @@ COPY probes/runtime/Cargo.toml ./probes/runtime/Cargo.toml
 COPY probes/runtime/src ./probes/runtime/src
 RUN cargo build --release --locked -p factory-server
 
-# Extension point for the browser client (built in web/ by its own stage):
-#   FROM node:<pinned digest> AS web
-#   ... npm ci && npm run build ...
-# then in the runtime stage:
-#   COPY --from=web /web/dist /app/web
-#   ENV FACTORY_WEB_DIST=/app/web
+# The browser client, built from the committed lockfile in the same pinned Node image that
+# web/scripts/docker-npm.sh uses. Only the static build output reaches the runtime image.
+FROM node:22-bookworm-slim@sha256:de170b39439eb0e5a3444ad7d60b015614a381e10fecae2e30ec9e735122f38d AS web
+WORKDIR /web
+COPY web/package.json web/package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY web ./
+RUN npm run build
 
 FROM debian:bookworm-slim@sha256:7ff6ba31527b9e336162fa061746c366c4b2032f4d2cff2078bea43f78efe3f8
 # git: the workspace crate drives the git CLI. ca-certificates: TLS to GitHub and mail relays.
@@ -34,10 +36,12 @@ RUN useradd --system --uid 10001 --no-create-home factory \
  && install -d -o 10001 -g 10001 -m 0755 /data \
  && install -d -m 0755 /game
 COPY --from=build /src/target/release/factory-server /usr/local/bin/factory-server
+COPY --from=web /web/dist /app/web
 ENV FACTORY_LISTEN=0.0.0.0:8080 \
     FACTORY_DATA_ROOT=/data \
     FACTORY_GAME_REF=/game \
     FACTORY_NODE_EXECUTABLE=/usr/bin/node \
+    FACTORY_WEB_DIST=/app/web \
     HOME=/tmp
 USER 10001
 EXPOSE 8080

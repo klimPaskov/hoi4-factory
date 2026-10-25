@@ -10,61 +10,61 @@ Fit says when an item is worth doing. **now** means cheap, invisible to users an
 
 | ID | Item | Fit | Friction | Owner stage | Where specified | Status now |
 |---|---|---|---|---|---|---|
-| PR-001 | Login works with plus sign in email | now | none | S02 | [S02 scope](../../evidence/S02/scope.md) names email sign-in | in progress |
-| PR-002 | Password reset links expire and work once | now | none | S02 | gap | in progress |
-| PR-003 | Sessions time out and kill every session for one user | now | sign in again after a long idle period | S02 | [SPEC-011](../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md) (collaborator removal revokes sessions), [S02 scope](../../evidence/S02/scope.md) (opaque session cookie) | in progress |
+| PR-001 | Login works with plus sign in email | now | none | S02 | [S02 scope](../../evidence/S02/scope.md) names email sign-in | done: crates/accounts tests, evidence/S02/live-compose.json (o'brien+s02 address) |
+| PR-002 | Password reset links expire and work once | now | none | S02 | gap | done: crates/accounts password reset tests (30 minutes, single use, ends sessions) |
+| PR-003 | Sessions time out and kill every session for one user | now | sign in again after a long idle period | S02 | [SPEC-011](../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md) (collaborator removal revokes sessions), [S02 scope](../../evidence/S02/scope.md) (opaque session cookie) | done: crates/accounts session expiry and sign-out-everywhere tests |
 | PR-004 | Roles and permissions deeper than admin/everyone | now | owners pick a role when inviting | S06 | [REQ-046](../01-product/product-requirements.md), [SPEC-011](../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md), [T-ACCT-02](TEST-STRATEGY.md), [S06-W5](../04-implementation-stages/stage-06-collaboration-and-content.md) | planned |
-| PR-005 | Checks stopping user A reading user B's data by changing a URL number | now | none | S02 | [SPEC-011](../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md) (EXT-13), [T-ACCT-01](TEST-STRATEGY.md), [S02-W2](../04-implementation-stages/stage-02-onboarding-and-workspaces.md) | in progress |
-| PR-006 | Tenant isolation | now | none | S02 | [REQ-046](../01-product/product-requirements.md), [RISK-20](RISKS-DECISIONS-AND-OPEN-QUESTIONS.md), [T-ACCT-01](TEST-STRATEGY.md), [S02 scope](../../evidence/S02/scope.md) (row-level security) | in progress |
-| PR-007 | Login rate limits | now | none in normal use | S02 | [REQ-046](../01-product/product-requirements.md), [SPEC-011](../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md) | in progress |
+| PR-005 | Checks stopping user A reading user B's data by changing a URL number | now | none | S02 | [SPEC-011](../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md) (EXT-13), [T-ACCT-01](TEST-STRATEGY.md), [S02-W2](../04-implementation-stages/stage-02-onboarding-and-workspaces.md) | done: crates/accounts and crates/server cross-account 404 tests |
+| PR-006 | Tenant isolation | now | none | S02 | [REQ-046](../01-product/product-requirements.md), [RISK-20](RISKS-DECISIONS-AND-OPEN-QUESTIONS.md), [T-ACCT-01](TEST-STRATEGY.md), [S02 scope](../../evidence/S02/scope.md) (row-level security) | done: forced row-level security, crates/accounts RLS tests, crates/server isolation tests |
+| PR-007 | Login rate limits | now | none in normal use | S02 | [REQ-046](../01-product/product-requirements.md), [SPEC-011](../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md) | done: crates/accounts rate limit tests |
 
 ## Data and database
 
 | ID | Item | Fit | Friction | Owner stage | Where specified | Status now |
 |---|---|---|---|---|---|---|
-| PR-008 | Schema someone designed instead of improvised | now | none | S02 | [Data, context and state](../02-architecture/data-context-and-state.md), [Contracts](../02-architecture/contracts-and-interfaces.md), [S02 scope](../../evidence/S02/scope.md) (migration ranges) | in progress |
-| PR-009 | Migrations forward and rollback | now | none | S02 | [Deployment and security](../02-architecture/deployment-and-security.md) (reversible or restore point), [Data, context and state](../02-architecture/data-context-and-state.md) (migration section) | in progress |
+| PR-008 | Schema someone designed instead of improvised | now | none | S02 | [Data, context and state](../02-architecture/data-context-and-state.md), [Contracts](../02-architecture/contracts-and-interfaces.md), [S02 scope](../../evidence/S02/scope.md) (migration ranges) | done: per-crate migrations designed against the contracts, migrations/ |
+| PR-009 | Migrations forward and rollback | now | none | S02 | [Deployment and security](../02-architecture/deployment-and-security.md) (reversible or restore point), [Data, context and state](../02-architecture/data-context-and-state.md) (migration section) | done: reversible .up and .down migrations, crates/server migration reversal test |
 | PR-010 | Migrations that don't lock the main table at peak | when needed: when real traffic or a table big enough to block writes for seconds appears | none | backlog | gap | gap |
-| PR-011 | Indexes for 5 million rows | now, on tenant and lookup keys, with a 5 million row test left for when real traffic appears | none | S02 | gap | in progress |
-| PR-012 | Connection pooling | now | none | S02 | [S02 scope](../../evidence/S02/scope.md) (sqlx on PostgreSQL) | in progress |
+| PR-011 | Indexes for 5 million rows | now, on tenant and lookup keys, with a 5 million row test left for when real traffic appears | none | S02 | gap | done: indexes on tenant and lookup keys with schema tests (5 million row test left for later) |
+| PR-012 | Connection pooling | now | none | S02 | [S02 scope](../../evidence/S02/scope.md) (sqlx on PostgreSQL) | done: sized sqlx pool with acquire timeout, FACTORY_DB_* settings |
 | PR-013 | Nightly backups | now | none | S08 | [Deployment and security](../02-architecture/deployment-and-security.md), [Data, context and state](../02-architecture/data-context-and-state.md), [S08-W3](../04-implementation-stages/stage-08-packaging-and-pilot.md) | planned |
 | PR-014 | Tested restore | now | none | S08 | [Deployment and security](../02-architecture/deployment-and-security.md) (EXP-08), [T-RELEASE-02](TEST-STRATEGY.md), [S08-W3](../04-implementation-stages/stage-08-packaging-and-pilot.md) | planned |
 | PR-015 | Point-in-time recovery | when needed: when paid credits launch or losing a day of data becomes unacceptable | none | backlog | gap | gap |
-| PR-016 | Soft deletes | now | deleted accounts stay restorable for 30 days | S02 | [ADR-021](../02-architecture/maintainer-decisions-2026-10-24.md), [Data, context and state](../02-architecture/data-context-and-state.md) (retention) | in progress |
+| PR-016 | Soft deletes | now | deleted accounts stay restorable for 30 days | S02 | [ADR-021](../02-architecture/maintainer-decisions-2026-10-24.md), [Data, context and state](../02-architecture/data-context-and-state.md) (retention) | done: soft delete and 30-day restore for projects, accounts deletion columns |
 
 ## Data correctness
 
 | ID | Item | Fit | Friction | Owner stage | Where specified | Status now |
 |---|---|---|---|---|---|---|
-| PR-017 | Server-side validation | now | none | S02 | [Contracts](../02-architecture/contracts-and-interfaces.md), [Deployment and security](../02-architecture/deployment-and-security.md) (trust boundaries) | planned |
-| PR-018 | Timezones stored right | now | none | S02 | gap | in progress |
-| PR-019 | Apostrophes in names | now | none | S02 | gap | gap |
-| PR-020 | Emoji, accents, RTL in every field | now, as storing and showing text exactly, with RTL layout polish left for a user who needs it | none | S02 | gap (stage 2 Unicode fixtures cover paths only) | gap |
+| PR-017 | Server-side validation | now | none | S02 | [Contracts](../02-architecture/contracts-and-interfaces.md), [Deployment and security](../02-architecture/deployment-and-security.md) (trust boundaries) | done: server-side validation with field names in error envelopes |
+| PR-018 | Timezones stored right | now | none | S02 | gap | done: timestamptz everywhere in migrations/ |
+| PR-019 | Apostrophes in names | now | none | S02 | gap | done: evidence/S02/live-compose.json (apostrophe in email and name) |
+| PR-020 | Emoji, accents, RTL in every field | now, as storing and showing text exactly, with RTL layout polish left for a user who needs it | none | S02 | gap (stage 2 Unicode fixtures cover paths only) | done: evidence/S02/live-compose.json (accent, emoji and Arabic stored exactly) |
 | PR-021 | Money as integers | when needed: when paid credits launch, but cheap to get right in the S03 allowance ledger | none | S03 | gap | gap |
 | PR-022 | Currency, rounding and tax per country | when needed: when paid credits launch | prices shown in one currency | backlog | [Backlog](../04-implementation-stages/BACKLOG-AND-DEFERRED-SCOPE.md) (Stripe row names tax registration) | gap |
 | PR-023 | Data model that survives "one small change" | now | none | S02 | [Contracts](../02-architecture/contracts-and-interfaces.md) (versioned schemas), [Data, context and state](../02-architecture/data-context-and-state.md) (migrations) | planned |
 | PR-024 | Idempotency keys on payments | when needed: when paid credits launch | none | backlog | [Backlog](../04-implementation-stages/BACKLOG-AND-DEFERRED-SCOPE.md) (metered exactly once), [Contracts](../02-architecture/contracts-and-interfaces.md) (idempotency on remote mutations) | planned |
 | PR-025 | Dedup of repeated submits | now | none, a double click starts one run | S03 | [Contracts](../02-architecture/contracts-and-interfaces.md), [S03-W2](../04-implementation-stages/stage-03-native-agent-and-durability.md), [S03-W4](../04-implementation-stages/stage-03-native-agent-and-durability.md) | planned |
 | PR-026 | Pagination on page 400 | when needed: when events or task lists pass a few hundred rows | none | S04 | gap | gap |
-| PR-027 | Imports surviving a 2009 CSV | now, read as old mod uploads with odd encodings, BOMs and CRLF | none | S02 | [Test strategy](TEST-STRATEGY.md) (F-SETUP-IMPORT, F-LOCALIZATION), [SPEC-001](../03-subsystem-specs/001-onboarding-and-mod-setup.md) | planned |
+| PR-027 | Imports surviving a 2009 CSV | now, read as old mod uploads with odd encodings, BOMs and CRLF | none | S02 | [Test strategy](TEST-STRATEGY.md) (F-SETUP-IMPORT, F-LOCALIZATION), [SPEC-001](../03-subsystem-specs/001-onboarding-and-mod-setup.md) | done: crates/intake upload tests keep BOM, CRLF and binary bytes |
 | PR-028 | Retention rules and deletion code | now | none | S08 | [Deployment and security](../02-architecture/deployment-and-security.md), [Data, context and state](../02-architecture/data-context-and-state.md), [ADR-021](../02-architecture/maintainer-decisions-2026-10-24.md), [RISK-25](RISKS-DECISIONS-AND-OPEN-QUESTIONS.md), [S08-W3](../04-implementation-stages/stage-08-packaging-and-pilot.md) | planned |
 
 ## Security
 
 | ID | Item | Fit | Friction | Owner stage | Where specified | Status now |
 |---|---|---|---|---|---|---|
-| PR-029 | Secrets out of code, repo and AI chat history | now | none | S02 | [Deployment and security](../02-architecture/deployment-and-security.md) (credentials), [AGENTS.md](../../AGENTS.md), .gitignore excludes .env, no secret scanner yet | planned |
+| PR-029 | Secrets out of code, repo and AI chat history | now | none | S02 | [Deployment and security](../02-architecture/deployment-and-security.md) (credentials), [AGENTS.md](../../AGENTS.md), .gitignore excludes .env, no secret scanner yet | done: .gitignore, .env.example, key file mounts, image and repository scans in S01 and S02 |
 | PR-030 | Rotating every key an AI pasted into config | now | none | S08 | gap | gap |
 | PR-031 | Confirming every package the AI installed is real and intended | now | none | S02 | [Deployment and security](../02-architecture/deployment-and-security.md) (supply chain), [T-RELEASE-03](TEST-STRATEGY.md) | planned |
 | PR-032 | Dependency scanning | now | none | S08 | gap | gap |
-| PR-033 | Input sanitization | now | none | S02 | [Deployment and security](../02-architecture/deployment-and-security.md), [SPEC-011](../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md) | planned |
-| PR-034 | SQL injection, XSS, CSRF and OWASP | now | none | S02 | [Deployment and security](../02-architecture/deployment-and-security.md) (CSRF, CSP, escaping), [T-SEC-01](TEST-STRATEGY.md) | planned |
-| PR-035 | File uploads scanned, size-limited, non-executable storage | now | an upload size limit message | S02 | [Deployment and security](../02-architecture/deployment-and-security.md), [SPEC-011](../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md) (EXT-10), [S02-W3](../04-implementation-stages/stage-02-onboarding-and-workspaces.md), malware scanning not specified | planned |
-| PR-036 | CORS not allow-all | now | none | S02 | [Deployment and security](../02-architecture/deployment-and-security.md) (strict origin checks) | planned |
-| PR-037 | Security headers | now | none | S02 | [Deployment and security](../02-architecture/deployment-and-security.md) (CSP only) | planned |
+| PR-033 | Input sanitization | now | none | S02 | [Deployment and security](../02-architecture/deployment-and-security.md), [SPEC-011](../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md) | in progress: typed validation on every S02 route, review again when the agent writes source in S03 |
+| PR-034 | SQL injection, XSS, CSRF and OWASP | now | none | S02 | [Deployment and security](../02-architecture/deployment-and-security.md) (CSRF, CSP, escaping), [T-SEC-01](TEST-STRATEGY.md) | done: parameterized queries, origin guard on mutations, CSP and escaping in the client |
+| PR-035 | File uploads scanned, size-limited, non-executable storage | now | an upload size limit message | S02 | [Deployment and security](../02-architecture/deployment-and-security.md), [SPEC-011](../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md) (EXT-10), [S02-W3](../04-implementation-stages/stage-02-onboarding-and-workspaces.md), malware scanning not specified | done: size, count, path and type limits with non-executable storage (malware scanning not added) |
+| PR-036 | CORS not allow-all | now | none | S02 | [Deployment and security](../02-architecture/deployment-and-security.md) (strict origin checks) | done: crates/server CORS tests reject foreign origins |
+| PR-037 | Security headers | now | none | S02 | [Deployment and security](../02-architecture/deployment-and-security.md) (CSP only) | done: crates/server security header tests |
 | PR-038 | Encryption at rest and in transit | now | none | S08 | [Deployment and security](../02-architecture/deployment-and-security.md) (secret store encrypted at rest), TLS and disk encryption not specified | gap |
 | PR-039 | Least privilege including the AI agent with production credentials | now | none | S03 | [SPEC-011](../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md), [Deployment and security](../02-architecture/deployment-and-security.md), [ADR-020](../02-architecture/maintainer-decisions-2026-10-24.md) | planned |
-| PR-040 | Logs of who did what without passwords, tokens, card numbers | now | none | S02 | [Deployment and security](../02-architecture/deployment-and-security.md) (redact before log persistence), [SPEC-011](../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md) (EXT-12) | in progress |
+| PR-040 | Logs of who did what without passwords, tokens, card numbers | now | none | S02 | [Deployment and security](../02-architecture/deployment-and-security.md) (redact before log persistence), [SPEC-011](../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md) (EXT-12) | done: crates/server log redaction test |
 | PR-041 | Vulnerability disclosure process | now, as a SECURITY.md with a contact address | none | S08 | gap | gap |
 | PR-042 | Stolen laptop plan | now, as disk encryption and a short key revocation list | none | S08 | gap | gap |
 
@@ -147,12 +147,12 @@ Fit says when an item is worth doing. **now** means cheap, invisible to users an
 | PR-080 | Accessibility compliance | now, as semantic HTML, labels and contrast, with no formal audit | none | S04 | [SPEC-007](../03-subsystem-specs/007-visual-state-synchronization.md) (VIS-10 keyboard only, no baseline chosen) | gap |
 | PR-081 | Pages that load on hotel wifi | now, as a small bundle and cached assets | slower first load on bad networks | S04 | [T-PERF-01](TEST-STRATEGY.md) (cached preview target, no network budget) | gap |
 | PR-082 | Empty, loading and error states | now | none | S04 | [REQ-010](../01-product/product-requirements.md) | gap |
-| PR-083 | Actionable error messages | now | none | S02 | [Contracts](../02-architecture/contracts-and-interfaces.md) (error codes with user-facing explanation) | planned |
-| PR-084 | Forms that keep input on validation failure | now | none | S02 | gap | gap |
+| PR-083 | Actionable error messages | now | none | S02 | [Contracts](../02-architecture/contracts-and-interfaces.md) (error codes with user-facing explanation) | done: error envelope codes mapped to actionable client messages |
+| PR-084 | Forms that keep input on validation failure | now | none | S02 | gap | done: web/src/test form retention test |
 | PR-085 | Notifications users can turn off | now, only if non-essential notifications are sent | none | S06 | gap | gap |
 | PR-086 | Undo | now | none | S04 | [REQ-024](../01-product/product-requirements.md), [SPEC-007](../03-subsystem-specs/007-visual-state-synchronization.md) | planned |
 | PR-087 | Keyboard and screen reader support | now | none | S04 | [SPEC-007](../03-subsystem-specs/007-visual-state-synchronization.md) (VIS-10), [SPEC-009](../03-subsystem-specs/009-focus-and-other-editors.md), screen reader checks not specified | planned |
-| PR-088 | Translations with locale formatting | now, as translatable strings and locale-aware dates, English only at launch | none | S02 | [ADR-021](../02-architecture/maintainer-decisions-2026-10-24.md), [S02 scope](../../evidence/S02/scope.md) | planned |
+| PR-088 | Translations with locale formatting | now, as translatable strings and locale-aware dates, English only at launch | none | S02 | [ADR-021](../02-architecture/maintainer-decisions-2026-10-24.md), [S02 scope](../../evidence/S02/scope.md) | done: all client strings through i18n, Intl formatting |
 | PR-089 | A back button that works | now | none | S04 | gap | gap |
 
 ## Billing
@@ -170,12 +170,12 @@ Fit says when an item is worth doing. **now** means cheap, invisible to users an
 |---|---|---|---|---|---|---|
 | PR-094 | Webhooks that verify signatures | now | none | S06 | [ADR-018](../02-architecture/maintainer-decisions-2026-10-24.md), [Deployment and security](../02-architecture/deployment-and-security.md), [SPEC-005](../03-subsystem-specs/005-git-collaboration-and-review.md), [T-GH-03](TEST-STRATEGY.md) | planned |
 | PR-095 | Webhooks that retry with a delivery log | now, as inbound dedupe plus periodic reconciliation, no outbound webhooks are offered | none | S06 | [ADR-018](../02-architecture/maintainer-decisions-2026-10-24.md), [SPEC-005](../03-subsystem-specs/005-git-collaboration-and-review.md), delivery log not specified | planned |
-| PR-096 | Versioned API | now | none | S02 | [S02 scope](../../evidence/S02/scope.md) (/api/v1), [Contracts](../02-architecture/contracts-and-interfaces.md) | planned |
+| PR-096 | Versioned API | now | none | S02 | [S02 scope](../../evidence/S02/scope.md) (/api/v1), [Contracts](../02-architecture/contracts-and-interfaces.md) | done: /api/v1 routes |
 | PR-097 | Customer API keys create and revoke | when needed: if a public API or MCP export ships | none | backlog | [Backlog](../04-implementation-stages/BACKLOG-AND-DEFERRED-SCOPE.md) (P3 MCP export) | gap |
-| PR-098 | API rate limits | now | none in normal use | S02 | [REQ-046](../01-product/product-requirements.md), [SPEC-011](../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md) | planned |
+| PR-098 | API rate limits | now | none in normal use | S02 | [REQ-046](../01-product/product-requirements.md), [SPEC-011](../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md) | in progress: sign-in and sign-up rate limits only, upload and setup routes not yet limited |
 | PR-099 | Plan for a third-party API changing format | now, light, as capability probes and a provider fault corpus | none | S03 | [SPEC-002](../03-subsystem-specs/002-native-runtime-and-models.md), [RISK-19](RISKS-DECISIONS-AND-OPEN-QUESTIONS.md) | planned |
 | PR-100 | OAuth token refresh | now | none, users stay signed in with GitHub | S02 | [ADR-018](../02-architecture/maintainer-decisions-2026-10-24.md) names user-to-server tokens, refresh not specified | gap |
-| PR-101 | Integration sandbox | now | none | S02 | [Test strategy](TEST-STRATEGY.md) (F-GITHUB-REPO), [S02 scope](../../evidence/S02/scope.md), [S01 checks](../../evidence/S01/checks.json) (disposable repository) | in progress |
+| PR-101 | Integration sandbox | now | none | S02 | [Test strategy](TEST-STRATEGY.md) (F-GITHUB-REPO), [S02 scope](../../evidence/S02/scope.md), [S01 checks](../../evidence/S01/checks.json) (disposable repository) | done: hoi4-factory-test-mod and the fake GitHub in crates/intake tests |
 
 ## AI and model use
 
