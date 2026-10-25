@@ -1,6 +1,6 @@
 # Package status and continuation
 
-Version: v02, revised 2026-10-25. Phase: **implementation, S01 and S02 complete, S03 next**.
+Version: v02, revised 2026-10-25. Phase: **implementation, S01 to S03 complete, the UI design track next, then S04**.
 
 ## Current state
 
@@ -8,9 +8,10 @@ Version: v02, revised 2026-10-25. Phase: **implementation, S01 and S02 complete,
 |---|---|---|
 | S01 bootstrap and architecture probes | Complete and accepted. Rust host and native Rust agent loop selected, Setup binding proven, GitHub App and memory decisions recorded | [S01 handoff](../evidence/S01/handoff.md) |
 | S02 accounts, server workspaces, Mod Setup and GitHub import | Complete. Email and GitHub sign-in, per-account workspaces with row-level security, ZIP and folder upload, GitHub import, the full Setup flow over HTTP against merged HOI4-Mod-Setup `c28198b`, and the browser Setup wizard. Gates G1 to G4 pass. G5 passes with the limitation recorded in the handoff | [S02 handoff](../evidence/S02/handoff.md), [checks](../evidence/S02/checks.json) |
-| S03 native agent and durability | Authorized inputs recorded, not started | [goal prompt](06-agent-handoffs/GOAL-S03.md), [draft scope](../evidence/S03/scope.md) |
-| UI design track (ADR-025) | Decided, runs after S03 and before S04. The maintainer chooses each page from live variants | [goal prompt](06-agent-handoffs/GOAL-UI.md) |
-| S04 to S08 | Not authorized | [roadmap](04-implementation-stages/ROADMAP.md) |
+| S03 native agent and durability | Complete. The native Rust agent runs in a supervised worker of the server binary. Every step is behind a C-08 grant and a workspace lease. Each attempt consumes an immutable C-06 bundle, and every tool call is a C-04 intent followed by a receipt. Tools are the built-in file tools in the task's own worktree plus a read-only HOI4 Agent Tools profile. Users can bring their own API key, and usage is metered apart from the $1 allowance, with budget stops. The stage also adds the event stream, pause, interrupt, revocation and restart recovery, and minimal task and key screens. G1 to G5 pass. G6 is partial: OpenAI is tested against recorded and refused responses only, and the self-hosted profile is checked by connection and listing only | [S03 handoff](../evidence/S03/handoff.md), [checks](../evidence/S03/checks.json) |
+| UI design track (ADR-025) | Next. Runs before S04. The maintainer chooses each page from live variants | [goal prompt](06-agent-handoffs/GOAL-UI.md) |
+| S04 focus vertical slice | Not authorized. Its goal prompt is ready | [goal prompt](06-agent-handoffs/GOAL-S04.md) |
+| S05 to S08 | Not authorized | [roadmap](04-implementation-stages/ROADMAP.md) |
 
 A new machine is set up with the [developer setup guide](07-developer-workflow/DEVELOPER-SETUP.md). Open questions for the maintainer are in [maintainer questions](../evidence/maintainer-questions.md). Under ADR-024, CLAUDE.md and the skills are maintained by the implementing agent, and AGENTS.md is generated from CLAUDE.md.
 
@@ -73,6 +74,8 @@ These are future stage gates, not missing planning sections. Their owners and ex
 
 ## Exact continuation
 
-On a new machine, follow the [developer setup guide](07-developer-workflow/DEVELOPER-SETUP.md) to its readiness checklist. Then launch Claude Code from the repository root, run `/start-implementation-stage S03`, and give it the [S03 goal prompt](06-agent-handoffs/GOAL-S03.md). The goal prompt is self-contained and lists what to read, the S03 maintainer decisions, what to build and how to finish.
+On a new machine, follow the [developer setup guide](07-developer-workflow/DEVELOPER-SETUP.md) to its readiness checklist.
 
-Do not begin S04 automatically. S03 ends with its own handoff and a goal prompt for S04. The package stands alone without any earlier conversation.
+Then run the UI design track: launch Claude Code from the repository root and give it the [GOAL-UI](06-agent-handoffs/GOAL-UI.md) prompt. The track is interactive and needs no stage command. After that, run `/start-implementation-stage S04` with the [S04 goal prompt](06-agent-handoffs/GOAL-S04.md).
+
+Open S03 questions are items 7 to 10 in [maintainer questions](../evidence/maintainer-questions.md). Do not begin S04 automatically. The package stands alone without any earlier conversation.

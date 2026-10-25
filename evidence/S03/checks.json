@@ -1,0 +1,280 @@
+{
+  "stage": "S03",
+  "recorded": "2026-10-25",
+  "machine": "macOS 26.5.2, Apple Silicon (Darwin 25.5.0), Docker Desktop engine 29.4.1 linux/arm64",
+  "revision": "48b970b21751fe22f76d460e0081b8a0622a9dc0 plus the documentation-only handoff commit that follows it",
+  "toolchain": {
+    "rust": "1.97.1",
+    "node_host": "v22.23.0 (Agent Tools tests only)",
+    "python": "3.13.13 via scripts/py.sh",
+    "postgres": "17.6-bookworm@sha256:f3bd19c6..."
+  },
+  "checks": [
+    {
+      "id": "workspace-macos",
+      "kind": "automated tests (real PostgreSQL with RLS as the app role, real worker process, real HOI4 Agent Tools 4.4.0)",
+      "command": "FACTORY_AGENT_TOOLS_NODE=$(which node) FACTORY_AGENT_TOOLS_ENTRY=.work/hoi4-agent-tools/dist/bin/stdio.js FACTORY_AGENT_TOOLS_FIXTURE=.work/hoi4-agent-tools/fixtures/focus/workspace FACTORY_TEST_ADMIN_URL=postgres://postgres@127.0.0.1:55433/postgres cargo test --no-fail-fast --workspace --exclude factory-runtime-probe",
+      "revision": "48b970b",
+      "exit": 0,
+      "result": {
+        "passed": 610,
+        "failed": 0,
+        "ignored": 13,
+        "test_binaries": 69
+      },
+      "notes": "Ignored tests are the live provider tests and the two recorders. An earlier run on 87201ab had one stale assertion (the migration component list, which S03 extends); fixed in 9cee3db."
+    },
+    {
+      "id": "agent-suite-stability",
+      "kind": "automated tests",
+      "command": "cargo test -p factory-server --test agent (6 consecutive runs)",
+      "exit": 0,
+      "result": {
+        "runs": 6,
+        "passed_each": 16,
+        "failed": 0
+      },
+      "notes": "After the biased-select, single-transaction finish and snapshot-read fixes; the 17th test (real Agent Tools) is env-gated and passed separately and in the workspace run."
+    },
+    {
+      "id": "linux-new-crates",
+      "kind": "automated tests on Linux (scripts/linux-tests.sh, test-runner image, own PostgreSQL)",
+      "command": "scripts/linux-tests.sh --no-fail-fast -p factory-agent -p factory-tasks -p factory-broker -p factory-hoi4-tools -p factory-server --test agent --lib ...",
+      "revision": "78e62ea",
+      "exit": 101,
+      "result": {
+        "passed": 254,
+        "failed": 1,
+        "failed_test": "factory-hoi4-tools fake_server::shutdown_kills_the_whole_process_group"
+      },
+      "notes": "The failure was a zombie left by a killed process group in a container without an init process (S03-L07). Fixed in 48b970b (--init, init: true, zombie-aware test); rerun below. The agent host suite (tests/agent.rs, 16 tests) passed on Linux."
+    },
+    {
+      "id": "linux-fake-server-rerun",
+      "kind": "automated tests on Linux",
+      "command": "scripts/linux-tests.sh -p factory-hoi4-tools --test fake_server",
+      "revision": "48b970b (working tree)",
+      "exit": 0,
+      "result": {
+        "passed": 19,
+        "failed": 0
+      }
+    },
+    {
+      "id": "web",
+      "kind": "lint, typecheck, unit tests and build in the pinned Node image",
+      "command": "web/scripts/docker-npm.sh ci && web/scripts/docker-npm.sh run check",
+      "revision": "48b970b",
+      "exit": 0,
+      "result": {
+        "test_files": 7,
+        "tests": 81,
+        "failed": 0,
+        "build": "ok"
+      },
+      "notes": "Screens tested against mocked fetch; not checked visually (the UI design track redesigns them)."
+    },
+    {
+      "id": "compose-readyz",
+      "kind": "deployment check",
+      "command": "scripts/compose.sh up -d --build --wait; GET /readyz",
+      "revision": "48b970b",
+      "exit": 0,
+      "result": {
+        "status": "ok",
+        "migrations_latest": 702,
+        "agent": {
+          "available": true,
+          "user_keys": true,
+          "agent_tools": true,
+          "operator_allowance": true
+        },
+        "game_reference": "available, read-only",
+        "server_image": "sha256:4ac3d18d200b96a84bc9fbdb3cfc7aaa3a15c570869b72e8484a38a9d9080508",
+        "init": true
+      }
+    },
+    {
+      "id": "image-scan",
+      "kind": "image filesystem scan",
+      "command": "docker run --rm --entrypoint sh <server image> -c 'command -v claude codex opencode aider gemini cursor npm npx yarn pnpm; find / -name *.pem -o -name .env ...'",
+      "exit": 0,
+      "result": {
+        "coding_cli": "none",
+        "npm_npx": "absent",
+        "credential_files": "none",
+        "executables": [
+          "/usr/local/bin/factory-server",
+          "/usr/bin/node (Debian 18, Setup)",
+          "/opt/node22/bin/node (Agent Tools)"
+        ]
+      }
+    },
+    {
+      "id": "G1-live-run",
+      "kind": "live model run through the deployed stack",
+      "command": "scripts/py.sh scripts/live_agent_flow.py --base http://127.0.0.1:8080 --mailpit http://127.0.0.1:8025 --out .work/live-agent-flow-final.json",
+      "exit": 0,
+      "artifact": "evidence/S03/live-agent-flow.json",
+      "artifact_sha256": "38ba9922c4ecc89a48976063e44bfda233b483d5f7c7018d7094b0bb7a4022ce",
+      "result": {
+        "attempt": "succeeded",
+        "task": "in_review",
+        "turns": 3,
+        "changed_files": [
+          "common/ideas/live_agent_ideas.txt"
+        ],
+        "events_gapless": true,
+        "operator_spent_micros": 2150,
+        "seconds": 24.4
+      }
+    },
+    {
+      "id": "C-06-fixture",
+      "kind": "database export",
+      "artifact": "evidence/S03/c06-fixture.json",
+      "artifact_sha256": "4ee3f3d4fa72d29c3bf674d79ddbbe0b84f64aeb97aaef7d2e27858bb3a88449",
+      "result": {
+        "manifest_sha256": "f06c0cc580dcfc15ea39754b47656dca4c773d917daa6d49c86f841977db12ae",
+        "source_versions": 4,
+        "omissions": 0,
+        "token_estimate": "ceil(canonical_json_bytes / 4), labelled an estimate"
+      }
+    },
+    {
+      "id": "G6-selfhosted",
+      "kind": "live endpoint check (connection, listing, destination policy; no inference)",
+      "artifact": "evidence/S03/selfhosted-profile.json",
+      "artifact_sha256": "a5e8c0097d9aead0e4a0cae62b9aaf8945fd2a349c557fe3a96ab522fcba70a9",
+      "result": {
+        "default_policy": "destination_blocked (172.20.0.5 private)",
+        "operator_range_172.20.0.0/16": "saved, listing HTTP 200, 0 models, all inference capabilities unknown",
+        "inference_requests": 0
+      }
+    },
+    {
+      "id": "G6-openai",
+      "kind": "recorded and refused responses only",
+      "command": "cargo test -p factory-agent (openai unit tests, probe tests, replay tests with synthetic streams)",
+      "result": "pass",
+      "limitation": "No live OpenAI call (no API balance, maintainer decision). Synthetic OpenAI streams are labelled synthetic."
+    },
+    {
+      "id": "G6-anthropic-live",
+      "kind": "live provider probe",
+      "command": "cargo test -p factory-agent --test live -- --ignored",
+      "result": {
+        "passed": 3,
+        "listing_models": 14,
+        "inference_probe_tokens": "438 in, 53 out",
+        "run_turn_tokens": "508 in, 84 out"
+      }
+    },
+    {
+      "id": "recordings",
+      "kind": "live recording of real Anthropic streams for replay",
+      "command": "cargo test -p factory-server --test agent_record -- --ignored --nocapture",
+      "exit": 0,
+      "artifacts": {
+        "crates/server/tests/fixtures/recorded/agent-write-turn.sse": "1a2fa623530a7c557ebc1cfe561271aeeab9fa02fcd7e51b6001244508128afd",
+        "crates/server/tests/fixtures/recorded/agent-finish-turn.sse": "89b35ebc71c7c6332ed9870b52bc91c398f9a634b61d17bcaa44ca9950c2705f",
+        "crates/server/tests/fixtures/recorded/agent-write-outside-turn.sse": "b7db2cfab6e71465038e163784393f9eca83533abe5b2eb0fdd1b924912c2943",
+        "crates/server/tests/fixtures/recorded/agent-read-turn.sse": "f0448d63a1353f76427daafaf21ef481a8883cf817d6e1eadc86d168fc2e16b9",
+        "crates/server/tests/fixtures/recorded/agent-tools-call-turn.sse": "df129b38e6a9910a877330dd1d947bb6d8ac1341687449ae2f8ef2b5a59d8ece",
+        "crates/server/tests/fixtures/recorded/agent-tools-finish-turn.sse": "fc5c7ab72051b5ead54e26f92254e5d5cd9de5f89c4db9358752ed012f0d9301"
+      }
+    },
+    {
+      "id": "validator",
+      "kind": "package validation",
+      "command": "scripts/py.sh scripts/validate_package.py --root . --working-tree",
+      "result": {
+        "status": "pass",
+        "checks": "11 of 11"
+      },
+      "exit": 0
+    },
+    {
+      "id": "skill-check",
+      "kind": "guidance drift",
+      "command": "scripts/py.sh scripts/sync_skills.py --check",
+      "result": "drift: []"
+    }
+  ],
+  "gates": {
+    "S03-G1": {
+      "status": "pass",
+      "evidence": [
+        "G1-live-run",
+        "C-06-fixture",
+        "image-scan",
+        "crates/server/tests/agent.rs::a_native_run_consumes_its_bundle_and_writes_only_inside_the_grant"
+      ]
+    },
+    "S03-G2": {
+      "status": "pass",
+      "evidence": [
+        "agent.rs::writes_outside_the_grant_and_off_schema_calls_change_nothing",
+        "agent.rs::a_read_only_task_has_no_write_tool",
+        "agent.rs::a_read_only_agent_tools_call_runs_through_the_broker_and_changes_no_source",
+        "crates/broker/tests/schema.rs",
+        "crates/broker/tests/paths.rs"
+      ]
+    },
+    "S03-G3": {
+      "status": "pass",
+      "evidence": [
+        "agent.rs::an_interrupted_write_is_reconciled_after_a_restart_and_never_rerun",
+        "agent.rs::a_stream_lost_after_acceptance_is_not_repeated",
+        "crates/tasks/tests/receipts.rs"
+      ]
+    },
+    "S03-G4": {
+      "status": "pass",
+      "evidence": [
+        "agent.rs::a_pause_survives_a_restart_and_resume_does_not_repeat_the_turn",
+        "agent.rs::revocation_stops_effects_and_persists_across_restart",
+        "crates/tasks/tests/ledger.rs",
+        "crates/broker/tests/grants.rs"
+      ]
+    },
+    "S03-G5": {
+      "status": "pass",
+      "evidence": [
+        "agent.rs::events_replay_in_order_from_a_cursor_and_the_stream_resumes",
+        "agent.rs::an_exhausted_allowance_stops_dispatch_before_any_request",
+        "agent.rs::a_task_budget_stops_dispatch_and_user_keys_are_metered_apart",
+        "agent.rs::a_worker_that_dies_mid_turn_is_not_retried_and_its_cost_stays_unknown",
+        "crates/broker/tests/meter.rs"
+      ]
+    },
+    "S03-G6": {
+      "status": "partial",
+      "evidence": [
+        "G6-anthropic-live",
+        "G6-openai",
+        "G6-selfhosted",
+        "agent.rs::custom_endpoints_to_blocked_destinations_are_refused",
+        "crates/agent/tests/destination.rs"
+      ],
+      "limitation": "OpenAI live inference unavailable (no API balance); the self-hosted profile is verified by connection, listing and destination policy only, both by maintainer decision."
+    }
+  },
+  "w6_cases": {
+    "process_death": "agent.rs::an_interrupted_write_is_reconciled_after_a_restart_and_never_rerun; agent.rs::a_worker_that_dies_mid_turn_is_not_retried_and_its_cost_stays_unknown",
+    "disconnect": "agent.rs::a_stream_lost_after_acceptance_is_not_repeated; SSE resume test",
+    "worker_ignores_cancellation": "agent.rs::a_worker_that_ignores_cancellation_is_killed_and_the_stop_is_recorded (killed, signal 9)",
+    "stale_results": "agent.rs::a_result_from_a_stale_worker_generation_is_rejected; fence refusal of the old incarnation in the pause test",
+    "reopen_without_repeated_writes": "agent.rs::an_interrupted_write_is_reconciled_after_a_restart_and_never_rerun (second attempt) and the pause/resume test"
+  },
+  "spend": {
+    "model": "claude-haiku-5-5",
+    "total_usd_estimate": 0.0063,
+    "parts": {
+      "agent_crate_live_tests": 0.00016,
+      "recordings": 0.0019,
+      "live_compose_runs": 0.0042
+    },
+    "openai": 0
+  }
+}

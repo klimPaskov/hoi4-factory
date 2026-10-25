@@ -80,7 +80,7 @@ Delegate independent, bounded packets to subagents with explicit owned paths, in
 
 - Anthropic refuses some JSON Schema features in tool definitions: top-level `anyOf`, `oneOf` and `allOf` for every tool, and in strict mode also length, size, pattern and numeric bounds and any nested combinator or `not`. All are refused with HTTP 400 at no cost. The adapter sends a conditioned schema (`anthropic::provider_schema`) and drops `strict` for tools that need combinators. The host always validates the full closed schema on the final arguments, so keep bounds in the host schema.
 - A lease must outlive any single step. A model turn can take longer than the lease TTL, so the runner renews the lease from a background heartbeat. Tie such background tasks to their owner with an abort-on-drop guard, or an aborted owner (a simulated process death) leaves the heartbeat renewing a dead host's lease.
-- `tokio::select!` polls branches in random order. When one branch sends a request and another reacts to a cancel, use `biased;` with the request first. Otherwise a cancel that is already pending wins before anything is sent, and the supervisor kills an idle worker.
+- `tokio::select!` polls branches in random order. When one branch sends a request and another reacts to a cancel, make the select biased (the `biased` keyword) with the request first. Otherwise a cancel that is already pending wins before anything is sent, and the supervisor kills an idle worker.
 - A route that answers from several tables reads them in one `REPEATABLE READ` snapshot (`AgentRuntime::snapshot`). Under the default READ COMMITTED each statement sees its own snapshot, and a reader can catch a task and its attempt from different commits. Commit an attempt's end and its task's next state in one transaction.
 - Pause defers a turn's tool calls instead of refusing them. The calls stay pending in the saved conversation and run after resume, so a resumed attempt neither repeats the model turn nor loses its effect.
 - Ledger hash fields hold real SHA-256 values. Record a missing file as `None` in the receipt and as `"absent"` in the artifact.
@@ -94,7 +94,7 @@ Use `validate-stage` to connect each requirement to observed output and real evi
 
 Run workspace tests with `cargo test --no-fail-fast`, because the default stops at the first failing test binary and hides every later crate. A nearly full disk makes tests fail with misleading errors, so check free space before trusting a red run. Setup's readiness differs between host platforms, so the S02 apply gates are verified with `scripts/linux-tests.sh`. [Developer setup](docs/07-developer-workflow/DEVELOPER-SETUP.md) covers a fresh machine.
 
-Review the diff for intent, unintended changes, secrets and generated-file drift. Run `scripts/py.sh scripts/validate_package.py --root . --working-tree` and `scripts/py.sh scripts/sync_skills.py --check`. Finish with a handoff from [the template](docs/06-agent-handoffs/STAGE-HANDOFF-TEMPLATE.md) and propose the next stage only as a proposal.
+Review the diff for intent, unintended changes, secrets and generated-file drift. The validator rejects semicolons and em dashes anywhere in Markdown outside code fences, inline code included, so write short sentences instead. Run `scripts/py.sh scripts/validate_package.py --root . --working-tree` and `scripts/py.sh scripts/sync_skills.py --check`. Finish with a handoff from [the template](docs/06-agent-handoffs/STAGE-HANDOFF-TEMPLATE.md) and propose the next stage only as a proposal.
 
 ## Keeping this guidance current
 

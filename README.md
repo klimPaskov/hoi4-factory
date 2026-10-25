@@ -2,7 +2,7 @@
 
 A free, open-source, hosted HOI4 modding workspace with optional visual editing, bounded agent work, GitHub integration and collaboration over real mod source files.
 
-**Status, 2026-10-25:** stages S01 (bootstrap and architecture probes) and S02 (accounts, server workspaces, Mod Setup and GitHub import) are implemented. A user can sign up, create or upload a mod or import it from GitHub, and run HOI4 Mod Setup on it in a per-account server workspace. The next stage is S03, the native agent loop. See [package status](docs/PACKAGE_STATUS.md) and the [S02 handoff](evidence/S02/handoff.md). The planning baseline and the [maintainer decisions](docs/02-architecture/maintainer-decisions-2026-10-24.md) still define the full product.
+**Status, 2026-10-25:** stages S01 to S03 are implemented. They cover bootstrap and architecture probes, then accounts, server workspaces, Mod Setup and GitHub import, then the native agent loop with durable attempts and scoped tools. A user can sign up, bring in a mod, run HOI4 Mod Setup on it, then give the agent a bounded task. The agent reads the mod, uses read-only HOI4 tools and writes only on the task's own branch. The task can be paused, interrupted or revoked, and survives a restart. Usage is paid by the free monthly allowance or the user's own API key. The next session is the UI design track, then S04. See [package status](docs/PACKAGE_STATUS.md) and the [S03 handoff](evidence/S03/handoff.md). The planning baseline and the [maintainer decisions](docs/02-architecture/maintainer-decisions-2026-10-24.md) still define the full product.
 
 ## Planned product
 
@@ -24,7 +24,7 @@ A free, open-source, hosted HOI4 modding workspace with optional visual editing,
 1. Follow the [developer setup](docs/07-developer-workflow/DEVELOPER-SETUP.md) to install the tools, create the local configuration and start the stack with `docker compose up -d --build --wait`. The app runs at http://127.0.0.1:8080.
 2. Read the [documentation index](docs/README.md), [master goal](docs/MASTER_GOAL.md) and [current status](docs/PACKAGE_STATUS.md).
 3. Review the [architecture options](docs/02-architecture/options-and-decisions.md) and [implementation roadmap](docs/04-implementation-stages/ROADMAP.md).
-4. To continue development, launch Claude Code from the repository root, run `/start-implementation-stage S03` and use the [S03 goal prompt](docs/06-agent-handoffs/GOAL-S03.md).
+4. To continue development, launch Claude Code from the repository root and give it the [UI design track prompt](docs/06-agent-handoffs/GOAL-UI.md). After that, run `/start-implementation-stage S04` with the [S04 goal prompt](docs/06-agent-handoffs/GOAL-S04.md).
 
 [CLAUDE.md](CLAUDE.md) holds the project instructions. [AGENTS.md](AGENTS.md) is its generated identical copy for clients that read that name. Project settings and skills are already in their working locations.
 

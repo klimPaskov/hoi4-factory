@@ -2,6 +2,23 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.5, 2026-10-25, S03 agent runtime
+
+- CLAUDE.md has a new section, "Agent runtime rules (learned in S03)". It covers:
+  - Anthropic tool-schema conditioning: top-level combinators, and strict-mode keywords and combinators.
+  - The lease heartbeat, tied to its owner with an abort-on-drop guard.
+  - Biased selects, so a request goes out before a cancel is acted on.
+  - REPEATABLE READ snapshots for answers that combine several tables, and one transaction for an attempt's end and its task's next state.
+  - Tool calls deferred on pause.
+  - Real SHA-256 values in ledger hash fields.
+  - Worker test faults passed through the launcher environment.
+  - An init process for containers whose PID 1 is our own binary.
+  - The two Node runtimes in the server image.
+- CLAUDE.md's delegation section and the `delegate-parallel-work` skill say how to run crate packets in parallel. The parent commits empty crate skeletons first, writes the integration API into each brief (saved as a file the agent reads), and keeps the composition that spans crates.
+- `scripts/linux-tests.sh` runs its container with `--init`, and the server service in `compose.yaml` sets `init: true`.
+
+Evidence: [S03 learning review](../../evidence/S03/learning-review.md) (S03-L01 to S03-L11) with the tests named there. Rollback: revert this commit and regenerate.
+
 ## 0.2.4, 2026-10-25, Windows and macOS development
 
 - CLAUDE.md's working environment now covers both development machines, Windows 11 and macOS on Apple Silicon, with shared rules first and per-platform quirks after them. The Python, Compose and disk-check commands are the same on both.

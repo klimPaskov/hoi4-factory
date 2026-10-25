@@ -33,13 +33,13 @@ Server: `FACTORY_SECRET_KEY_FILE`, `FACTORY_OUTBOUND_ALLOW_CIDRS`, `FACTORY_ALLO
 | Service | State |
 |---|---|
 | Anthropic | `claude-haiku-5-5` used for recordings, the agent crate's live tests and one live run in Compose. Total S03 spend about 0.004 USD (see the handoff) |
-| OpenAI | Not called. No key on this machine; the adapter is tested against recorded and refused responses |
+| OpenAI | Not called. No key on this machine. The adapter is tested against recorded and refused responses |
 | hoi4-agent-tools | Pinned at `731e64f` in the image and in local tests. No upstream change in S03 |
 | GitHub | No S03 change. App and installation as left by the maintainer after S02 |
 
 ## Development client configuration
 
-CLAUDE.md gained the "Agent runtime rules (learned in S03)" section and a delegation note, and the `delegate-parallel-work` skill gained two notes. Copies regenerated with `scripts/sync_skills.py --write`; `--check` reports no drift. Seven skills, invocation modes unchanged. A user-scope REA MCP server was connected in the session and not used.
+CLAUDE.md gained the "Agent runtime rules (learned in S03)" section and a delegation note, and the `delegate-parallel-work` skill gained two notes. Copies regenerated with `scripts/sync_skills.py --write`, and `--check` reports no drift. Seven skills, invocation modes unchanged. A user-scope REA MCP server was connected in the session and not used.
 
 ## Rollback
 

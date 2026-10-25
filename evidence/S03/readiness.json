@@ -1,0 +1,64 @@
+{
+  "stage": "S03",
+  "date": "2026-10-25",
+  "reviewed": [
+    "PR-021",
+    "PR-025",
+    "PR-039",
+    "PR-053",
+    "PR-054",
+    "PR-056",
+    "PR-063",
+    "PR-074",
+    "PR-092",
+    "PR-099",
+    "PR-102",
+    "PR-103",
+    "PR-104",
+    "PR-108",
+    "PR-109"
+  ],
+  "done": [
+    "PR-021",
+    "PR-025",
+    "PR-054",
+    "PR-099",
+    "PR-104",
+    "PR-109"
+  ],
+  "in_progress": [
+    "PR-039",
+    "PR-053",
+    "PR-063",
+    "PR-074",
+    "PR-092",
+    "PR-102",
+    "PR-103",
+    "PR-108"
+  ],
+  "unchanged": [
+    {
+      "item": "PR-056",
+      "why": "S03 added no scheduled job; recovery runs once per incarnation under leases"
+    }
+  ],
+  "recommendations": [
+    {
+      "item": "PR-063 operator alert",
+      "why": "budget stops already hold per task and account; the operator learns of runaway spend only from the Anthropic Console",
+      "cost": "small: a log line or email when an account's allowance is exhausted or unknown usage accumulates"
+    },
+    {
+      "item": "PR-032 dependency scanning",
+      "why": "still open from S02; S03 added jsonschema, ipnet and libc and the Agent Tools npm tree",
+      "cost": "small: cargo audit, npm audit of the pinned Agent Tools lockfile at image build"
+    },
+    {
+      "item": "PR-098 API rate limits",
+      "why": "still open from S02; task creation and attempt start are unthrottled per account (budgets bound spend, not request volume)",
+      "cost": "small: reuse the accounts RateLimiter on the task routes"
+    }
+  ],
+  "fit_changes": [],
+  "new_rows": []
+}

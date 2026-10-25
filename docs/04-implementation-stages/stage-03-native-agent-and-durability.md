@@ -1,6 +1,6 @@
 # S03: Native agent, durable attempts and scoped tools
 
-Status: **Proposed future implementation stage**. Nothing in this packet was executed as product implementation during planning. Primary agent: Claude Code. Delegate only bounded work with explicit file ownership. Revised on 2026-10-24 for the [maintainer decisions](../02-architecture/maintainer-decisions-2026-10-24.md), especially ADR-011 and ADR-016.
+Status: **Executed 2026-10-25, complete (G6 partial as planned)**. The result is in [the S03 handoff](../../evidence/S03/handoff.md) and the authorized scope in [the S03 scope](../../evidence/S03/scope.md). Primary agent: Claude Code. Delegate only bounded work with explicit file ownership. Revised on 2026-10-24 for the [maintainer decisions](../02-architecture/maintainer-decisions-2026-10-24.md), especially ADR-011 and ADR-016.
 
 ## Objective and non-goals
 

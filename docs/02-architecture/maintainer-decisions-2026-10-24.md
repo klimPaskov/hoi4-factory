@@ -213,6 +213,20 @@ The maintainer answered the remaining product questions later on 2026-10-24.
 | Development machines | Development continues on both the Windows 11 machine and a macOS (Apple Silicon) machine. Scripts, commands, guidance and the local `.env` must work unchanged on both |
 | Game folder | `scripts/compose.sh` finds the Hearts of Iron IV folder in the machine's Steam libraries, so `.env` needs no machine-specific `HOI4_GAME_DIR` |
 
+### S03 implementation defaults (implementing agent, 2026-10-25, open to revision)
+
+These are not maintainer decisions. The maintainer authorized S03 to proceed with sensible defaults. They are listed in full in the [S03 scope](../../evidence/S03/scope.md), and the ones that most need confirmation are items 7 to 10 in [maintainer questions](../../evidence/maintainer-questions.md).
+
+| Topic | Default used |
+|---|---|
+| Agent loop placement | A supervised worker process of the server binary, driven turn by turn by the host (S01 measurement) |
+| Where agent writes go | Only into the task's own worktree on its owned branch, under the grant's paths, uncommitted until S04's review |
+| Agent Tools packaging | Built from commit `731e64f` inside the server image with its own Node 22, started per attempt over stdio. gVisor stays EXP-07 |
+| Agent Tools exposure | A read-only profile of nine tools. Rewrite tools are withheld until S04 |
+| Interrupted attempts after a restart | Reconciled and ended, never resumed automatically. A paused attempt survives a restart and resumes on request |
+| User key encryption | The accounts crate's AES-256-GCM store with a master key file, bound to owner, key and provider |
+| Task defaults | $0.20 budget, 20 model turns, `claude-haiku-5-5` on the allowance |
+
 ### ADR-025: a separate UI design track chosen from live previews (2026-10-25)
 
 **Decision.** The browser client built in S02 is functional and temporary. Its visual design is redone in a separate, interactive UI design track, run as its own session after S03 and before S04. For each page the agent builds three or four working variants and shows them side by side in a development-only "design lab" page of the running app, with realistic data. The maintainer picks one, or asks for changes, and the agent implements the choice before moving to the next page. The track starts with an overall visual direction and a shared component set, then goes page by page until the maintainer is satisfied.
