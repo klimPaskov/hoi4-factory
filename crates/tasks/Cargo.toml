@@ -8,3 +8,14 @@ repository.workspace = true
 publish.workspace = true
 
 [dependencies]
+factory-accounts = { path = "../accounts" }
+sqlx = { workspace = true, features = ["json"] }
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["net", "io-util", "time", "sync"] }
