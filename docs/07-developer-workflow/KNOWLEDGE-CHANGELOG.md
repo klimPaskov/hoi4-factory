@@ -2,6 +2,16 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.4, 2026-10-25, Windows and macOS development
+
+- CLAUDE.md's working environment now covers both development machines, Windows 11 and macOS on Apple Silicon, with shared rules first and per-platform quirks after them. The Python, Compose and disk-check commands are the same on both.
+- New `scripts/py.sh` runs the Python scripts with Python 3.11 or newer and `PYTHONUTF8=1` on either machine. Every guide, skill body and goal prompt uses it in place of `py -3.13` or `python`.
+- New `scripts/compose.sh` resolves the game folder from the machine's Steam libraries, so one `.env` works on both machines. The setup guide and `compose.yaml` use it.
+- Shell scripts are committed with the executable bit. macOS refused to run `scripts/linux-tests.sh` and `web/scripts/docker-npm.sh` without it.
+- The first macOS run found that an uploaded repository with `include.path = /etc/passwd` was reported as not a repository instead of unsafe config, because Git follows includes while it discovers a repository and that file exists on macOS and Linux. `GitRepo::config_findings` now reads `.git/config` without discovery, and a platform-independent regression test covers it.
+
+Evidence: the macOS session of 2026-10-25 (workspace and upload tests on macOS). Rollback: revert this commit and regenerate.
+
 ## 0.2.3, 2026-10-25, UI design track
 
 - New skill `ui-design-iteration` for designing client pages from working variants that the maintainer chooses in a development-only design lab, by maintainer decision ADR-025. Generator, validator, CLAUDE.md and the instruction map list it.

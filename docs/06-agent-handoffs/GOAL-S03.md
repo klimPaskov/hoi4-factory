@@ -9,7 +9,7 @@ You are the implementing agent for HOI4 Factory, a free, open-source hosted web 
 ## Before any code
 
 1. This may be a new computer. Follow `docs/07-developer-workflow/DEVELOPER-SETUP.md` until every box in its section 7 is checked: the stack runs, `/readyz` is ok, the validator, skill check, Rust tests and web checks pass, and Claude Code lists the seven project skills. Local items that are not in Git (the game folder in `.env`, the Anthropic key, the GitHub App private key at `.work/github-app/private-key.pem`) are described there. If one is missing, record it in `evidence/maintainer-questions.md` and continue with everything that does not need it.
-2. Read CLAUDE.md fully. It is canonical and holds the working rules learned so far: Windows and Git handling, disk limits and the shared build cache, Docker etiquette, how to delegate with worktrees, GitHub and upstream rules, model use and verification.
+2. Read CLAUDE.md fully. It is canonical and holds the working rules learned so far: Windows, macOS and Git handling, disk limits and the shared build cache, Docker etiquette, how to delegate with worktrees, GitHub and upstream rules, model use and verification.
 3. Read `docs/PACKAGE_STATUS.md`, `docs/MASTER_GOAL.md`, the S03 packet `docs/04-implementation-stages/stage-03-native-agent-and-durability.md`, the decision record `docs/02-architecture/maintainer-decisions-2026-10-24.md` (especially ADR-011, ADR-016, ADR-019, ADR-020 and "S03 inputs"), the contracts `docs/02-architecture/contracts-and-interfaces.md` (C-03, C-04, C-06, C-08), SPEC-002, SPEC-003, SPEC-004 (the C-06 parts), SPEC-006 and SPEC-011.
 4. Read `evidence/S02/handoff.md` and the draft `evidence/S03/scope.md`. Confirm the scope against the packet, finalize it, and write `evidence/S03/environment.json`.
 
@@ -38,7 +38,7 @@ Delegate independent packets to Sonnet subagents (Haiku for mechanical work), fo
 
 - Work autonomously. Do not stop to ask. Append every question or request for the maintainer to `evidence/maintainer-questions.md`, with what you did meanwhile. Stop only for a direct blocker that no reasonable default can get around.
 - Never fabricate model output, test results or evidence. Use recorded real responses for faults a live API cannot produce, and label them.
-- Whenever you learn something useful, update CLAUDE.md or a skill in the same session and regenerate the copies with `PYTHONUTF8=1 py -3.13 scripts/sync_skills.py --write`. Create a new skill when a workflow repeats.
+- Whenever you learn something useful, update CLAUDE.md or a skill in the same session and regenerate the copies with `scripts/py.sh scripts/sync_skills.py --write`. Create a new skill when a workflow repeats.
 - Commit locally as you go, with the attribution trailer CLAUDE.md requires.
 
 ## Finish

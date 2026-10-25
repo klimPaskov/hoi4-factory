@@ -206,6 +206,13 @@ The maintainer answered the remaining product questions later on 2026-10-24.
 | hoi4-agent-tools #42 | The agent may merge it once its checks pass |
 | Old S01 probe App and repositories | To be deleted. The agent does not perform permanent deletions, so the maintainer deletes them |
 
+### Development on Windows and macOS (maintainer, 2026-10-25)
+
+| Topic | Decision |
+|---|---|
+| Development machines | Development continues on both the Windows 11 machine and a macOS (Apple Silicon) machine. Scripts, commands, guidance and the local `.env` must work unchanged on both |
+| Game folder | `scripts/compose.sh` finds the Hearts of Iron IV folder in the machine's Steam libraries, so `.env` needs no machine-specific `HOI4_GAME_DIR` |
+
 ### ADR-025: a separate UI design track chosen from live previews (2026-10-25)
 
 **Decision.** The browser client built in S02 is functional and temporary. Its visual design is redone in a separate, interactive UI design track, run as its own session after S03 and before S04. For each page the agent builds three or four working variants and shows them side by side in a development-only "design lab" page of the running app, with realistic data. The maintainer picks one, or asks for changes, and the agent implements the choice before moving to the next page. The track starts with an overall visual direction and a shared component set, then goes page by page until the maintainer is satisfied.

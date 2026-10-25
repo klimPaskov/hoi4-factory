@@ -55,13 +55,13 @@ Stage evidence is written to project-root `evidence/SNN/`. Detailed navigation a
 
 ## Check the planning and guidance files
 
-Run commands from this project root with Python 3.11 or newer. On Windows, set `PYTHONUTF8=1` first, because the validator otherwise reads files in the locale encoding and fails on UTF-8 text.
+Run commands from this project root with Python 3.11 or newer. `scripts/py.sh` picks a suitable Python on Windows (Git Bash), macOS and Linux and sets `PYTHONUTF8=1`, because the validator otherwise reads files in the locale encoding on Windows and fails on UTF-8 text.
 
 ```bash
-python scripts/sync_skills.py --check
-python scripts/validate_package.py --root . --working-tree
+scripts/py.sh scripts/sync_skills.py --check
+scripts/py.sh scripts/validate_package.py --root . --working-tree
 ```
 
 The working-tree check validates the maintained planning and guidance files without comparing them to the frozen distribution hashes. The frozen hashes in `docs/MANIFEST.json` describe the original v02 package, which is the first commit of this repository, so the default distribution mode no longer matches the revised files. Run the stage's own tests for product behavior. See the [quality review](docs/05-verification/PLANNING-PACKAGE-QUALITY-REVIEW.md) for exact validation scope.
 
-When an approved workflow-body change is needed, update its canonical source in `docs/07-developer-workflow/skill-workflows/`, then run `python scripts/sync_skills.py --write` and the check again. The generator preserves correct links in all three client locations.
+When an approved workflow-body change is needed, update its canonical source in `docs/07-developer-workflow/skill-workflows/`, then run `scripts/py.sh scripts/sync_skills.py --write` and the check again. The generator preserves correct links in all three client locations.

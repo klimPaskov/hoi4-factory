@@ -35,15 +35,15 @@
     {
       "name": "capture-engineering-lessons",
       "source": "docs/07-developer-workflow/skill-workflows/capture-engineering-lessons/BODY.md",
-      "body_sha256": "6fc265dabd6940387ecf8062a2283fd14c5747c00297e5f4afb824af457210b4",
+      "body_sha256": "55f3e49df6cfe960252a3dc6c68774e0154a5b5596ac5aef36b93d363b5efd3c",
       "generated": [
         {
           "path": ".claude/skills/capture-engineering-lessons/SKILL.md",
-          "sha256": "279550e4001d05fd1280a6513644260fa3520ef2f6532cc7f82c08f163f87dc5"
+          "sha256": "60eb6489a7186de2553625a0f498973630e3a728ffc7b24481e1cb794691626d"
         },
         {
           "path": ".codex/skills/capture-engineering-lessons/SKILL.md",
-          "sha256": "279550e4001d05fd1280a6513644260fa3520ef2f6532cc7f82c08f163f87dc5"
+          "sha256": "60eb6489a7186de2553625a0f498973630e3a728ffc7b24481e1cb794691626d"
         },
         {
           "path": ".codex/skills/capture-engineering-lessons/agents/openai.yaml",
@@ -51,7 +51,7 @@
         },
         {
           "path": ".agents/skills/capture-engineering-lessons/SKILL.md",
-          "sha256": "279550e4001d05fd1280a6513644260fa3520ef2f6532cc7f82c08f163f87dc5"
+          "sha256": "60eb6489a7186de2553625a0f498973630e3a728ffc7b24481e1cb794691626d"
         },
         {
           "path": ".agents/skills/capture-engineering-lessons/agents/openai.yaml",
@@ -62,15 +62,15 @@
     {
       "name": "delegate-parallel-work",
       "source": "docs/07-developer-workflow/skill-workflows/delegate-parallel-work/BODY.md",
-      "body_sha256": "715b44dbb7fbc9347c68247b27711315203a3fc91acdcf04a80e21ce0a12333b",
+      "body_sha256": "604f1ab2412f0ec6caca7e21050f75b9496396bab3377bfcebbe8170b4765320",
       "generated": [
         {
           "path": ".claude/skills/delegate-parallel-work/SKILL.md",
-          "sha256": "445638d2e2030790f621f50a50a2f21c593483f8bb95028adb5d42f4843cae21"
+          "sha256": "85f4ba85f611f9ab207417e2ed94fa3aad76d385f5687efe49f10f84b5fe6f84"
         },
         {
           "path": ".codex/skills/delegate-parallel-work/SKILL.md",
-          "sha256": "445638d2e2030790f621f50a50a2f21c593483f8bb95028adb5d42f4843cae21"
+          "sha256": "85f4ba85f611f9ab207417e2ed94fa3aad76d385f5687efe49f10f84b5fe6f84"
         },
         {
           "path": ".codex/skills/delegate-parallel-work/agents/openai.yaml",
@@ -78,7 +78,7 @@
         },
         {
           "path": ".agents/skills/delegate-parallel-work/SKILL.md",
-          "sha256": "445638d2e2030790f621f50a50a2f21c593483f8bb95028adb5d42f4843cae21"
+          "sha256": "85f4ba85f611f9ab207417e2ed94fa3aad76d385f5687efe49f10f84b5fe6f84"
         },
         {
           "path": ".agents/skills/delegate-parallel-work/agents/openai.yaml",
@@ -89,15 +89,15 @@
     {
       "name": "production-readiness-review",
       "source": "docs/07-developer-workflow/skill-workflows/production-readiness-review/BODY.md",
-      "body_sha256": "cf3f2a117bc511a8f08d16216d3a0f91f28ca632cd1db6f203cfb4997483e44b",
+      "body_sha256": "76712039e51ebd92284c8397eef61f7e57bed40e874efcadd3fb0883cb327d30",
       "generated": [
         {
           "path": ".claude/skills/production-readiness-review/SKILL.md",
-          "sha256": "a13ebdbb985fb436387ef535dc5efe64267f14c1e313e665e1b2ba3028f18db8"
+          "sha256": "aaa9868e98cbdf15172686b913bea45bf6f10e6f1171bcf5321661f12f117563"
         },
         {
           "path": ".codex/skills/production-readiness-review/SKILL.md",
-          "sha256": "a13ebdbb985fb436387ef535dc5efe64267f14c1e313e665e1b2ba3028f18db8"
+          "sha256": "aaa9868e98cbdf15172686b913bea45bf6f10e6f1171bcf5321661f12f117563"
         },
         {
           "path": ".codex/skills/production-readiness-review/agents/openai.yaml",
@@ -105,7 +105,7 @@
         },
         {
           "path": ".agents/skills/production-readiness-review/SKILL.md",
-          "sha256": "a13ebdbb985fb436387ef535dc5efe64267f14c1e313e665e1b2ba3028f18db8"
+          "sha256": "aaa9868e98cbdf15172686b913bea45bf6f10e6f1171bcf5321661f12f117563"
         },
         {
           "path": ".agents/skills/production-readiness-review/agents/openai.yaml",

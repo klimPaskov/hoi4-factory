@@ -526,7 +526,26 @@ impl GitRepo {
     /// names are returned, never the values.
     pub fn config_findings(&self) -> Result<Vec<String>, GitError> {
         let mut findings = Vec::new();
-        let raw = self.run(["config", "--local", "--list", "-z"])?;
+        let raw = match self.kind {
+            // Read `.git/config` as a plain file without discovering the repository, because
+            // discovery parses the configuration with its includes. A hostile `include.path`
+            // would otherwise be read before this check, and one naming a file that is not
+            // configuration (`/etc/passwd` exists on Linux and macOS, not on Windows) fails the
+            // repository as unreadable instead of reporting the key. GIT_DIR names a path under
+            // a regular file, which can never exist, so Git runs outside any repository.
+            RepoKind::Primary => self.run_env(
+                [
+                    "config",
+                    "--no-includes",
+                    "--file",
+                    ".git/config",
+                    "--list",
+                    "-z",
+                ],
+                &[("GIT_DIR", ".git/config/no-repository")],
+            )?,
+            RepoKind::Linked => self.run(["config", "--local", "--list", "-z"])?,
+        };
         for record in raw.split(|b| *b == 0).filter(|r| !r.is_empty()) {
             let text = String::from_utf8_lossy(record);
             let key = text.split('\n').next().unwrap_or("").to_ascii_lowercase();

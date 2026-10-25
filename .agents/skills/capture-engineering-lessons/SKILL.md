@@ -15,11 +15,11 @@ Read [knowledge policy](../../../docs/07-developer-workflow/REUSABLE-KNOWLEDGE-P
 
 1. Review what actually happened: failures, retries, recovery work, verification gaps, maintainer corrections and things that went smoothly because of a pattern. Compare with the current CLAUDE.md and skills before adding anything.
 2. For each useful lesson, choose the smallest destination that will reach the next session: a line in CLAUDE.md for a stable project-wide rule, an edit to the skill whose workflow it improves, a new skill when a workflow repeats or a task type needs a written procedure, or a regression test when the lesson is testable.
-3. Apply it now. Edit CLAUDE.md (never AGENTS.md, which is generated), edit or add canonical skill bodies under `docs/07-developer-workflow/skill-workflows/`, add new skills to `skills.json` and the skill sets in `scripts/sync_skills.py` and `scripts/validate_package.py`, add a trigger fixture, and run `PYTHONUTF8=1 py -3.13 scripts/sync_skills.py --write`. Add the regression test where feasible.
+3. Apply it now. Edit CLAUDE.md (never AGENTS.md, which is generated), edit or add canonical skill bodies under `docs/07-developer-workflow/skill-workflows/`, add new skills to `skills.json` and the skill sets in `scripts/sync_skills.py` and `scripts/validate_package.py`, add a trigger fixture, and run `scripts/py.sh scripts/sync_skills.py --write`. Add the regression test where feasible.
 4. Keep each change specific and bounded. State the observation, the rule and when it applies. Avoid broad claims from one anecdote, and keep stage-specific workarounds in stage evidence.
 5. Check the limit: a change must not widen authority, access roots, external data transfer, paid operations, approved product scope or game canon. If it would, write it up as a proposal and ask the maintainer instead of applying it.
 6. Remove secrets, private data and hidden reasoning from anything you write.
-7. Run `PYTHONUTF8=1 py -3.13 scripts/sync_skills.py --check` and the package validator, then add a changelog entry naming what changed and why.
+7. Run `scripts/py.sh scripts/sync_skills.py --check` and the package validator, then add a changelog entry naming what changed and why.
 
 ## Outputs and evidence
 

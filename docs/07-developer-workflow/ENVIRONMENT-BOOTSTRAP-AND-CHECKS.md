@@ -17,14 +17,14 @@ The package requires Python 3.11 or newer for the portable TOML-based validation
 Before changing a fresh extraction, the default validator verifies the frozen distribution, including its manifest:
 
 ```bash
-python scripts/validate_package.py --root .
+scripts/py.sh scripts/validate_package.py --root .
 ```
 
 During work, run the documentation and skill checks from the project root:
 
 ```bash
-python scripts/validate_package.py --root . --working-tree
-python scripts/sync_skills.py --check
+scripts/py.sh scripts/validate_package.py --root . --working-tree
+scripts/py.sh scripts/sync_skills.py --check
 ```
 
 Working-tree mode checks the authored planning and guidance files while allowing later Git metadata, evidence and product files. It skips frozen distribution hashes and cannot be combined with archive verification. It does not test the future application. Use the approved stage's own checks for product behavior.

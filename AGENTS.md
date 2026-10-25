@@ -29,21 +29,35 @@ Never fabricate model output, test results or evidence. Live model calls use rea
 
 ## Working environment
 
-The development machine is Windows 11 with Git Bash, PowerShell, Docker Desktop on WSL2, Rust pinned by `rust-toolchain.toml`, Node 24 and several Pythons.
+Development happens on two machines, and every script, command and document must work on both: Windows 11 with Git Bash, PowerShell and Docker Desktop on WSL2, and macOS on Apple Silicon with zsh, Homebrew and Docker Desktop. Rust is pinned by `rust-toolchain.toml`. The server and its Linux tests run in Docker, and every pinned image has amd64 and arm64 builds. Check `uname -s` (`MINGW64_NT-*` or `Darwin`) to see which machine a session is on.
 
-- Run Python checks with `py -3.13` and `PYTHONUTF8=1`. The default `python` is 3.9 and the locale encoding is cp1252.
+On both machines:
+
+- Write repository scripts as POSIX `sh` that runs in Git Bash and zsh, and commit them with the executable bit (`git update-index --chmod=+x <file>`). Windows ignores the bit, but macOS refuses to run a script without it. Avoid GNU-only and BSD-only flags (`sed -i`, `readlink -f`, `grep -P`) in committed scripts.
+- Run Python through `scripts/py.sh`, for example `scripts/py.sh scripts/validate_package.py --root . --working-tree`. It sets `PYTHONUTF8=1` and picks Python 3.11 or newer (`py -3.13` on Windows, then `python3.13` and older, then `uv run --python 3.13`). The default `python` is 3.9 on both machines.
+- Run Compose through `scripts/compose.sh`, for example `scripts/compose.sh up -d --build --wait`. It finds the game folder in the machine's Steam libraries and ignores an `HOI4_GAME_DIR` that does not exist on this machine, so one `.env` works on both. The dev database runs its role setup only on a fresh volume. After `docker/db-init/` changes, recreate this project's own volume with `scripts/compose.sh -p hoi4-factory down -v`.
+- `.env` holds secrets and is not readable by Claude Code. Ask the maintainer to change it, and give them the exact line.
 - Git for Windows sets `core.autocrlf=true` system-wide. Every Git operation on workspaces or fixtures passes `-c core.autocrlf=false`. `.gitattributes` keeps text LF and keeps `evidence/**` and `probes/**` byte-exact because evidence records their hashes.
-- Python text-mode writes on Windows produce CRLF. Write files in binary mode or with `newline="\n"`.
-- Shell heredocs passed into Python can alter backslash escapes. Make edits containing backslashes with the Edit tool.
-- Git Bash on Windows corrupts non-ASCII text passed on a command line, for example `curl -d` with accents or emoji. Write such payloads to a UTF-8 file and send them with `--data-binary @file`.
-- The dev Compose database runs its role setup only on a fresh volume. After `docker/db-init/` changes, recreate this project's own volume with `docker compose -p hoi4-factory down -v`. Set `HOI4_GAME_DIR` to the game folder before `docker compose up`.
+- Code that touches the host filesystem or Git can pass on one machine and fail on the other. For example, Git follows a repository's `include.path` while discovering it, and `/etc/passwd` exists on macOS and Linux but not on Windows, so an upload test passed only on Windows. Read untrusted repository configuration without discovery (`GitRepo::config_findings`), and run the workspace tests on the other machine, or on Linux with `scripts/linux-tests.sh`, before trusting a platform-sensitive change.
 - A `cd` inside one shell command changes the session's working directory for later tools. Start commands that depend on location with `cd` to an absolute path.
-- The C: drive is nearly full. Share one build cache by pointing `CARGO_TARGET_DIR` at the main checkout's `target/` (an absolute path, the same for every worktree and agent), remove large probe output when its evidence is recorded, and check `df -h /c` before heavy builds. The shared cache still keeps a separate copy of every crate per worktree path, so after removing worktrees delete `target/release` if unused and every entry in `target/debug/{deps,build,incremental}` older than two hours. Cargo rebuilds whatever an active build still needs.
-- Run tests that apply a Setup plan on Linux, the server's platform: `scripts/linux-tests.sh -p factory-server --test setup_gates`. The script builds its image from `docker/test-runner.Dockerfile` and starts its own PostgreSQL (trust authentication, because the test roles have no password) on a shared Docker network. On Windows Setup blocks readiness on the uninstalled MCP route, and its Linux Node check accepts only Debian's `/usr/bin/node`.
+- Disk is tight on both machines (the Windows C: drive is nearly full, the Mac had 58 GB free on 2026-10-25). Share one build cache by pointing `CARGO_TARGET_DIR` at the main checkout's `target/` (an absolute path, the same for every worktree and agent), remove large probe output when its evidence is recorded, and check `df -h .` from the repository root before heavy builds. The shared cache still keeps a separate copy of every crate per worktree path, so after removing worktrees delete `target/release` if unused and every entry in `target/debug/{deps,build,incremental}` older than two hours. Cargo rebuilds whatever an active build still needs.
+- Run tests that apply a Setup plan on Linux, the server's platform: `scripts/linux-tests.sh -p factory-server --test setup_gates`. The script builds its image from `docker/test-runner.Dockerfile` and starts its own PostgreSQL (trust authentication, because the test roles have no password) on a shared Docker network. Setup's readiness depends on the host platform. On Windows it blocks readiness on the uninstalled MCP route, and its Linux Node check accepts only Debian's `/usr/bin/node`.
 - Tests that assert behavior of a pinned upstream revision go stale when the pin moves. Assert against `SETUP_PIN` (for example `contains_pr_105_fix`) instead of a fixed value, and rerun the whole workspace after every pin change.
 - Setup's source client wraps a blocking HTTP client. Build and drop it off the async runtime (`DetachedDrop`, `spawn_blocking`), or tokio panics on drop.
-- In this shell a Python heredoc that edits files containing backslashes or `'''` can fail silently or abort the command. Check that an edit applied, or use the Edit tool.
 - Docker Desktop also runs the maintainer's other projects. Never restart it, prune shared images or volumes, or stop containers you did not start. Ask the maintainer instead. Stop your own test containers when done.
+
+On Windows only:
+
+- The locale encoding is cp1252, and Python text-mode writes produce CRLF. Write files in binary mode or with `newline="\n"`.
+- Shell heredocs passed into Python can alter backslash escapes, and a Python heredoc that edits files containing backslashes or `'''` can fail silently or abort the command. Make such edits with the Edit tool, and check that an edit applied.
+- Git Bash corrupts non-ASCII text passed on a command line, for example `curl -d` with accents or emoji. Write such payloads to a UTF-8 file and send them with `--data-binary @file`.
+- Scripts that pass host paths to `docker run` convert them with `cygpath -m` when it exists and set `MSYS_NO_PATHCONV=1`, as `scripts/linux-tests.sh` does. Both are no-ops on macOS.
+
+On macOS only:
+
+- The system `sed`, `grep` and `find` are BSD versions (`sed -i ''`, no `grep -P`). Homebrew is at `/opt/homebrew`.
+- Python 3.13 comes from `uv` (`scripts/py.sh` uses it) or `brew install python@3.13`.
+- The maintainer's Anthropic key is not in the shell environment, so live model tests are unavailable on this machine unless the maintainer provides it for a session.
 
 ## Delegation and parallel work
 
@@ -51,23 +65,23 @@ Delegate independent, bounded packets to subagents with explicit owned paths, in
 
 - Create each worktree yourself with `git worktree add -b <branch> ../hoi4-factory-wt-<name> main` from the repository root, and give the agent that absolute path. Do not rely on automatic worktree isolation, which follows the session's current directory.
 - Subagents in this environment cannot create new Markdown files. Ask them to return report text and save it yourself.
-- Tell every agent to put temporary output, including test fixtures and short paths used to dodge Windows path limits, only in its worktree, `.work/` or the session scratchpad, and never to delete anything outside those places. One agent once wrote golden-test output to a folder in the user's home directory and later deleted it without remembering that it had created it.
+- Tell every agent to put temporary output, including test fixtures and short paths used to dodge Windows path limits (keep fixture paths short on macOS too, so the same tests run on Windows), only in its worktree, `.work/` or the session scratchpad, and never to delete anything outside those places. One agent once wrote golden-test output to a folder in the user's home directory and later deleted it without remembering that it had created it.
 - Merge each branch into main as soon as it is reviewed, resolve `Cargo.toml` and `Cargo.lock` conflicts by unioning members and regenerating the lockfile, then remove the worktree and its branch immediately. Never remove a worktree that holds uncommitted work.
 
 ## External services
 
 - **GitHub writes.** Automated tests write only to `klimPaskov/hoi4-factory-test-mod`. Negative tests use a private repository outside the App installation. The HOI4 Factory Dev App must be installed on selected repositories only, and the host enforces its own per-project repository allowlist before every call. Reconcile uncertain outcomes by reading state, never by trusting status codes.
 - **Upstream repositories.** Pull requests to `klimPaskov/HOI4-Mod-Setup` and `klimPaskov/hoi4-agent-tools` are pre-approved. Push only feature branches, never their default branches. Merge only when the maintainer says so. HOI4-Mod-Setup's main requires a code-owner review that the PR author cannot give, so an authorized merge uses `gh pr merge --squash --admin`, and only after every required status check is green (rerun a flaky check rather than bypassing it). Merge stacked PRs in order and update the next branch onto main first, because the rules require branches to be up to date. A squash merge of the base PR breaks the stacked branch's ancestry, so the update shows add/add conflicts. Resolve each file as the stacked branch's version plus whatever main changed since the base PR's last commit (`git diff <base-head> origin/main -- <file>`). Prefer independent PRs off main over stacks. Upstream tests must not rely on tools present only on this machine, such as Setup's trusted Node runtime, because Linux CI will not have them. Setup's `NodeRuntime::new` accepts only Debian's packaged `/usr/bin/node` (verified by its dpkg checksum), so images install Node with `apt-get install nodejs` instead of copying a binary.
-- **Model providers.** Development probes may use the maintainer's Anthropic key from the Windows user environment, read per command and never echoed. Record spend in evidence. The OpenAI keys on this machine have had no API balance.
+- **Model providers.** Development probes may use the maintainer's Anthropic key from the Windows user environment, read per command and never echoed. Record spend in evidence. The OpenAI keys on the Windows machine have had no API balance.
 - **Pushing to this repository.** Commit locally freely. Push to `origin main` when the maintainer approves a stage result or asks for it.
 
 ## Verification and handoff
 
 Use `validate-stage` to connect each requirement to observed output and real evidence. Test normal, failure and recovery paths. Record commands, versions, exit codes, input revisions, artifact hashes and limitations. Source parsing, rendering, game execution and maintainer approval are different evidence kinds. Re-run key checks on the final tree, and check that recorded input hashes still match instead of re-running expensive probes.
 
-Run workspace tests with `cargo test --no-fail-fast`, because the default stops at the first failing test binary and hides every later crate. A nearly full disk makes tests fail with misleading errors, so check free space before trusting a red run. Setup's readiness differs between Windows and Linux, so the S02 apply gates are verified with `scripts/linux-tests.sh`. [Developer setup](docs/07-developer-workflow/DEVELOPER-SETUP.md) covers a fresh machine.
+Run workspace tests with `cargo test --no-fail-fast`, because the default stops at the first failing test binary and hides every later crate. A nearly full disk makes tests fail with misleading errors, so check free space before trusting a red run. Setup's readiness differs between host platforms, so the S02 apply gates are verified with `scripts/linux-tests.sh`. [Developer setup](docs/07-developer-workflow/DEVELOPER-SETUP.md) covers a fresh machine.
 
-Review the diff for intent, unintended changes, secrets and generated-file drift. Run `PYTHONUTF8=1 py -3.13 scripts/validate_package.py --root . --working-tree` and `PYTHONUTF8=1 py -3.13 scripts/sync_skills.py --check`. Finish with a handoff from [the template](docs/06-agent-handoffs/STAGE-HANDOFF-TEMPLATE.md) and propose the next stage only as a proposal.
+Review the diff for intent, unintended changes, secrets and generated-file drift. Run `scripts/py.sh scripts/validate_package.py --root . --working-tree` and `scripts/py.sh scripts/sync_skills.py --check`. Finish with a handoff from [the template](docs/06-agent-handoffs/STAGE-HANDOFF-TEMPLATE.md) and propose the next stage only as a proposal.
 
 ## Keeping this guidance current
 

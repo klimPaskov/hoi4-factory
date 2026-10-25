@@ -36,15 +36,15 @@ For a larger implementation repository, Claude-specific rules may live in `.clau
 From `hoi4-factory/`, with Python 3.11 or newer:
 
 ```bash
-python scripts/sync_skills.py --check
-python scripts/validate_package.py --root . --working-tree
+scripts/py.sh scripts/sync_skills.py --check
+scripts/py.sh scripts/validate_package.py --root . --working-tree
 ```
 
 After reviewing a change to canonical bodies or metadata:
 
 ```bash
-python scripts/sync_skills.py --write
-python scripts/sync_skills.py --check
+scripts/py.sh scripts/sync_skills.py --write
+scripts/py.sh scripts/sync_skills.py --check
 ```
 
 Write mode changes only the named generated skill trees and hash manifest inside this repository. It refuses symlinked managed paths. It does not install skills into a personal client directory. Inspect the resulting diff and include the canonical edit, generated copies, updated tests and knowledge changelog in the same review. Check mode is read-only and is the default.

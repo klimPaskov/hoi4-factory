@@ -18,7 +18,7 @@ The checklist is a menu of considerations, not a requirements list and not a sou
 3. Never recommend adding a step a user must take (extra verification, MFA, lockouts, mandatory settings, consent walls beyond what the law requires) unless the maintainer asked for it. If an item would add friction, say what the user would feel and leave it as "when needed".
 4. Leave enterprise, certification and scale items (SSO, SAML, SCIM, SOC 2, HIPAA, BAAs, data residency, pen tests, security questionnaires, access reviews, on-call rotations, second regions and similar) as "when needed" with their trigger. Do not raise them again unless their trigger has happened.
 5. For each picked item, report done with an evidence path, a short recommendation, or "skip for now" with the reason. A plan or a spec paragraph is not done.
-6. Update only the checklist rows whose status changed, and add a row only for a genuinely new risk the stage introduced. Run `PYTHONUTF8=1 python scripts/validate_package.py --root . --working-tree`.
+6. Update only the checklist rows whose status changed, and add a row only for a genuinely new risk the stage introduced. Run `scripts/py.sh scripts/validate_package.py --root . --working-tree`.
 
 ## Outputs and evidence
 

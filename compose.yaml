@@ -1,13 +1,17 @@
 # HOI4 Factory development services: server, PostgreSQL and Mailpit (development mail).
 #
-# Start:   docker compose up -d --build --wait
-# Stop:    docker compose down          (add -v only to delete the database and workspaces)
+# Start:   scripts/compose.sh up -d --build --wait
+# Stop:    scripts/compose.sh down      (add -v only to delete the database and workspaces)
 #
 # Required: HOI4_GAME_DIR, the host folder of a Hearts of Iron IV install (the folder that
 # holds launcher-settings.json and dlc/). It is bind-mounted read-only at /game and only
-# identity metadata is read from it. Put it in a git-ignored .env file next to this file:
+# identity metadata is read from it. scripts/compose.sh finds it in this machine's Steam
+# libraries on Windows, macOS and Linux, so one .env works on every machine. Set it in the shell
+# or in the git-ignored .env only for an install outside Steam; a value that does not exist on
+# this machine is ignored by the script. Plain `docker compose` needs it set, for example:
 #
-#   HOI4_GAME_DIR=C:/Program Files (x86)/Steam/steamapps/common/Hearts of Iron IV
+#   Windows: HOI4_GAME_DIR=C:/Program Files (x86)/Steam/steamapps/common/Hearts of Iron IV
+#   macOS:   HOI4_GAME_DIR=/Users/<you>/Library/Application Support/Steam/steamapps/common/Hearts of Iron IV
 #
 # Required: the GitHub App private key file, ./.work/github-app/private-key.pem (git-ignored). It is
 # bind-mounted read-only at /run/secrets/github-app-key.pem. To use another location set

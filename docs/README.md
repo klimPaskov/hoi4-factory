@@ -51,11 +51,11 @@ Codex and Claude settings are separate native formats. Both inherited MCP relati
 From the `hoi4-factory/` project root, with Python 3.11 or newer, check the freshly extracted distribution:
 
 ```bash
-python scripts/sync_skills.py --check
-python scripts/validate_package.py --root .
+scripts/py.sh scripts/sync_skills.py --check
+scripts/py.sh scripts/validate_package.py --root .
 ```
 
-After implementation work adds files or changes the distributed baseline, run `python scripts/validate_package.py --root . --working-tree` instead. This mode checks maintained planning and guidance without enforcing the original distribution hashes.
+After implementation work adds files or changes the distributed baseline, run `scripts/py.sh scripts/validate_package.py --root . --working-tree` instead. This mode checks maintained planning and guidance without enforcing the original distribution hashes.
 
 The validator checks the authored package. It does not connect MCP, invoke a model, install dependencies or run HOI4. Its recorded result is [verification-run.json](05-verification/verification-run.json). See the quality-review document for exact coverage and limitations.
 

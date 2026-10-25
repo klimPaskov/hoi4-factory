@@ -912,6 +912,33 @@ fn harmless_local_configuration_is_accepted() {
 }
 
 #[test]
+fn an_include_is_reported_without_being_followed() {
+    // Git parses includes while it discovers a repository. An include naming an existing file
+    // that is not configuration (`/etc/passwd` on Linux and macOS) used to fail the repository
+    // as unreadable there, while on Windows the same upload reported the key. The relative
+    // path resolves next to .git/config, so this runs the same way on every platform.
+    let fx = Fx::new();
+    seed(&fx);
+    let repo = init_repo(&fx);
+    repo.baseline_commit("baseline").unwrap();
+    fs::write(
+        fx.src().join(".git/not-config"),
+        "root:x:0:0:root:/root:/bin/sh\n",
+    )
+    .unwrap();
+    let config = fx.src().join(".git/config");
+    let mut body = fs::read_to_string(&config).unwrap();
+    body.push_str("[include]\n\tpath = not-config\n");
+    fs::write(&config, body).unwrap();
+    match GitRepo::open(&fx.src()).unwrap_err() {
+        GitError::UnsafeConfig(findings) => {
+            assert_eq!(findings, vec!["include.path".to_string()]);
+        }
+        other => panic!("expected UnsafeConfig, got {other}"),
+    }
+}
+
+#[test]
 fn alternates_and_commondir_redirection_are_refused() {
     let fx = Fx::new();
     seed(&fx);
