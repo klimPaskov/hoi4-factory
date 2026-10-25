@@ -29,6 +29,10 @@
     {
       "name": "ui-design-iteration",
       "description": "Use when a browser client page is designed or redesigned. Build three or four working variants in the development-only design lab, let the maintainer choose, implement the chosen one with i18n and accessibility intact, record the decision, and move to the next page."
+    },
+    {
+      "name": "track-issues",
+      "description": "Use when a problem found in a session cannot be fixed in that session, at every stage handoff, and when picking up a tracked issue. File it as a GitHub issue on klimPaskov/hoi4-factory with evidence, the reason it is not fixed now and an acceptance check, then fix tracked issues later with a regression test and close them with evidence. Fix everything you can in the session instead of filing it."
     }
   ]
 }

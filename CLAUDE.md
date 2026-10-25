@@ -96,6 +96,10 @@ Run workspace tests with `cargo test --no-fail-fast`, because the default stops 
 
 Review the diff for intent, unintended changes, secrets and generated-file drift. The validator rejects semicolons and em dashes anywhere in Markdown outside code fences, inline code included, so write short sentences instead. Run `scripts/py.sh scripts/validate_package.py --root . --working-tree` and `scripts/py.sh scripts/sync_skills.py --check`. Finish with a handoff from [the template](docs/06-agent-handoffs/STAGE-HANDOFF-TEMPLATE.md) and propose the next stage only as a proposal.
 
+## Issues
+
+GitHub issues on `klimPaskov/hoi4-factory` are the ticket system. Fix every problem you can in the session. File an issue only for one that truly cannot be fixed now, because it needs the maintainer, an outside resource, another machine or a later stage. Follow the `track-issues` skill: search first, give evidence, the reason and an acceptance check, list the issue in the handoff, and close it later with `Fixes #N` and the test results. Issues are public, so never put secrets, private paths or user data in them.
+
 ## Keeping this guidance current
 
 You maintain this file and the skills. Whenever you learn something that would help future development, such as a repeated failure, a tool quirk, a working pattern or a maintainer preference, edit CLAUDE.md or the relevant skill in the same session, then regenerate the copies. Create a new skill whenever a workflow repeats or a task type would benefit from a written procedure. Add a regression test where the lesson is testable.
@@ -115,6 +119,7 @@ One limit stays: a guidance or skill edit must never widen authority, access roo
 | `production-readiness-review` | Agent, at handoffs | Suggest proportionate, low-friction hardening |
 | `delegate-parallel-work` | Agent, when splitting work | Worktrees, subagent briefs, merging and cleanup |
 | `ui-design-iteration` | Agent, for any client page design | Working variants in the design lab, the maintainer chooses, then implement |
+| `track-issues` | Agent, when a problem cannot be fixed in the session, and at handoffs | GitHub issues with evidence and acceptance, fixed later with a regression test |
 
 ## Client notes
 

@@ -22,6 +22,8 @@ Implementation remains deferred. The maintainer stated that the application will
 | ADR-022 | Automatic personal, project and global memory with verified lessons and no authority | Review-every-lesson runtime learning |
 | ADR-023 | Automatic engineering learning gated by regression tests | Review-every-lesson engineering learning |
 | ADR-024 | Agent edits canonical CLAUDE.md and the skills directly, AGENTS.md is a generated identical copy | Test-gated guidance promotion and the AGENTS import |
+| ADR-026 | A later desktop companion app for macOS, Linux and Windows, always synced with the web app, which stays the priority | Web-only client |
+| ADR-027 | New users first in the queue, higher plans later get more priority and credits, full Agent Tools on the server plus an optional local MCP | Unordered admission |
 
 ADR-001 and ADR-003 through ADR-010 remain in force, with the scope changes noted below. ADR-002 is superseded by ADR-011 and ADR-012.
 
@@ -232,6 +234,28 @@ These are not maintainer decisions. The maintainer authorized S03 to proceed wit
 **Decision.** The browser client built in S02 is functional and temporary. Its visual design is redone in a separate, interactive UI design track, run as its own session after S03 and before S04. For each page the agent builds three or four working variants and shows them side by side in a development-only "design lab" page of the running app, with realistic data. The maintainer picks one, or asks for changes, and the agent implements the choice before moving to the next page. The track starts with an overall visual direction and a shared component set, then goes page by page until the maintainer is satisfied.
 
 **Effect on stages.** Stages keep building working screens for their features. S03 adds only minimal task and API key screens with the existing components. Screens added by S04 and later stages use the design system the track produces, and new or changed pages go through the same preview-and-pick loop. S08 still runs the usability pilot. The workflow is the `ui-design-iteration` skill, and the session goal is [GOAL-UI](../06-agent-handoffs/GOAL-UI.md).
+
+### ADR-026: a desktop companion app, synced with the web app (2026-10-25)
+
+**Decision.** The web app stays the first priority and must support everything to the fullest and be very easy to use. Later, HOI4 Factory also ships a desktop app for macOS, Linux and Windows on the same server and account. A desktop app gives more local control: it can run locally installed tools such as HOI4 Live Tools and a locally installed Agent Tools MCP server, and use the user's own game. Project members on the web and on the desktop app work on the same projects, and their changes always sync, so it does not matter where a participant works.
+
+**Effect on stages.** No stage builds the desktop app yet. Web features keep the server as the single source of truth: projects, tasks, receipts, grants and Git history all live there. A later desktop client then needs only a sync and local-tool layer, not a second authority. ADR-012 (hosted web first) stands. The desktop app does not bring back the superseded desktop-only plan of ADR-002. The planning issue is tracked on GitHub (see [the issue workflow](../07-developer-workflow/skill-workflows/track-issues/BODY.md)).
+
+### ADR-027: usage priority and plan tiers (2026-10-25)
+
+**Decision.** When agent work queues, new users get higher priority, so a first experience is fast. Once paid plans exist, users on higher plans get higher priority and more credits. Agent Tools run on the server and must be fully usable there, even if a server run is slower. Users may also connect a locally installed MCP server where that is possible, because it can be more reliable. Everything must work out of the box, without that.
+
+**Effect on stages.** The S03 runner admits work through a plain concurrency limit, and a priority queue is planned with the credits backlog. Exposing the full Agent Tools surface (the rewrite tools behind S04's guards) belongs to S04. A local MCP connection depends on a local bridge or the desktop app (ADR-026). All three are tracked as GitHub issues.
+
+### S03 handoff answers (maintainer, 2026-10-25)
+
+| Question | Answer |
+|---|---|
+| 7. Where Agent Tools runs | On the server, as built. It must be fully usable there. Add an option to connect a locally installed MCP server where possible (ADR-027) |
+| 8. Self-hosted endpoint check | Download the smallest local model and use it to test that a local model connects |
+| 9. Interrupted attempts after a restart | Agreed: reconcile and end them, never resume automatically |
+| 10. Agent edits uncommitted until S04 | Agreed |
+| Issue tracking | Record issues that cannot be fixed in the current session as GitHub issues, so they can be picked up and fixed later with evidence. Fix everything else in the session. Workflow: the `track-issues` skill |
 
 ### ADR-024: the agent maintains its own guidance
 

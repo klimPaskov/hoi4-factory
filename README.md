@@ -46,9 +46,9 @@ HOI4 Factory is licensed under the GNU Affero General Public License version 3 w
 | `scripts/` | Package validator, skill synchronization, Linux test runner and the live onboarding flow |
 | `CLAUDE.md` | Canonical project instructions |
 | `AGENTS.md` | Generated identical copy of CLAUDE.md |
-| `.claude/` | Claude project settings and seven skills |
+| `.claude/` | Claude project settings and eight skills |
 | `.codex/` | Codex project settings and portable skill copies |
-| `.agents/` | Codex discovery copies of the same seven skills |
+| `.agents/` | Codex discovery copies of the same eight skills |
 | `.mcp.json` | Claude MCP definitions, disabled until their setup is reviewed |
 
 Stage evidence is written to project-root `evidence/SNN/`. Detailed navigation and the full file inventory are in [docs/README.md](docs/README.md) and [docs/MANIFEST.md](docs/MANIFEST.md).

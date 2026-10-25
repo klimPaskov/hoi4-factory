@@ -14,7 +14,9 @@ Collected while working autonomously from 2026-10-24. Nothing here blocked work 
 5. **Local secrets are not in Git.** On the new machine you need the game folder in `.env`, your Anthropic key in the user environment, and a GitHub App private key at `.work/github-app/private-key.pem`. Generate a fresh key at https://github.com/settings/apps/hoi4-factory-dev rather than copying the old file, and revoke keys you no longer use. The [developer setup guide](../docs/07-developer-workflow/DEVELOPER-SETUP.md) lists each item. Meanwhile: everything that does not need a secret works without one, and missing items are reported as unavailable.
 6. **OpenAI balance.** The OpenAI keys on this machine returned `insufficient_quota`. S03 treats OpenAI live inference as unavailable unless you add balance. Meanwhile: the OpenAI adapter is tested against recorded responses.
 
-## S03 (added 2026-10-25 while implementing S03 on the Mac)
+## S03 (added 2026-10-25 while implementing S03 on the Mac, answered the same day)
+
+Answers are recorded in the decision record under "S03 handoff answers", ADR-026 and ADR-027. In short: 7 server-side Agent Tools stay, fully usable, plus an optional local MCP later. 8 test with the smallest local model. 9 and 10 agreed.
 
 None of these blocked work. Each lists the default the agent used, recorded in [S03 scope](S03/scope.md).
 

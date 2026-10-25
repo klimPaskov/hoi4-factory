@@ -2,7 +2,7 @@
   "schema_version": 1,
   "version": "0.1.1",
   "generator": "scripts/sync_skills.py",
-  "metadata_sha256": "5a09b03fe39638f4c5396acd209d18efa3a985cbcf36d4bb0d645bad88928a20",
+  "metadata_sha256": "38832b744d651af424d55177e43c54e727e1c793930a7eb11da76cf4df3514d6",
   "scope": "Only these repository projections. No personal installation.",
   "skills": [
     {
@@ -137,6 +137,33 @@
         {
           "path": ".agents/skills/start-implementation-stage/agents/openai.yaml",
           "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94"
+        }
+      ]
+    },
+    {
+      "name": "track-issues",
+      "source": "docs/07-developer-workflow/skill-workflows/track-issues/BODY.md",
+      "body_sha256": "fc61856d4a048d7bcadf121bc8278fe717fdb93b3cd51c251c3a24f639c0fa93",
+      "generated": [
+        {
+          "path": ".claude/skills/track-issues/SKILL.md",
+          "sha256": "3428059896a859fc2f9791259376b3c80b3b0eae134f6b4c4cbc70e231395982"
+        },
+        {
+          "path": ".codex/skills/track-issues/SKILL.md",
+          "sha256": "3428059896a859fc2f9791259376b3c80b3b0eae134f6b4c4cbc70e231395982"
+        },
+        {
+          "path": ".codex/skills/track-issues/agents/openai.yaml",
+          "sha256": "8619a54e8c098122a7f3881394f84ca89b684366e848233a29ad18b6ec363935"
+        },
+        {
+          "path": ".agents/skills/track-issues/SKILL.md",
+          "sha256": "3428059896a859fc2f9791259376b3c80b3b0eae134f6b4c4cbc70e231395982"
+        },
+        {
+          "path": ".agents/skills/track-issues/agents/openai.yaml",
+          "sha256": "8619a54e8c098122a7f3881394f84ca89b684366e848233a29ad18b6ec363935"
         }
       ]
     },
