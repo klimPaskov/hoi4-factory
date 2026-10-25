@@ -57,7 +57,7 @@ On macOS only:
 
 - The system `sed`, `grep` and `find` are BSD versions (`sed -i ''`, no `grep -P`). Homebrew is at `/opt/homebrew`.
 - Python 3.13 comes from `uv` (`scripts/py.sh` uses it) or `brew install python@3.13`.
-- The maintainer's Anthropic key is not in the shell environment, so live model tests are unavailable on this machine unless the maintainer provides it for a session.
+- The maintainer's Anthropic key is exported as `ANTHROPIC_API_KEY` from `~/.zshrc` (written by `scripts/setup-local.sh`), read per command and never echoed. Sessions started before that line was added do not have it.
 
 ## Delegation and parallel work
 
@@ -72,7 +72,7 @@ Delegate independent, bounded packets to subagents with explicit owned paths, in
 
 - **GitHub writes.** Automated tests write only to `klimPaskov/hoi4-factory-test-mod`. Negative tests use a private repository outside the App installation. The HOI4 Factory Dev App must be installed on selected repositories only, and the host enforces its own per-project repository allowlist before every call. Reconcile uncertain outcomes by reading state, never by trusting status codes.
 - **Upstream repositories.** Pull requests to `klimPaskov/HOI4-Mod-Setup` and `klimPaskov/hoi4-agent-tools` are pre-approved. Push only feature branches, never their default branches. Merge only when the maintainer says so. HOI4-Mod-Setup's main requires a code-owner review that the PR author cannot give, so an authorized merge uses `gh pr merge --squash --admin`, and only after every required status check is green (rerun a flaky check rather than bypassing it). Merge stacked PRs in order and update the next branch onto main first, because the rules require branches to be up to date. A squash merge of the base PR breaks the stacked branch's ancestry, so the update shows add/add conflicts. Resolve each file as the stacked branch's version plus whatever main changed since the base PR's last commit (`git diff <base-head> origin/main -- <file>`). Prefer independent PRs off main over stacks. Upstream tests must not rely on tools present only on this machine, such as Setup's trusted Node runtime, because Linux CI will not have them. Setup's `NodeRuntime::new` accepts only Debian's packaged `/usr/bin/node` (verified by its dpkg checksum), so images install Node with `apt-get install nodejs` instead of copying a binary.
-- **Model providers.** Development probes may use the maintainer's Anthropic key from the Windows user environment, read per command and never echoed. Record spend in evidence. The OpenAI keys on the Windows machine have had no API balance.
+- **Model providers.** Development probes may use the maintainer's Anthropic key from the user environment (a Windows user variable, or `~/.zshrc` on the Mac), read per command and never echoed. Record spend in evidence. The OpenAI keys on the Windows machine have had no API balance.
 - **Pushing to this repository.** Commit locally freely. Push to `origin main` when the maintainer approves a stage result or asks for it.
 
 ## Verification and handoff
