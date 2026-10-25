@@ -23,6 +23,7 @@ use factory_setup_adapter::{AnalysisRoute, ModelClient, SetupAdapter, SetupAdapt
 use factory_workspace::{StorageRoot, WorkspaceError};
 use tokio::net::TcpListener;
 
+use crate::agent::{AgentRuntime, AgentRuntimeParts, AgentToolsSettings, RunnerSettings, WorkerLauncher};
 use crate::config::{GithubAppSettings, ServerConfig, cors_origins};
 use crate::game_reference::GameReferenceHandle;
 use crate::github::{AppInstallations, ConfigSecrets, GithubRuntime, HttpAppInstallations};
@@ -67,6 +68,14 @@ pub struct Overrides {
     pub model_client: Option<Arc<dyn ModelClient>>,
     /// Replaces where the Setup workflow package comes from (the public repository by default).
     pub setup_source: Option<Arc<dyn SourceFetcher>>,
+    /// Replaces how the agent's worker process is started (tests run the built server binary).
+    pub agent_worker: Option<WorkerLauncher>,
+    /// Replaces the agent loop's timings.
+    pub agent_settings: Option<RunnerSettings>,
+    /// Replaces the Agent Tools install found in the configuration (`Some(None)` disables it).
+    pub agent_tools: Option<Option<AgentToolsSettings>>,
+    /// Skips the startup recovery pass, so a test can run it itself.
+    pub agent_skip_recovery: bool,
 }
 
 pub async fn initialize(config: ServerConfig) -> Result<ServerState, StartupError> {
@@ -140,6 +149,21 @@ pub async fn initialize_with(
     )
     .await;
 
+    let agent = build_agent(
+        &config,
+        &db,
+        &storage,
+        &clock,
+        game_reference.status().is_healthy(),
+        AgentOverrides {
+            worker: overrides.agent_worker,
+            settings: overrides.agent_settings,
+            tools: overrides.agent_tools,
+            skip_recovery: overrides.agent_skip_recovery,
+        },
+    )
+    .await;
+
     let web = config.web_dist.as_deref().and_then(StaticSite::open);
     match (&config.web_dist, &web) {
         (Some(_), Some(_)) => tracing::info!("serving the browser client"),
@@ -161,7 +185,105 @@ pub async fn initialize_with(
             cors_origins: cors_origins(&config.accounts.allowed_origins),
         }),
         web,
+        agent,
     })
+}
+
+struct AgentOverrides {
+    worker: Option<WorkerLauncher>,
+    settings: Option<RunnerSettings>,
+    tools: Option<Option<AgentToolsSettings>>,
+    skip_recovery: bool,
+}
+
+/// The agent host: key encryption, the outbound destination policy, operator keys, the worker
+/// program and the Agent Tools install. Whatever is missing makes its one feature unavailable
+/// and is logged; only a bad destination range in the configuration stops the agent entirely.
+async fn build_agent(
+    config: &ServerConfig,
+    db: &Database,
+    storage: &StorageRoot,
+    clock: &Arc<dyn Clock>,
+    game_available: bool,
+    overrides: AgentOverrides,
+) -> Option<AgentRuntime> {
+    let settings = &config.agent;
+    let secrets: Option<Arc<dyn factory_accounts::SecretStore>> = match &settings.secret_key_file {
+        None => {
+            tracing::info!("saving model keys is unavailable: FACTORY_SECRET_KEY_FILE is not set");
+            None
+        }
+        Some(path) => match std::fs::read_to_string(path) {
+            Ok(text) => match factory_accounts::AesGcmSecretStore::from_base64(&text) {
+                Ok(store) => Some(Arc::new(store)),
+                Err(_) => {
+                    tracing::error!("saving model keys is unavailable: the key file is not 32 bytes of base64");
+                    None
+                }
+            },
+            Err(err) => {
+                tracing::error!(kind = ?err.kind(), "saving model keys is unavailable: the key file cannot be read");
+                None
+            }
+        },
+    };
+    let ranges: Vec<&str> = settings.outbound_allow_cidrs.iter().map(String::as_str).collect();
+    let policy = match factory_agent::destination::DestinationPolicy::allowing(&ranges) {
+        Ok(p) => p,
+        Err(err) => {
+            tracing::error!(error = %err, "the agent is unavailable: FACTORY_OUTBOUND_ALLOW_CIDRS is invalid");
+            return None;
+        }
+    };
+    if !ranges.is_empty() {
+        tracing::warn!(ranges = ?ranges, "custom model endpoints may use these private ranges");
+    }
+    let tools = match overrides.tools {
+        Some(t) => t,
+        None => match (&settings.agent_tools_node, &settings.agent_tools_entry) {
+            (Some(node), Some(entry)) if node.exists() && entry.exists() => Some(AgentToolsSettings {
+                install: factory_hoi4_tools::AgentToolsInstall { node: node.clone(), entry: entry.clone() },
+                game_root: game_available.then(|| config.game_ref_dir.clone()),
+            }),
+            _ => {
+                tracing::info!("HOI4 Agent Tools are unavailable: FACTORY_AGENT_TOOLS_NODE or _ENTRY is not installed");
+                None
+            }
+        },
+    };
+    let operator_keys = crate::agent::profiles::OperatorKeys {
+        anthropic: config.anthropic.as_ref().map(|a| a.api_key.clone()),
+        openai: settings.openai_api_key.clone(),
+        anthropic_base: config.anthropic.as_ref().map(|a| a.base_url.clone()),
+        openai_base: settings.openai_base_url.clone(),
+    };
+    let runtime = AgentRuntime::start(AgentRuntimeParts {
+        db: db.clone(),
+        storage: storage.clone(),
+        clock: clock.clone(),
+        secrets,
+        policy,
+        allowance_micros: i64::try_from(settings.allowance_micros).unwrap_or(i64::MAX),
+        operator_keys,
+        agent_tools: tools,
+        worker: overrides.worker.or_else(WorkerLauncher::current_exe),
+        settings: overrides.settings.unwrap_or_default(),
+        max_running: settings.max_running,
+    })
+    .await;
+    match runtime {
+        Ok(rt) => {
+            tracing::info!(incarnation = %rt.incarnation(), "agent host started");
+            if !overrides.skip_recovery {
+                crate::agent::recovery::spawn(rt.clone());
+            }
+            Some(rt)
+        }
+        Err(err) => {
+            tracing::error!(error = %err, "the agent host could not start");
+            None
+        }
+    }
 }
 
 /// The Setup adapter: analysis through the server's model, planning through Setup's

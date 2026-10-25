@@ -281,6 +281,7 @@ impl Harness {
                 app_installations: Some(installations.clone()),
                 model_client: options.model.clone(),
                 setup_source: options.setup_source.clone(),
+                ..Overrides::default()
             },
         )
         .await
@@ -323,6 +324,7 @@ impl Harness {
                 app_installations: Some(self.installations.clone()),
                 model_client: self.model.clone(),
                 setup_source: self.setup_source.clone(),
+                ..Overrides::default()
             },
         )
         .await

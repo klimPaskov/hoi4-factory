@@ -9,6 +9,7 @@ use factory_intake::{IntakeLimits, IntakeService};
 use factory_setup_adapter::SetupAdapter;
 use factory_workspace::StorageRoot;
 
+use crate::agent::AgentRuntime;
 use crate::game_reference::GameReferenceHandle;
 use crate::github::GithubRuntime;
 use crate::migrations::MigrationReport;
@@ -60,6 +61,9 @@ pub struct ServerState {
     pub migrations: Arc<MigrationReport>,
     pub settings: Arc<RuntimeSettings>,
     pub web: Option<StaticSite>,
+    /// The native agent host. `None` only when it could not start; the task routes then
+    /// answer `agent_unavailable`.
+    pub agent: Option<AgentRuntime>,
 }
 
 impl FromRef<ServerState> for AccountsState {

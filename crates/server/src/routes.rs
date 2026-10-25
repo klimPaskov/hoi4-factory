@@ -60,6 +60,7 @@ pub fn api_routes(state: &ServerState) -> Router {
         .with_state(state.clone())
         .merge(crate::intake_api::router(state))
         .merge(crate::setup_api::router(state))
+        .merge(crate::agent_api::router(state))
         .merge(factory_accounts::router(state.accounts.clone()))
 }
 
