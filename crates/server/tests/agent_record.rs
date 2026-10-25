@@ -158,3 +158,59 @@ async fn record_agent_streams() {
     let r = record("agent-read-turn", &read).await;
     assert_eq!(r.tool_calls.first().map(|c| c.name.as_str()), Some("read_file"));
 }
+
+/// A read-only task through the real HOI4 Agent Tools profile: the model calls
+/// `agent_tools_mod_index`, the real tool answers (run here against the Agent Tools fixture mod),
+/// and the model finishes. Needs `FACTORY_AGENT_TOOLS_NODE`, `FACTORY_AGENT_TOOLS_ENTRY` and
+/// `FACTORY_AGENT_TOOLS_FIXTURE`, like the hoi4-tools integration tests.
+#[tokio::test]
+#[ignore = "calls the live Anthropic API and needs a local Agent Tools build"]
+async fn record_agent_tools_streams() {
+    let install = factory_hoi4_tools::AgentToolsInstall::from_env().expect("FACTORY_AGENT_TOOLS_NODE and _ENTRY");
+    let fixture = std::env::var("FACTORY_AGENT_TOOLS_FIXTURE").expect("FACTORY_AGENT_TOOLS_FIXTURE");
+    let work = tempfile::tempdir().unwrap();
+    let mod_root = work.path().join("mod");
+    copy_dir(std::path::Path::new(&fixture), &mod_root);
+    let state = factory_hoi4_tools::prepare_state_dir(&work.path().join("state")).unwrap();
+    let spec = factory_hoi4_tools::agent_tools_spec(&install, &mod_root, &state, None);
+    let mut session = factory_hoi4_tools::ToolSession::start(spec, factory_hoi4_tools::agent_tools_read_only()).await;
+    assert!(session.inventory().is_healthy());
+    let mut specs = tools(false);
+    for t in session.exposed_tools() {
+        specs.push(ToolSpec { name: t.name, description: t.description, input_schema: t.input_schema });
+    }
+    let mut req = ModelRequest {
+        system: SYSTEM_PROMPT.to_owned(),
+        messages: vec![Message::user_text(
+            "Task: Summarize what content this mod defines. Call agent_tools_mod_index once with mode \
+             \"overview\", then call finish with a one-sentence summary. Read-only task; do nothing else.",
+        )],
+        tools: specs,
+        max_output_tokens: 1024,
+    };
+    let call = record("agent-tools-call-turn", &req).await;
+    assert_eq!(call.tool_calls.first().map(|c| c.name.as_str()), Some("agent_tools_mod_index"));
+    let result = session
+        .call("agent_tools_mod_index", &call.tool_calls[0].arguments, std::time::Instant::now() + std::time::Duration::from_secs(120))
+        .await
+        .expect("the real tool answers");
+    let body = result.output.structured.clone().unwrap_or(json!({ "content": result.output.content }));
+    req.messages.push(tool_use_message(&call));
+    req.messages.push(result_message(&call, body));
+    let finish = record("agent-tools-finish-turn", &req).await;
+    assert_eq!(finish.tool_calls.first().map(|c| c.name.as_str()), Some("finish"));
+    let _ = session.shutdown().await;
+}
+
+fn copy_dir(from: &std::path::Path, to: &std::path::Path) {
+    std::fs::create_dir_all(to).unwrap();
+    for entry in std::fs::read_dir(from).unwrap() {
+        let entry = entry.unwrap();
+        let target = to.join(entry.file_name());
+        if entry.file_type().unwrap().is_dir() {
+            copy_dir(&entry.path(), &target);
+        } else {
+            std::fs::copy(entry.path(), &target).unwrap();
+        }
+    }
+}

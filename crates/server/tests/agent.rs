@@ -821,3 +821,62 @@ async fn events_replay_in_order_from_a_cursor_and_the_stream_resumes() {
     let first_id = text.lines().find_map(|l| l.strip_prefix("id: ")).unwrap();
     assert_eq!(first_id, "3", "the stream starts right after the cursor: {text}");
 }
+
+// ----- the real HOI4 Agent Tools profile through the host ------------------------------------
+
+/// Runs only where a local Agent Tools build is configured (`FACTORY_AGENT_TOOLS_NODE` and
+/// `FACTORY_AGENT_TOOLS_ENTRY`, as for the hoi4-tools tests); prints a note and passes otherwise.
+#[tokio::test]
+async fn a_read_only_agent_tools_call_runs_through_the_broker_and_changes_no_source() {
+    let Some(install) = factory_hoi4_tools::AgentToolsInstall::from_env() else {
+        eprintln!("SKIPPED: FACTORY_AGENT_TOOLS_NODE / FACTORY_AGENT_TOOLS_ENTRY are not set");
+        return;
+    };
+    let replay = vec![rec("agent-tools-call-turn"), rec("agent-tools-finish-turn")];
+    let replay_server = ReplayServer::start(vec![("/v1/messages", Reply::Sequence(replay))]).await;
+    let key_dir = tempfile::tempdir().unwrap();
+    let key_file = key_dir.path().join("secret.key");
+    std::fs::write(&key_file, "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=").unwrap();
+    let h = Harness::start(Options {
+        anthropic_key: Some("sk-ant-replay-not-a-real-key"),
+        extra_vars: vec![
+            ("FACTORY_ANTHROPIC_BASE_URL", replay_server.base_url.clone()),
+            ("FACTORY_OUTBOUND_ALLOW_CIDRS", "127.0.0.0/8".to_owned()),
+            ("FACTORY_SECRET_KEY_FILE", key_file.to_string_lossy().into_owned()),
+        ],
+        agent: AgentOptions {
+            worker: Some(launcher(&[])),
+            settings: Some(fast_settings()),
+            tools: Some(Some(factory_server::agent::AgentToolsSettings { install, game_root: None })),
+            skip_recovery: true,
+        },
+        ..Options::default()
+    })
+    .await;
+    let alice = h.verified_user("alice@example.org").await;
+    let project = h.project(&alice, "Agent tools").await;
+    let up = alice
+        .client
+        .upload(&project, &[Part::text("kind", "zip"), Part::text("git_init_consent", "true"), Part::file("m.zip", build_zip(&mod_entries()))])
+        .await;
+    assert_eq!(up.status, 201, "{}", up.text);
+    let a = Agent { h, replay: replay_server, alice, project, _key: key_dir };
+    let task = a.task(&a.alice, json!({ "objective": "Summarize the mod", "mode": "read_only" })).await;
+    let id = task["id"].as_str().unwrap().to_owned();
+    a.start(&a.alice, &task).await;
+    let d = a.wait(&id, 120, |at| matches!(at["state"].as_str(), Some("succeeded" | "failed"))).await;
+    assert_eq!(d["attempts"][0]["state"], "succeeded", "{d:#}");
+    let events = a.events(&id).await;
+    let ready = events.iter().find(|e| e["type"] == "tools_ready").unwrap();
+    let names: Vec<&str> = ready["payload"]["tools"].as_array().unwrap().iter().filter_map(Value::as_str).collect();
+    assert!(names.contains(&"agent_tools_mod_index"), "{names:?}");
+    assert!(!names.iter().any(|n| n.contains("rewrite")), "no rewrite tool is exposed: {names:?}");
+    let admin = a.h.admin().await;
+    assert_eq!(
+        count(&admin, "SELECT count(*) FROM tool_receipts r JOIN tool_intents i USING (operation_id) WHERE i.task_id = $1 AND i.tool = 'agent_tools_mod_index' AND r.status = 'succeeded' AND i.effect_class = 'pure_read'", &id).await,
+        1
+    );
+    admin.close().await;
+    // The tool kept its index outside the mod: the worktree is byte-identical to the source.
+    assert_eq!(tree(&a.worktree(&id)), tree(&a.source()));
+}

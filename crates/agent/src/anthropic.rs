@@ -64,6 +64,36 @@ pub const STRICT_UNSUPPORTED: &[&str] = &[
     "exclusiveMinimum", "exclusiveMaximum", "multipleOf", "uniqueItems",
 ];
 
+/// The schema Anthropic receives for a tool. Top-level `anyOf`, `oneOf` and `allOf` are refused
+/// for every tool (observed 2026-10-25: "input_schema does not support oneOf, allOf, or anyOf at
+/// the top level", HTTP 400), and strict mode also refuses [`STRICT_UNSUPPORTED`]. What is removed
+/// here is still enforced by the host's validation of the final arguments.
+pub fn provider_schema(schema: &Value, strict: bool) -> Value {
+    let mut out = if strict { strict_schema(schema) } else { schema.clone() };
+    if let Value::Object(map) = &mut out {
+        for k in ["anyOf", "oneOf", "allOf"] {
+            map.remove(k);
+        }
+    }
+    out
+}
+
+/// True when `anyOf`, `oneOf`, `allOf`, `not` or a conditional appears below the top level (or
+/// anywhere with `top` false). Strict mode refuses all of them ("Schema keyword 'not' is not
+/// supported", 2026-10-25).
+pub fn has_combinator(schema: &Value, top: bool) -> bool {
+    match schema {
+        Value::Object(map) => map.iter().any(|(k, v)| {
+            (!top && matches!(k.as_str(), "anyOf" | "oneOf" | "allOf" | "not" | "if" | "then" | "else"))
+                || (k != "properties" && k != "$defs" && has_combinator(v, false))
+                || ((k == "properties" || k == "$defs")
+                    && v.as_object().is_some_and(|p| p.values().any(|s| has_combinator(s, false))))
+        }),
+        Value::Array(items) => items.iter().any(|v| has_combinator(v, false)),
+        _ => false,
+    }
+}
+
 /// `schema` without the keywords strict mode refuses, at every depth.
 pub fn strict_schema(schema: &Value) -> Value {
     match schema {
@@ -126,7 +156,10 @@ pub fn render_with(req: &ModelRequest, profile: &ModelProfile, caps: &Capabiliti
         .tools
         .iter()
         .map(|t| {
-            let schema = if strict { strict_schema(&t.input_schema) } else { t.input_schema.clone() };
+            // Strict mode also refuses combinators at any depth ("Schema type 'oneOf' is not
+            // supported", 2026-10-25), so such a tool goes without strict and relies on the host.
+            let strict = strict && !has_combinator(&t.input_schema, true);
+            let schema = provider_schema(&t.input_schema, strict);
             let mut v = tool(&t.name, &t.description, &schema, strict);
             if !strict {
                 v.as_object_mut().map(|o| o.remove("strict"));
@@ -565,6 +598,16 @@ mod tests {
             v["tools"][0]["strict"], true,
             "strict recorded as supported for this model"
         );
+    }
+
+    #[test]
+    fn top_level_combinators_are_never_sent() {
+        let schema = json!({"type": "object", "properties": {"a": {"type": "string"}}, "anyOf": [{"required": ["a"]}], "additionalProperties": false});
+        for strict in [false, true] {
+            let s = provider_schema(&schema, strict);
+            assert!(s.get("anyOf").is_none());
+            assert_eq!(s["additionalProperties"], false);
+        }
     }
 
     #[test]
