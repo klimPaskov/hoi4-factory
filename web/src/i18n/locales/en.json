@@ -110,7 +110,15 @@
       "task_paused": "This task is paused. Resume it first.",
       "unauthenticated": "Your session has ended. Sign in to continue.",
       "unresolved_effects": "An earlier tool action has an unknown outcome. It has to be checked before a new attempt can start.",
-      "version_conflict": "Someone else changed this task. The page was reloaded with the latest state, so check it and try again."
+      "version_conflict": "Someone else changed this task. The page was reloaded with the latest state, so check it and try again.",
+      "grant_expired": "This attempt's permissions ran out while it was paused. Interrupt it and start a new attempt.",
+      "no_model_listed": "That server lists no model to test.",
+      "provider_unavailable": "The free allowance does not cover this model on this server. Use your own API key for it.",
+      "provider_key_unavailable": "That saved key is not available any more. Choose another key or the free allowance.",
+      "workspace_busy": "Another server process is using this project right now. Try again in a minute.",
+      "workspace_not_ready": "The mod has no Git baseline yet. Finish bringing the mod in first.",
+      "agent_unavailable": "The agent is not available on this server.",
+      "attempt_not_active": "This attempt is not running any more."
     }
   },
   "unavailable": {

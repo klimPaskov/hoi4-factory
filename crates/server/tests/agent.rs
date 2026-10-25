@@ -910,3 +910,51 @@ async fn an_inference_probe_is_opt_in_and_records_what_it_observed() {
     let bad = a.alice.client.post(&format!("/api/v1/account/api-keys/{id}/probe"), json!({ "mode": "everything" })).await;
     assert_eq!(bad.status, 400, "{}", bad.text);
 }
+
+#[tokio::test]
+async fn task_creation_is_rate_limited_per_account() {
+    let a = agent(Setup::default()).await;
+    let mut refused = None;
+    for n in 0..40 {
+        let r = a.alice.client.post(&a.tasks(), json!({ "objective": format!("Look {n}"), "mode": "read_only" })).await;
+        if r.status == 429 {
+            refused = Some((n, r));
+            break;
+        }
+        assert_eq!(r.status, 201, "{}", r.text);
+    }
+    let (n, r) = refused.expect("a script creating tasks is stopped");
+    assert_eq!(n, 30, "the first 30 succeed");
+    assert_eq!(r.error_code(), "rate_limited");
+    // Another account is not affected.
+    let bob = a.h.verified_user("bob@example.org").await;
+    let bob_project = a.h.project(&bob, "Bob").await;
+    let ok = bob.client.post(&format!("/api/v1/projects/{bob_project}/tasks"), json!({ "objective": "x", "mode": "read_only" })).await;
+    assert_eq!(ok.status, 201, "{}", ok.text);
+}
+
+#[tokio::test]
+async fn resuming_after_the_grant_expired_is_refused_without_side_effects() {
+    let a = agent(Setup { replies: vec![delayed(1500, rec("agent-write-turn")), rec("agent-finish-turn")], ..Setup::default() }).await;
+    let task = a.edit_task(&["common/ideas"]).await;
+    let id = task["id"].as_str().unwrap().to_owned();
+    a.start(&a.alice, &task).await;
+    a.wait_event(&id, "model_request").await;
+    let version = a.detail(&id).await["task"]["version"].clone();
+    a.alice.client.post(&format!("{}/{id}/pause", a.tasks()), json!({ "expected_version": version })).await;
+    a.wait_event(&id, "attempt_suspended").await;
+    // The grant runs out while the task is paused.
+    let admin = a.h.admin().await;
+    sqlx::query("UPDATE agent_grants SET expires_at = now() - interval '1 minute' WHERE task_id = $1")
+        .bind(Uuid::parse_str(&id).unwrap())
+        .execute(&admin)
+        .await
+        .unwrap();
+    admin.close().await;
+    let d = a.detail(&id).await;
+    let r = a.alice.client.post(&format!("{}/{id}/resume", a.tasks()), json!({ "expected_version": d["task"]["version"] })).await;
+    assert_eq!(r.error_code(), "grant_expired", "{}", r.text);
+    let after = a.detail(&id).await;
+    assert_eq!(after["task"]["paused"], true, "the refused resume changed nothing");
+    assert_eq!(a.replay.request_count("/v1/messages"), 1);
+}

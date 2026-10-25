@@ -28,7 +28,10 @@ use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
-use factory_accounts::{AccountId, ApiError, Clock, Database, SecretStore};
+use factory_accounts::{
+    AccountId, ApiError, Clock, Database, InMemoryRateLimiter, RateLimitConfig, RateLimiter, Rule,
+    SecretStore,
+};
 use factory_agent::destination::DestinationPolicy;
 use factory_broker::KeyStore;
 use factory_hoi4_tools::AgentToolsInstall;
@@ -124,12 +127,35 @@ pub(crate) struct Inner {
     pub running: Mutex<HashMap<AttemptId, Running>>,
     pub notifier: broadcast::Sender<TaskId>,
     pub slots: Arc<Semaphore>,
+    pub limiter: InMemoryRateLimiter,
 }
 
 /// A runner of this process.
 pub(crate) struct Running {
     pub control: watch::Sender<Control>,
     pub abort: Option<tokio::task::AbortHandle>,
+}
+
+/// Per-account request limits of the agent routes (PR-098). Budgets bound spend; these bound
+/// request volume. Generous for people, tight enough to stop a script.
+pub const LIMIT_TASK_CREATE: &str = "agent_task_create";
+pub const LIMIT_ATTEMPT_START: &str = "agent_attempt_start";
+pub const LIMIT_KEY_WRITE: &str = "agent_key_write";
+pub const LIMIT_PROBE: &str = "agent_probe";
+
+fn rate_limits() -> RateLimitConfig {
+    let rule = |capacity, secs| Rule { capacity, refill_every: Duration::from_secs(secs) };
+    RateLimitConfig {
+        rules: [
+            (LIMIT_TASK_CREATE, rule(30, 120)),
+            (LIMIT_ATTEMPT_START, rule(20, 90)),
+            (LIMIT_KEY_WRITE, rule(10, 60)),
+            (LIMIT_PROBE, rule(10, 60)),
+        ]
+        .into_iter()
+        .map(|(k, v)| (k.to_owned(), v))
+        .collect(),
+    }
 }
 
 /// The parts of the runtime that startup assembles.
@@ -155,6 +181,7 @@ impl AgentRuntime {
         let incarnation = factory_tasks::register_incarnation(&mut conn, "factory-server").await?;
         drop(conn);
         let (notifier, _) = broadcast::channel(1024);
+        let limiter = InMemoryRateLimiter::new(parts.clock.clone(), &rate_limits());
         Ok(Self {
             inner: Arc::new(Inner {
                 db: parts.db,
@@ -171,6 +198,7 @@ impl AgentRuntime {
                 running: Mutex::new(HashMap::new()),
                 notifier,
                 slots: Arc::new(Semaphore::new(parts.max_running.max(1))),
+                limiter,
             }),
         })
     }
@@ -217,6 +245,14 @@ impl AgentRuntime {
             .execute(&mut *tx)
             .await?;
         Ok(tx)
+    }
+
+    /// Counts one request of `rule` for `account`, or refuses it with `429 rate_limited`.
+    pub fn limit(&self, rule: &str, account: AccountId) -> Result<(), ApiError> {
+        self.inner
+            .limiter
+            .check(rule, &account.to_string())
+            .map_err(ApiError::rate_limited)
     }
 
     /// Wakes the event streams of `task`.

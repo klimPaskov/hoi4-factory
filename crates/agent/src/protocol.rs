@@ -18,7 +18,9 @@ use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt};
 /// Version 2 adds `Cancel` and the typed `RunTurnPayload` / `TurnOutcome`.
 pub const PROTOCOL_VERSION: u32 = 2;
 pub const SCHEMA_VERSION: u32 = 1;
-pub const MAX_FRAME: usize = 1024 * 1024;
+/// 16 MiB: a long conversation with large tool results fits (a 100k-token context is about
+/// 400 KiB of text). Context compaction (S05) keeps requests far below this.
+pub const MAX_FRAME: usize = 16 * 1024 * 1024;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Frame {

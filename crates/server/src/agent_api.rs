@@ -47,7 +47,10 @@ use serde_json::{Value, json};
 
 use crate::access::{active_project_for, project_for};
 use crate::agent::runner::{self, AdmitRequest, ReplayBase, event, task_error, ws_task};
-use crate::agent::{AgentRuntime, Control, profiles, recovery, workspace_tools as ws};
+use crate::agent::{
+    AgentRuntime, Control, LIMIT_ATTEMPT_START, LIMIT_KEY_WRITE, LIMIT_PROBE, LIMIT_TASK_CREATE, profiles,
+    recovery, workspace_tools as ws,
+};
 use crate::api_error::Fail;
 use crate::intake_api::{accepted_origins, origin_guard};
 use crate::state::ServerState;
@@ -211,6 +214,7 @@ async fn add_key(
     let Some(keys) = rt.inner.keys.as_ref() else {
         return Err(keys_unavailable());
     };
+    rt.limit(LIMIT_KEY_WRITE, principal.account_id())?;
     let provider = KeyProvider::parse(&body.provider)
         .ok_or_else(|| Fail::from(ApiError::invalid_request("Unknown provider.").with_id("field", "provider")))?;
     let label = body.label.trim();
@@ -285,6 +289,8 @@ async fn probe_key(
     body: axum::body::Bytes,
 ) -> Result<Json<Value>, Fail> {
     // The body is optional: an empty one means a listing probe.
+    let rt0 = runtime(&state)?;
+    rt0.limit(LIMIT_PROBE, principal.account_id())?;
     let request: ProbeRequest = if body.iter().all(u8::is_ascii_whitespace) {
         ProbeRequest::default()
     } else {
@@ -527,6 +533,7 @@ async fn create_task(
 ) -> Result<Response, Fail> {
     let rt = runtime(&state)?;
     let project = active_project_for(&state, &principal, &id, Permission::CreateTask).await?;
+    rt.limit(LIMIT_TASK_CREATE, principal.account_id())?;
     let objective = body.objective.trim().to_owned();
     if objective.is_empty() || objective.chars().count() > MAX_OBJECTIVE_CHARS {
         return Err(ApiError::invalid_request("Describe the task in up to 4000 characters.").with_id("field", "objective").into());
@@ -715,6 +722,7 @@ async fn start_attempt(
     let rt = runtime(&state)?;
     principal.require_verified()?;
     let project = active_project_for(&state, &principal, &id, Permission::CreateTask).await?;
+    rt.limit(LIMIT_ATTEMPT_START, principal.account_id())?;
     let role = project.role.ok_or_else(ApiError::not_found)?;
     let task = load_task(rt, &principal, &project, &task).await?;
     if task.version != body.expected_version {

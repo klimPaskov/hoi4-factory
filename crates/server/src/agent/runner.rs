@@ -50,8 +50,15 @@ use super::{AgentRuntime, Control, Running, profiles};
 
 /// Policy version recorded on grants and events.
 pub const POLICY_VERSION: &str = "s03-1";
-/// How long an attempt's grant lasts.
-const GRANT_TTL: chrono::Duration = chrono::Duration::hours(2);
+/// Shortest lifetime of an attempt's grant. Longer limits scale with the task's turn limit.
+const GRANT_TTL_MIN: chrono::Duration = chrono::Duration::hours(2);
+
+/// The grant lifetime for a task: at least two hours, and enough for every allowed turn at the
+/// turn timeout plus the same again for tool calls.
+pub fn grant_ttl(max_turns: i32, turn_timeout: Duration) -> chrono::Duration {
+    let per_turn = chrono::Duration::from_std(turn_timeout * 2).unwrap_or(chrono::Duration::minutes(6));
+    (per_turn * max_turns.max(1)).max(GRANT_TTL_MIN)
+}
 /// Files listed (with hashes) in the C-06 bundle.
 pub const MAX_BUNDLE_FILES: usize = 400;
 
@@ -177,7 +184,7 @@ pub async fn admit(
             max_cost_micros: task.budget_micros,
             max_turns: task.max_turns,
             max_changed_files: 50,
-            expires_at: now + GRANT_TTL,
+            expires_at: now + grant_ttl(task.max_turns, rt.inner.settings.turn_timeout),
             policy_version: POLICY_VERSION.to_owned(),
             proposal_sha256: None,
         },
@@ -851,6 +858,10 @@ impl Runner {
                     BudgetStop::AllowanceExhausted { .. } => "budget_allowance_exhausted",
                     BudgetStop::AccountNotVerified => "account_not_verified",
                 };
+                if code == "budget_allowance_exhausted" {
+                    // Operator signal (PR-063): an account used up its monthly allowance.
+                    tracing::warn!(account = %self.plan.account, event = "allowance_exhausted", detail = %stop, "an account exhausted its monthly allowance");
+                }
                 self.emit("budget_stop", "Budget reached: no new model turn is dispatched", json!({ "code": code, "detail": stop.to_string() })).await;
                 Err(End::Failed { code, detail: stop.to_string() })
             }
@@ -860,6 +871,10 @@ impl Runner {
     }
 
     async fn settle(&self, id: ReservationId, settlement: Settlement) {
+        if let Settlement::Unknown { reason } = &settlement {
+            // Operator signal (PR-063): spend that stays at its reservation until reconciled.
+            tracing::warn!(account = %self.plan.account, task = %self.plan.task, event = "usage_unknown", reason = %reason, "model usage is unknown and stays counted at its reservation");
+        }
         if let Ok(mut tx) = self.tx().await
             && Meter::new().settle(&mut tx, id, settlement, self.rt.inner.clock.now()).await.is_ok()
         {
@@ -1275,4 +1290,17 @@ pub fn funding_key(funding: &MeterFunding) -> Option<UserKeyId> {
 
 pub fn now() -> chrono::DateTime<Utc> {
     Utc::now()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn the_grant_outlives_every_allowed_turn() {
+        let turn = Duration::from_secs(180);
+        assert_eq!(grant_ttl(20, turn), chrono::Duration::hours(2));
+        assert_eq!(grant_ttl(40, turn), chrono::Duration::hours(4));
+        assert_eq!(grant_ttl(1, Duration::from_secs(5)), chrono::Duration::hours(2));
+    }
 }

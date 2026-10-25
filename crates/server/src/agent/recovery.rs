@@ -269,6 +269,17 @@ pub async fn prepare_resume(rt: &AgentRuntime, account: AccountId, task: &Task, 
         .await
         .map_err(|_| ApiError::internal())?
         .ok_or_else(ApiError::internal)?;
+    // Resuming does not renew authority: an expired or revoked grant ends here, and the user
+    // starts a new attempt (which gets the earlier receipts in its bundle).
+    let now = rt.inner.clock.now();
+    if grant.revoked_at.is_some() || grant.expires_at <= now {
+        return Err(ApiError::new(
+            axum::http::StatusCode::CONFLICT,
+            if grant.revoked_at.is_some() { "grant_revoked" } else { "grant_expired" },
+            "This attempt's permissions ended while it was paused. Interrupt it and start a new attempt.",
+            factory_accounts::RetryClass::RequiresAuthorization,
+        ));
+    }
     let lease = factory_tasks::acquire_lease(
         &mut tx,
         task.project_id,
