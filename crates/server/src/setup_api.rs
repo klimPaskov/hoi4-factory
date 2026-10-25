@@ -222,6 +222,7 @@ async fn scan(
     Path(id): Path<String>,
     ApiJson(body): ApiJson<ScanBody>,
 ) -> Result<Json<Value>, Fail> {
+    crate::access::limit(&state, crate::access::LIMIT_SETUP_SCAN, &principal)?;
     let mode = SetupMode::parse(&body.mode)
         .ok_or_else(|| field_error("mode", "mode must be create or existing."))?;
     let mut description = body
@@ -418,6 +419,7 @@ async fn analyze(
     Path(id): Path<String>,
 ) -> Result<Json<Value>, Fail> {
     let project = project_for(&state, &principal, &id, READ_PERMISSION).await?;
+    crate::access::limit(&state, crate::access::LIMIT_SETUP_ANALYZE, &principal)?;
     let session = live_session(&state, &principal, &project).await?;
     let draft = state
         .setup
@@ -579,6 +581,7 @@ async fn build_plan(
     Path(id): Path<String>,
 ) -> Result<Json<Value>, Fail> {
     let project = project_for(&state, &principal, &id, READ_PERMISSION).await?;
+    crate::access::limit(&state, crate::access::LIMIT_SETUP_PLAN, &principal)?;
     let session = live_session(&state, &principal, &project).await?;
     let view = state
         .setup
@@ -746,6 +749,7 @@ async fn apply(
     ApiJson(body): ApiJson<ApplyBody>,
 ) -> Result<Json<Value>, Fail> {
     let project = project_for(&state, &principal, &id, READ_PERMISSION).await?;
+    crate::access::limit(&state, crate::access::LIMIT_SETUP_APPLY, &principal)?;
     let adapter = &state.setup.adapter;
     let account = principal.account_id();
     let session = live_session(&state, &principal, &project).await?;

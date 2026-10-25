@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use axum::extract::FromRef;
-use factory_accounts::{AccountsState, Database};
+use factory_accounts::{AccountsState, Database, InMemoryRateLimiter};
 use factory_intake::{IntakeLimits, IntakeService};
 use factory_setup_adapter::SetupAdapter;
 use factory_workspace::StorageRoot;
@@ -64,6 +64,8 @@ pub struct ServerState {
     /// The native agent host. `None` only when it could not start; the task routes then
     /// answer `agent_unavailable`.
     pub agent: Option<AgentRuntime>,
+    /// Per-account limits of the expensive intake and Setup routes (see [`crate::access::limit`]).
+    pub route_limits: Arc<InMemoryRateLimiter>,
 }
 
 impl FromRef<ServerState> for AccountsState {

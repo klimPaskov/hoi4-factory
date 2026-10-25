@@ -186,6 +186,10 @@ pub async fn initialize_with(
         }),
         web,
         agent,
+        route_limits: Arc::new(factory_accounts::InMemoryRateLimiter::new(
+            clock.clone(),
+            &crate::access::route_limits(),
+        )),
     })
 }
 
