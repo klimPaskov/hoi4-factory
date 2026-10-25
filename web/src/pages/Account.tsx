@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GITHUB_LINK_URL } from '../api/accounts';
 import { useAuth } from '../auth';
+import { ApiKeysSection } from '../components/ApiKeys';
 import { Alert, ErrorMessage } from '../components/ui';
+import { UsageSummary } from '../components/UsageSummary';
 import { formatDate } from '../format';
 import { usePageTitle } from '../hooks';
 
@@ -55,6 +57,9 @@ export function AccountPage() {
           <dd>{formatDate(account.created_at)}</dd>
         </dl>
       </section>
+
+      <UsageSummary />
+      <ApiKeysSection />
 
       <section className="card" aria-labelledby="account-sessions">
         <h2 id="account-sessions">{t('account.sessions')}</h2>

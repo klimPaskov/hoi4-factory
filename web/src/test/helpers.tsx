@@ -16,6 +16,8 @@ export interface MockResponse {
 export interface RecordedRequest {
   method: string;
   path: string;
+  /** The query string, with the leading ?, or empty. */
+  search: string;
   body: unknown;
 }
 
@@ -50,7 +52,7 @@ export function mockApi(routes: Record<string, Handler>) {
     let body: unknown = undefined;
     if (typeof init?.body === 'string') body = JSON.parse(init.body);
     else if (init?.body) body = init.body;
-    const recorded = { method, path, body };
+    const recorded = { method, path, search: url.search, body };
     requests.push(recorded);
     const handler = routes[`${method} ${path}`];
     const response: MockResponse = handler
