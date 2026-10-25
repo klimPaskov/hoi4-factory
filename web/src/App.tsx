@@ -13,6 +13,8 @@ import {
   VerifyEmailPage,
 } from './pages/auth';
 import { ProjectPage } from './pages/Project';
+import { TaskPage } from './pages/Task';
+import { TasksPage } from './pages/Tasks';
 import { ProjectsPage } from './pages/Projects';
 
 /** Waits for the "who am I" answer before any page decides what to show. */
@@ -68,6 +70,8 @@ export function AppRoutes() {
           <Route element={<RequireAuth />}>
             <Route index element={<ProjectsPage />} />
             <Route path="projects/:id" element={<ProjectPage />} />
+            <Route path="projects/:id/tasks" element={<TasksPage />} />
+            <Route path="projects/:id/tasks/:taskId" element={<TaskPage />} />
             <Route path="account" element={<AccountPage />} />
           </Route>
           <Route path="*" element={<NotFoundPage />} />
