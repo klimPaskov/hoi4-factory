@@ -6,7 +6,7 @@
 //! server's real arguments), a timeout, an output bound and a retry policy. Discovery can only
 //! confirm or withhold what the profile lists; it never adds tools.
 //!
-//! # Classification of the nine Agent Tools reads (package 4.4.0, commit 731e64f)
+//! # Classification of the nine Agent Tools reads (classified at 4.4.0, commit 731e64f; schemas unchanged at the 4.6.1 pin)
 //!
 //! I read what each handler does in the pinned source rather than trusting `readOnlyHint`:
 //!
@@ -371,14 +371,20 @@ fn tool(
     }
 }
 
-/// The S03 profile: nine read tools of HOI4 Agent Tools 4.4.0, nothing that writes mod source.
+/// The pinned HOI4 Agent Tools: its commit (also `AGENT_TOOLS_REV` in `docker/server.Dockerfile`)
+/// and package version. Move both together, then refresh [`SCHEMA_HASHES`] from the real server
+/// (the `real_agent_tools` test prints them) and rerun that test.
+pub const AGENT_TOOLS_REV: &str = "fbc514407155e572fe95fa1e263b7e1552d4d6fc";
+pub const AGENT_TOOLS_VERSION: &str = "4.6.1";
+
+/// The S03 profile: nine read tools of the pinned HOI4 Agent Tools, nothing that writes mod source.
 pub fn agent_tools_read_only() -> ToolProfile {
     use EffectClass::{DerivedJob, PureRead};
     ToolProfile {
         id: "hoi4-agent-tools.read-only.v1".into(),
         server: ServerIdentity {
             name: "hoi4-agent-tools".into(),
-            version_req: "4.4.0".into(),
+            version_req: AGENT_TOOLS_VERSION.into(),
         },
         mode: ProfileMode::ReadOnly,
         tools: vec![
@@ -476,7 +482,7 @@ pub fn agent_tools_read_only() -> ToolProfile {
     }
 }
 
-/// Input-schema hashes of the pinned server (4.4.0, commit 731e64f), in profile order.
+/// Input-schema hashes of the pinned server ([`AGENT_TOOLS_VERSION`]), in profile order.
 const SCHEMA_HASHES: [Option<&str>; 9] = [
     Some("939462b1642f19d2753b6b192e5458be0745a41ffc38056047e613a58afb0a7c"),
     Some("ae6435313935a25847456a6fd057bbabe373150fbd8433012d22210affd20287"),

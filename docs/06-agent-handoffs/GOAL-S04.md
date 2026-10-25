@@ -21,7 +21,7 @@ You are the implementing agent for HOI4 Factory, a free, open-source hosted web 
   - Each tool call passes the broker's closed schema, then the fence and grant checks and the C-04 intent are committed together, then the receipt is settled.
   - Pause, interrupt (with kill evidence), revocation and restart recovery are covered by `crates/server/tests/agent.rs`.
 - The agent writes only in the task's own Git worktree on branch `hoi4factory/<task>` and does not commit. The attempt outcome lists the changed files. Turning that worktree into a reviewed commit, and publishing it, is S04's job (C-02, C-10).
-- Built-in tools are `list_files`, `read_file`, `write_file` (expected-before hash, idempotent) and `finish` (structured report, one repair). HOI4 Agent Tools `731e64f` runs over MCP stdio with a read-only profile of nine tools. Rewrite tools are withheld. S04 decides which focus rewrite operations to expose, using EXP-02's supported subset and host hash guards.
+- Built-in tools are `list_files`, `read_file`, `write_file` (expected-before hash, idempotent) and `finish` (structured report, one repair). HOI4 Agent Tools `fbc5144` (4.6.1, pinned by issue #4) runs over MCP stdio with a read-only profile of nine tools. Rewrite tools are withheld. S04 decides which focus rewrite operations to expose, using EXP-02's supported subset and host hash guards.
 - Profiles:
   - `anthropic:claude-haiku-5-5`: default, live-verified, funded by the $1 monthly allowance or the user's own key.
   - `openai:gpt-5.4-nano`: adapter tested against recorded and refused responses only.
@@ -32,7 +32,6 @@ You are the implementing agent for HOI4 Factory, a free, open-source hosted web 
 
 Pick up the GitHub issues labelled `stage:S04` with the `track-issues` skill, and close each with `Fixes #N` and its test results:
 
-- #4: bump the Agent Tools pin after hoi4-agent-tools#49 merges.
 - #5: let the agent read Agent Tools artifacts.
 - #6: make the full Agent Tools surface usable on the server, behind the guarded proposal path.
 - #7: use probed self-hosted endpoints as agent profiles.

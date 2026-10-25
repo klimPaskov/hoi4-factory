@@ -235,6 +235,24 @@
         "web_npm": "0 vulnerabilities",
         "agent_tools_npm": "8 moderate at the pin 731e64f, fixed upstream in hoi4-agent-tools#49 (local build, typecheck, lint, 2033 unit and 258 integration tests pass), pin bump tracked as #4"
       }
+    },
+    {
+      "id": "agent-tools-pin-4.6.1",
+      "kind": "automated tests, image build and a live run after the pin bump (issue #4)",
+      "pin": "hoi4-agent-tools fbc514407155e572fe95fa1e263b7e1552d4d6fc (4.6.1, contains #49)",
+      "result": {
+        "npm_audit_omit_dev": "0 vulnerabilities",
+        "schema_hashes": "all nine unchanged",
+        "real_agent_tools_tests": "2 passed (fixture byte-identical)",
+        "agent_suite": "20 passed",
+        "readyz": "ok, agent_tools true",
+        "live_run": {
+          "state": "succeeded",
+          "operator_spent_micros": 2142,
+          "agent_tools_version": "4.6.1",
+          "tools_exposed": 13
+        }
+      }
     }
   ],
   "gates": {

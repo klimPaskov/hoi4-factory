@@ -166,7 +166,7 @@ async fn real_server_discovery_schemas_and_read_only_calls() {
     assert!(inv.version_matches);
     assert_eq!(
         inv.server.as_ref().map(|s| s.server_version.as_str()),
-        Some("4.4.0")
+        Some(factory_hoi4_tools::profile::AGENT_TOOLS_VERSION)
     );
     for t in &inv.tools {
         assert_eq!(

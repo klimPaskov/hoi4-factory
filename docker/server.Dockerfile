@@ -25,9 +25,10 @@ RUN npm run build
 # exact upstream commit; `git rev-parse` must equal the pin, so the commit hash is the content
 # check. It needs Node 22 or 24, while Setup needs Debian's own /usr/bin/node (18), so the tools
 # get this image's Node at /opt/node22 and Setup keeps its own. Raise AGENT_TOOLS_REV deliberately
-# and rerun the hoi4-tools integration tests: the profile pins the package version.
+# and rerun the hoi4-tools integration tests: crates/hoi4-tools/src/profile.rs pins the same
+# commit and package version (AGENT_TOOLS_REV, AGENT_TOOLS_VERSION).
 FROM node:22-bookworm-slim@sha256:de170b39439eb0e5a3444ad7d60b015614a381e10fecae2e30ec9e735122f38d AS agent-tools
-ARG AGENT_TOOLS_REV=731e64f5b5c964bd1b33adad9c085bd3168b1940
+ARG AGENT_TOOLS_REV=fbc514407155e572fe95fa1e263b7e1552d4d6fc
 RUN apt-get update \
  && apt-get install -y --no-install-recommends git ca-certificates \
  && rm -rf /var/lib/apt/lists/*
@@ -41,7 +42,7 @@ RUN npm ci --no-audit --no-fund \
  && npm run build \
  && npm prune --omit=dev --no-audit --no-fund \
  && rm -rf src tests fixtures examples scripts \
- && node -e "const p=require('./package.json'); if (p.version !== '4.4.0') { throw new Error('unexpected Agent Tools version ' + p.version) }"
+ && node -e "const p=require('./package.json'); if (p.version !== '4.6.1') { throw new Error('unexpected Agent Tools version ' + p.version) }"
 
 FROM debian:bookworm-slim@sha256:7ff6ba31527b9e336162fa061746c366c4b2032f4d2cff2078bea43f78efe3f8
 # git: the workspace crate drives the git CLI. ca-certificates: TLS to GitHub and mail relays.

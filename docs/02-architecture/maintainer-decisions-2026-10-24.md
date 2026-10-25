@@ -223,7 +223,7 @@ These are not maintainer decisions. The maintainer authorized S03 to proceed wit
 |---|---|
 | Agent loop placement | A supervised worker process of the server binary, driven turn by turn by the host (S01 measurement) |
 | Where agent writes go | Only into the task's own worktree on its owned branch, under the grant's paths, uncommitted until S04's review |
-| Agent Tools packaging | Built from commit `731e64f` inside the server image with its own Node 22, started per attempt over stdio. gVisor stays EXP-07 |
+| Agent Tools packaging | Built from a pinned commit (`731e64f` in S03, `fbc5144` 4.6.1 since issue #4) inside the server image with its own Node 22, started per attempt over stdio. gVisor stays EXP-07 |
 | Agent Tools exposure | A read-only profile of nine tools. Rewrite tools are withheld until S04 |
 | Interrupted attempts after a restart | Reconciled and ended, never resumed automatically. A paused attempt survives a restart and resumes on request |
 | User key encryption | The accounts crate's AES-256-GCM store with a master key file, bound to owner, key and provider |

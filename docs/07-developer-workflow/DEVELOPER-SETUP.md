@@ -103,7 +103,7 @@ The S03 HOI4 Agent Tools tests run against a local build of the pinned Agent Too
 
 ```bash
 git clone https://github.com/klimPaskov/hoi4-agent-tools.git .work/hoi4-agent-tools
-git -C .work/hoi4-agent-tools -c core.autocrlf=false checkout 731e64f5b5c964bd1b33adad9c085bd3168b1940
+git -C .work/hoi4-agent-tools -c core.autocrlf=false checkout fbc514407155e572fe95fa1e263b7e1552d4d6fc
 (cd .work/hoi4-agent-tools && npm ci && npm run build)
 export FACTORY_AGENT_TOOLS_NODE="$(command -v node)" FACTORY_AGENT_TOOLS_ENTRY="$PWD/.work/hoi4-agent-tools/dist/bin/stdio.js" FACTORY_AGENT_TOOLS_FIXTURE="$PWD/.work/hoi4-agent-tools/fixtures/focus/workspace"
 ```

@@ -142,7 +142,7 @@ Issues that could not be fixed in this session, filed on GitHub:
 |---|---|
 | [#2](https://github.com/klimPaskov/hoi4-factory/issues/2) Verify the OpenAI adapter live | Needs an OpenAI account with balance |
 | [#3](https://github.com/klimPaskov/hoi4-factory/issues/3) Run the S03 tests on Windows and kill process trees there | Needs the Windows machine |
-| [#4](https://github.com/klimPaskov/hoi4-factory/issues/4) Bump the Agent Tools pin after hoi4-agent-tools#49 | Needs the maintainer's upstream merge |
+| [#4](https://github.com/klimPaskov/hoi4-factory/issues/4) Bump the Agent Tools pin after hoi4-agent-tools#49 | Done: #49 merged as `fbc5144` with the maintainer's go-ahead, the pin moved to 4.6.1 and the issue was closed |
 | [#5](https://github.com/klimPaskov/hoi4-factory/issues/5) Let the agent read Agent Tools artifacts | S04 preview and review design |
 | [#6](https://github.com/klimPaskov/hoi4-factory/issues/6) Make the full Agent Tools surface usable on the server | S04 guarded proposal path |
 | [#7](https://github.com/klimPaskov/hoi4-factory/issues/7) Use probed self-hosted endpoints as agent profiles | Feature beyond S03's gate |
