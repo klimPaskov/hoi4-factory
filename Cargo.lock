@@ -1048,6 +1048,17 @@ dependencies = [
 [[package]]
 name = "factory-hoi4-tools"
 version = "0.0.0"
+dependencies = [
+ "chrono",
+ "jsonschema 0.60.1",
+ "libc",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "tempfile",
+ "thiserror",
+ "tokio",
+]
 
 [[package]]
 name = "factory-intake"
