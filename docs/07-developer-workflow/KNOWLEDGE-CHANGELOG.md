@@ -6,7 +6,7 @@ This is the versioned index of accepted engineering guidance changes. Detailed c
 
 - CLAUDE.md now says to run another repository's own CI steps locally before an approved push to it. The kit's wiki follow-ups were pushed after seven hand-picked checks passed, and the kit's Validate workflow then failed on the quality complexity ratchet, which only `check.py full --only ... quality` runs. The fix (`aa09a0c` in the kit) moved three checks into helpers without touching the baseline.
 
-Evidence: kit Validate run 41229595759 failed on `4261df9` with `QUALITY-COMPLEXITY C901 verify is too complex (55 > 15); recorded 50`, and the same check passed locally after the fix. Rollback: revert this commit and regenerate.
+Evidence: kit Validate run 41229595759 failed on `4261df9` because `verify` had a complexity of 55 against a recorded baseline of 50, and the same check passed locally after the fix. Rollback: revert this commit and regenerate.
 
 ## 0.2.5, 2026-10-31, deep clones on Windows
 
