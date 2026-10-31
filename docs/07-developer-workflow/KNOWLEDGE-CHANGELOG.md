@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.6, 2026-10-31, run the target repository's CI list before pushing
+
+- CLAUDE.md now says to run another repository's own CI steps locally before an approved push to it. The kit's wiki follow-ups were pushed after seven hand-picked checks passed, and the kit's Validate workflow then failed on the quality complexity ratchet, which only `check.py full --only ... quality` runs. The fix (`aa09a0c` in the kit) moved three checks into helpers without touching the baseline.
+
+Evidence: kit Validate run 41229595759 failed on `4261df9` with `QUALITY-COMPLEXITY C901 verify is too complex (55 > 15); recorded 50`, and the same check passed locally after the fix. Rollback: revert this commit and regenerate.
+
 ## 0.2.5, 2026-10-31, deep clones on Windows
 
 - CLAUDE.md notes that cloning a deep repository into the long session scratchpad path fails on Windows with "Filename too long", and that cloning inside a Linux container with the checkout mounted read-only works and doubles as a fresh-checkout Linux run.
