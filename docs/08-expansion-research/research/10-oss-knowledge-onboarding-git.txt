@@ -1,0 +1,472 @@
+# OSS research 10: shared knowledge/notes, onboarding tours, integrated Git experience
+
+Date accessed for every source: 2026-10-31. Researcher: read-only research agent. Scope: three topics for HOI4 Factory (AGPL-3.0, Rust/axum/sqlx/PostgreSQL server, React 19 + TypeScript + Vite client with plain CSS custom properties, i18n files, jsx-a11y lint).
+
+## 0. How to read this report
+
+Evidence conventions:
+- "Verified" means I read it from a primary source in this session (GitHub API, raw file, registry JSON, official docs). Source URLs are in section 8.
+- "Unverified" means it is from general knowledge, a search-result summary, or could not be fetched. Every such item is labelled.
+- GitHub fields: license is the SPDX id GitHub reports, plus what the LICENSE file actually says where GitHub reported NOASSERTION. SHA is the default-branch HEAD (10 chars) on 2026-10-31. "Release" is the latest GitHub release or tag.
+- npm figures come from registry.npmjs.org (version, license, unpackedSize, dependency counts, publish date) and bundlephobia.com (minified/gzip JS only, CSS excluded, dependencies included). These are NOT measurements from this project's Vite build; re-measure before relying on them.
+- Rust crate figures come from the crates.io API.
+- Nothing was cloned, installed or run. No accounts were created. No paid model calls. Only small excerpts were saved under `.work/research/raw/` (my files there: `karpathy-llm-wiki.md` (a local reading copy of the gist, do not redistribute), `basic-memory-README.md`, `rdv-README.md`, `gdv-README.md`, `serde-saphyr-README.md`, `gix-crate-status.md`, `git2-repo.rs`, `pdc-wikilinks-spec.txt`, `ghdesktop-tree.txt`, `crates.txt`, `t1-*.txt`, `t2-*.txt`, `t3-*.txt`). Other files in that folder belong to other agents and were not touched.
+
+Repo facts that shape the recommendations (verified by reading the working tree):
+- ADR-022: automatic personal/project/global memory in PostgreSQL, verification gate, memory carries no authority, no page to browse or edit memories (maintainer choice). Lane D says canon or lore changes are never stored as memory and become design proposals. Exporting project memory into the mod repository is off unless the owner turns it on.
+- ADR-009: exact/domain retrieval before vectors. The data model already separates a KnowledgeCandidate from an ApprovedCanonVersion, and "search projections" may reference either.
+- `factory-workspace` drives the `git` CLI only (its Cargo description says so). It already has task branches, task worktrees, `create_restore_point` under `refs/hoi4factory/restore/<task>/<label>`, `commit_paths` (stages exactly the given paths, refuses if the index already has staged changes) and `config_findings` for untrusted repo config. SPEC-005 requires that imported hooks, filters, external diff tools and credential helpers gain no execution, and says text conflicts "can offer a three-way comparison" while the agent cannot silently choose between competing human intent.
+- Server image is `debian:bookworm-slim` with apt `git` (Debian bookworm ships git 2.39.5, trixie 2.47.3: verified via sources.debian.org). Dev DB is `postgres:17.6-bookworm`.
+- Web client has 5 runtime dependencies (i18next, react, react-dom, react-i18next, react-router); no dialog/popover component exists yet.
+- Steam Workshop publishing is explicitly deferred (BACKLOG P2; stage 08 says do not add it as polish).
+
+---
+
+## 1. Executive summary
+
+Net result across the three topics: zero required new web runtime dependencies, one optional (CodeMirror 6), three small Rust crates on the server, and no change to the Git engine.
+
+Topic 1 (notes): Do not invent a format. Use Obsidian-compatible CommonMark + GFM Markdown with YAML frontmatter, `[[wikilinks]]`, tags and aliases, stored as files in the project's Git repository (default `.factory/notes/`), with PostgreSQL holding only a rebuildable search/link index (an ADR-009 "search projection"). Parse and render on the server with `pulldown-cmark` (MIT, has Obsidian-inspired wikilink support), parse frontmatter with `serde-saphyr` (Apache-2.0/MIT, `unsafe` forbidden, configurable budgets), sanitize with `ammonia`. Notes complement ADR-022: memory stays automatic, unbrowsable and about agent behavior; notes are explicit, browsable, Git-versioned project knowledge with a status field (confirmed, proposal, assumption, outdated) and are the natural destination for ADR-022 Lane D canon/lore "design proposals". Karpathy's LLM-wiki pattern (verified from the original gist) fits, except that `index.md` and `log.md` must be generated, not hand-appended, or parallel agent worktrees will conflict on them. Retrieval: PostgreSQL full text + pg_trgm + one-hop link expansion; no embeddings now. Biggest open risk: how the Paradox Launcher uploads a mod folder is UNVERIFIED (no public statement found), so the Factory's own packaging step must be allow-list based and a disposable upload test is needed when Workshop publishing starts.
+
+Topic 2 (onboarding): Build a small in-house tour on the platform (Popover API + CSS anchor positioning, both Baseline "newly available" in 2026) with tours as versioned data, `data-tour` target attributes, i18n keys, completion verified from server state, and a CI test that every target exists. If the maintainer wants a dependency instead, pick Driver.js (MIT, zero deps, 8 KB gzip, role=dialog and focus trap in source). Reject Shepherd.js and Intro.js (AGPL-3.0 or paid commercial license: compatible today, but a trap if the project ever earns revenue), Reactour (focus lock disabled, hard-coded English aria-labels), Onborda/NextStep (Next.js oriented), OnboardJS (release candidate), Usertour (a separate service).
+
+Topic 3 (Git): Keep shelling out to `git` (already the design). Do not add git2 (second engine, C dependency) or gix now (push, apply, rebase, cherry-pick, stash and merge-state persistence are unchecked in its own status file). Use patterns proven by GitHub Desktop and lazygit: hunk/line staging by generating a patch and running `git apply --cached`; conflict detection by `git merge-tree --write-tree` (git 2.38+, present in bookworm's 2.39.5); undo through recorded ref snapshots (jj operation log / GitButler Undo Timeline idea) layered on the restore-point refs that already exist. Render diffs with an in-house accessible table component fed by server-parsed hunks (react-diff-view is the fallback dependency). Resolve conflicts with a per-region chooser; CodeMirror's merge package has no 3-way mode. Reject Mergiraf (GPL-3.0, no Paradox grammar, languages are compiled in) and difftastic (CLI); adapt the idea as entity-keyed merging using the project's own HOI4 parser. Image diffs: GitHub Desktop's four modes (two-up, swipe, onion skin, difference blend) with CSS only, server-side DDS/TGA to PNG conversion, pixelmatch only if a mismatch count is wanted.
+
+---
+
+## 2. TOPIC 1: shared mod knowledge and notes
+
+### 2.1 Formats and conventions (portable first)
+
+| Item | Pin | License | Status |
+|---|---|---|---|
+| Obsidian format conventions | help pages on obsidian.md/help (fetched); source repo obsidianmd/obsidian-help @4aa30a3370, last commit 2026-10-28 | The help repo has no LICENSE file (API 404, repo listing showed none), so reuse terms are unstated: use it as a reference, do not copy its text | Verified. There is no formal spec for Obsidian Flavored Markdown. |
+| JSON Canvas | obsidianmd/jsoncanvas @456f843cb2 (2026-07-24); spec 1.0 dated 2024-03-11 | MIT (LICENSE file) | Verified. Formal open spec, 3,748 stars, no release tags, small. |
+
+Verified Obsidian conventions (from the help pages):
+- Obsidian follows CommonMark, GFM and LaTeX, and adds internal links `[[Link]]`, embeds `![[Link]]`, block IDs `^id` with block references `![[Link#^id]]`, comments `%%text%%`, highlights `==text==`, callouts `> [!note]`. Internal links, comments and highlights are Obsidian specific.
+- Links: `[[Note#Heading]]`, `[[#Heading]]` for same note, pipe for display text `[[Note|Custom]]`, Markdown links are supported "for interoperability", wikilinks are the default. Block IDs may contain only Latin letters, numbers and dashes, and "block links don't work outside Obsidian". A link to a nonexistent note creates it at the written folder path.
+- Properties are YAML frontmatter between `---` lines; types are text, list, number, checkbox, date, date and time, tags; default properties `tags`, `aliases`, `cssclasses` (lists). JSON frontmatter is read but rewritten as YAML.
+- UNVERIFIED: the "shortest path when unique" wikilink resolution rule (the fetched page did not state it), how Obsidian treats `.txt` mod files when a vault root is a mod repo, and whether GitHub's web UI renders `[[ ]]` (it likely does not). Do not depend on these.
+
+JSON Canvas 1.0 (verified): two optional arrays `nodes` and `edges`; node types text, file (path plus optional `#` subpath), link (url) and group; edges have `fromNode`, `toNode`, optional sides, ends, color, label; colors hex or preset "1" to "6". The file extension is `.canvas` (the repo ships `sample.canvas`; the spec page itself did not state it). Recommendation: allow `.canvas` files to live in the notes folder as opaque, preserved files; add a read-only SVG viewer later only if users ask. Third-party React viewers exist but I did not evaluate them.
+
+Compatibility profile to adopt ("Factory Markdown"):
+1. Required: CommonMark + GFM (tables, task lists, footnotes), YAML frontmatter, `[[wikilinks]]` with `|alias` and `#heading`, tags (`#tag` inline plus `tags:` property), `aliases:`.
+2. Preserve byte-for-byte, never rewrite: callouts, `![[embeds]]`, block IDs `^id`, `%%comments%%`, `==highlights==`, math, unknown frontmatter keys, `.obsidian/` folders. This mirrors SPEC rule "unknown script constructs remain preserved".
+3. Do not generate `^id` block IDs (they do not work outside Obsidian). Address sections by heading anchors.
+4. Filenames: lowercase ASCII slugs, no characters illegal on Windows, unique case-insensitively (macOS and Windows are case-insensitive, the Linux server is not); reuse the workspace `paths::resolve` rules. Use LF endings via `.gitattributes`.
+5. Cross-note links: accept wikilinks and Markdown relative links on read; emit wikilinks by default with a per-project switch to Markdown links (Obsidian documents that switch).
+
+### 2.2 Karpathy's "LLM wiki" pattern (original source read)
+
+Source: gist `karpathy/442a6bf555914893e9891c11519de94f`, file `llm-wiki.md`, first commit ac46de1ad27f (2026-04-04), gist updated 2026-10-31. It is an "idea file" meant to be pasted to an agent; it has no code and no license statement. Accurate description:
+- Contrast with RAG: instead of re-deriving from raw documents on every question, the LLM incrementally builds and maintains a persistent interlinked Markdown wiki that sits between the human and the raw sources; knowledge is compiled once and kept current; cross-references and contradictions are already flagged.
+- Three layers: raw sources (immutable, the source of truth), the wiki (LLM-owned Markdown), and a schema document (CLAUDE.md or AGENTS.md) describing structure, conventions and workflows.
+- Three operations: ingest (read a source, discuss, write a summary page, update index, update affected entity/concept pages, append to the log; one source may touch 10 to 15 pages), query (search, read, answer with citations; good answers can be filed back as pages), lint (find contradictions, stale claims, orphans, missing concepts and cross-references, data gaps).
+- Two special files: `index.md` (content catalog, per page a link and one-line summary, organized by category, read first when answering; claimed to work at roughly 100 sources and hundreds of pages without embedding infrastructure) and `log.md` (append-only chronology with a greppable entry prefix such as a dated heading).
+- Optional tooling: a local search engine for larger wikis (the gist names tobi/qmd), Obsidian Web Clipper, graph view, Marp, Dataview over frontmatter; "the wiki is just a git repo of markdown files".
+- It has the same shape as this repo's own CLAUDE.md/AGENTS.md "schema".
+
+Mapping to HOI4 Factory: raw sources = mod files, imported mods, game reference and uploads (immutable inputs); wiki = project notes; schema = a short per-project notes guide (conventions, status vocabulary, naming) loaded into the agent's context.
+
+Two necessary adaptations:
+- Do not let agents hand-append `log.md` and hand-maintain `index.md` in the notes folder. With parallel task worktrees (already the design) these are guaranteed merge-conflict hotspots. Generate both views server-side from the index (and `git log`), and render them in the UI; optionally commit them only on demand as export files.
+- The gist lets the LLM own the wiki. For a shared mod, `confirmed` status must require a human decision (see 2.5), consistent with ADR-022 Lane D.
+
+### 2.3 Where notes live: options, Workshop and GitHub implications
+
+| Option | Pros | Cons |
+|---|---|---|
+| A. In the mod repo, `.factory/notes/` (recommended default) | Atomic commits with the code ("focus changed + design note updated"); Git blame gives per-line human/agent attribution for free; travels with clone/fork/PR; works in Obsidian, VS Code (Foam), Quartz; mirrors GitHub reviews | Risk of shipping in the Workshop upload (unverified, see below); public if the repo is public; PR noise |
+| B. Separate notes repo per project | Zero chance of shipping with the mod; separate privacy | Two repos to create, link, sync and permission; non-atomic with code changes; harder for hobbyists |
+| C. Database only (PostgreSQL) | Fast, RLS-isolated, easy FTS | Not usable outside the app, no Git history/blame, contradicts "native files and Git are the source of truth" |
+| D. Orphan branch in the same repo (for example `factory/notes`) in a second worktree | Cannot ship on the mod branch; same repo and permissions | Not visible in PR diffs with code; not atomic; confusing for beginners |
+
+Recommendation: A for files, plus a PostgreSQL search projection (rebuildable from the files, tenant column and RLS per the existing data rules). Label it clearly in the UI: "Notes are part of your repository; anyone who can see the repository can read them." If a project needs private notes, they stay out of v1 (do not invent a second store).
+
+Steam Workshop and mod uploads (what is known):
+- Verified (HOI4 wiki, Mod structure): the `.mod` file is local only and is "not uploaded when publishing via Steam Workshop"; `descriptor.mod` sits inside the mod folder; `thumbnail.png` is the Workshop image. The HOI4 wiki Modding page has no section on what the launcher uploads or excludes.
+- UNVERIFIED and unresolved: whether the Paradox Launcher's Upload mod flow skips dot-folders such as `.git` or any ignore file. A Paradox forum thread asking exactly this exists (title: "is there any way to make launcher ignore certain directories like git when uploading a mod") but both fetch attempts failed (validation page, then HTTP 500), so its answers are unread. Web searches found nothing authoritative. Do not assume exclusion.
+- Consequence: the Factory's own publish/package step (deferred stage) must build the Workshop payload from an allow-list of game directories plus `descriptor.mod`, `thumbnail.png` (not "everything except notes"), and a validator must warn users who upload manually through the launcher. Also add `.factory/ export-ignore` to `.gitattributes` so `git archive`-based consumers skip it.
+- Proposed experiment (not run; Workshop publishing is deferred): upload a disposable mod containing `.factory/notes/x.md` and a `.git` directory through the Launcher, then download the item and list its files. Record spend/time and the Launcher version.
+- GitHub: notes render as Markdown on github.com (wikilinks probably show as raw brackets, unverified). Block references and embeds will not resolve there. Keep a per-project switch to Markdown links for projects whose collaborators read on GitHub.
+
+### 2.4 Libraries and projects evaluated
+
+Rust (server side; responsibility: parse, extract links/tags/headings, render, sanitize)
+
+| Project | Pin | License | Last release / commit | Maintenance signal | Weight | Accessibility | Integration cost | Verdict |
+|---|---|---|---|---|---|---|---|---|
+| pulldown-cmark | v0.13.6 @29d6cfa042 | MIT (LICENSE) | 2026-10-30 release | very active; 91 open issues; about 64M recent downloads; MSRV 1.71.1 | small pure-Rust pull parser | n/a (emits semantic HTML) | Low. `ENABLE_WIKILINKS` ("Obsidian-style", per its source comment and `specs/wikilinks.txt`), `ENABLE_YAML_STYLE_METADATA_BLOCKS`, GFM, tables, footnotes. Event stream makes link/tag/heading extraction and rewriting simple | Integrate. Caveats (verified in the spec): `![[x|alt]]` is parsed as an image with the pipe as alt text, so Obsidian's `![[Note]]` transclusion and `|200x300` sizing need a post-pass on the event stream; `#heading` and `^id` stay inside the destination string. GFM alert blockquotes exist, Obsidian callouts with custom titles or fold markers are UNVERIFIED |
+| comrak | v0.59.0 @203f740aec | BSD-2-Clause (COPYING; GitHub says NOASSERTION) | 2026-10-26 | very active; MSRV 1.89 | larger AST library | n/a | Low. Options `wikilinks_title_after_pipe` / `wikilinks_title_before_pipe`, `front_matter_delimiter`, `alerts`, `math_dollars`, `multiline_block_quotes` | Strong alternative; AST suits editing but one parser is enough. Choose pulldown-cmark unless AST rewriting becomes the main need |
+| markdown-rs (crate `markdown`) | 1.0.0 @1506572f9b | MIT | 2025-04-23 | last commit 2025-04, 97 open issues | mid | n/a | Has frontmatter; a grep of `configuration.rs` found no wikilink construct | Reject (no wikilinks, slower cadence) |
+| ammonia | 4.2.4 | MIT OR Apache-2.0 | 2026-10-17 | active | small | n/a | Low | Integrate as defense in depth (URL scheme and tag allow-list) on top of dropping raw HTML events. Note PostgreSQL `ts_headline` output is documented as not XSS-safe |
+| serde-saphyr | 2.0.0 @ef83f36866 (bourumir-wyngs) | Apache-2.0 file; crate MIT OR Apache-2.0 | 2026-10-13 | active, 11M recent downloads | small | n/a | Low. README: `unsafe` denied, fuzz-tested, "configurable budgets" against resource exhaustion | Integrate for frontmatter, subject to a short spike (YAML from untrusted repos needs alias/size limits; budget behavior is UNVERIFIED by test) |
+| serde_norway 0.9.42 | n/a | MIT OR Apache-2.0 | 2024-12-21 | fork of serde_yaml, slower cadence | small | n/a | Low | Fallback |
+| serde_yaml 0.9.34+deprecated | n/a | MIT OR Apache-2.0 | 2024-03-25 | deprecated | n/a | n/a | n/a | Reject |
+| serde_yml 0.0.13 | n/a | MIT OR Apache-2.0 | 2026-05-27 | RUSTSEC-2025-0068: unsound and unmaintained, repo archived | n/a | n/a | n/a | Reject |
+
+JavaScript Markdown libraries (only needed if the client parses Markdown itself; the server-render plan avoids all of them)
+
+| Project | Pin | License | Last release | Weight (bundlephobia min / gzip) | Notes |
+|---|---|---|---|---|---|
+| unified | 11.0.5 @dfaf172e8b | MIT | 2024-06-19 (repo active 2026-10-03) | 13.0 KB / 4.7 KB | with remark-parse 54.9 KB / 15.0 KB; micromark 4.0.3 53.4 KB / 15.2 KB (18 deps) |
+| markdown-it | 15.0.3 @a8c00d474e | MIT | tag 15.0.3, commit 2026-10-16 | 98 KB / 40.8 KB | no wikilinks in core |
+| @flowershow/remark-wiki-link | 4.0.1 | package.json: MIT (monorepo is AGPL-3.0) | 2026-10-25 | n/a (bundlephobia HTTP 422) | README: supports `[[x]]`, `|text`, `#heading`, images/video/audio/pdf with dimensions; note embeds "future support" |
+| remark-wiki-link (landakram) | 2.0.1 @421e2ae40d | MIT | 2023-10-10 | 5.3 KB / 2.3 KB | stale |
+| markdown-it-wikilinks | 1.4.0 @954ceb8cbc | MIT | 2023-08-12 | 5.0 KB / 2.2 KB | stale, 199 weekly downloads |
+Verdict: reject for now (extra client weight, duplicates the server parser, needs maintainer approval). Revisit only for a live client-side preview.
+
+Editors (responsibility: edit note source in the browser)
+
+| Project | Pin | License | Last release | Maintenance | Weight | Accessibility | Cost / verdict |
+|---|---|---|---|---|---|---|---|
+| Plain `<textarea>` + server-rendered preview | n/a | n/a | n/a | n/a | 0 | native | Default for v1. Agents are the main writers; humans correct |
+| CodeMirror 6 (`codemirror` 6.0.2, `@codemirror/view` 6.43.15, `state` 6.7.6, `lang-markdown` 6.5.2, `merge` 6.12.3) | repo moved to code.haverbeke.berlin/codemirror/dev; GitHub mirror archived 2026-04-15 (dev @c010426d06) | MIT | merge 2026-10-19, view 2026-10-19 | actively published; hosting moved off GitHub (signal to note) | codemirror meta-package 373 KB / 119 KB; view 250 KB / 80 KB; merge 292 KB / 94 KB; lang-markdown 508 KB / 175 KB (includes language packs) | Official example documents that Tab is not bound by default so the editor meets the W3C no-keyboard-trap criterion (Escape then Tab leaves). Merge strings go through `state.phrase` (i18n-able) | Optional dependency. One editor dependency could serve notes source editing, file viewing and the conflict "edit result" pane. Lazy-load the route; measure in Vite |
+| Milkdown | v7.23.0 @0655111f3b | MIT | 2026-10-27 | active | `@milkdown/kit` 21 deps | not audited | WYSIWYG ProseMirror; round-trip fidelity for Obsidian syntax UNVERIFIED; reject for v1 |
+| TipTap | v3.32.0 @8f4624315d | MIT | 2026-10-13 (npm 3.32.2 on 2026-10-30) | very active | core 120 KB / 37 KB plus ProseMirror | not audited | Same WYSIWYG normalization risk: reject for v1 |
+| Lexical | v0.53.0 @cfcd3c407b | MIT | 2026-10-28 | very active, 0.x | 218 KB / 69 KB | not audited | Reject for v1 |
+| BlockNote | v0.57.0 @2892699d9d | MPL-2.0 core; XL packages GPL-3.0 or commercial (LICENSE.txt) | 2026-10-30 | active | 624 KB / 190 KB core | not audited | Block model, Markdown export is not native storage: reject |
+
+WYSIWYG editors rewrite Markdown on save (normalization churn in Git diffs, risk of losing `%%`, `^id`, `==`). A source editor avoids this.
+
+Apps and viewers (reference or "use outside the app")
+
+| Project | Pin | License | Last release | Verdict |
+|---|---|---|---|---|
+| Quartz | v5.0.0 (branch v5 @97a2d05f80) | MIT (LICENSE.txt) | v4.0.8 is the latest GitHub release (2023); v5 branch active 2026-10-25; Node >=22 | Not embeddable. Document as the way to publish notes as a static site (outside the app) |
+| SilverBullet | 2.12.1 @3c8a5030ee | MIT (LICENSE.md) | 2026-10-12 | Not embeddable (a notes server; README: CodeMirror 6 client, Rust server, headless Chrome runtime for Lua). Mention as an optional self-hosted viewer over the notes folder |
+| Foam (VS Code) | vscode@0.46.0 @7a2e632295 | MIT (file text read; GitHub says NOASSERTION because of the spelling "Licence") | 2026-09-30 | Outside-the-app option for VS Code users |
+| Logseq | 2.0.2 @e7e9c97c7f | AGPL-3.0 (LICENSE.md) | 2026-10-07 | Reject (outliner format and database version; not embeddable) |
+| Outline | v1.12.0 @a374ce9b46 | Business Source License 1.1; change date 2030-10-23 to Apache-2.0; Additional Use Grant forbids use as a "Document Service" (a commercial offering letting third parties create teams and documents) | 2026-10-23 | Reject: not open source, and a hosted multi-tenant service is exactly the restricted case |
+| Trilium (TriliumNext) | v0.106.1 @779c733789 | AGPL-3.0 | 2026-10-23 | Reject: own database model, not a file-native vault |
+| Joplin | v3.7.22 @2e13101904 | AGPL-3.0-or-later by default, per-directory overrides (LICENSE) | 2026-10-28 | Reject: sync-centric desktop app |
+
+Agent memory and note tooling over Markdown
+
+| Project | Pin | License | Last release | What to take |
+|---|---|---|---|---|
+| basic-memory | v1.0.0 @d7b1612835 | AGPL-3.0 (pyproject: AGPL-3.0-or-later) | 2026-10-29 | Python >= 3.12, MCP server, SQLite or Postgres index, paid cloud product. Do not integrate (separate runtime, would duplicate our index). Adapt its grammar: each file is an entity with frontmatter (`title`, `type`, `permalink`, `tags`), `## Observations` as `- [category] text #tag`, and `## Relations` as `- relation_type [[Target]]`; bare links index as `links_to`. Typed relations are useful for "implements", "supersedes", "depends on" |
+| qmd (tobi) | v2.8.3 @86d2365d17 | MIT | 2026-08-16 | Node 22 or Bun, SQLite FTS5, sqlite-vec, three GGUF models of roughly 300 MB, 640 MB and 1.1 GB (README): far heavier than our need. Reject; evidence that hybrid search exists when scale demands |
+| Letta MemFS (Letta Code) | letta-code v0.34.36 @59df542483; letta v0.16.8 @8816d3a851 | Apache-2.0 both (LICENSE files) | letta-code 2026-10-31 | Docs (verified): memory as a git repository of Markdown files with YAML frontmatter, root files loaded each turn, directories with their own index file loaded on demand, subagents use git worktrees. Same architecture as our plan (files in Git, worktrees for concurrent writers) |
+| Anthropic memory tool | type `memory_20250818` | docs | stable | Client-side file ops view/create/str_replace/insert/delete/rename on a `/memories` prefix that the application maps to its own storage; docs require path-traversal checks. Adopt this tool surface (not the product) for a scoped `notes` tool over `.factory/notes/` |
+| obsidian-mcp servers | mcp-obsidian @5ee0b84fa8 (MIT, 2026-08-31); cyanheads/obsidian-mcp-server v3.8.0 @023b1dd49f (Apache-2.0, 2026-10-31); StevenStavrakis/obsidian-mcp v2.0.0 @bd900974ad (MIT) | as listed | as listed | The first two work through Obsidian's Local REST API plugin on a running desktop Obsidian, so they do not apply to a hosted server. Useful tool-surface ideas from cyanheads' README: read a note as raw, structured, document map or single section; patch against a heading, block or frontmatter field; manage tags and one frontmatter key; folder-scoped read/write permissions. Section-addressed patches reduce merge conflicts versus whole-file rewrites |
+
+### 2.5 How notes relate to ADR-022 memory (complement, not duplicate)
+
+| | ADR-022 memory | Notes |
+|---|---|---|
+| Purpose | Make the agent stop repeating mistakes, personalize it | Shared, human-readable project knowledge: lore, mechanics, conventions, design decisions, plans |
+| Writer | Background reflection job, automatic after the verification gate | Humans and agents, explicit, proposal then acceptance |
+| Store | PostgreSQL rows with RLS, ledger | Markdown files in the project's Git repo; PostgreSQL index is derived |
+| Visibility | No browse or edit page (maintainer choice); Undo and forget | Browsable, editable, diffable, outside-the-app readable |
+| Authority | None, always data | None, always data (untrusted input to the model, labelled with status) |
+| History | Ledger | Git log and blame |
+| Canon | Lane D: never memory | Home of canon: a `proposal` note is a KnowledgeCandidate; a human-accepted `confirmed` note is the file form of an ApprovedCanonVersion (mapping needs maintainer confirmation) |
+
+Rules to avoid duplication:
+1. A MemoryItem never copies note text. It may cite a note by path plus blob hash ("project convention documented in note X"), and Lane B "observable in accepted source" can treat an accepted note as an observable source.
+2. ADR-022 Lane D "canon changes become design proposals": implement the proposal as a note change proposal (`status: proposal`) accepted through the normal review flow.
+3. Both memory and notes enter the context assembler as labelled, attributed data blocks that grant nothing; an `outdated` or `assumption` note is shown with that label.
+4. Notes do not reopen the "no page to browse memories" decision: that decision is about the automatic memory store; the notes browser is a different feature.
+
+### 2.6 Proposed note model (frontmatter)
+
+```yaml
+---
+id: focus-tree-conventions        # stable slug, never reused
+title: Focus tree conventions
+type: system                      # lore | mechanic | convention | decision | plan | reference
+status: confirmed                 # confirmed | proposal | assumption | outdated
+tags: [focus, naming]
+aliases: [focus naming]
+authors: [human:klim, agent:run-0183]   # also derivable from git blame
+confirmed_by: human:klim          # required when status is confirmed
+refs:                             # mod files and assets, for staleness checks
+  - path: common/national_focus/chaos.txt
+    anchor: focus:CHAOS_rise      # optional entity key
+    blob: 3f2a9c1                 # hash when last verified
+links:                            # work items in the app
+  job: J-123
+  spec: SPEC-005
+  pr: 42
+supersedes: [old-focus-naming]
+---
+```
+
+- `status` is set by authors; the server computes a separate derived flag `possibly_stale` when a `refs[].blob` no longer matches the current file (this is the "outdated" signal the agent can act on), so agents never silently rewrite a human's `confirmed`.
+- Version history and attribution come from Git (`git log -- path`, `git blame`); agent commits use a distinct author identity or trailer so line-level human/agent attribution works in the UI without a custom table.
+- A `lint` operation (the gist's third operation) reports broken links, orphans, missing status, ambiguous wikilinks, case collisions and stale refs, and runs as a validator in the existing validation flow.
+- Folders are for humans (the maintainer's Events, Systems, Planning, Agents, Tooling layout works); semantics come from `type`.
+
+### 2.7 Retrieval (ADR-009 compliant)
+
+Verified PostgreSQL facts (v17 docs): `websearch_to_tsquery` (never raises syntax errors), `ts_rank_cd` (cover density, uses proximity), `setweight` A to D, `ts_headline` (output not XSS-safe), `pg_trgm` (contrib, trusted extension, `similarity()`, `%`, `word_similarity()`, GIN/GiST support for LIKE/ILIKE/regex).
+
+Design:
+1. Tables (derived, rebuildable, tenant column and RLS like the rest): `note(project_id, path, blob_sha, title, type, status, tags[], aliases[], frontmatter jsonb, updated_at)`, `note_section(note, heading_path, text, tsv)`, `note_link(src, dst_path, dst_anchor, kind wikilink|embed|ref|relation, resolved)`.
+2. Query order for the agent tool: exact (id, alias, title, path, tag, entity key such as a focus ID), then full text over sections with weights (title A, headings B, tags/aliases B, body D) using `websearch_to_tsquery` and `ts_rank_cd`, then `pg_trgm` fuzzy on titles, aliases and identifiers (HOI4 IDs like `CHAOS_rise` tokenize badly in FTS, trigrams handle them), then optional one-hop link expansion through `note_link` (a recursive CTE is enough at this size; no graph database), preferring `confirmed` notes and respecting a token budget.
+3. Generated map (the gist's `index.md` idea): a compact per-folder listing of title, status, one-line summary, produced by the server, so a small project can hand the whole map to the agent first and then fetch sections.
+4. Tool surface (modelled on the Anthropic memory-tool commands and the Obsidian MCP read modes): `notes.map`, `notes.search`, `notes.read(section)`, `notes.backlinks`, `notes.propose(create|patch_section|patch_frontmatter|rename)`; all paths validated against the notes root, writes become change proposals (never direct), size caps.
+5. Embeddings: not needed now. Evidence for deferral: the gist claims the index works at hundreds of pages; basic-memory and qmd add vectors for semantic matching, which is a scale and recall question for EXP-05 under ADR-009, not a starting requirement. Trigger to revisit: measured recall gap on real project notes after FTS + trigram + link expansion. (A pgvector service appears in an older research evidence file; the current compose file uses plain postgres:17.6, so a vector extension would be a new image decision.)
+
+### 2.8 Topic 1 consolidated recommendation (one dependency per responsibility)
+
+| Responsibility | Choice | Type |
+|---|---|---|
+| Note format | Obsidian-compatible CommonMark+GFM, YAML frontmatter, wikilinks, tags, aliases; `.canvas` passthrough | convention, no dependency |
+| Storage and history | Files in the project repo (`.factory/notes/`), Git for history and blame; PostgreSQL derived index | no new dependency |
+| Server parse and render | pulldown-cmark 0.13.6 | Rust crate (MIT) |
+| HTML sanitization | ammonia 4.2.4 | Rust crate |
+| Frontmatter YAML | serde-saphyr 2.0.0 (spike first; fallback serde_norway) | Rust crate |
+| Retrieval | PostgreSQL FTS + pg_trgm + link expansion | no new dependency |
+| Agent tool surface | memory-tool-style commands plus section-addressed patches | in-house |
+| Browser editor | textarea + server preview in v1; CodeMirror 6 only if the maintainer approves one shared editor dependency (also reused for Topic 3) | optional web dependency |
+| Outside the app | Obsidian, Foam, Quartz documented, not bundled | docs only |
+
+Rejected: Outline (BSL, restricted use), Logseq/Trilium/Joplin (AGPL apps, not embeddable), basic-memory (AGPL Python runtime), qmd (heavy local models), WYSIWYG editors (Markdown rewrite risk), obsidian-mcp servers (need desktop Obsidian).
+
+---
+
+## 3. TOPIC 2: interactive onboarding and guided tours
+
+### 3.1 Framework comparison
+
+Constraints from the repo: React 19.3.1, Vite 8, plain CSS custom properties, all strings in i18n files, jsx-a11y lint, new runtime dependencies need maintainer approval, hobbyist audience.
+
+| Library | Pin | License (file) | Last release / commit | Maintenance | Weight | Accessibility (source inspected) | i18n | React 19 | Integration cost | Verdict |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Driver.js | npm 1.10.2 (tag object 6f5916711e); HEAD a75736ab1c (2026-10-29) | MIT (`license`) | 2026-10-18 | very active; 2 open issues; 3.4M weekly downloads | 0 deps; 206 KB unpacked; 27.9 KB min / 8.0 KB gzip JS; CSS separate | `popover.ts` sets role="dialog", aria-labelledby and aria-describedby; `events.ts` has `trapFocus`, Escape and arrow key handling; focus restored on destroy (`driver.ts`); `closeBtnLabel` becomes an aria-label. No live-region announcement found | Button and progress strings are config values you pass in (`closeBtnLabel` seen in source; the other label options per its docs, not re-verified). Fixed English element IDs only | Framework-agnostic; works with any React | Low-medium: imperative DOM API outside React, wrapper hook, restyle its CSS with your tokens | Best dependency if one is wanted |
+| React Joyride | 3.2.0 @1fe55f1aed | MIT | 2026-07-09 | active; 4 open issues; 1.96M weekly | 10 deps (floating-ui react-dom etc.); 720 KB unpacked; 75 KB min / 25.6 KB gzip | `useFocusTrap` hook, `aria-modal`, aria-labelledby/describedby on the tooltip, close/back/next buttons with aria-labels from `locale` | `locale` object (back, close, last, next, skip, next-with-progress) with step placeholders; custom tooltip component lets you use `t()` | peer React 16.8 to 19 | Low: React-native, controlled mode, `controls.replay` (3.1.0) | Good React-native alternative; heavier |
+| Shepherd.js / react-shepherd | 15.3.0 / 7.0.6 @7f25ce5db4 | `LICENSE.md`: dual AGPL-3.0 and a paid Commercial License; free for open-source AGPL-compatible projects, personal and non-commercial use; commercial license required for revenue-generating companies and proprietary use | 2026-08-24 | active | 2 deps; 814 KB unpacked; 44.7 KB / 15.3 KB | `shepherd-element.ts` handles focus, Escape and accessible name via title or `label` | per-step strings | react-shepherd peers React 18 or 19 | Low | Reject: legally usable today under AGPL, but a commercial-license trap if the project or a fork ever earns revenue; no technical advantage over Driver.js |
+| Intro.js | 8.6.0 @5b12889b4b | `license.md`: AGPL-3.0 plus commercial license "for a commercial project" | 2026-09-21 | active | 1 MB unpacked; 69 KB / 19 KB | not inspected | not inspected | intro.js-react 1.0.0 last published 2023-05 | Low | Reject (same license trap) |
+| Reactour `@reactour/tour` | 3.8.0 (npm 2025-05-07); repo HEAD f38832ffd0 (2026-05-19) | MIT | 2022 GitHub release 3.0.0; npm 3.8.0 | 82 open issues | 3 deps; 98 KB unpacked; 20.5 KB / 7.2 KB | `Tour.tsx` has its `disableFocusLock` prop commented out; `Navigation.tsx` uses a hard-coded English template aria-label ("Go to ... step"); accessible name only via optional accessibility options | weak (hard-coded strings) | peers include 19 | Low | Reject (a11y and i18n gaps) |
+| Onborda | 1.2.5 @e865eb4089 | No LICENSE file (GitHub: none; npm field says MIT) | 2024-12-22 | stale releases | peers: next >=13, framer-motion, radix portal | not inspected | n/a | n/a | Not applicable | Reject: Next.js oriented, unclear license file |
+| NextStep (`nextstepjs`) | 2.3.0 @50379a1318 (enszrlu/NextStep) | MIT | 2026-07-20 | active | peers include next >=13 and motion; 19.5 KB / 5.6 KB | not inspected | n/a | peers react >=18 | Not applicable | Reject: Next.js oriented (peer-optionality UNVERIFIED) |
+| OnboardJS (`@onboardjs/core`, `@onboardjs/react`) | core 1.0.0-rc.4, react 1.0.0-rc.5 @9a35e747bd | MIT (LICENSE.md); react package's npm license field is empty | 2026-05-18 | 82 stars, release candidates | core 110 KB / 27 KB | not inspected | n/a | peers 18 or 19 | Medium | Reject for now. Idea worth adapting: a headless onboarding flow state machine separate from the UI |
+| Hopscotch (LinkedIn) | v0.3.1 @11df61a222 | Apache-2.0 | 2017 release | archived | n/a | n/a | n/a | n/a | n/a | Reject (archived) |
+| Usertour | v0.9.7 @156c0b0bcd | MIT Expat with carve-outs for "enterprise"/"ee" directories and feature/plan code (LICENSE) | 2026-10-30 | active | a separate Docker stack plus SDK | not inspected | n/a | n/a | High: second service, data leaves the app, tours authored outside the repo and prone to rot | Reject |
+| Hosted SaaS (Userpilot, Appcues, Pendo, Chameleon, Frigade) | not evaluated | commercial | n/a | n/a | n/a | n/a | n/a | n/a | n/a | Reject unreviewed: third-party event collection conflicts with the privacy posture; not investigated |
+| PostHog "product tours" | PostHog/posthog @03cb9b8086 | GitHub NOASSERTION (mixed license) | active | n/a | n/a | n/a | n/a | n/a | n/a | Not evaluated (web search returned nothing specific) |
+
+### 3.2 In-house option on platform primitives
+
+Verified platform status:
+- Popover API: MDN labels it Baseline "Newly available". Provides `popover` (auto, hint, manual), `popovertarget`, `showPopover()`, top-layer rendering; non-modal; focus is not trapped, so focus management is yours.
+- CSS anchor positioning: web.dev's January 2026 roundup lists it Baseline "Newly available" with Chrome and Edge 125, Firefox 147, Safari 26. Properties: `anchor-name`, `position-anchor`, `position-area`, `position-try`, `position-visibility`. Anchor positioning changes only visual placement, so keep DOM order logical.
+- Testing: jsdom (the project's test environment, jsdom 30.1.3) does not implement the popover attribute; the tracking issue jsdom/jsdom#3721 is open (updated 2026-08-03). Tests must stub `showPopover/hidePopover` or run in a real browser. A plain `role="dialog"` element in a portal with anchor positioning works without the Popover API and is jsdom-friendly; use Popover only for top-layer stacking.
+- Fallback for older browsers (Safari < 26, Firefox < 147): a centered, non-anchored card with the same content. Optional dependency if exact placement everywhere matters: `@floating-ui/dom` 1.8.0 (MIT, 21 KB min / 8 KB gzip, @floating-ui/dom @93ea014e03 repo), which Joyride also uses.
+
+Sketch of the in-house engine (an estimate of 250 to 400 lines of TypeScript plus about 100 lines of CSS, not measured):
+- A tour is data, not code: `{ id, version, requires: [featureFlag], steps: [{ target: 'data-tour=project-create', titleKey, bodyKey, advanceOn: 'next' | 'click' | { appState: 'project.created' } }] }`.
+- Targets use dedicated `data-tour="..."` attributes (never CSS classes), so redesigns do not break tours.
+- Focus: move focus to the step heading, restore it on close, Escape closes, no dimming overlay so users can operate the real UI ("learn by doing"), aria-live polite step announcement, `prefers-reduced-motion` respected.
+- Persistence: server-side per account, `seen[tourId] = version` plus dismissals, not only localStorage.
+
+### 3.3 Patterns that keep onboarding from rotting
+
+1. Tours are versioned data keyed to feature flags and `version`. Show a tour only when `seen < version` and its feature flag is on; bump `version` only when the underlying UI changes. New features ship a small "what is new" tour, never a replay of old ones.
+2. A CI test (Vitest + Testing Library, or a browser test) renders each tour's route and asserts every `data-tour` target exists and every i18n key exists in all locales (the project's i18n lint already exists). A missing target fails the build instead of confusing users.
+3. Tasks verified by app state, not clicks: onboarding checklist items are computed from server facts (project created, setup applied, first agent run finished, first proposal accepted, first save point made, GitHub linked) through one endpoint. Verified analogues: GitHub Skills courses are template repositories whose GitHub Actions workflows watch your activity and advance the README to the next step; MediaWiki's Growth team ships a newcomer homepage with suggested tasks and a help panel (its feature summary says the help panel alone does not raise edits, but supports the tasks flow). Lesson: real, in-context tasks beat passive help.
+4. Anecdotal warning (one forum report, not a study): Discourse's opt-in tutorial bot in a private message had very low completion in one admin's report (3 of 90 replied, 1 completed). Do not hide the first-run experience in a separate channel; embed it in the real first screens and keep it skippable and replayable.
+5. Empty-state guidance: every empty list has one sentence of explanation and one primary action ("Create your first project"). Offer a "Start from a sample mod" project (a tiny repository the maintainer controls; `klimPaskov/hoi4-factory-test-mod` is the existing test repository) so beginners can see the loop before importing their own mod.
+6. Docs-as-code help panel: help topics are Markdown files in the repo (same pulldown-cmark pipeline as notes, rendered at build or server time), opened by a `?` button keyed by route or component (`helpKey`). A test asserts every `helpKey` has a file. The same text feeds a public docs page.
+7. Always optional and replayable: a "Tour" entry in the help menu replays any tour; "Don't show again" is per tour version.
+8. Beginner/advanced split: onboarding explains the default simple path; advanced Git controls are introduced by a tour only after the user opens them.
+
+### 3.4 Topic 2 consolidated recommendation
+
+| Responsibility | Choice |
+|---|---|
+| Tour rendering, positioning, focus | In-house component on Popover API + CSS anchor positioning (0 dependencies). If a dependency is preferred: Driver.js 1.10.2 (MIT). Not both |
+| Tour definition and state | In-house: versioned data, `data-tour` targets, feature-flag keys, server-side seen state |
+| Checklist and task verification | In-house, computed from server state |
+| Help panel | In-house, Markdown files via the notes pipeline |
+| Positioning fallback | none initially; `@floating-ui/dom` only if older-browser placement matters |
+
+Reject: Shepherd.js and Intro.js (AGPL or commercial license), Reactour, Onborda, NextStep, OnboardJS, Usertour, hosted SaaS.
+
+---
+
+## 4. TOPIC 3: integrated Git experience
+
+### 4.1 Git engines
+
+| Option | Pin | License | Last release / commit | Maintenance | Weight | Fit |
+|---|---|---|---|---|---|---|
+| `git` CLI (current design) | Debian bookworm 2.39.5, trixie 2.47.3 | GPL-2.0 (separate process) | n/a | n/a | already in the image | Verified features: `git merge-tree --write-tree` (merges without index or worktree; exit 0 clean, 1 conflicted; `--name-only`, `-z`, `--messages`, `--merge-base`; introduced in Git 2.38 per the 2.38.0 release notes), `git apply --cached` (stage a partial patch to the index only), `--recount`, `--unidiff-zero`, `--3way`. Cost: zero new dependency; keep controlled environment (SPEC-005) |
+| gitoxide `gix` | 0.90.0 (crates.io 2026-10-22); repo HEAD @95194788d7 (2026-10-31) | MIT OR Apache-2.0 | very active | Rust, MSRV 1.88 | Verified from its `crate-status.md`: strong on repository discovery, rev-walk, tree diff, status (index vs worktree, rename tracking, untracked files), checkout of an index, three-way blob merge (merge, diff3, zdiff styles), tree and commit merge. Unchecked (not implemented): push, patch apply (`gix-apply`), blob patch generation in `gix-diff` (text patches, binary patches, `git-apply` compatibility), rebase, cherry-pick, stash, checkout/switch/restore orchestration, merge continue/abort and conflicted-merge state persistence, client-side hooks. The missing patch generation and apply are exactly what hunk-level staging needs. Not a complete engine. GitButler pins a specific gix revision (Cargo.toml), a sign that the API still moves. Verdict: do not adopt now; consider later only for in-process read paths (log graph, tree diff, blob reads) if process-spawn cost is measured |
+| git2-rs (libgit2) | git2 0.21.0 (2026-10-06), libgit2-sys 0.18.8+1.9.7; repo @bcf8b998c0 | git2: MIT OR Apache-2.0; libgit2 v1.9.7: GPL-2.0 with a linking exception (COPYING) | active | C library vendored by the crate; `https`/`ssh` features for network | Verified API: `apply`, `apply_to_tree`, `merge_trees`, `merge_commits`, `merge_file_from_index`, `cherrypick`, `revert`, `rebase`, `stash_save`, `worktree`, diff functions. Blocking API. GitButler uses git2 0.21.0 through its own git2-rs fork, plus gix. Verdict: reject. A second engine doubles semantics and re-verification of the SPEC-005 hardening (hooks, filters, config includes), adds C and TLS build surface on both dev machines (cost UNVERIFIED), and gives nothing the CLI lacks for this scope |
+
+Decision: keep `git` CLI as the single engine. The existing `GitRepo` wrapper, restore points and `commit_paths` already assume it.
+
+### 4.2 Diff rendering in React
+
+| Project | Pin | License | Last release / commit | Maintenance | Weight | Accessibility | Integration cost | Verdict |
+|---|---|---|---|---|---|---|---|---|
+| In-house structured diff table | n/a | n/a | n/a | n/a | 0 dependencies (estimate 300 to 500 lines) | Full control: table with row headers, labelled checkboxes, keyboard hunk navigation, i18n | Medium, but the server must own the hunk model anyway for selective staging | Recommended |
+| react-diff-view | 3.3.3 @776e11d00c | MIT | 2026-03-30 | one main maintainer pattern (UNVERIFIED); 11 open issues; about 349K weekly | 6 deps; 1.48 MB unpacked; 70.8 KB min / 23.3 KB gzip | not documented; table-based, CSS custom properties for theming (fits the plain-CSS rule) | Low-medium: `parseDiff` wraps gitdiff-parser, `renderGutter` and widget API can host staging checkboxes and review comments; README warns that rendering a 2.2 MB diff took about 26 s without lazy rendering | Fallback dependency |
+| diff2html | 3.4.56 @72331ff5d1 | MIT (LICENSE.md) | 2026-01-31 | active enough | 2 deps (+ optional highlight.js); 2.0 MB unpacked; 44.7 KB / 12.7 KB | generates HTML from git diff or unified diff (README), so output is injected HTML | Low | Reject: HTML strings, weak fit for accessibility and i18n |
+| Monaco diff editor | monaco-editor 0.57.0 @3d71d06338 | MIT | 2026-09-24 | very active | 101.7 MB unpacked; workers | good editor a11y but heavy | High | Reject: weight and worker setup |
+| `@codemirror/merge` | 6.12.3 | MIT | 2026-10-19 | active, hosting moved to Forgejo | 292 KB min / 94 KB gzip with view and state | see 4.3 | Medium | Only as part of an approved CodeMirror dependency |
+| git-diff-view | `@git-diff-view/react` 0.1.8 @e995783408 | MIT | 2026-10-15 | active, 0.x | 1.07 MB min / 338 KB gzip per bundlephobia (includes highlighters; re-measure) | not documented | Medium | Defer (0.x, heavy) |
+| jsdiff (`diff`) 9.0.0, parse-diff 0.12.0, gitdiff-parser 0.3.1 | n/a | BSD-3-Clause, MIT, MIT | 2026-04 | healthy | 22.5 KB, 2.5 KB, 2.3 KB min | n/a | Low | Not needed if the server parses diffs |
+
+### 4.3 Conflict resolution UIs
+
+- `@codemirror/merge` (verified by reading the archived GitHub mirror, which stops at 2026-04-15, before releases 6.12.2 and 6.12.3): split `MergeView` (two editors) and `unifiedMergeView` with per-chunk accept and reject controls; the diff algorithm can be replaced (`DiffConfig.override`, 6.12.0); zero occurrences of "conflict" or "three" in `merge.ts`, `chunk.ts`, `diff.ts`, `deco.ts`. So there is no 3-way or conflict-marker mode. The default Accept and Reject buttons are real `<button>` elements but their handlers are attached with `onmousedown` (`unified.ts`), which is not keyboard-operable; the `mergeControls` option (added in 6.11.0) accepts a function so you can render your own buttons with `onClick`. Strings go through `state.phrase`.
+- VS Code merge editor: design reference only (incoming, current and result panes); not inspected here (UNVERIFIED details).
+- GitHub Desktop (MIT, release-3.6.10, @952326e873): has dedicated conflict UI code (`app/src/ui/lib/conflicts`, `app/src/ui/merge-conflicts`), a `continue-rebase.tsx`, `undo-commit.tsx`; it stages hunks and lines by running `git apply --cached --unidiff-zero` with the patch on stdin (`app/src/lib/git/apply.ts`, verified).
+- lazygit (MIT, v0.66.2 @4e1eebe278): interactive staging and a custom patch builder (`pkg/commands/patch/`); its README says Undo (`z`) uses the reflog, so it cannot undo working-tree or stash changes.
+- Sapling ISL (repo GPL-2.0; `addons/` has its own MIT LICENSE, release 0.2.20261028): React front end, Jotai, back end that runs `sl` commands. Tightly coupled to Sapling; reuse as ideas only (smartlog graph, uncommitted changes with selective commit, undo).
+- GitButler (FSL-1.1-MIT, release/0.23.1 @3948ffa3d7): stacked and parallel branches, hunk assignment between parallel branches, drag-and-drop commit mutation, "Undo Timeline" (README). License forbids a "Competing Use" (making the Software available in a commercial product or service that substitutes for it or offers similar functionality); each version converts to MIT on its second anniversary. Do not copy code; adapt the patterns.
+- Jujutsu (jj, Apache-2.0, v0.46.0 @f5b5be1f40): operation log records every repo-modifying operation with a snapshot of refs and working-copy commit; `jj undo`, `jj op revert`, `jj op restore`; the working copy is snapshotted automatically (docs verified). Pattern: undo by restoring a recorded ref state.
+
+Recommended conflict flow (no new dependency):
+1. Detect: `git merge-tree --write-tree --name-only -z <ours> <theirs>` for a pre-merge conflict list without touching any worktree; this also powers the "will this merge cleanly?" badge on PRs.
+2. Present per conflicted file a region chooser: for each conflict region show "Keep mine", "Keep theirs", "Keep both", "Edit", with plain-language labels and the HOI4 context (which focus or event ID). The result pane is editable. Regions come from `git merge-file -p --diff3` (or zdiff3) output parsed server-side.
+3. Never auto-choose between competing human intent (SPEC-005). The agent may propose a resolution that appears as a proposal.
+4. Binary conflicts: choose a version or add a new asset (SPEC-005 line 99).
+5. If CodeMirror 6 is approved for other reasons, use it for the "edit result" pane with `mergeControls` custom buttons.
+
+### 4.4 Structural and semantic merge
+
+| Project | Pin | License | Last release | Findings | Verdict |
+|---|---|---|---|---|---|
+| Mergiraf | v0.20.0 @d88acb6233 (Codeberg) | GPL-3.0-only (LICENSE.txt; Cargo.toml) | 2026-09-26 | Git merge driver, tree-sitter based. Languages are compiled in: adding one means a tree-sitter grammar crate in Cargo.toml plus a `LangProfile` in `src/supported_langs.rs` and a rebuild; no runtime plug-in route found. Its `supported_langs.rs` has no Paradox, Clausewitz or HOI4 entry (it does list Markdown and YAML) | Reject as a dependency (GPL-3.0 is usable as a separate process from an AGPL-3.0 project, but the grammar and rebuild burden are on us) |
+| tree-sitter grammars for Paradox script | `tree-sitter-paradox` 0.2.0 (npm, 2025-08-08, AGPL-3.0-only), `fedacking/tree-sitter-HoI4` @68121000f4 (MIT, last commit 2022-10, 2 stars) | as listed | stale | HOI4 coverage of the first is UNVERIFIED | Not a basis for a merge driver |
+| difftastic | 0.72.0 @d8f1c1da12 | MIT | 2026-10-29 | CLI structural diff; no library API found; no Paradox grammar assumed (UNVERIFIED) | Reject; adapt the idea |
+
+Adapt the idea instead: merge by entity. The project already parses HOI4 script for its structured editors (focus, event, decision, localisation). A 3-way merge keyed by top-level entity ID (one focus, one event, one localisation key) resolves most "two edits in the same file" conflicts that line-based merge reports, and unknown constructs stay opaque, as SPEC-005 requires. This is a future stage, not part of S02; do it only after the line-based flow works.
+
+### 4.5 Image diffs and visual before/after
+
+| Project | Pin | License | Last release | Notes |
+|---|---|---|---|---|
+| GitHub Desktop image diffs | `app/src/ui/diff/image-diffs/` @952326e873 | MIT | 2026-10-30 | Verified files: `two-up.tsx`, `swipe.tsx`, `onion-skin.tsx`, `difference-blend.tsx` (uses `mixBlendMode: 'difference'`), plus a DDS path (`dds-converter.ts` imports `parse-dds` and renders through WebGL2, which depends on browser texture support: UNVERIFIED cross-browser behavior) |
+| pixelmatch | 8.0.0 @ab76f526ef | ISC (LICENSE) | 2026-10-06 | Typed-array RGBA comparison, returns the number of mismatched pixels, optional diff image, OKLab-based threshold, anti-alias detection; images must have the same dimensions; 5.8 KB min / 2.8 KB gzip. npm metadata lists `pngjs` as a dependency though the README says no dependencies (likely CLI only, UNVERIFIED) |
+| image / image_dds crates | image 0.25.10 (default formats include TGA, not DDS); image_dds 0.7.2 (MIT, 2025-03) | MIT OR Apache-2.0; MIT | n/a | Server-side conversion of TGA and DDS to PNG before comparison; `image_dds` decoding of HOI4's DDS variants is UNVERIFIED (not run) |
+| odiff | v4.5.0 @6dd1e96298 | MIT | 2026-07-23 | OCaml binary; not evaluated beyond metadata; reject (extra runtime) |
+
+Recommended pattern: for each changed image (or each rendered view, since the app already has focus, event and GUI render tools), the server produces PNG renditions of "before" and "after" at identical dimensions; the client offers four modes using CSS and a range input: side-by-side (two-up), swipe, onion skin (opacity slider), difference blend (CSS `mix-blend-mode: difference`). Add a numeric "x pixels differ" from the server (a few lines of Rust over RGBA buffers) or pixelmatch if a diff overlay image is wanted. This also gives "visual before/after" for non-image changes by rendering both revisions, for example a focus tree before and after.
+
+### 4.6 What makes Git approachable for hobbyists (patterns to adopt)
+
+1. Save points: present a commit as a "save point" with a plain message. The workspace already has restore points under `refs/hoi4factory/restore/<task>/<label>`; extend this idea to automatic save points before every agent run and before every risky operation (jj snapshots the working copy automatically; GitButler has an undo timeline).
+2. Plain-language status (no staging vocabulary by default): "3 changes not saved yet in 2 files", "GitHub has 2 newer saves", "1 file needs your decision". Group changes by game concept (focus, event, localisation, gfx) with a "Show raw diff" advanced toggle.
+3. Undo everywhere: record each Factory-initiated Git operation with the before and after ref states in the existing ledger, and offer "Undo" that restores refs (jj operation log pattern). Unreferenced objects are kept alive by the restore refs, so undo is safe. lazygit's undo covers only commits and branches, so also capture the working tree in a save point.
+4. Branches as "try an idea": agent tasks already get a branch and worktree; present them as "Agent's draft" versus "Your version", with a one-click "Keep this draft" (merge) or "Discard".
+5. Selective saving: file, hunk and line checkboxes, using the proven patch path (build patch from selected hunks, `git apply --cached --unidiff-zero`, as GitHub Desktop does); `commit_paths` already refuses surprise staged changes.
+6. Progressive disclosure: simple view by default; advanced controls (raw index, branches graph, cherry-pick, rebase) behind an "Advanced" switch, introduced by a tour only after first use.
+7. Guardrails: confirm any discard, show what will be lost, never auto-resolve conflicts silently, show validation status next to the save action, and link GitHub check results next to internal validators.
+8. Reviews and PRs: mirrored GitHub data uses the same diff component with inline comment rows; the server already has `reqwest` and `jsonwebtoken`; `octocrab` 0.54.7 (MIT OR Apache-2.0) is available but I did not evaluate it against the existing code, so keep typed `reqwest` wrappers unless endpoint count grows.
+
+### 4.7 Topic 3 consolidated recommendation
+
+| Responsibility | Choice |
+|---|---|
+| Git engine and write path | `git` CLI (existing); no new crate |
+| Optional later read acceleration | `gix` 0.90.x, only after measuring a need |
+| Hunk and line staging | Server-built patch + `git apply --cached --unidiff-zero` (GitHub Desktop pattern) |
+| Conflict detection and merge | `git merge-tree --write-tree` and `git merge-file --diff3`/`zdiff3` (git >= 2.38) |
+| Diff model | Server parses `git diff` into structured hunks with stable IDs; `similar` 3.2.1 (Apache-2.0) only if in-memory proposal diffs are needed |
+| Diff UI | In-house accessible table component; fallback dependency react-diff-view 3.3.3 |
+| Conflict UI | In-house region chooser; CodeMirror 6 merge only for an optional edit pane |
+| Structural merge | None now; future entity-keyed merge with the project's own HOI4 parser |
+| Image diffs | In-house CSS modes (two-up, swipe, onion skin, difference); server PNG conversion; pixelmatch optional |
+| Undo and save points | Ledger of ref snapshots + restore refs (jj and GitButler idea) |
+
+Rejected: git2-rs/libgit2 (second engine), Monaco (weight), diff2html (HTML strings), git-diff-view (0.x, heavy), Mergiraf (GPL-3.0, compiled-in languages, no Paradox grammar), difftastic (CLI), GitButler code (FSL competing-use clause), Sapling ISL (coupled to `sl`), Gitless (MIT, v0.8.8, last commit 2021-02, stale).
+
+---
+
+## 5. Cross-topic synergies
+
+- One Markdown pipeline (pulldown-cmark + ammonia) serves notes, help panels and PR/issue body rendering.
+- One optional web dependency, CodeMirror 6, could serve note source editing, read-only file viewing and the conflict edit pane; if not approved, a textarea works for all three at lower comfort.
+- Onboarding checklist items (first save point, first accepted proposal) reuse the Git ledger; the Git tour is versioned like any other.
+- Notes make the first-run sample project teachable: the sample ships with three example notes (one per status).
+- Generated artifacts (note index/log, help index) are never hand-edited, which avoids merge conflicts in agent worktrees.
+
+## 6. Questions for the maintainer (batched so work does not stall)
+
+1. Notes: confirm `.factory/notes/` inside the project repository as the default, with the on-screen label that repository visibility applies. Confirm that `confirmed` requires a human and maps to ApprovedCanonVersion, `proposal` and `assumption` to KnowledgeCandidate.
+2. Notes: wikilinks or Markdown links as the default emitted link style (recommended: wikilinks, per-project switch).
+3. Do you approve CodeMirror 6 (`codemirror`, `@codemirror/lang-markdown`, `@codemirror/merge`, lazy-loaded) as a single optional web dependency, or keep textarea-only for now?
+4. Tours: in-house engine (recommended) or Driver.js? Is any AGPL-or-commercial dual-licensed dependency (Shepherd.js, Intro.js) acceptable, given a possible future revenue model?
+5. Minimum browser baseline: is requiring CSS anchor positioning (Chrome/Edge 125, Firefox 147, Safari 26) acceptable, with a centered-card fallback below that?
+6. Git terminology: approve "save point", "agent's draft", "keep this draft" as the beginner vocabulary, with advanced Git names behind a switch.
+7. Image diffs: approve server-side conversion of DDS/TGA to PNG for before/after views (and the choice of `image_dds` after a spike), and whether a numeric mismatch count is wanted.
+8. Experiments to schedule: (a) disposable Launcher upload of a mod containing `.factory/` and `.git` to learn what is shipped (blocked by the Workshop deferral); (b) a serde-saphyr budget test with hostile YAML; (c) recall test of FTS + trigram + link expansion on a real project's notes under EXP-05.
+
+## 7. Unverified items and things not done
+
+- Paradox Launcher upload exclusions (two fetch attempts to the Paradox forum failed; searches inconclusive).
+- Obsidian shortest-path link resolution; Obsidian behavior on non-Markdown mod files; GitHub rendering of wikilinks; Obsidian callout fold syntax in pulldown-cmark.
+- Accessibility of react-diff-view, git-diff-view, Milkdown, TipTap, Lexical, BlockNote, Intro.js (not inspected); Shepherd `role` attribute not confirmed by grep.
+- Bundle sizes are bundlephobia estimates for JS only; several entries returned HTTP 422 and are blank or omitted.
+- Source inspections of Driver.js, Joyride, Shepherd, Reactour used default-branch HEAD, which may differ slightly from the npm release; the CodeMirror merge inspection used an archived GitHub mirror that predates releases 6.12.2 and 6.12.3.
+- `image_dds` and `serde-saphyr` were not run; `octocrab`, `similar`, PostHog product tours and hosted SaaS tools were not evaluated in depth; VS Code's merge editor and Foam's wikilink semantics were not inspected.
+- Anecdote-level evidence: Discourse tutorial completion numbers; Growth feature results summarized from search results only.
+- Letta server licensing was read from GitHub metadata for letta-ai/letta and letta-ai/letta-code; MemFS details come from its docs page.
+
+---
+
+## 8. Sources (all accessed 2026-10-31)
+
+Versions and SHAs are the values observed that day. License column states the source of the license.
+
+| URL | SHA / version | License | Accessed |
+|---|---|---|---|
+| https://github.com/obsidianmd/jsoncanvas ; https://jsoncanvas.org/spec/1.0/ | @456f843cb2 ; spec 1.0 (2024-03-11) | MIT (LICENSE) | 2026-10-31 |
+| https://github.com/obsidianmd/obsidian-help ; https://obsidian.md/help/obsidian-flavored-markdown ; https://obsidian.md/help/properties ; https://obsidian.md/help/links | @4aa30a3370 | no license file found | 2026-10-31 |
+| https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f | first revision ac46de1ad27f | none stated | 2026-10-31 |
+| https://github.com/pulldown-cmark/pulldown-cmark (incl. specs/wikilinks.txt, src/lib.rs) | v0.13.6 @29d6cfa042 | MIT (LICENSE) | 2026-10-31 |
+| https://github.com/kivikakk/comrak | v0.59.0 @203f740aec | BSD-2-Clause (COPYING) | 2026-10-31 |
+| https://github.com/wooorm/markdown-rs | 1.0.0 @1506572f9b | MIT | 2026-10-31 |
+| https://crates.io/api/v1/crates/{comrak,pulldown-cmark,markdown,gray_matter,serde_yaml,serde_norway,serde_yml,serde_yaml_ng,saphyr,serde-saphyr,yaml-rust2,ammonia,gix,git2,similar,imara-diff,image,image_dds,ddsfile,image-compare,dify,octocrab} | versions as in text | per crate | 2026-10-31 |
+| https://github.com/bourumir-wyngs/serde-saphyr | 2.0.0 @ef83f36866 | Apache-2.0 (LICENSE-APACHE); crate MIT OR Apache-2.0 | 2026-10-31 |
+| https://osv.dev/vulnerability/RUSTSEC-2025-0068 | RUSTSEC-2025-0068 | advisory | 2026-10-31 |
+| https://github.com/unifiedjs/unified ; remarkjs/remark ; micromark/micromark ; markdown-it/markdown-it | 11.0.5 @dfaf172e8b ; @1146b3a274 ; 4.0.3 @6577c20015 ; 15.0.3 @a8c00d474e | MIT | 2026-10-31 |
+| https://github.com/flowershow/flowershow (packages/remark-wiki-link) ; landakram/remark-wiki-link ; jsepia/markdown-it-wikilinks | 4.0.1 ; 2.0.1 @421e2ae40d ; 1.4.0 @954ceb8cbc | MIT (package.json / LICENSE) | 2026-10-31 |
+| https://github.com/jackyzha0/quartz | v5.0.0 @97a2d05f80 | MIT (LICENSE.txt) | 2026-10-31 |
+| https://github.com/silverbulletmd/silverbullet | 2.12.1 @3c8a5030ee | MIT (LICENSE.md) | 2026-10-31 |
+| https://github.com/foambubble/foam | vscode@0.46.0 @7a2e632295 | MIT (LICENSE text) | 2026-10-31 |
+| https://github.com/logseq/logseq | 2.0.2 @e7e9c97c7f | AGPL-3.0 | 2026-10-31 |
+| https://github.com/outline/outline | v1.12.0 @a374ce9b46 | BSL 1.1 (to Apache-2.0 on 2030-10-23) | 2026-10-31 |
+| https://github.com/TriliumNext/Trilium | v0.106.1 @779c733789 | AGPL-3.0 | 2026-10-31 |
+| https://github.com/laurent22/joplin | v3.7.22 @2e13101904 | AGPL-3.0-or-later default (LICENSE) | 2026-10-31 |
+| https://github.com/Milkdown/milkdown ; ueberdosis/tiptap ; facebook/lexical | v7.23.0 @0655111f3b ; v3.32.0 @8f4624315d ; v0.53.0 @cfcd3c407b | MIT | 2026-10-31 |
+| https://github.com/TypeCellOS/BlockNote | v0.57.0 @2892699d9d | MPL-2.0 plus GPL-3.0 XL packages (LICENSE.txt) | 2026-10-31 |
+| https://github.com/codemirror/dev ; https://github.com/codemirror/merge (archived mirrors) ; https://codemirror.net/examples/tab/ | dev @c010426d06 ; merge npm 6.12.3 | MIT | 2026-10-31 |
+| https://github.com/basicmachines-co/basic-memory | v1.0.0 @d7b1612835 | AGPL-3.0 | 2026-10-31 |
+| https://github.com/tobi/qmd | v2.8.3 @86d2365d17 | MIT | 2026-10-31 |
+| https://github.com/letta-ai/letta ; https://github.com/letta-ai/letta-code ; https://docs.letta.com/letta-code/memfs | 0.16.8 @8816d3a851 ; v0.34.36 @59df542483 | Apache-2.0 | 2026-10-31 |
+| https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool | memory_20250818 | docs | 2026-10-31 |
+| https://github.com/MarkusPfundstein/mcp-obsidian ; cyanheads/obsidian-mcp-server ; StevenStavrakis/obsidian-mcp | @5ee0b84fa8 ; v3.8.0 @023b1dd49f ; v2.0.0 @bd900974ad | MIT ; Apache-2.0 ; MIT | 2026-10-31 |
+| https://www.postgresql.org/docs/17/textsearch-controls.html ; https://www.postgresql.org/docs/17/pgtrgm.html | PostgreSQL 17 docs | docs | 2026-10-31 |
+| https://hoi4.paradoxwikis.com/Mod_structure ; https://hoi4.paradoxwikis.com/Modding ; https://forum.paradoxplaza.com/forum/threads/is-there-any-way-to-make-launcher-ignore-certain-directories-like-git-when-uploading-a-mod.1627426 (unreadable) | n/a | docs | 2026-10-31 |
+| https://github.com/kamranahmedse/driver.js | 1.10.2 (tag 6f5916711e) ; HEAD a75736ab1c | MIT (`license`) | 2026-10-31 |
+| https://github.com/shipshapecode/shepherd | shepherd.js 15.3.0 ; react-shepherd 7.0.6 ; @7f25ce5db4 | AGPL-3.0 or commercial (LICENSE.md) | 2026-10-31 |
+| https://github.com/gilbarbara/react-joyride | 3.2.0 @1fe55f1aed | MIT | 2026-10-31 |
+| https://github.com/usablica/intro.js | 8.6.0 @5b12889b4b | AGPL-3.0 or commercial (license.md) | 2026-10-31 |
+| https://github.com/elrumordelaluz/reactour | @reactour/tour 3.8.0 ; @f38832ffd0 | MIT | 2026-10-31 |
+| https://github.com/uixmat/onborda ; https://github.com/enszrlu/NextStep ; https://github.com/Somafet/onboardjs | 1.2.5 @e865eb4089 ; 2.3.0 @50379a1318 ; rc @9a35e747bd | none ; MIT ; MIT | 2026-10-31 |
+| https://github.com/linkedin/hopscotch (archived) ; https://github.com/usertour/usertour ; https://github.com/floating-ui/floating-ui | v0.3.1 @11df61a222 ; v0.9.7 @156c0b0bcd ; @floating-ui/dom 1.8.0 @93ea014e03 | Apache-2.0 ; MIT Expat with enterprise carve-outs ; MIT | 2026-10-31 |
+| https://registry.npmjs.org/ and https://bundlephobia.com/api/size for driver.js, shepherd.js, react-shepherd, react-joyride, intro.js, @reactour/tour, onborda, nextstepjs, @onboardjs/*, @floating-ui/*, react-diff-view, diff2html, monaco-editor, @git-diff-view/*, @codemirror/*, pixelmatch, diff, parse-diff, gitdiff-parser, looks-same, odiff-bin, resemblejs, unified, remark-*, markdown-it*, micromark, @milkdown/kit, @tiptap/*, lexical, @blocknote/*, yaml, gray-matter | versions as in text | per package metadata | 2026-10-31 |
+| https://developer.mozilla.org/en-US/docs/Web/API/Popover_API ; https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_anchor_positioning ; https://web.dev/blog/web-platform-01-2026 ; https://github.com/jsdom/jsdom/issues/3721 | n/a | docs | 2026-10-31 |
+| https://skills.github.com/quickstart ; https://github.blog/2022-06-06-introducing-github-skills ; https://www.mediawiki.org/wiki/Growth/Feature_summary ; https://meta.discourse.org/t/new-users-arent-starting-the-discobot-tutorial/62995 | n/a (search-result summaries only, pages not fully read) | n/a | 2026-10-31 |
+| https://github.com/GitoxideLabs/gitoxide (crate-status.md, README.md) | gix 0.90.0 ; @95194788d7 | MIT OR Apache-2.0 (GitHub shows Apache-2.0 for LICENSE-APACHE) | 2026-10-31 |
+| https://github.com/rust-lang/git2-rs ; https://github.com/libgit2/libgit2 | git2 0.21.0 @bcf8b998c0 ; libgit2 v1.9.7 @42a89d7cc9 | MIT OR Apache-2.0 ; GPL-2.0 with linking exception (COPYING) | 2026-10-31 |
+| https://git-scm.com/docs/git-merge-tree ; https://git-scm.com/docs/git-apply ; https://raw.githubusercontent.com/git/git/master/Documentation/RelNotes/2.38.0.adoc ; https://sources.debian.org/api/src/git/ | git 2.38.0 notes ; Debian 2.39.5 / 2.47.3 | GPL-2.0 | 2026-10-31 |
+| https://github.com/otakustay/react-diff-view ; rtfpessoa/diff2html ; microsoft/monaco-editor ; MrWangJustToDo/git-diff-view ; kpdecker/jsdiff | 3.3.3 @776e11d00c ; 3.4.56 @72331ff5d1 ; 0.57.0 @3d71d06338 ; 0.1.8 @e995783408 ; 9.0.0 @8d2706c8f2 | MIT ; MIT ; MIT ; MIT ; BSD-3-Clause | 2026-10-31 |
+| https://github.com/desktop/desktop (apply.ts, image-diffs/, conflicts) ; https://github.com/jesseduffield/lazygit | release-3.6.10 @952326e873 ; v0.66.2 @4e1eebe278 | MIT | 2026-10-31 |
+| https://github.com/gitbutlerapp/gitbutler | release/0.23.1 @3948ffa3d7 | FSL-1.1-MIT (LICENSE.md) | 2026-10-31 |
+| https://github.com/facebook/sapling (addons/LICENSE) | 0.2.20261028-123539+7415fb2f @2b35ff9da6 | GPL-2.0 repo; addons MIT | 2026-10-31 |
+| https://github.com/jj-vcs/jj ; http://docs.jj-vcs.dev/latest/operation-log/ | v0.46.0 @f5b5be1f40 | Apache-2.0 | 2026-10-31 |
+| https://codeberg.org/mergiraf/mergiraf ; https://mergiraf.org/ ; https://mergiraf.org/adding-a-language.html | v0.20.0 @d88acb6233 | GPL-3.0-only (LICENSE.txt) | 2026-10-31 |
+| https://github.com/Wilfred/difftastic ; https://github.com/fedacking/tree-sitter-HoI4 ; https://www.npmjs.com/package/tree-sitter-paradox | 0.72.0 @d8f1c1da12 ; @68121000f4 ; 0.2.0 | MIT ; MIT ; AGPL-3.0-only (npm) | 2026-10-31 |
+| https://github.com/mapbox/pixelmatch ; https://github.com/dmtrKovalenko/odiff ; https://github.com/image-rs/image ; https://github.com/ScanMountGoat/image_dds | 8.0.0 @ab76f526ef ; v4.5.0 @6dd1e96298 ; 0.25.10 ; 0.7.2 | ISC ; MIT ; MIT OR Apache-2.0 ; MIT | 2026-10-31 |
+| https://github.com/spderosso/gitless | v0.8.8 @3ac28e39e1 | MIT (LICENSE.md) | 2026-10-31 |
+| Repo files read: CLAUDE.md, docs/02-architecture/maintainer-decisions-2026-10-24.md (ADR-022), options-and-decisions.md (ADR-009), data-context-and-state.md, docs/03-subsystem-specs/005-git-collaboration-and-review.md, crates/workspace/src/git.rs, web/package.json, docker/server.Dockerfile, compose.yaml | working tree at main 7c70b0c | AGPL-3.0 | 2026-10-31 |

@@ -1,0 +1,562 @@
+# Research report 12: hoi4-imagegen-mcp (derivative of Connected-Mate/gptimage)
+
+Date: 2026-10-31. Research only. Nothing was built, installed or run from third-party code. No image was generated and no paid API was called. The `gptimage` MCP server that is connected in this session was not used.
+
+Evidence tags used throughout:
+- [V] verified this session from the cited file, command output or vendor page
+- [INF] my inference or calculation from verified inputs, stated with its assumptions
+- [UNV] unavailable or not verified, with the reason
+
+What I created: a shallow clone at `<projects>\hoi4-factory\.work\ext\gptimage`, and under `<projects>\hoi4-factory\.work\research\`: `measure_assets.py` and `parse_sprites.py` (my own stdlib-only read-only scripts; they read at most 148 bytes of each DDS, 18 bytes of each TGA and the text of `interface/*.gfx`), plus their JSON outputs `_asset_survey_full.json`, `_asset_survey.json`, `_sprite_survey.json`, `_survey_stdout.txt`. No game file was copied. The kit, user-level config and installed MCPs were not modified.
+
+----------------------------------------------------------------------------------------------------
+
+## 0. Maintainer decisions folded in (received mid-task)
+
+1. Repository: public `klimPaskov/hoi4-imagegen-mcp`, MIT like upstream, upstream notices kept.
+2. First provider targets: OpenAI Images API (API key), Google Gemini, a ComfyUI endpoint (local GPU or RunPod), plus other hosted APIs that I recommend. See section 5. One correction to the brief: the Google Imagen models are gone (section 5.2), so "Gemini/Imagen" becomes the Gemini image models ("Nano Banana" family).
+3. The upstream ChatGPT-login backend stays available only as an opt-in, local-only, personal-use provider plugin: off by default, never in hosted HOI4 Factory, documented with terms and breakage risk. HOI4 asset logic must never depend on it. Section 7.4 designs this isolation.
+4. In hosted Factory the monthly operator allowance may also pay for image generation next to bring-your-own keys, with per-user and per-task budgets. Section 6 gives cost-per-asset estimates per provider and the exposure against the allowance ($1 per verified user per month in ADR-019, from `docs/02-architecture/maintainer-decisions-2026-10-24.md`).
+
+----------------------------------------------------------------------------------------------------
+
+## 1. Summary of findings and recommendations
+
+1. Upstream is small (1,420 lines in 20 files, JavaScript, Node 20+, two dependencies, one commit lineage of 8 commits by one author, 4 stars, no tests, no releases). Only its MCP tool shape, the reference-first workflow text and the auto-versioning idea are worth keeping. Its authentication and generation core is an impersonation of the OpenAI Codex CLI against an undocumented endpoint. Its file saving has no project containment. (Section 2.)
+2. The kit already integrates gptimage as a verbatim vendored copy (one line differs) and makes it the default image provider in the provider catalog. It also already ships a hardened Python stdio MCP (`.tools/image_generation/runtime/server.py`, 1,800 lines) with about 20 provider routes, project-contained saves and a no-overwrite rule. What the kit lacks is a HOI4-aware layer: category profiles, preprocessing, DDS and sprite registration in one pipeline, batch validation and a machine-readable provenance ledger. That layer is the real value of the new MCP; the provider adapters are the commodity part. (Section 3.)
+3. Measured HOI4 1.19.3.0 asset facts: 95.8% of 15,126 surveyed DDS files are uncompressed A8R8G8B8 and 93.0% have one mip level. The kit's DDS contract (one-level uncompressed BGRA) is confirmed. Several kit canvas conventions are not vanilla: focus icons are 100x88 in 94.1% of `focus_*` files (kit convention 94x86), decision icons 33x32 (kit 32x32), idea pictures 65x67 or 60x68 (kit 64x64). The kit's `.tools/gfx/profiles.json` confirms category icons, report, news and counters; it has no row yet for focus, decision, idea, technology, MIO, agency, portraits or super events. (Section 4.)
+4. Providers (checked in vendor docs on 2026-10-31): `gpt-image-2.5-sunburst` and `gpt-image-2.5-flare` are the current OpenAI models; `gpt-image-1` was shut down on 2026-10-23; Imagen is shut down in the Gemini API and discontinued on Vertex (2026-06-30); `gemini-2.5-flash-image` shuts down 2027-03-15. Native alpha is documented only for OpenAI GPT Image (GA on 2.5, preview on `gpt-image-2`). Everything else needs a background-removal route. (Section 5.)
+5. Language: build in Rust. The core as a library crate that Factory links directly (no subprocess, which suits SPEC-011's "audited built-in adapter" rule), plus a thin rmcp stdio binary for the kit. Fork-then-rewrite keeps upstream's history and MIT notices. (Section 7.1.)
+6. Reuse `.tools/gfx/profiles.json` as the owner of canvas, accepted sizes, margin, frames and evidence. Add an optional `imagegen` sub-object per row for the extra export and naming fields. `gfx.py` reads only `canvas`, `margin` and `accepted`, so extra keys are safe. (Section 7.3.)
+7. Cost exposure: with a $1 monthly allowance, one finished asset (5 provider calls at about 1 megapixel) costs about $0.015 to $1.06 depending on provider and quality tier. Medium-quality OpenAI and Gemini Pro-class tiers would consume the whole allowance on 1 to 4 assets. Recommendation: operator-funded image calls limited to a cheap-tier allowlist, expensive tiers bring-your-own-key only. (Section 6.)
+
+Open questions for the maintainer are in section 9.
+
+----------------------------------------------------------------------------------------------------
+
+## 2. Upstream: Connected-Mate/gptimage
+
+### 2.1 Identity
+
+- URL https://github.com/Connected-Mate/gptimage, default branch `main`, license MIT [V `gh api repos/Connected-Mate/gptimage`]
+- Commit inspected: `dfb4948b6877b5b7febf73e1342fcfacd862a1ed`, 2026-10-05, "AGENT-INSTALL: French version of the starter prompt" [V]. The kit's vendored copy pins the same SHA.
+- Copyright line: `Copyright (c) 2026 Alex-Connected-Mate` (LICENSE, 21 lines, standard MIT text) [V]. Sole contributor: `Connected-Mate`, 8 commits [V `gh api .../contributors`]. Repo owner type is a user account.
+- Created 2026-06-30, last push 2026-10-05, 4 stars, 1 fork, no releases, 2 open items: issue #1 and PR #2 "respect CODEX_HOME" (PR body mentions `npm test`, but the cloned tree has no test directory and no test script) [V].
+- Maintenance judgment [INF]: single-author, small, active for about 3 months, no CI, no tests, no release process. Treat it as a reference implementation of the pattern, not a dependency to track.
+- Files (20): `src/{auth,banner,codex,gen,images,login,server}.js`, `src/banner.txt`, `scripts/build-banner.mjs`, `install.sh`, `skill/gptimage/SKILL.md`, `AGENT-INSTALL.md`, `QUICKSTART.md`, `README.md`, `package.json`, `package-lock.json`, `LICENSE`, `.gitignore`, `assets/mascot.png`, `assets/terminal-art.png`. Source lines: auth 211, login 255, server 136, codex 119, images 96, gen 48, banner 16.
+- Language and dependencies: JavaScript ESM, `engines.node >= 20`; runtime dependencies `@modelcontextprotocol/sdk ^1.12.0` and `zod ^3.23.8`; `private: true`; binaries `gptimage-login`, `gptimage-server`, `gptimage-gen` [V package.json].
+- The two PNGs, the pixel-art banner and the mascot have no separate license statement. Do not copy them [INF; avoids an unverified rights claim].
+
+### 2.2 MCP server (src/server.js)
+
+- Transport: stdio only (`StdioServerTransport`). Server name `gptimage`, version `0.1.0`. [V]
+- Tools [V]:
+  - `generate_image` with zod schema: `prompt` (string, required), `out` (string, required; "relative to the project directory unless absolute; an existing file is auto-versioned"), `quality` (`low|medium|high|auto`, default high), `size` (free string, "auto or WIDTHxHEIGHT, multiples of 16, max edge 3840, ratio <= 3:1"; description only, not enforced in code), `reference_images` (array of paths). One image per call. Returns text "Image saved to <abs path>" plus notes (versioned, or a nudge to use `references/`).
+  - `list_references`: lists image files directly under `<project>/references/` (creates the folder on demand).
+  - `image_auth_status`: reports the credential store in use, the plan type and the account id decoded from the token.
+- Project root: `GPTIMAGE_PROJECT_DIR` or `process.cwd()`; relative `out` and reference paths resolve against it.
+- Errors are returned as `isError` text results, not exceptions.
+- CLI (`src/gen.js`): `--prompt/-p --out/-o --ref (repeatable) --quality --size`; `login.js` offers `--status` and `--logout`.
+
+### 2.3 Image handling and file safety (src/images.js) [V]
+
+- Reference images are read from any path (absolute or relative), the MIME type is taken from magic bytes (PNG, JPEG, WebP, GIF) and falls back to the file extension. A file named `x.png` with other content is therefore still sent. No size limit and no count limit exist in code.
+- References are sent as base64 data URLs inside the request body.
+- Saving: `savePng` resolves `out` (absolute allowed), `mkdir -p`, then `pickNonOverwritePath` tries `name`, `name-v2`, `name-v3`, ... up to 999 using an `access()` existence check, then `writeFile` without an exclusive-create flag. There is no project containment (any absolute path, any extension, `..` accepted), no symlink handling, and a check-then-write race (two concurrent writers can pick the same name). The saved bytes are always treated as PNG, whatever the extension.
+- Overwrite protection: the auto-version idea is good and is what the kit's test `scripts/test_gptimage_reference_upgrade.py` exercises (`out.png` then `out-v2.png`). Its implementation is not safe enough to reuse as is.
+
+### 2.4 Authentication and the unofficial backend (exactly how it works)
+
+All of this is in `src/auth.js`, `src/login.js`, `src/codex.js` [V].
+
+1. Login (`login.js`): an OAuth 2.0 authorization-code flow with PKCE (S256) against `https://auth.openai.com/oauth/authorize`, using the fixed public client id `app_EMoamEEZ73f0CkXaXp7hrann`, redirect URI `http://localhost:1455/auth/callback`, scope `openid profile email offline_access`, and extra query parameters `id_token_add_organizations=true`, `codex_cli_simplified_flow=true`, `originator=codex_cli_rs`. These are the parameters the official Codex CLI uses; the tool presents itself as the Codex CLI. A loopback HTTP server on 127.0.0.1:1455 receives the code (state is checked), then the code is exchanged at `https://auth.openai.com/oauth/token`.
+2. Token storage: the access token, refresh token, account id (decoded from the access-token JWT claim `https://api.openai.com/auth.chatgpt_account_id`), and expiry are written to `~/.gptimage/auth.json` (mode 0600; on Windows the mode has no effect). Resolution order at call time: `GPTIMAGE_ACCESS_TOKEN` env, then `~/.gptimage/auth.json`, then the Codex CLI's `~/.codex/auth.json`. When a token is within 60 s of expiry it is refreshed (`grant_type=refresh_token`, same client id) and the rotated tokens are written back to whichever file they came from, including the Codex CLI's file. Writing into another tool's credential file, and rotating its refresh token, is a risk of its own [INF].
+3. Generation (`codex.js`): `POST https://chatgpt.com/backend-api/codex/responses` with headers `Authorization: Bearer <subscription access token>`, `chatgpt-account-id`, `originator: codex_cli_rs`, `Accept: text/event-stream`. Body: `model` default `gpt-5.5` (override `GPTIMAGE_MODEL`), a fixed instruction "always satisfy the request by invoking the image_generation tool exactly once", the user prompt plus each reference as an `input_image` data URL, `tools: [{type: "image_generation", output_format: "png", quality, size?}]`, `tool_choice: image_generation`, `stream: true`, `store: false`. The SSE stream is parsed for `response.output_item.done` with an `image_generation_call` item whose `result` is base64 PNG. This is the Responses-style protocol of the ChatGPT Codex backend, not the public Images API. Which image model actually runs is not stated by the route (the kit's own docs say the same).
+4. Billing and limits: the ChatGPT plan's allowance. 401 and 429 are mapped to messages. There is no cost or usage reporting.
+5. The upstream README and skill state it themselves: "Grey area, by design ... not an officially sanctioned API ... Heavy use can trigger plan rate-limits (429) or, worst case, account restrictions" [V README]. OpenAI's own Codex auth page (https://learn.chatgpt.com/docs/auth, accessed 2026-10-31) says to "treat ~/.codex/auth.json like a password" and, for general OpenAI API calls, to "continue to use Platform API keys" [V]. A secondary source reports that OpenAI's Terms of Use prohibit automatic or programmatic extraction of Output except as permitted through the API; I could not fetch the primary text (HTTP 403), so the exact current wording is [UNV] and must be checked before the plugin documentation quotes it.
+
+What must be removed from the default product (and isolated per decision 3): `auth.js`, `login.js`, `codex.js`, the `~/.codex` fallback and write-back, `GPTIMAGE_ACCESS_TOKEN`, `GPTIMAGE_ORIGINATOR`, the `chatgpt-account-id`/`codex_cli_rs` header impersonation, the `gpt-5.5` forced-tool request, `image_auth_status` as implemented, the "Pinterest/Dribbble sourcing" advice in the skill, and every doc sentence saying "no API key, no per-image bill".
+
+### 2.5 Install, skill, tests
+
+- `install.sh` (bash, 113 lines): checks Node >= 20, `npm install`, then registers the server at user scope (`claude mcp add gptimage -s user -- node src/server.js`, copies the skill into `~/.claude/skills/gptimage`), or `codex mcp add`, or merges `~/.cursor/mcp.json`; then runs the browser login. `AGENT-INSTALL.md` is a paste-in prompt for an agent (English and French). The kit does not use any of this (UPSTREAM.md: "Upstream install scripts are not part of the project-managed route").
+- Skill (`skill/gptimage/SKILL.md`, 58 lines): reference-first workflow (ask the user for references, keep them under `references/`, feed the previous output and feedback screenshots back in), one image per call, size advice, "never ask for credentials". The workflow text is reusable; the Pinterest/Dribbble sourcing advice conflicts with the kit's source and rights rules.
+- Tests: none in the cloned tree [V]. CI: none.
+
+### 2.6 Reusable versus replace
+
+| Upstream piece | Verdict | Notes |
+|---|---|---|
+| Tool shape `generate_image(prompt,out,quality,size,reference_images)`, `list_references` | Reuse the idea | Replace free `out` with category-derived placement; keep reference lists and one-image-per-call |
+| Auto-version `-vN` never overwrite | Reuse the idea, rewrite | Use exclusive create plus atomic rename; version in candidates, explicit replace for installed files |
+| Reference-first and iterate-with-feedback skill text | Reuse and adapt | Add category profiles, rights rules, approval step |
+| `images.js` base64 data-URL reading | Replace | Needs containment, size and decode limits, real format validation |
+| SSE parser | Keep only inside the opt-in plugin | Public APIs here do not need it |
+| `auth.js`, `login.js`, `codex.js` | Isolate in the opt-in plugin crate only | Section 7.4 |
+| `server.js` | Rewrite on rmcp | Same stdio pattern, typed schemas |
+| `gen.js` CLI | Rewrite as `hoi4-imagegen` CLI | Same tool functions without MCP |
+| `install.sh`, `AGENT-INSTALL.md`, banner, mascot | Drop | Replaced by Mod Setup components and a POSIX `sh` installer |
+| MIT LICENSE | Keep verbatim | Add the new copyright line below the existing one; add NOTICE listing ported files |
+
+Attribution plan [INF]: create the repo as a GitHub fork of `Connected-Mate/gptimage` (keeps commit authorship), rename it, keep `LICENSE` with the original line plus `Copyright (c) 2026 klimPaskov and hoi4-imagegen-mcp contributors`, add `UPSTREAM.md` (pinned SHA, what was ported, what was dropped, like the kit's `providers/gptimage/UPSTREAM.md`), a `NOTICE`, and a header comment in every ported file. A clean new repo with a first commit that cites the SHA is the alternative; the fork preserves history automatically. Open question 1.
+
+----------------------------------------------------------------------------------------------------
+
+## 3. Existing image workflows in the kit (kit HEAD `1dd36a5903fa332a4ee17c1684eeb92794b973e1`, 2026-10-25, working tree clean [V])
+
+### 3.1 How the kit integrates gptimage today [V]
+
+- Vendored source: `.tools/image_generation/providers/gptimage/` (src/*.js, package.json, package-lock.json, LICENSE, UPSTREAM.md, `bootstrap.py`). `UPSTREAM.md` pins `dfb4948b...` and package 0.1.0. My diff of `src/*.js` against the fresh clone shows exactly one difference: `login.js` opens the browser with `rundll32 url.dll,FileProtocolHandler` on Windows instead of `cmd /c start` (an `&` in the URL breaks `start`). UPSTREAM.md also lists a refreshed lock file and a trimmed banner line.
+- Provider catalog: `scripts/image_generation_provider_data.py` defines provider `gptimage` (kind `local_package`, auth `chatgpt_subscription`, component `imagegen.gptimage`, runtime entry `.tools/image_generation/providers/gptimage/src/server.js`, tools `generate_image`, `image_auth_status`, `list_references`) and sets `"default_provider": "gptimage"` (line 527). The generated runtime catalog `.tools/image_generation/runtime/provider_catalog.json` repeats it. Recommendation: change the default when the new MCP exists, because the default currently points to the undocumented route.
+- Bootstrap: `bootstrap.py` runs `npm ci --omit=dev --ignore-scripts --no-bin-links` in the vendored tree after checking a source-tree SHA-256 and a lock-file SHA-256 against the manifest pins, with an isolated empty npm config and cache. The manifest components are `imagegen.gptimage` and `imagegen.gptimage.bootstrap` (`hoi4-mod-setup.manifest.json`, 60 components total).
+- Tests: `scripts/test_gptimage_reference_upgrade.py` (runs the vendored `images.js` under Node: reference discovery, `-v2` versioning, plus a check that the Windows launcher line and lock integrity stay), `scripts/test_image_generation_bootstrap.py`, `scripts/test_image_generation_provider_data.py`, `scripts/test_image_generation_runtime.py` (815 lines), all mocked transports.
+- Docs: `docs/image-generation-providers.md` (checked 2026-10-12) already says the route "calls an undocumented ChatGPT/Codex endpoint ... OpenAI does not publish or support this subscription endpoint".
+- Agents: `hoi4-icon-artist`, `hoi4-generated-feature-art`, `hoi4-portrait-creator` each contain the marker block `<!-- HOI4_MOD_SETUP:IMAGE_GENERATION_PROVIDER:START ... END -->` that Mod Setup fills with the selected provider's details, and the rule "Use the selected image-generation route ... Do not create a substitute image-generation pipeline." The same marker appears in `hoi4-feature-assets/SKILL.md` and `references/generation-and-review.md`. A new MCP is therefore the "selected route"; it must be installable as a provider choice, not a second pipeline.
+
+### 3.2 The existing Python provider runtime (do not duplicate) [V `.tools/image_generation/runtime/server.py`]
+
+- Stdio MCP (protocol version `2025-11-25`) started per provider as `server.py --provider <id> --project-root .`. Reads the project's `.hoi4-setup/image_generation.json` (written by Mod Setup), checks it against the trusted `provider_catalog.json`, refuses symlinked settings, and takes API keys from the OS credential store using references `credential://image_generation_api_key/<provider>_<field>` (Windows Generic Credential target `<reference>.com.klimpaskov.hoi4-mod-setup`, macOS `security` keychain, Linux `secret-tool`).
+- Tools: `generate_image`, `edit_image`, `remove_background`, `image_auth_status` with schemas derived from per-model capability profiles.
+- Routes: the catalog has 24 entries, 20 of them `stdio_adapter` routes served by this runtime: openai_api, gemini_api, fal_ai, replicate, black_forest_labs, stability_ai, ideogram, recraft, leonardo, adobe_firefly, xai_grok, together_ai, openrouter, comfyui_local, automatic1111_local, forge_local, vertex_imagen, microsoft_foundry, aws_bedrock, huggingface_inference. The other four are gptimage (Node `local_package`), codex_native (client built-in), and the manual routes midjourney_manual and none. Default models include `gpt-image-2.5-sunburst` for OpenAI and `gemini-nano-banana-2.1` for Gemini, which match the vendor docs I checked.
+- Safety properties already solved there and worth keeping: project-relative paths only, `..` and symlinks rejected, reference files validated as real PNG/JPEG/WebP, caps (message 8 MiB, image 32 MiB, reference 24 MiB each and 64 MiB total, prompt 12,000 chars), per-provider host allowlists for API and image download hosts (https, port 443, no redirects, no private addresses), no overwrite ("The output file already exists"), temp file plus fsync plus rename, alpha and transparent-pixel detection on the saved PNG, secrets redacted from errors.
+- Gaps relevant to HOI4: no notion of asset category, canvas, DDS, sprite, validation beyond PNG alpha, preprocessing, lineage or approval. Its ComfyUI route builds a fixed checkpoint text-to-image or img2img graph (`CheckpointLoaderSimple`, `KSampler` 24 steps, `SaveImage`, `POST /prompt` with `client_id`, poll `/history/<id>`, fetch `/view`), which cannot run the maintainer's FLUX.2 Klein portrait workflows. The model/size profile data (`model_profiles`) is a hand-reviewed catalog; it already contains stale choices relative to my checks (section 5.2).
+
+### 3.3 Responsibility map: who owns what today
+
+| Responsibility | Current owner | Evidence |
+|---|---|---|
+| Provider choice, credentials | HOI4 Mod Setup (Rust app) writes `.hoi4-setup/image_generation.json` and OS-vault secrets | runtime `load_provider_config`, `read_credential` |
+| Image API calls (generate, edit, remove background) | Python `imagegen.runtime` (20 routes) or the vendored Node gptimage route; Codex native ImageGen when the client is Codex | `provider_catalog.json` |
+| Prompt and brief rules, no text in art, one image per call | `hoi4-feature-assets` SKILL sections 5, 11 and `references/generation-and-review.md` | files |
+| Style references | `.claude/skills/hoi4-feature-assets/assets/vanilla_reference/` (README, CATALOG 69 KB, REFERENCE_MANIFEST 58 KB, contact sheets) | files |
+| Preprocessing and resizing | No general tool. `process_report_event_image.py` (cover crop, B/W, sepia, grain, paper border, tilt, shadow, 210x176, provenance record), `extract_portrait_source_crop.py` (YuNet face crop to 156x210), `create_advisor_icon.py` (65x67 dossier compositor), `process_achievement_icons.py` (64x64 triplets). `gfx.py` states "no automatic rescaling or cropping" | tools/README.md, gfx README |
+| Transparency | Provider native alpha or its remover; `gfx.py alpha` and `defringe` for repair | gfx README |
+| DDS export | `convert_to_dds.py` (texconv, BGRA, 1 mip; also a pure-Python `write_bgra_dds`), `gfx.py dds`, ComfyUI `Hoi4SaveDDS` node for portraits; compressed BC1/BC3 only in the 3D pipeline | files |
+| Sprite registration | Main agent by hand from `gfx_handoff.md`; portrait worker owns portrait-specific `.gfx`; `gfx.py sprites` checks frame widths | skill sections 2.1, 25 |
+| Validation | `gfx.py audit|size|alpha|flags|achievements|binaries|families|reports|counter` (`GFX-*` rules); `hoi4.package_check`; renderers `hoi4.focus_render`, `tech_render`, `gui_render` as source-render evidence | gfx README, manifest |
+| Provenance | `docs/assets/<feature_slug>/manifest.md` plus `prompts/`, `source_png/`, `processed_png/`, `contact_sheets/`, `gfx_handoff.md`; `docs/report_image_provenance.json` (pixels_sha256 for report cards); portrait provenance contract; no machine-readable generation ledger | skill sections 7, 8 |
+| Review and approval | Written rules (inspect native size and 4x on solid and checker backgrounds; automated checks are not visual approval); contact sheets by `gfx.py sheet` | generation-and-review.md |
+| Animation | `hoi4-frame-animation` (real per-frame art, frame-sheet DDS, `frameAnimatedSpriteType`) | skill |
+| Portraits | `hoi4-portrait-production` + router `hoi4-comfyui` + `-cloud/-local/-runpod`; grounded subjects use sourced photos and a user-run styled replacement; fictional ones use the image generator | skills, `.codex/portrait_pipeline.toml` |
+| 3D | `hoi4-3d-model-pipeline` (scope only: Meshy, Blender, io_pdx_mesh, texconv) | skill |
+
+### 3.4 Maintainer's portrait repo (https://github.com/klimPaskov/comfyui-hoi4-portraits) [V]
+
+- MIT; default branch `codex/portrait-pipeline`; HEAD `dce200950147f234309d29d41f38eef03bc6f6b2` (pushed 2026-08-31). The kit pins `workflow_commit = b47222a77f2f...` in `.codex/portrait_pipeline.toml`, so the kit's pin lags the repo HEAD [INF; worth a bump decision].
+- FLUX.2 Klein 9B plus a 2500-step HOI4 style LoRA, four workflows (`hoi4_portrait_source`, `text_to_image`, `batch`, `processing_only`), each with an API-format twin `workflows/*.api.json` (submittable to ComfyUI `POST /prompt`). Output: master PNG 1024x1365, game PNG 156x210 (center crop, Lanczos, never stretched), DDS "uncompressed 32-bit BGRA ... A8R8G8B8, no-mipmap" via its `Hoi4SaveDDS` node. Runs locally, on RunPod (FP8 default, 25 GB minimum) and in Comfy Cloud.
+- Licenses: project MIT; FLUX.2 Klein 9B is gated and non-commercial (README), so it should not be offered on a hosted service [INF]. `THIRD_PARTY_LICENSES.md` lists ComfyUI GPL-3.0 (not bundled), Qwen3 Apache-2.0, BiRefNet, RealESRGAN and others.
+- Kit policy conflict to resolve (open question 3): the kit forbids agents from operating RunPod ("never open, configure, start, queue, monitor") and keeps grounded portraits user-run. The new ComfyUI provider (decision 2) must stay a plain HTTP client to an endpoint the user configured, must never start or stop pods, and category profiles for grounded portraits must carry `automation: user_run_only`.
+
+### 3.5 What not to duplicate
+
+- Provider long tail (Ideogram, Recraft, Leonardo, Firefly, xAI, Together, OpenRouter, Hugging Face, Vertex, Foundry, Bedrock, A1111, Forge): keep in the Python runtime; offer an optional `kit-runtime-bridge` provider in the new MCP that talks MCP to `server.py --provider <id>` (kit mode only).
+- Advisor compositor, achievement triplets, report-card treatment, portrait crop: keep as is. The new MCP calls them (kit mode) or accepts their output and validates it. The Rust QA and DDS functions listed in section 7.2 are the only new image-processing code, and they exist because Factory's Linux images cannot depend on texconv or the kit's Python environment.
+- Texture conversion for 3D (BC1/BC3 with mips): out of scope.
+
+----------------------------------------------------------------------------------------------------
+
+## 4. HOI4 asset specifications measured from the installed game
+
+Game: Hearts of Iron IV `rawVersion` 1.19.3.0, version string "Operation Postern v1.19.3.0.c01a (5632)" (`launcher-settings.json`), folder `C:\Program Files (x86)\Steam\steamapps\common\Hearts of Iron IV` [V]. Method: `measure_assets.py` reads the DDS header (128 bytes plus the 20-byte DX10 extension when present) and the 18-byte TGA header only; `parse_sprites.py` parses `interface/**/*.gfx` text. Pixel contents were not read, so "alpha" below means header-level capability (an alpha channel is declared), not proof that the pixels use it. For pixel-level alpha behaviour I cite the kit's own calibration (`.tools/gfx/README.md`: on the same game, the opaque-canvas and empty-subject rules matched 0 of 4,440 focus, decision and idea textures; ghosted focus icons 5.5%; chroma fringe 4-7%) as [V in kit docs, not re-run by me].
+
+### 4.1 Overall DDS contract [V]
+
+- 15,126 DDS files surveyed across 29 icon, portrait, event and GUI folders: 14,485 (95.8%) are uncompressed 32-bit with masks R=00FF0000 G=0000FF00 B=000000FF A=FF000000 (D3DFMT A8R8G8B8, legacy 128-byte header, no DX10 header); 14,072 (93.0%) have a single mip level.
+- Other formats: X1R5G5B5 with 8 mips 444 (all older leader portraits), DXT5 123, DXT1 35, DXT3 10, RGB24 20, DX10-header files 8 (all B8G8R8A8_UNORM_SRGB or R8G8B8A8_UNORM_SRGB), RXGB 1. No BC7 and no BC4/BC5 occur.
+- So the kit's `convert_to_dds.py` contract (texconv BGRA, 1 mip; `write_bgra_dds`: 128-byte header, `RGB|ALPHAPIXELS`, straight alpha, `DDSCAPS_TEXTURE`, file length `128 + w*h*4`) matches the dominant vanilla format. An in-process Rust writer can produce byte-identical output without texconv [INF; verify with a golden test against `write_bgra_dds`].
+- Flags are TGA, not DDS (4.3).
+
+### 4.2 Per-family measurements [V unless marked]
+
+| Family (folder or file pattern) | Files | Dominant dimensions | Format and mips | Sprite declaration |
+|---|---|---|---|---|
+| Focus icons `gfx/interface/goals/focus_*.dds` | 2,849 | 100x88: 2,681 (94.1%); 102x90: 28; 192x128: 17; 99x88: 12; 98x88: 11 | A8R8G8B8, 1 mip in 2,948 of 2,954 files of the folder (3 DX10 B8G8R8A8_SRGB, 6 with 7 mips) | `SpriteType { name = "GFX_<id>" texturefile = ".../goals/<file>.dds" }` in `interface/goals.gfx`, plus a paired shine sprite (below) |
+| Old focus icons `goal_*.dds` | 102 | mixed (89x79: 18; 94x77: 14; 94x76: 5) | A8R8G8B8 | same |
+| Idea and national spirit pictures `gfx/interface/ideas/idea_*.dds` | 2,866 | 65x67: 1,249 (43.6%); 60x68: 1,025 (35.8%); 64x64: 505 (17.6%); 65x64: 14 | A8R8G8B8 3,390 of 3,393 (DXT1 2, DXT5 1); 1 mip in 97.7% | `spriteType { name = "GFX_idea_<id>" texturefile = ... }` in `ideas.gfx` and `ideas_characters.gfx`; one strip `GFX_idea_traits_strip` with `noOfFrames = 18` |
+| Advisor and theorist portraits `ideas/portrait_*.dds` | 386 | 65x67: 385 | A8R8G8B8 | `GFX_idea_<TAG>_<name>` in `ideas_characters.gfx` |
+| Officer corps spirits `gfx/interface/officer_corp/spirits` | 149 of 222 files in folder | 45x45 | A8R8G8B8 | `officer_corp_spirits.gfx` (155 sprites) |
+| Technology art `gfx/interface/technologies` | 1,318 | 64x64: 328; 146x54: 269; 173x77: 92; 131x52: 55; 62x62: 50; 285x56: 23; 322 distinct sizes | A8R8G8B8 100%; 1 mip 80.3%, 6-8 mips for 259 files | `SpriteType` in `Technologies.gfx` (1,797 sprites); 86 use `alwaysTransparent = yes` |
+| Decision icons and category art `gfx/interface/decisions` (whole folder; 503 files carry the `decision_` prefix) | 615 | 33x32: 236 (38%); 38x35: 69; 38x38: 16; 38x37: 12; 33x31: 10 (32x32 occurs fewer than 5 times) | A8R8G8B8 612 of 615 (DXT5 1, RGB24 1, DX10 1); 1 mip 89.1% | `spriteType` in `decisions.gfx` (621 sprites) |
+| Decision category icons | 94 | 52x40 | A8R8G8B8 | same |
+| Decision category pictures | 131 | 114x101 | A8R8G8B8 | same; two animated strips with `noOfFrames = 21` |
+| Event pictures `gfx/event_pictures` | 885 | 210x176: 533 (report); 397x153: 233 (news); 209x176: 54; 396x153: 46; 208x176: 9; 397x165: 6 | A8R8G8B8 882 (RGB24 2, DX10 1); 1 mip 98.2% | `GFX_report_event_*` / `GFX_news_event_*` in `eventpictures.gfx`, plain `spriteType` |
+| Super events (457x328) | none in vanilla | not a vanilla surface; defined by the optional Mod Setup Super Events runtime (`gfx/super_events/super_event_image_template_457x328.psd`) [V in kit docs] | n/a | per-event sprite in `<prefix>_super_events.gfx` [V in kit docs] |
+| Leader, commander, operative portraits `gfx/leaders/**` | 1,129 | 156x210: 1,122; 100x135: 3; others 1 px off | A8R8G8B8 669 (59.3%, newer portraits: FIN, scientists, MISC); X1R5G5B5 with 8 mips 444 (39.3%, legacy nation folders GER, SOV, JAP, ENG, USA, FRA, ITA); RGB24 15; DXT5 1 | `GFX_portrait_*` and per-person sprites in `_leader_portraits.gfx` (1,598 sprites); a few use `legacy_lazy_load`, `generate_mip_maps`, `masking_texture` |
+| Flags `gfx/flags/<TAG>[_ideology].tga` | 2,203 | 82x52: 2,202 (one 82x55) | TGA uncompressed truecolor 32bpp 2,187, 24bpp 9, RLE 6, 16bpp 1; origin bottom-left 2,198, top-left 5 | none: the file name is the lookup |
+| Flags `gfx/flags/medium` | 2,203 | 41x26: 2,202 (one 41x28) | TGA 32bpp 2,187 (RLE 9, 24bpp 7); origin top-left 221 (10.0%), bottom-left 1,982 | none |
+| Flags `gfx/flags/small` | 2,226 | 10x7: 2,225 (one 10x6) | TGA 32bpp; origin top-left 3 | none |
+| Military industrial organization `gfx/interface/military_industrial_organization` | 425 | 48x48: 381 (department icons); 60x60: 20 (policy icons); 63x63: 4 (rosters); 945x660: 5 (backgrounds) | A8R8G8B8 424, DXT5 1; 1 mip all | 520 sprites in two `.gfx` files under `interface/military_industrial_organization/`; 6 use `noOfFrames` |
+| Intelligence agency logos `gfx/interface/operatives/agencies` | about 70 | 233x119 and 234x119 | A8R8G8B8 | `GFX_intelligence_agency_logo_<tag>` with `noOfFrames = 2` in `countryintelligenceagencyview.gfx`; department icons 68x68 |
+| Operations `gfx/interface/operations` | 225 | 210x176: 71 (phase pictures); 59x58: 71; 48x48: 21 (map); 85x85: 17 | A8R8G8B8 | `countryintelligenceagencyview.gfx` and related |
+| Medals | 88 | 16x28: 41 ribbons; strips up to 7 frames | A8R8G8B8 | `medals.gfx`, 38 sprites with `noOfFrames` |
+| State modifiers | 101 | 32x32: 100 | A8R8G8B8 | `countrystateview.gfx` |
+| Achievements `gfx/achievements` | 882 | 64x64: 882 | A8R8G8B8 792, DXT5 90 | none in `.gfx` (id = file name) |
+| Division counters (`gfx/interface/counters`) | divisions_large 115, divisions_small 83, templates 101+101, air_small 26, ships_small 22 | divisions_large 152x42 (111; = 2 x 76x42), divisions_small 60x12 (83; = 2 x 30x12), template emblems 76x42 and 30x12 | A8R8G8B8 mostly; DXT1 in air_small (12) and ships_small (9) | frame strips with `noOfFrames = 2` |
+| General GUI textures `gfx/interface/*.dds` (top level) | 1,324 | 856 distinct sizes; 16x16: 21; 63x63: 17; 31x31: 17; 32x32: 17 | A8R8G8B8 95.0%; DXT1 26, DXT5 25, DXT3 10, DX10 3; 1 mip 95.2% | `spriteType` (14,939), `SpriteType` (8,577), `frameAnimatedSpriteType` (151), `corneredTileSpriteType` (130, with `bordersize`, `tilingcenter`, `size`), `progressbartype` (99), `textSpriteType` (67) |
+| Text icons `gfx/texticons` | 331 | 60x12: 149; 20x20: 38; 18x18: 27 | A8R8G8B8 328 | `texticons.gfx` |
+| Loading screens | 19 | 1920x1440 (9), 192x144 (10) | A8R8G8B8 | `frontendmainviewbg*.gfx` |
+
+### 4.3 How sprites are declared, frames and shine [V]
+
+- Plain icon: `spriteType = { name = "GFX_x"  texturefile = "gfx/....dds" }`. `SpriteType` and `spriteType` both occur (case-insensitive). Optional keys seen: `noOfFrames`, `effectFile`, `legacy_lazy_load`, `alwaysTransparent`, `generate_mip_maps`, `masking_texture`, `animation = { ... }`.
+- Frames: a horizontal strip whose width is `noOfFrames` times the frame width. Examples: 21-frame decision category UI strips; 2-frame agency logos and counters; 18-frame `idea_traits_strip`; medals up to 7 frames. `gfx.py sprites` already warns when the width does not divide by `noOfFrames` (vanilla has 79 uneven strips of 1,798, per the kit README).
+- Focus shine: every focus icon has a second sprite named `<icon sprite>_shine` in `interface/goals_shine.gfx` (3,122 shine sprites against 3,131 goal sprites). Pattern: same `texturefile` as the icon, `effectFile = "gfx/FX/buttonstate.lua"`, two `animation` blocks with `animationmaskfile` = the icon texture, `animationtexturefile = "gfx/interface/goals/shine_overlay.dds"`, `animationrotation = -90.0` and `90.0`, `animationlooping = no`, `animationtime = 0.75`, `animationdelay = 0`, `animationblendmode = "add"`, `animationtype = "scrolling"`, `animationtexturescale = { x = 1.0 y = 1.0 }`, `legacy_lazy_load = no`. The kit's skills do not mention the shine sprite at all (search for "shine" in all skills and references found nothing). Whether a mod focus without a shine sprite logs an error was not tested [UNV]. The sprite registration step should generate the shine sprite from this template and mark it "pattern observed in vanilla, game behaviour untested".
+- Implicit lookups: idea `picture`, focus `icon`, decision `icon`, achievements and flags resolve by name or file without explicit sprite for flags and achievements; the kit's `gfx.py families` already follows focus, decision and idea consumers through the registry.
+
+### 4.4 Comparison with the kit's `.tools/gfx/profiles.json` and skill conventions
+
+| Kit statement | Measured | Status |
+|---|---|---|
+| `category` 52x40 (94 vanilla) | 94 files, 52x40 | Confirmed |
+| `report` 210x176 (532 of 884) | 533 of 885 | Confirmed (installed game has one more file; count drift of 1) |
+| `news` 397x153 (233) | 233 | Confirmed |
+| `counter-large` 76x42 x2 (111 of 115 strips are 152x42) | 111 of 115 | Confirmed |
+| `counter-small` 30x12 x2 (all 83 strips are 60x12) | 83 of 83 | Confirmed |
+| Flags 82x52, 41x26, 10x7 (2,202 of 2,203) | 2,202 of 2,203 each | Confirmed |
+| `GFX-FLAG-ORIGIN`: "vanilla ships 5 of 2,203 top-origin flags" | Normal folder: 5 top-origin. Medium folder: 221 top-origin (10.0%). Small: 3 | Accurate for the normal folder only; the sentence understates the medium folder. Check what `check_flags` does for medium before copying its rule [UNV: not read] |
+| Achievements 64x64 (882 of 882) | 882 of 882 | Confirmed |
+| Officer corps spirits 45x45 | 149 of 222 in the folder | Confirmed as the dominant size |
+| Leader, commander, operative portraits 156x210 | 1,122 of 1,129 | Confirmed |
+| Advisor family 65x67 | 385 of 386 `portrait_*` files | Confirmed |
+| Focus icons 94x86 (skill convention, and no `focus` row in profiles.json) | 100x88 in 94.1% of `focus_*` files; 94x86 does not occur in the top sizes | Different. The skill itself says the canvas is a package convention and vanilla uses 100x88. Needs a maintainer decision and a profile row with source |
+| Idea and national spirit icons 64x64 | 64x64 in 17.6% of `idea_*`; 65x67 43.6%; 60x68 35.8% | Different (convention, not vanilla); no profile row |
+| Decision icons 32x32 | 33x32 for the dominant sizes; 32x32 under 5 files | Different |
+| Tech icons small 64x64 | 64x64 is the most common single size (328) | Confirmed |
+| Tech icons medium 132x52 | 131x52: 55; 146x54: 269; 173x77: 92; 132x52 not among the top sizes | Not confirmed; no profile row |
+| Naming prefix `goal_` for focus icons | `focus_` in 2,849 files; `goal_` only in 102 older ones | Convention differs from the modern vanilla majority; harmless for modding, but the profile `imagegen.name_prefix` should record the project choice |
+| Prefixes `idea_`, `decision_`, `report_event_`, `news_event_` | match vanilla (2,866 `idea_`, 503 `decision_`) | Confirmed |
+| One-level uncompressed BGRA DDS | 95.8% of surveyed files | Confirmed |
+| Super event 457x328 | not vanilla | Mod-package convention only |
+| Missing from profiles.json | focus, decision, idea, technology small and medium, MIO (48x48, 60x60), agency logos (234x119), leader portraits (156x210), advisor (65x67), super event (457x328), flags (covered by dedicated checks), general GUI | Missing |
+
+Evidence caveats [INF]: dimensions and formats are measured; the "style" of each family (aged texture, outline, drop shadow, report sepia, news black and white) cannot be measured from headers and stays a visual-review matter, as the kit rules already say.
+
+----------------------------------------------------------------------------------------------------
+
+## 5. Authorized providers (vendor documentation, accessed 2026-10-31)
+
+### 5.1 Matrix
+
+| Provider and verified model ids | Auth | References and edits | Transparency | Max size | Rate limit | Price order | Output terms |
+|---|---|---|---|---|---|---|---|
+| OpenAI Images API. Ids [V]: `gpt-image-2.5-sunburst` (default for edits; "editing precision"), `gpt-image-2.5-flare` ("fast, everyday"), `gpt-image-2` (snapshot `gpt-image-2-2026-04-21`), `gpt-image-1.5`, `gpt-image-1-mini`, `chatgpt-image-latest`; 2.5 snapshots `...-2026-09-08`. `gpt-image-1` shut down 2026-10-23 | `Authorization: Bearer <API key>`; API organization verification may be required | `POST /v1/images/edits`: 1 to 16 images (`image_url` or `file_id`, each up to 20,971,520 chars), optional `mask` (alpha channel, same size and format, applies to first image, "may not follow the exact shape") or `markup` overlay (2.5); `input_fidelity` `high|low` on 1.5, omit on `gpt-image-2`, low only on mini; Responses API `image_generation` tool with `action` auto/generate/edit | `background: "transparent"` with `png` or `webp`: GA on 2.5 models, "in preview" on `gpt-image-2` | gpt-image-2 family: any WxH, multiples of 16, ratio 1:3 to 3:1, edge <= 3840, total pixels 655,360 to 8,294,400, above 2560x1440 experimental; older models 1024x1024, 1536x1024, 1024x1536 | not stated on the pages fetched [UNV] (tier-based) | Table in section 6 | Customer owns Output, OpenAI assigns its rights, no use of Output to build competing models (Services Agreement language seen via search snippets; primary page returned 403) [partly UNV]. Content moderation `auto|low`, error `moderation_blocked`. `safety_identifier` (<= 128 chars) per end user |
+| Azure OpenAI / Foundry. Ids [V]: GPT-Image-2.5-Sunburst, -Flare, GPT-Image-2 are GA; 1.5, 1, 1-Mini limited access; `dall-e-3` retired 2026-03-04 | `api-key` header or Microsoft Entra ID (scope `https://cognitiveservices.azure.com/.default`); deployment name used as `model`; `api-version` (`preview` on `/openai/v1/`, `2025-04-01-preview` on deployment paths) | up to 16 input images (< 50 MB each, PNG or JPG), mask PNG with zero-alpha edit area | `background=transparent` with PNG (page comment says "GPT-image-1 only", unclear for newer models) [UNV] | same limits as OpenAI; PNG and JPEG only | default quota 5 images/min per deployment for gpt-image-1 series and gpt-image-2 [V] | same family pricing, billed through Azure [UNV] | Microsoft product terms [UNV] |
+| Microsoft MAI-Image (Foundry). Ids [V]: `MAI-Image-2.6`, `MAI-Image-2.6-Flash`, `MAI-Image-2.5-Pro`, `-2.5-Flash`, `-2.5`, all Preview | `api-key` or Entra | edits take up to 5 JPEG/PNG references | none | 2.6: <= 2,359,296 px, min 768 per edge; 2.5: <= 1,048,576 px | 2 to 36 RPM by tier [V] | not stated | not stated |
+| Google Gemini API. Ids [V]: `gemini-nano-banana-2.1` (recommended), `gemini-3.1-flash-image`, `gemini-3.1-flash-lite-image`, `gemini-3-pro-image`, `gemini-2.5-flash-image` (deprecated, shuts down 2027-03-15) | API key (Google AI Studio); Vertex route uses Google Cloud credentials | generation plus text-and-image edits; multi-turn via `previous_interaction_id`; references: Lite up to 14 object images, Nano Banana 2.1 and 3.1 Flash up to 10 object plus character and style, Pro up to 6 object (cell mapping for character and style is ambiguous in my fetch [UNV]); no mask or inpainting documented | none documented; all outputs carry a SynthID watermark | tiers 1K, 2K, 4K (0.5K on 3.1 Flash; Lite 1K only), uppercase K required; aspect ratios per model | not stated on the pages fetched [UNV] | Section 6; no free tier for the image models | Google "won't claim ownership" of generated content; user responsible for use; paid tier does not use prompts or responses to improve products (Gemini API Additional Terms, March 2026 version, via search snippet) |
+| Google Imagen. Ids that existed: `imagen-4.0-generate-001`, `-fast-`, `-ultra-` | | text-in only, no editing | none | 1K to 2K | 30 to 150 requests/min regional | $0.02 to $0.06 per the kit doc | **Not available**: the Gemini API page says Imagen models "are shut down"; the Vertex model card lists discontinuation on 2026-06-30 and points to `gemini-2.5-flash-image` |
+| Black Forest Labs API. Ids [V]: `flux-2-pro`, `flux-2-pro-preview`, `flux-2-klein-9b`, `flux-2-klein-9b-preview` (plus FLUX.2 max, flex, klein 4B, FLUX 3 Image and FLUX 3 Image Klein exist; their exact endpoint ids were not stated on the pages I read) | header `x-key`; base `https://api.bfl.ai/v1/`; asynchronous: POST returns `polling_url`, poll for the result | FLUX.2: up to 8 references via API (klein: 4); FLUX 3 Image: up to ten images, bounding-box edits; Fill/Kontext/Expand endpoints exist | not documented | FLUX.2 up to 4 MP; FLUX 3 Image tiers 768sq, 1k, 1.5k (about 2 MP), 2k (about 4 MP), 4k (about 16 MP) | HTTP 429 "exceeded the rate limits"; no numbers [UNV] | 1 credit = $0.01; FLUX.2 per megapixel; FLUX 3 per tier; the price cells were empty in the docs I fetched, the pricing calculator showed "$0.048 / image" at 768x768 for an unnamed model [UNV] | output license not stated in docs fetched [UNV]; klein 9B weights are non-commercial, klein 4B Apache-2.0 |
+| Stability AI (REST v2beta). [V] credit table | `Authorization: Bearer <key>` [INF; not stated on the pages I fetched] | services Ultra, Core, SD 3.5 Large/Medium; edit services inpaint, erase object, search and replace, outpaint, remove background, control structure, style guide, style transfer; per-endpoint reference support not read [UNV] | **Remove Background** returns a cutout (service listed at 5 credits) | not read [UNV] | not stated [UNV] | 1 credit = $0.01: Ultra 8, Core 3, SD 3.5 Large 6.5, Medium 3.5, inpaint 5, remove background 5, erase 5, outpaint 4, structure 5, style guide 5, style transfer 8 | output terms not read [UNV] |
+| fal.ai (queue API). Endpoints [V]: `fal-ai/flux-2-pro/edit` (input `image_urls`, `image_size` presets or custom, output `jpeg|png`), `fal-ai/flux-2`, `fal-ai/flux-2/edit`, `fal-ai/flux/dev`, `fal-ai/flux/schnell`, `fal-ai/nano-banana(/edit)`; the kit doc also lists Seedream 4.5, Recraft V4, Ideogram V3 and Ideogram V3 Transparent (`generate-transparent`) [kit doc, not re-read by me] | `Authorization: Key $FAL_KEY`; key presets API, SERVERLESS, custom | edits take image URLs (upload needed) | native only on certain endpoints (Ideogram transparent) [kit doc] | per-endpoint | not stated [UNV] | Section 6 | pages tag models "Commercial use" with no license text; check per model |
+| Replicate. [V] | `Authorization: Bearer r8_...` | model-dependent | model-dependent (Bria remove-background per kit doc) | model-dependent | create prediction 600/min, other endpoints 3,000/min [V] | Section 6 | model-dependent. API predictions' inputs, outputs and logs are deleted after one hour by default [V] |
+| ComfyUI, self-hosted or RunPod (HTTP API) | none by default; Comfy Cloud uses `X-API-Key` and needs a paid subscription [V] | any: the workflow decides; upload via `POST /upload/image`, `POST /prompt`, `GET /history/{id}`, `GET /view`, `GET /object_info`, WebSocket `/ws` (`status`, `execution_start`, `executing`, `progress`, `executed`) [V]; API-format JSON accepted (the kit runtime and the maintainer's `*.api.json` use `{"prompt": ..., "client_id": ...}`) | workflow-dependent (BiRefNet and similar nodes in the maintainer's repo) | hardware and model dependent | none | no per-image fee; RunPod on-demand: RTX 4090 $0.89/hr Secure, $0.34/hr Community; A40 $0.59 / $0.35; L40S $1.09 / $0.79; storage $0.10/GB/mo running, $0.20 idle [V] | per model license; FLUX.2 Klein 9B non-commercial |
+
+Official Rust or other SDK availability is not needed: every route above is plain HTTPS plus JSON or multipart [INF].
+
+### 5.2 Corrections to the brief and to the kit's provider data
+
+- Imagen: not a usable target (above). The kit's `vertex_imagen` route (`imagen-4.0-generate-001`) points to a model Google discontinued on 2026-06-30 [V]; flag it for removal from `scripts/image_generation_provider_data.py`.
+- `gpt-image-1` shut down 2026-10-23 [V]; `docs/image-generation-providers.md` still lists it among current models.
+- `gemini-2.5-flash-image` is deprecated (shutdown 2027-03-15) [V]; the kit's `gemini-nano-banana-2.1` default is correct.
+- The model id lists change quickly (Azure `dall-e-3` 2026-03-04, Imagen 2026-06-30, `gpt-image-1` 2026-10-23: three retirements within eight months). Therefore model ids, limits and prices belong in a dated, reviewed data file per provider (like Factory's `crates/agent/src/cost.rs` `Price` table with `source` and `retrieved`), never in code or in skills.
+
+### 5.3 Recommendation for first targets
+
+Phase 1: `openai` (Images API; also covers Azure OpenAI by `base_url` and auth-style variants), `gemini` (Gemini API image models), `comfyui` (workflow-template runner), plus `fal` as the recommended other hosted API: one key reaches FLUX.2 Pro and its edit endpoint, Nano Banana, and several transparent-output and Ideogram/Recraft endpoints; it has an asynchronous queue with request ids, which makes lost-response reconciliation possible; prices are explicit per megapixel or per image.
+Phase 2: `stability` (cheap deterministic Remove Background and inpaint/erase at 5 credits, fills the transparency gap for providers without native alpha), `bfl` (direct FLUX.2 with up to 8 references), `azure-openai` (same wire format as `openai`).
+Not first: Replicate (overlaps with fal; 1-hour output deletion), the kit-runtime-bridge long tail (optional, kit mode only).
+Reason for fal over BFL in phase 1 [INF]: BFL's pricing and limits were not readable in the docs I could fetch, so budget reservation could not be implemented from verified data today.
+
+Constraint for hosted Factory [V in SPEC-011/SPEC-002]: provider requests are outbound data operations with per-project destination policy; a task restricted to one provider cannot fail over silently (EXT-09); custom endpoint URLs (the ComfyUI endpoint) pass the outbound check that blocks private, loopback, link-local and metadata addresses, so on the hosted service a ComfyUI endpoint must be a public HTTPS URL the user supplies.
+
+----------------------------------------------------------------------------------------------------
+
+## 6. Cost per asset and exposure against the operator allowance
+
+Definitions [INF]: an "asset" is one finished HOI4 asset obtained through 5 provider calls of about 1 megapixel each (4 candidate generations or edits plus 1 refinement edit). HOI4 targets are small (100x88 to 397x153), so every call can use the cheapest size/quality tier that gives a clean subject, then downscale; the minimum size on the gpt-image-2 family is 655,360 pixels, so tiny sizes are not an option. Background removal, where a provider lacks native alpha, adds one call per asset. The call count is a planning assumption; scale linearly (2 calls = x0.4, 10 calls = x2).
+
+Prices verified on 2026-10-31 are marked [V]; calculations are marked [INF]. The allowance is $1 per verified user per month (ADR-019) [V].
+
+| Provider and model | Verified price basis | Per 1K-class call | Per asset (5 calls) | Assets per $1 allowance |
+|---|---|---|---|---|
+| OpenAI `gpt-image-2`, low | $0.006 at 1024x1024, $0.005 at 1536x1024 (guide table) [V] | $0.006 | $0.03 | 33 |
+| OpenAI `gpt-image-2`, medium | $0.053 / $0.041 [V] | $0.053 | $0.265 | 3.8 |
+| OpenAI `gpt-image-2`, high | $0.211 / $0.165 [V] | $0.211 | $1.055 | 0.95 |
+| OpenAI `gpt-image-1.5`, low / medium / high | $0.009 / $0.034 / $0.133 at 1024x1024 [V] | | $0.045 / $0.17 / $0.665 | 22 / 5.9 / 1.5 |
+| OpenAI `gpt-image-1-mini`, low / medium | $0.005 / $0.011 [V] | | $0.025 / $0.055 | 40 / 18 |
+| OpenAI `gpt-image-2.5-sunburst` and `-flare` | per-image price not published in the pages I fetched; token rates $8 per 1M image input, $30 per 1M image output, $5 per 1M text input, equal to `gpt-image-2`, but the page warns "Equal token rates don't mean equal cost per image" [V] | unknown | unknown | unknown. Proxy: use the `gpt-image-2` row [INF] until the first recorded call reports `usage` |
+| Gemini `gemini-nano-banana-2.1` | $0.0336 (1K), $0.0504 (2K), $0.113 (4K) [V]; batch half price | $0.0336 | $0.168 | 6.0 |
+| Gemini `gemini-3.1-flash-lite-image` | $0.0336 (1K only) [V] | $0.0336 | $0.168 | 6.0 |
+| Gemini `gemini-3.1-flash-image` | $0.067 (1K), $0.101, $0.151, 0.5K $0.045 [V] | $0.067 | $0.335 | 3.0 |
+| Gemini `gemini-3-pro-image` | $0.134 (1K and 2K), $0.24 (4K) [V] | $0.134 | $0.67 | 1.5 |
+| fal `fal-ai/flux-2-pro` and edit | first output megapixel $0.03, each additional input or output megapixel $0.015, 1 MP = 1024x1024 [V]; edit with one 1 MP reference = $0.045 [INF reading of that rule] | $0.03 / $0.045 | 4 x 0.03 + 0.045 = $0.165 | 6.1 |
+| fal `fal-ai/flux-2` (and edit) | $0.012 per (processed) megapixel [V] | $0.012 | about $0.072 with a 2 MP edit [INF] | 14 |
+| fal `fal-ai/flux/schnell` | $0.003 per megapixel [V] | $0.003 | $0.015 | 66 |
+| fal `fal-ai/flux/dev` | $0.025 per megapixel [V] | $0.025 | $0.125 | 8 |
+| fal `fal-ai/nano-banana` (and edit) | $0.0398 per image [V] | $0.0398 | $0.199 | 5.0 |
+| Replicate `flux-1.1-pro` / `flux-dev` / `flux-schnell` | $0.04 / $0.025 / $0.003 per image [V] | | $0.20 / $0.125 / $0.015 | 5 / 8 / 66 |
+| Stability Core / SD 3.5 Medium / SD 3.5 Large / Ultra | 3 / 3.5 / 6.5 / 8 credits at $0.01 [V] | $0.03 / $0.035 / $0.065 / $0.08 | $0.15 / $0.175 / $0.325 / $0.40 | 6.7 / 5.7 / 3.1 / 2.5 |
+| Stability Remove Background or Inpaint (add-on) | 5 credits [V] | $0.05 | +$0.05 per asset needing it | |
+| BFL direct FLUX.2 | not readable in the docs fetched [UNV]. Use the fal rows as a stand-in | | | |
+| ComfyUI local | no provider fee; electricity and hardware only | $0 | $0 | unlimited |
+| ComfyUI on RunPod | $0.89/hr RTX 4090 Secure ($0.34 Community) [V]; seconds per image not measured [UNV]. Example [INF]: 30 s per image gives $0.0074 per image, $0.037 per asset, plus pod start-up, idle time and storage ($0.10 to $0.20 per GB per month; the portraits repo needs at least 25 GB) | | | |
+
+Reading the exposure [INF]:
+- With a $1 allowance, a medium-quality OpenAI or a Pro-class Gemini tier gives 1.5 to 4 assets per user per month. The cheap tiers (`gpt-image-2` low, Gemini 2.1 / Lite, flux-2, schnell) give 6 to 66.
+- Quality is not linear with price for tiny targets: a 100x88 focus icon is a downscale of the generated image, so low or medium tiers plus careful references may be enough. This is a hypothesis to test in the first recorded runs, not a finding.
+- Recommended policy: operator-funded image calls are limited to an allowlist of cheap-tier models (candidates: `gemini-nano-banana-2.1` at 1K, `gpt-image-2` low or medium, `fal-ai/flux-2`), with a default per-task cap (suggest $0.25) and per-user monthly image sub-limit inside the same $1; expensive tiers, high-resolution tiers and bulk batches require the user's own key. Both the per-task and the per-user limits apply whoever pays (SPEC-002 section on budgets).
+- Budget mechanics for image calls: price-per-image providers have deterministic cost, so reserve exactly; token-priced providers (OpenAI 2.5, Gemini token tables) reserve an upper bound from a dated price table, then settle from the response `usage` fields (OpenAI returns `usage.input_tokens`, `output_tokens`, with image/text details [V]); missing usage becomes `usage_unknown` with the reserve held, never zero (existing Factory rule, `crates/agent/src/cost.rs`).
+- A lost response on a synchronous API (OpenAI Images API, Gemini generate) cannot be reconciled by job id; treat as an uncertain charge and require an explicit user decision before resubmitting. Asynchronous providers (BFL `polling_url`, fal queue request ids, Replicate prediction ids, ComfyUI `prompt_id`) can be reconciled by reading the job. Whether the OpenAI Responses API offers a background-retrieval mode that would allow reconciliation was not checked [UNV].
+
+----------------------------------------------------------------------------------------------------
+
+## 7. Language, architecture and integration (proposal; nothing here is built)
+
+### 7.1 Fork in JavaScript or rewrite in Rust
+
+| Criterion | (a) Fork upstream in JavaScript | (b) Rust implementation keeping upstream's architecture and attribution |
+|---|---|---|
+| Start-up cost | Lowest: 1.4k lines already work for the removed backend only | Higher: the reusable upstream code is roughly 300 lines of logic [INF]; almost everything HOI4-specific is new in either language |
+| Maintainer preference and plan | Conflicts with "Rust for new tooling where practical" and D-07 | Matches D-07; the shared Rust HOI4 engine can supply `.gfx` parsing and edits |
+| HOI4 Factory | Cannot be linked into the Rust server; would run as a Node subprocess inside the gVisor tool container, which SPEC-011 allows only for audited bundled code and which adds Node to the images | Library crate linked into the server as an audited built-in adapter, no subprocess, one binary |
+| Kit install | Node is already a kit prerequisite for hoi4-agent-tools (Node 22.19+ or 24), so no extra runtime; but the kit's MCP bootstrap covers Windows and Linux only today | Single native binary per platform (Windows x64, macOS arm64, Linux amd64/arm64), no Node or Python needed for this tool |
+| Image processing | Needs `sharp` (libvips, LGPL prebuilt binaries; agent-tools already ships them) or a pure-JS stack; DDS writer by hand | `image` 0.25.10 (MIT/Apache-2.0), `png` 0.18.1, `fast_image_resize` 6.1.0 for deterministic resize; DDS A8R8G8B8 is a 128-byte header plus raw BGRA, writable in under 100 lines. `image_dds` 0.7.2 (MIT) was last released 2025-03-13 and is not needed because vanilla does not use BC7 [V crates.io] |
+| MCP SDK | `@modelcontextprotocol/sdk` 1.x (upstream uses ^1.12) | `rmcp` 3.8.0, Apache-2.0, official `modelcontextprotocol/rust-sdk`, published 2026-10-26, rust-version 1.88, implements MCP 2026-07-28 and 2025-11-25 including long-running Tasks and stdio/Streamable HTTP; Factory pins Rust 1.97.1 [V] |
+| Testing | vitest or node:test; no shared fixtures with Factory | `cargo test`, same fixtures as Factory, `scripts/linux-tests.sh` for the Linux gate |
+| Windows disk (C: has 11 GB free, 99% used [V `df`]) | small | larger build cache; use the shared `CARGO_TARGET_DIR` rule from CLAUDE.md |
+| Attribution | fork history intact | fork then rewrite, or new repo citing the SHA; keep LICENSE, add NOTICE and file headers for ported code |
+
+Recommendation: (b). Layout inside `klimPaskov/hoi4-imagegen-mcp` (names are proposals):
+
+```
+LICENSE (MIT, original line kept), NOTICE, UPSTREAM.md, docs/, skill/hoi4-imagegen/, examples/
+crates/imagegen-core        no network, no keyring: categories, profiles, pipeline, QA, DDS/TGA, naming, ledger, prompt plan
+crates/imagegen-providers   trait impls behind cargo features: openai, gemini, comfyui, fal (phase 1); stability, bfl, azure (phase 2); kit-runtime-bridge (kit only)
+crates/imagegen-mcp         rmcp stdio server binary `hoi4-imagegen-mcp`
+crates/imagegen-cli         `hoi4-imagegen` (doctor, calibrate, plan, generate, validate, install) sharing the same functions
+crates/provider-chatgpt-login   OPT-IN plugin (section 7.4); not a default member, not depended on by anything above
+```
+
+Upstream-to-new mapping (keeps the original architecture readable): `images.js` -> `imagegen-core::fsio` (reference reading and safe saving); `server.js` -> `imagegen-mcp`; `gen.js` -> `imagegen-cli`; `codex.js` and `auth.js` and `login.js` -> `provider-chatgpt-login`; `skill/gptimage` -> `skill/hoi4-imagegen`; `install.sh` -> Mod Setup component plus `hoi4-imagegen doctor`.
+
+### 7.2 Core design
+
+Environment abstraction (the same code runs in the kit and in Factory): `ProjectFs` (rooted at the mod, containment enforced), `GameRef` (installed game folder in the kit; Factory's read-only mount, headers and decoded pixels used for preview and calibration only, never copied out), `Credentials` (OS keyring using Mod Setup's exact references; environment variables; or a Factory-supplied handle resolved by the host), `Egress` (HTTP client with per-provider host allowlists, https/443 only, no redirects off the allowlist, private-address block; Factory injects its outbound policy), `Spend` (reserve, settle, refuse), `Clock`.
+
+Provider trait (outline):
+
+```rust
+#[async_trait]
+pub trait ImageProvider: Send + Sync {
+    fn descriptor(&self) -> &ProviderDescriptor;          // id, reviewed model table with retrieved-date, limits, cost model
+    async fn estimate(&self, r: &Request) -> Result<CostEstimate, ProviderError>;     // exact or upper bound, no network
+    async fn generate(&self, r: GenerateRequest, c: &CallContext) -> Result<ProviderOutput, ProviderError>;
+    async fn edit(&self, r: EditRequest, c: &CallContext) -> Result<ProviderOutput, ProviderError>; // refs, optional mask
+    async fn remove_background(&self, r: BgRequest, c: &CallContext) -> Result<ProviderOutput, ProviderError>; // optional
+    async fn reconcile(&self, job: &JobRef) -> Result<Reconciled, ProviderError>;     // async providers; sync ones return Unknown
+}
+// Capabilities in the descriptor, per model: max_refs, mask, native_alpha (ga|preview|none), sizes (arbitrary{mult,min_px,max_px,ratio}|fixed|tiers),
+// formats, async, cost_model (per_image|per_megapixel|tokens|gpu_time|plan_quota), moderation, terms_ref, doc_url, retrieved.
+```
+
+Rules: the pipeline selects a provider and model from the descriptor, never from a prompt string; unsupported options fail before any request; one asset per call; no silent fallback to another provider (Factory EXT-09 and the kit's "never silently switch providers"); `n` is always 1 even where the API allows 10.
+
+Pipeline for one asset (every step writes a ledger entry and an immutable artifact addressed by SHA-256):
+1. Resolve category and profile (7.3), effective canvas, generation size (smallest allowed size with the profile's aspect, then downscale), alpha policy, export container.
+2. Collect and preprocess references: project-owned approved style references, optional installed-game or kit-shelf references (policy-gated, see risk R4), user attachments, previous candidates. Decode and re-encode to clean PNG (strips metadata and ancillary chunks), enforce pixel and byte caps, number the references by role (style anchor, subject anchor, geometry anchor, edit target) as the kit's `generation-and-review.md` requires.
+3. Plan: deterministic prompt assembly from the profile template plus the brief plus the project style profile; return a `plan_id` (hash) with estimate, provider/model, output paths, approvals needed. No spend yet.
+4. Reserve budget, check grant (Factory) or confirmation (kit), call the provider, store the raw output unchanged as `candidate vN`.
+5. Transparency: if the profile requires alpha, use native alpha when the model documents it (OpenAI 2.5), otherwise a provider remover (Stability) or a ComfyUI matte workflow, then deterministic defringe and alpha checks. Never accept a prompt-only claim; the saved pixels must prove it (existing kit rule).
+6. Deterministic processing: crop or cover-fit to the exact aspect, resize with Lanczos3 in premultiplied alpha, composition steps owned by the category (frame strip assembly, news black and white, report card via the existing tool, shine companion). Resizing is a step, never a verdict.
+7. Deterministic validation (7.7), producing findings with stable codes.
+8. Preview artifacts: native size, 4x nearest-neighbour, dark, light and checker backgrounds, contact sheet with the approved style references beside the candidate.
+9. Visual review record (human or agent with image viewing) against the profile's rubric: composition, silhouette readability at native size, style match to the approved references, era fit, no text, no unintended elements. Stored separately from the deterministic results.
+10. Approval checkpoint (policy: user, agent, or auto for drafts). Install requires: validation pass, review approved, candidate hash unchanged, plan hash unchanged.
+11. Install: export DDS or TGA to the final path, write the provenance record, then either write `gfx_handoff.md` with the ready sprite snippet (kit default, matches the rule that asset workers do not edit `.gfx`) or register the sprite (explicit scope; through the shared Rust HOI4 engine, or as a C-02 proposal operation in Factory).
+
+Naming, placement, versions (kit conventions reused, not reinvented): working files under `docs/assets/<feature_slug>/` with `source_png/`, `processed_png/`, `contact_sheets/`, `prompts/`, `manifest.md`, `gfx_handoff.md` (skill section 7), plus `imagegen/records/<asset_id>.json`; final files in the feature-scoped category folder (skill section 2.2); lowercase snake_case, category prefixes from the profile. Candidates are `v1`, `v2`, ... created with exclusive-create plus temp file, fsync and rename (and the exclusive hard-link technique `gfx.py` already uses); a collision never overwrites. A final runtime path that already exists is a conflict unless the ledger shows this asset owns it and the user approved `replace`, in which case the previous hash is recorded. Sprite names stay stable.
+
+Provenance record (one JSON per asset, rendered into `manifest.md` rows): schema version; asset id and category; profile source (path, sha256, row); request (prompt text and hash, style profile id and hash, provider id, exact model id, parameters, seed when supported, idempotency key, request hash); references (path or artifact id, sha256, role, origin: project, user upload, kit shelf, installed game, previous candidate); response (provider request id, raw output sha256, usage); cost (estimated, reserved, actual, `usage_unknown` flag, funding source); lineage (parent candidate); processing steps (operation, parameters, input and output sha256, tool and crate version); validation findings; review (reviewer, verdict, rubric id, notes); approval (who, grant or policy id, time); install (final path, DDS sha256, decoded `pixels_sha256`, sprite name, `.gfx` file, replaced hash); rights (source mode "generated", provider terms reference, watermark note such as Gemini SynthID). This aligns with SPEC-010's provenance fields and with the kit's `pixels_sha256` convention used for report cards.
+
+### 7.3 Profiles: reuse `.tools/gfx/profiles.json`, add an `imagegen` sub-object
+
+Facts [V]: `gfx.py` loads only `canvas`, `margin` and `accepted` from each row (lines 34-38, 209-214) and tolerates other keys; row names double as `--profile` choices; the file already carries `frames` and `source` for human evidence; the README says focus, decision and idea rows are project decisions that the source package intentionally leaves out.
+
+Proposal: `profiles.json` remains the single owner of geometry and evidence (canvas, accepted sizes, margin, frames, source). Each row may carry an optional `imagegen` object that `gfx.py` ignores, holding what the generator needs: `category` id, `automation` (`generate` | `import_only` | `user_run_only`), generation aspect and background, export (container, format, mips), placement folder and name pattern, sprite template (including companions such as `shine`), required checks, reference folders and the rubric id. Example for the focus row (values are proposals; the canvas needs a maintainer decision):
+
+```json
+"focus": {
+  "canvas": [100, 88], "accepted": [[100,88],[102,90],[99,88],[98,88]], "margin": 2, "frames": 1,
+  "source": "Project decision <date>. 2,681 of 2,849 vanilla focus_* DDS are 100x88 (header survey, HOI4 1.19.3.0).",
+  "imagegen": {
+    "category": "focus_icon", "automation": "generate",
+    "generation": {"aspect": "100:88", "background": "transparent"},
+    "export": {"container": "dds", "format": "a8r8g8b8", "mips": 1},
+    "placement": {"folder": "gfx/interface/goals/{feature_slug}/", "prefix": "goal_"},
+    "sprite": {"gfx_file": "interface/{feature_slug}_goals.gfx", "name": "GFX_{prefix}{asset}", "companions": ["shine"]},
+    "checks": ["size", "alpha", "fringe", "opaque_canvas", "fill"],
+    "reference_dirs": ["icons/national_focus"], "rubric": "focus_icon_v1"
+  }
+}
+```
+
+Two helper commands keep the numbers honest: `hoi4-imagegen calibrate` reads DDS/TGA headers and `.gfx` text from the installed game (kit) or the read-only mount (Factory), compares them with every profile row and prints a proposed diff with counts (the same method as `measure_assets.py`), and never writes silently; `hoi4-imagegen profiles` lists rows with their evidence and flags any row whose canvas is not the dominant vanilla size. Rows for the categories in section 4 that the kit lacks are produced as proposals from that calibration. Category ids: `focus_icon`, `idea_icon`, `decision_icon`, `decision_category_icon`, `decision_category_picture`, `tech_icon_small`, `tech_icon_medium`, `event_report`, `event_news`, `event_super`, `flag_set` (three TGA sizes), `mio_icon`, `agency_logo`, `officer_spirit`, `leader_portrait` (156x210), `gui_texture` (profile-less, size from the consumer), `custom`. Categories that other tools own are `import_only` or `user_run_only`: advisor 65x67 (`create_advisor_icon.py`), achievement triplets (`process_achievement_icons.py`), grounded portraits (user-run ComfyUI workflow), counters (need the exact vanilla reference), animation (real per-frame art, `hoi4-frame-animation`), 3D.
+
+Project style profiles: `.hoi4-imagegen/styles/<name>.json` (project-owned, committed): reference images pinned by SHA-256, prompt fragments, negative rules, palette notes, applicable categories, preferred provider and model, seed policy, approver and date. A style profile is data with no authority, like a Factory memory item.
+
+### 7.4 The opt-in ChatGPT-login plugin (decision 3)
+
+Goal: the upstream backend remains usable for a single person on their own machine, with zero reach into hosted Factory and zero coupling to the asset logic.
+
+- Separate crate `provider-chatgpt-login` containing the Rust port of `auth.js`, `login.js` and `codex.js` under the original MIT notice with a header naming the upstream file and SHA. It implements only `ImageProvider`; core and the other provider crates have no dependency on it and no mention of its endpoints.
+- Not in `default-members`, not in the default feature set, not in release artifacts of the default build. Enabling it needs all of: building `imagegen-mcp` with `--features unofficial-chatgpt-login`; `[providers.chatgpt_login] enabled = true` in `.hoi4-imagegen/config.toml`; environment variable `HOI4_IMAGEGEN_ACCEPT_UNOFFICIAL=1` at start-up (so a project file alone cannot switch it on); and `--mode local-stdio` (the plugin refuses `--mode hosted`, any HTTP listener, and any process that has the Factory broker profile).
+- Behaviour changes from upstream: its own credential file only (user data directory, 0600 on Unix and a user-only ACL on Windows); it never reads or writes `~/.codex/auth.json` (no cross-tool refresh-token rotation); no `GPTIMAGE_ACCESS_TOKEN`; `originator`, model slug and client id are configuration constants in one place with a loud doc comment; capability descriptor says: references yes, mask no, native alpha no (proven pixels only), cost model `plan_quota` so budgets record `usage_unknown` and never charge the operator allowance.
+- Isolation checks that run in CI: `cargo tree -e normal -p imagegen-core -p imagegen-providers -p imagegen-mcp` (default features) must not list the plugin crate; a test greps the default-build binary for the strings `chatgpt.com`, `auth.openai.com`, `codex_cli_rs`; Factory's own dependency on the library uses `default-features = false` with an explicit allow-list of provider features, and Factory CI repeats the `cargo tree` and string checks on the server binary (new EXT test, see section 8).
+- Documentation shipped with the plugin (`docs/unofficial-chatgpt-login.md`): how it works (section 2.4), that it impersonates the Codex CLI, that the endpoint is undocumented and can change or be blocked without notice, that the model slug is not a stable image model, upstream's own warning about rate limits and account restrictions, OpenAI's guidance to use Platform API keys for general API calls and to treat `auth.json` like a password, the unverified Terms-of-Use question (open item), that it is for the user's own account and personal use, not for sharing tokens, not for servers, and that the maintainers do not support the account consequences.
+- Distribution (open question 6): source-only build is the cleanest way to keep the official binary free of it; a separately named prebuilt artifact is possible later.
+- The kit's vendored Node copy can stay until the plugin replaces it; afterwards remove `.tools/image_generation/providers/gptimage/` and the `gptimage` default in the catalog.
+
+### 7.5 MCP tool list (server key `hoi4_imagegen`, tool names `hoi4.image_*` to match `hoi4.*` naming)
+
+| Tool | Effect class | Purpose |
+|---|---|---|
+| `hoi4.image_status` | read | providers configured, key present (never the value), model table dates, game reference found, profile file hash, plugin state |
+| `hoi4.image_profiles` | read | list or get effective category profiles with their evidence; `calibrate: true` returns the proposed diff against the game |
+| `hoi4.image_references` | read / write project style data | list references, add a reference with role and rights note, approve it, list or save style profiles |
+| `hoi4.image_plan` | read | dry run: resolved profile, prompt plan, provider and model, estimate, output paths, approvals needed; returns `plan_id` |
+| `hoi4.image_generate` | external, paid | execute a plan for one asset (candidate vN); idempotency key; returns candidate record and preview refs |
+| `hoi4.image_edit` | external, paid | refine a candidate: instruction, optional mask or region, extra references; new candidate with lineage |
+| `hoi4.image_process` | local write (candidates area) | run the deterministic chain on a candidate (crop, resize, matte, frames, news/report treatment) |
+| `hoi4.image_validate` | read | deterministic checks on candidates, processed files or installed files, single or batch; findings with codes |
+| `hoi4.image_preview` | local write (previews) | native, 4x, backgrounds, contact sheet, side by side with references |
+| `hoi4.image_review` | local write (ledger) | record the visual review verdict and rubric answers, or an approval decision |
+| `hoi4.image_install` | local write (final paths) | export DDS/TGA, write record, handoff or register; refuses unless validation passed, review approved, hashes unchanged |
+| `hoi4.image_ledger` | read | query records: which references, settings, outputs belong together; lineage graph |
+| `hoi4.image_cancel` | control | cancel or reconcile a pending asynchronous job |
+
+Schema outlines (JSON Schema 2020-12 via `schemars`; unknown fields rejected):
+
+```
+hoi4.image_plan   { category: enum, feature_slug: string, asset: string(snake_case), brief: string<=4000,
+                    style?: string, references?: [{path|artifact_id, role: enum}], provider?: string, model?: string,
+                    transparent?: bool, variants?: int(1..4), budget_usd?: number }
+                  -> { plan_id, plan_hash, profile:{id,source_hash}, provider, model, estimate:{usd,basis,usage_unknown},
+                       paths:{candidate_dir,final}, approvals:[...], warnings:[...] }
+hoi4.image_generate { plan_id, idempotency_key } -> { candidate_id, version, sha256, size:[w,h], alpha:{channel,transparent_pixels},
+                       cost:{reserved,actual?,usage_unknown}, findings:[], preview:[artifact refs] }
+hoi4.image_edit   { candidate_id, instruction, mask?:{artifact_id}, extra_references?:[...], idempotency_key } -> as generate, parent set
+hoi4.image_validate { targets:[path|candidate_id], profile?: string, checks?: [...] } -> { results:[{target, status, findings:[{code,level,message,evidence}]}] }
+hoi4.image_install  { candidate_id, mode: "handoff"|"register", on_exists: "fail"|"replace", approval_id }
+                  -> { final_path, dds_sha256, pixels_sha256, sprite:{name,gfx_file,snippet}, record_path }
+```
+
+Annotations are hints only (`readOnlyHint` etc.); Factory treats the effect class column as the contract after reviewing the adapter. Errors carry a stable code and a retry class (`safe_same_inputs`, `refresh_preconditions`, `reconcile_first`, `requires_authorization`, `terminal`) as in Factory's common envelope. Long operations (ComfyUI, asynchronous providers) use MCP Tasks where the client supports them (rmcp supports them), otherwise a job id with `hoi4.image_status` polling.
+
+### 7.6 Deterministic validation versus visual review
+
+Deterministic (Rust, reproducible, finding codes reused from `gfx.py` where the rule is the same): exact dimensions against `accepted`; per-frame alpha statistics, empty subject, ghosting (mean alpha), margins at alpha >= 16, subject span >= 80% for icon families, opaque-canvas corners, chroma fringe (magenta/green key colours), halo and fake-checkerboard detection (periodic grey/white pattern in opaque pixels), DDS header exactness (128-byte header, masks, no mips, length `128+w*h*4`), flag TGA origin, frame strip divisibility, name collision and containment, sprite resolves, provenance present, LFS pointer and truncation. Advisory heuristics: palette and luminance distance to the approved references, native-size edge energy, perceptual-hash near-duplicate of a vanilla or existing asset (guards against copying), optional OCR for stray text. Visual review (human or agent, recorded separately): subject readability and silhouette at native size, style match against the approved references side by side, period fit, no text or watermark artefacts, composition and centring, forbidden additions. A resize that passes the size check is never reported as "suitable"; the report separates `deterministic: pass` from `visual: pending|approved|rejected`.
+
+Image-QA code scope [INF, open question 13]: port only what Factory needs without Python or texconv (BGRA DDS writer, TGA writer, resize, alpha stats, size/margin, defringe, fringe check, checker detection, header validators), expose the check ids, and prove parity with `gfx.py` and `convert_to_dds.py` on a synthetic corpus. Do not port report-card, advisor, achievement or portrait tools in phase 1; in kit mode the MCP can call them when present.
+
+### 7.7 Kit integration
+
+- Install procedure (end user): select "HOI4 image generation" in HOI4 Mod Setup; Setup fetches the pinned binary, verifies SHA-256 and size from the manifest, registers the MCP for the chosen clients, and asks for the provider key through the existing credential UI (OS vault, references `credential://image_generation_api_key/<provider>_<field>`). The new server reads the same `.hoi4-setup/image_generation.json` selection and the same vault entries as the Python runtime, so Setup needs no new secret handling. Manual install: download the release for the platform, verify the published SHA-256, put it on PATH, then `hoi4-imagegen doctor` (providers, key presence, game folder, profile hash, calibration summary).
+- Distribution choices (open question 5): (A) npm platform packages carrying the Rust binary, installed by the kit's existing SHA-512-pinned npm bootstrap (`.tools/mcp/bootstrap_*.py`), which already handles Windows and Linux; (B) GitHub Release binaries consumed by a new "release binary" component kind in Mod Setup, which also covers macOS. (A) needs no Setup code change; (B) is cleaner long term.
+- Client configuration (all with empty `env`, no secrets): `.mcp.json` `hoi4_imagegen` stdio entry with `--project-root .`; `.cursor/mcp.json`, `.qoder/mcp.json` the same shape; `.opencode/mcp.json` with the `command` array form; `.codex/config.toml` a `[mcp_servers.hoi4_imagegen]` table with the same timeouts as `hoi4_agent_tools` (startup 120 s, tool timeout 600 s). Manifest components (names are proposals): `mcp.hoi4_imagegen` (category `mcp`, platforms windows/macos/linux, expected files with sha256 and size, health check `initialize` and tool list), `runtime.<client>.imagegen_mcp` merged-config entries (three-way merge like `runtime.claude.mcp`), `workflow.imagegen` (skill, references, examples), `docs.imagegen`. The `HOI4_MOD_SETUP:IMAGE_GENERATION_PROVIDER` marker text in the three agents and the two asset-skill files is filled with a short description of this route and the selected provider.
+- Skill `hoi4-imagegen` (under 8 KB with `references/` for category details and recipes, text only, evidence-tagged rules, per P8/P9): when to call, the plan-generate-validate-review-install loop, reference roles, one asset per call, never trust prompt-only transparency, what the MCP will refuse, where each tool's output lands. Edits to `hoi4-feature-assets` limited to pointing sections 5, 11, 24 and 25 at the MCP; the existing DDS and handoff rules stay authoritative. Agents `hoi4-icon-artist` and `hoi4-generated-feature-art` call the MCP; `hoi4-portrait-creator` uses it only for fictional portraits and for validating user-supplied styled output, keeping the user-run rule for grounded portraits.
+- Example workflows shipped in `examples/` and the skill: (1) five focus icons with a project style profile and shine companions; (2) a national spirit set; (3) a report and a news event picture (generate, then the existing report-card tool); (4) a three-size flag set; (5) refine-loop on a rejected candidate; (6) fictional portrait through the ComfyUI provider with the maintainer's text-to-image workflow; (7) batch validation of an existing mod's art; (8) the hosted Factory checkpoint flow.
+- Transition: keep `imagegen.runtime` (Python) and the vendored Node route until the new MCP covers openai, gemini, comfyui and fal; then switch the catalog default, remove stale routes (`vertex_imagen`/Imagen, `gpt-image-1` text), and retire the Node vendor copy once the opt-in plugin replaces it. Coordinate with the FR-4 synchronization work so the new skill and agent edits project to the other clients without drift.
+
+### 7.8 HOI4 Factory integration
+
+Stage reality [V]: S01 and S02 are done; S03 (native agent and durability, which brings the tool broker) is not started; SPEC-010 schedules generation workflows for S06 and a minimal asset package in S04. This section is a design to keep that future cheap, not a request to start anything. `crates/agent` today holds only provider adapters and cost estimation; broker, grants and budgets are specified (C-04, C-08, SPEC-002, SPEC-011) but not implemented.
+
+- Form: Factory links `imagegen-core` and `imagegen-providers` (git dependency pinned by revision like the Setup pin, `default-features = false`, explicit provider features) as an audited built-in adapter. No MCP subprocess and no user-supplied executables (SPEC-011). The stdio binary exists for the kit and for development.
+- Broker tool profile "assets": `asset.plan` (read), `asset.generate` and `asset.edit` (external paid effect), `asset.process`, `asset.validate`, `asset.preview`, `asset.review`, `asset.propose_install` (produces a C-02 ChangeProposal with binary-replacement and `.gfx` source-span operations; the host applies it, the tool never writes the workspace directly), `asset.ledger`. Provider calls run in the host process behind the egress policy; decoding and processing of untrusted provider bytes run in the per-task gVisor container with size, pixel and time limits.
+- Grants (C-08): a new operation class `generate_image` bound to workspace or run scope, a provider and model allow-list, a cost ceiling and an expiry; `edit` of an existing candidate is the same class; install is a proposal grant like any other file change. A standing grant allows repeated generations within its ceiling without re-prompting. Fallback between providers or funding sources needs an explicit policy.
+- Funding and budgets (SPEC-002): a profile per provider with funding source `user_key` or `operator_allowance`; the user's key is stored encrypted, never returned to the browser, never used for another account. Reserve before the call (exact for per-image providers, upper bound from the dated price table for token-priced ones), settle from the response, `usage_unknown` keeps the reserve. Limits: per task, per project, per user per month, plus an image sub-limit inside the $1 allowance; allowance-funded calls restricted to the cheap-tier allowlist (section 6). Operator-held image keys count against operator budget and rate limits like model keys; abuse limits apply per account, project and source address.
+- Reconciliation (C-04, SPEC-010 test "generation disconnect after submission"): write the intent (final normalized arguments, idempotency key, price table version) before the call; asynchronous providers are reconciled by job id before any retry; synchronous ones record an uncertain outcome and ask the user. Pass the OpenAI `safety_identifier` as a hash of the account id so one user's abuse cannot flag the whole key.
+- Artifact store: candidates, processed files, previews and the ledger JSON live as tenant- and project-scoped artifacts with SHA-256 keys; a changed hash after approval invalidates the approval and previews (SPEC-010 "approved variant replaced"). Game-reference material is mounted read-only and is never written to artifacts or sent to a provider by default.
+- Approval checkpoint: the visual-review step maps to Factory's per-project checkpoint policy (A2: auto, ask or notify per checkpoint, switchable mid-job without widening grants). Default for a new style profile: ask. The UI shows candidate, previews, validation findings, cost so far and the exact install diff.
+- Provider destinations and ComfyUI: per-project destination policy; ComfyUI endpoints are user-supplied public HTTPS URLs that pass the outbound check; Factory never starts or stops RunPod pods. The FLUX.2 Klein 9B non-commercial weights must not be offered by any Factory-operated endpoint.
+- Plugin: never compiled into Factory; CI asserts it (section 7.4).
+
+----------------------------------------------------------------------------------------------------
+
+## 8. End-to-end test plan
+
+Principles from the Factory CLAUDE.md: never fabricate model output or results; live calls use real providers; faults a live API cannot produce on demand are injected into recorded real responses and labelled recorded-real replay; anything that could not run is marked unavailable with the reason; test normal, failure and recovery paths; run platform-sensitive code on both machines and in Linux (`scripts/linux-tests.sh`); keep fixtures in short paths under the worktree or `.work/`.
+
+| Layer | Tests | Evidence kind |
+|---|---|---|
+| L0 unit (`imagegen-core`) | profile parsing and unknown-key tolerance with the real `profiles.json`; category resolution; name and placement patterns; version allocation under concurrent writers (exclusive create, no lost writes); containment (`..`, absolute, symlink, Windows junction, UNC, 8.3 short names, case folding); reference validation (magic bytes, caps, decompression bomb, wrong extension, SVG rejected); prompt-plan snapshots; ledger round-trip and hash chain; cost reservation and settlement incl. `usage_unknown` | source parsing |
+| L0 parity | Rust DDS writer vs `convert_to_dds.py write_bgra_dds` byte-for-byte on a synthetic corpus; header field-by-field comparison with vanilla header samples (read-only, headers only); TGA writer origin bit vs the 5 / 221 / 3 vanilla top-origin counts; alpha stats, size/margin, defringe and fringe findings equal to `gfx.py` on the same synthetic images; Pillow decode round-trip of Rust-written DDS (dev-only Python) | source parsing and binary comparison |
+| L1 provider contract | for each provider and capability (generate, edit with refs, edit with mask, native alpha, async job, 400, 401, 429, moderation block, malformed body, truncated image, oversized image, redirect to a non-allowlisted host): one real recording per path, stored hash-addressed with request redaction; replay tests for retry class, reconcile, `usage` parsing and price settlement; faults injected into recordings are labelled recorded-real replay. A tiny axum mock server may check wire format, labelled mock, and is never counted as provider evidence | recorded real API behaviour |
+| L2 pipeline | synthetic source images through every category to final DDS/TGA in a temp mod: placement, versions, ledger, handoff snippet, `register` mode against fixture `.gfx` (preserving comments and indentation); then `gfx.py audit` and `hoi4.package_check` over the result; header comparison with vanilla; `hoi4.focus_render` / `tech_render` show the icons through the registered sprite (source-render evidence) | static validation and source render |
+| L3 MCP protocol | spawn the binary with an rmcp client over stdio: initialize, tool list and schema hashes, every tool's positive path, invalid arguments, unknown category, traversal, overwrite attempt, missing key, refusal when validation failed or review missing, cancellation, idempotent retry returns the same candidate; real Claude Code session with the project `.mcp.json` (project trust prompt) as a manual evidence run | tool-protocol evidence |
+| L4 end to end with real providers | per available provider, at least: one focus icon (transparent), one idea icon from a style profile, one report picture, one flag set, one refinement edit, one batch of 5; checking cost against the estimate and the recorded `usage`; ComfyUI with the maintainer's text-to-image API workflow on a local GPU and, when the user supplies an endpoint, on RunPod; each result goes through validate, preview, review and install | live provider evidence |
+| L5 game | user-operated in-game check on HOI4 1.19.3.0: icons visible in the focus tree, ideas, decisions, event window; shine sprite present and absent (answers the open shine question); flags upright; recorded as user-operated game evidence | actual game observation |
+| L6 cross-platform | whole suite on Windows 11 (Git Bash and PowerShell), macOS arm64, Linux amd64 and arm64 in Docker; keyring read on each OS with Setup-written entries; path rules on both machines; release binaries smoke-tested after download with SHA-256 verification | per-platform |
+| L7 Factory | broker gates: no grant, wrong provider, ceiling exceeded, revoked epoch, role too low; allowance vs own-key funding and cheap-tier allowlist; per-task and per-user limits; cross-tenant key or artifact reference by guessed id (T-ACCT-02 style); lost response with async and sync providers; EXT-09 (no silent failover); EXT-14 (ComfyUI URL resolving to a private or metadata address, directly or after redirect); EXT-15 (game bytes never leave); approved candidate replaced -> approval invalid; secrets absent from logs and context (EXT-12); crash between artifact write and proposal -> recoverable | host and container evidence |
+| L8 security and supply chain | plugin isolation (`cargo tree`, string scan, Factory build); `cargo deny` for licences (MIT, Apache-2.0 only in the default graph); prompt injection through image metadata, file names and filenames in references; hostile provider output (decompression bomb, polyglot, huge dimensions); credential redaction in every error path; SBOM and artifact attestations for release binaries | source and binary checks |
+| L9 model-id drift | scheduled job comparing the data file with provider model-list endpoints where documented, and with the retirement notes seen here (`gpt-image-1`, Imagen, `gemini-2.5-flash-image`); fails when a listed model is retired | live check |
+
+Known blockers for L1 and L4 [V]: the maintainer's OpenAI API keys on Windows have no balance, so OpenAI recordings are unavailable until funded; keys for Gemini, fal, BFL or Stability and a GPU or RunPod endpoint are not known to exist yet. Rough cost of the recording set [INF]: five providers x about six recordings x at most a few cents each at the cheapest tiers, in the order of one to two dollars; to be confirmed by the first runs.
+
+----------------------------------------------------------------------------------------------------
+
+## 9. Risks and open questions (batched for one consultation)
+
+Risks
+- R1 Model and endpoint churn (three retirements in eight months): data-file model tables with dates, drift test, never ids in skills.
+- R2 Rights and terms not verified: output terms for BFL, Stability and fal models; Paradox's rules and Steam Workshop disclosure for AI-generated mod assets were not researched. The documentation must not promise anything until checked.
+- R3 Plugin account risk is borne by the user; wording per section 7.4; terms question open.
+- R4 Sending Paradox's vanilla art as references to a third-party provider is a data transfer of copyrighted material. Hosted Factory must default to off (REQ-048, SPEC-011 EXT-15); the kit's `vanilla_reference` shelf ships Paradox-derived PNGs inside an Apache-2.0 repository while NOTICE says the artwork belongs to its owners, a question that exists independently of this MCP.
+- R5 Quality of tiny assets from 1 MP generations is a hypothesis; the first recorded runs decide the default tiers.
+- R6 Duplicate QA logic in Rust and Python until `gfx.py` is retired; mitigated by parity tests and shared finding codes.
+- R7 Windows build size (11 GB free on C:): shared target directory, release artifacts built in CI.
+- R8 ComfyUI workflows are brittle (node versions, custom nodes); workflow templates need slot files and a version check against `/object_info`.
+
+Open questions for the maintainer
+1. Fork of Connected-Mate/gptimage then rewrite, or a new repo citing the SHA?
+2. Canvas decisions to record in `profiles.json`: focus 100x88 (vanilla 94.1%) versus the kit's 94x86; idea 65x67, 60x68 or 64x64; decision 33x32 or 32x32; tech medium; the `goal_` versus `focus_` prefix.
+3. May the ComfyUI provider (local or user-supplied RunPod URL) be called by agents for non-portrait and fictional-portrait work, given the kit rule that agents never operate RunPod? Grounded portraits stay user-run?
+4. Are installed-game or kit-shelf references allowed as provider inputs in the kit's local mode (opt-in per project)? Default off in Factory?
+5. Kit distribution: npm platform packages through the existing bootstrap, or a new release-binary component in Mod Setup?
+6. Plugin distribution: source-only build, or a separately named prebuilt artifact?
+7. Allowance policy: cheap-tier allowlist, default per-task cap (suggest $0.25), image sub-limit inside the $1; which provider keys will the operator hold?
+8. Timeline for retiring the Python runtime routes, the Node vendor copy, `default_provider = gptimage`, the Imagen and `gpt-image-1` entries?
+9. Funding and keys for the recorded-real test set: OpenAI balance, Gemini, fal, BFL or Stability keys, a GPU or RunPod endpoint.
+10. Rights research session: Paradox terms, Steam Workshop AI disclosure, output terms of the chosen providers.
+11. One user-operated in-game test for the missing focus `_shine` sprite.
+12. Port scope of the Rust QA code versus calling `gfx.py` and `convert_to_dds.py` when present.
+13. Bump decision for the kit's pinned portrait workflow commit (`b47222a7...` versus HEAD `dce20095...`).
+14. Which phase-2 providers matter first: Stability (remove background, inpaint), BFL direct, Azure OpenAI?
+
+----------------------------------------------------------------------------------------------------
+
+## 10. Sources (all web pages accessed 2026-10-31)
+
+| Source (URL or path) | SHA / version / date | License | Used for |
+|---|---|---|---|
+| https://github.com/Connected-Mate/gptimage | `dfb4948b6877b5b7febf73e1342fcfacd862a1ed`, 2026-10-05 | MIT, Copyright (c) 2026 Alex-Connected-Mate | upstream analysis; local clone `<projects>\hoi4-factory\.work\ext\gptimage` |
+| `<projects>\agentic-hoi4-modding` (github.com/klimPaskov/Agentic-HOI4-Modding) | HEAD `1dd36a5903fa332a4ee17c1684eeb92794b973e1`, 2026-10-25, clean | Apache-2.0 (NOTICE excludes third-party material) | `.claude/skills/hoi4-feature-assets/**`, `hoi4-comfyui*`, `hoi4-portrait-production`, `hoi4-super-events`, `hoi4-frame-animation`, `hoi4-3d-model-pipeline`; `.claude/agents/hoi4-icon-artist.md`, `hoi4-generated-feature-art.md`, `hoi4-portrait-creator.md`; `.tools/gfx/{gfx.py,profiles.json,settings.json,README.md}`; `.tools/image_generation/{runtime/server.py,runtime/provider_catalog.json,providers/gptimage/*}`; `docs/image-generation-providers.md`; `scripts/image_generation_provider_data.py`, `scripts/generate_image_generation_catalog.py`, `scripts/test_gptimage_reference_upgrade.py`, `scripts/test_image_generation_*.py`; `hoi4-mod-setup.manifest.json`; `.mcp.json`, `.cursor|.qoder|.opencode/mcp.json`, `.codex/config.toml`, `.codex/portrait_pipeline.toml`; `NOTICE` |
+| https://github.com/klimPaskov/comfyui-hoi4-portraits | `dce200950147f234309d29d41f38eef03bc6f6b2` (branch `codex/portrait-pipeline`, pushed 2026-08-31) | MIT (third-party models keep their terms) | README, docs/output-layout.md, THIRD_PARTY_LICENSES.md, scripts/convert/png_to_dds.py |
+| Installed game `C:\Program Files (x86)\Steam\steamapps\common\Hearts of Iron IV` | 1.19.3.0, "Operation Postern v1.19.3.0.c01a (5632)" | Paradox Interactive, not licensed for redistribution | header-only survey; not copied |
+| `<projects>\hoi4-factory\docs\**` (CLAUDE.md, PACKAGE_STATUS, contracts-and-interfaces, SPEC-002/010/011, maintainer-decisions-2026-10-24, 08-expansion-research/00-decision-record) and `crates/**` | repo HEAD `7c70b0c`, working tree has untracked `docs/08-expansion-research/` | AGPL-3.0 | Factory constraints |
+| `<projects>\hoi4-factory\.work\ext\agent-tools` (github.com/klimPaskov/hoi4-agent-tools) | `fbc514407155e572fe95fa1e263b7e1552d4d6fc`, package 4.6.1 | Apache-2.0 | sprite and asset handling context |
+| https://developers.openai.com/api/docs/guides/image-generation/ | page, no version; first 100,000 of 114,889 chars read plus the tail | vendor docs | model ids, sizes, transparency, quality, moderation, price table |
+| https://developers.openai.com/api/reference/resources/images/methods/generate and `.../edit` | page | vendor docs | enums, limits, `input_fidelity`, mask/markup, `gpt-image-1` shutdown |
+| https://developers.openai.com/api/docs/pricing | page, undated | vendor docs | token prices |
+| https://openai.com/api/policies/terms/ (via search snippet; direct fetch of terms pages returned 403) and https://learn.chatgpt.com/docs/auth | snippets; auth page current | vendor | output ownership (partly unverified), Codex auth guidance |
+| https://ai.google.dev/gemini-api/docs/image-generation, `/pricing`, `/imagen`, https://ai.google.dev/gemini/terms (snippet) | pages; Imagen page "Last updated 2026-09-17 UTC" | vendor docs | Gemini ids, references, tiers, prices, Imagen shutdown, ownership |
+| https://docs.cloud.google.com/vertex-ai/generative-ai/docs/models/imagen/4-0-generate-001 | page | vendor docs | Imagen 4 lifecycle (discontinuation 2026-06-30), quotas |
+| https://docs.bfl.ml/ (`llms.txt`, `quick_start/pricing.md`, `quick_start/get_started.md`, `flux_2/flux2_overview.md`, `flux_3/flux3_image_overview.md`, `api_integration/errors.md`), https://bfl.ai/pricing | pages | vendor docs | endpoints, `x-key`, references, credits, 429 |
+| https://docs.stability.ai/ (`pricing`, `getting-started/stable-image.md`) | pages | vendor docs | credit prices, service list |
+| https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/dall-e and `.../azure/foundry/foundry-models/how-to/use-foundry-models-mai-image` | MAI page `ms.date 2026-09-21` | vendor docs | Azure OpenAI ids, auth, limits; MAI ids, RPM |
+| https://fal.ai/pricing, `https://fal.ai/models/fal-ai/flux-2-pro/llms.txt`, `.../flux-2-pro/edit/api`, https://fal.ai/docs/model-apis/authentication | pages | vendor docs | prices, auth |
+| https://replicate.com/pricing, https://replicate.com/docs/reference/http | pages | vendor docs | prices, limits, retention |
+| https://docs.comfy.org/development/comfyui-server/comms_routes, `.../development/cloud/overview` | pages (cloud page documents the deprecated v1 API) | vendor docs | ComfyUI routes, Comfy Cloud auth |
+| https://www.runpod.io/pricing | page | vendor | GPU prices |
+| https://crates.io (API) and https://github.com/modelcontextprotocol/rust-sdk | rmcp 3.8.0 (2026-10-26, Apache-2.0); image 0.25.10 (MIT OR Apache-2.0); image_dds 0.7.2 (MIT); ddsfile 0.6.0 (MIT); fast_image_resize 6.1.0; png 0.18.1; reqwest 0.13.5; tokio 1.54.1; schemars 1.2.3 | as listed | language comparison |
+
+Not checked or not fetchable, and so not asserted: OpenAI primary Terms of Use and Services Agreement text; BFL and Stability output terms; per-image prices of `gpt-image-2.5-*` and BFL direct FLUX.2; OpenAI, Gemini, fal, Stability and BFL numeric rate limits; Paradox and Steam rules on AI-generated mod assets; in-game behaviour of a focus without a `_shine` sprite.

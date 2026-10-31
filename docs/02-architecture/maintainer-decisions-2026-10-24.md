@@ -22,6 +22,8 @@ Implementation remains deferred. The maintainer stated that the application will
 | ADR-022 | Automatic personal, project and global memory with verified lessons and no authority | Review-every-lesson runtime learning |
 | ADR-023 | Automatic engineering learning gated by regression tests | Review-every-lesson engineering learning |
 | ADR-024 | Agent edits canonical CLAUDE.md and the skills directly, AGENTS.md is a generated identical copy | Test-gated guidance promotion and the AGENTS import |
+| ADR-025 | A separate UI design track chosen from live previews | Visual design inside each stage |
+| ADR-026 | Expansion research outcomes: Rust HOI4 engine, autonomy presets, notes, local companion, Hagane harvest, image MCP, phase scope (2026-10-31) | Parts of ADR-007 timing, ADR-010 for Hagane material, ADR-015 for opt-in reference images |
 
 ADR-001 and ADR-003 through ADR-010 remain in force, with the scope changes noted below. ADR-002 is superseded by ADR-011 and ADR-012.
 
@@ -248,6 +250,27 @@ Existing requirement IDs are kept. Wording changed for REQ-002, REQ-003, REQ-006
 | REQ-046 | Accounts and tenant isolation. Public sign-up through GitHub or email, per-account and per-project isolation of workspaces, agent runs, secrets and budgets, project roles for invited collaborators, abuse and rate limits | SPEC-011 | S02 |
 | REQ-047 | GitHub integration. Work with GitHub entirely inside the app, from repository connection, import and upload through issues, pull requests, reviews, comments, checks and merges, mirrored by verified webhooks, with every write separately authorized and reconciled (extended by ADR-018) | SPEC-005 | S02 |
 | REQ-048 | Server game reference. A read-only full game copy, latest build with all DLC, used for validation and previews, never exported or baked into images, with the rights review completed before public exposure | SPEC-006 | S02 |
+
+## Expansion research decisions (2026-10-31)
+
+### ADR-026: outcomes of the expansion research consultation
+
+**Status.** Maintainer decisions made in an interactive planning session on 2026-10-31. They set direction for the expansion plan in [the expansion research package](../08-expansion-research/README.md). The full question-by-question record is the [expansion decision record](../08-expansion-research/00-decision-record.md). No stage is authorized by this record, and implementation waits for explicit approval of the plan.
+
+| Topic | Decision | Effect on earlier decisions |
+|---|---|---|
+| Phase scope (D-13) | The first implementation covers research and workflow updates only: the Agentic HOI4 Modding Kit, hoi4-agent-tools, a new `hoi4-imagegen-mcp`, HOI4 Mod Setup touch points and Chaos Redux workflow files. HOI4 Factory features stay designs until their stage is authorized. Kit work happens directly in its checkout | None |
+| Rust (D-07, C1) | New backend and tool code is Rust where practical. One shared Rust HOI4 engine (parser, symbol index, reference closure, lints, override audit, findings baseline, focus layout) lives in a Cargo workspace inside hoi4-agent-tools under Apache-2.0, and agent-tools routes move onto it behind the same names | SPEC-006 validator plan: CWTools MD Edition replaces the F# worker only if a bounded spike shows it improves the MCP (C2) |
+| Hagane Works (D-05, A1) | The maintainer holds written permission from the Hagane Works author to use `hagane-works/hagane-studio` and `haganeworks/hoi4-modmaking-skills` in any way. Selected Hagane Studio modules are harvested, and the studio is archived once HOI4 Factory covers its users | ADR-010 written-permission trigger met for these two repositories |
+| Autonomy (A2) | Fully autonomous, semi-autonomous and human-in-the-loop are presets of one per-project checkpoint policy. The existing visual, hybrid and autonomous modes become editing styles. An owner may set the merge checkpoint to auto as a standing rule, under branch protection and required checks | The backlog's first-slice exclusion of automatic pull request merging becomes a project option once the checkpoint policy exists |
+| Parallel writers (A3) | After the S06 conflict and recovery tests | ADR-007 order unchanged |
+| Agent knowledge (A4) | HOI4 Factory's agent loads the kit's text skills and lessons as versioned product knowledge, and a project's own instructions as labelled data | None |
+| Notes (B1) | Obsidian-compatible Markdown notes in the project repository, a rebuildable database index, human-only `confirmed` status, never shipped in the mod | ADR-022 memory stays page-less. Notes are documents, not memory |
+| Jobs (B2) | A deliberately simple board on the SPEC-003 task model, linked to GitHub issues where GitHub stays authoritative | ADR-018 unchanged |
+| Drift Bot (B3) | Not built | None |
+| Local companion (D-02, C4) | Optional Rust companion with pairing, game detection, mod folder sync with local edits as proposals, log upload on request and HOI4 Live Tools test cards | ADR-012 stands. The companion needs its own security review before it ships |
+| Dependencies (C3) | Approved: `@xyflow/react`, `@dagrejs/dagre`, `image_dds`, optional CodeMirror 6 | None |
+| Images (D-09, D-11, D-12, D3, D4) | `hoi4-imagegen-mcp` is a public MIT fork of `Connected-Mate/gptimage` rewritten in Rust, using documented provider APIs. The ChatGPT-login backend survives only as an opt-in local plugin, never in hosted builds. The monthly allowance may be spent on images. Agents may call a ComfyUI endpoint the maintainer configured for any asset. Vanilla art may be sent as a reference only with a per-project opt-in | ADR-015 amended for opt-in reference images only, still behind the game-rights review |
 
 ## Remaining open questions
 

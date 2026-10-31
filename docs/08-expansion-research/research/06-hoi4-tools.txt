@@ -1,0 +1,415 @@
+# 06 - HOI4 tool ecosystem audit for HOI4 Factory planning
+
+Date of audit: 2026-10-31. Mode: read-only. Nothing was executed (no MCP server, no game, no build, no test run, no paid model call). Every count below comes from grep or file listings, not from running code.
+
+## 0. Scope, pins and how to read the evidence tags
+
+| Repo | Path | Revision | Version |
+|---|---|---|---|
+| hoi4-agent-tools (AT) | <projects>\hoi4-factory\.work\ext\agent-tools | fbc514407155e572fe95fa1e263b7e1552d4d6fc (shallow, depth 1) | package.json, server.json and README say 4.6.1; CHANGELOG has an "Unreleased" entry that only bumps three transitive dependency overrides |
+| HOI4-Live-Tools (LT) | <projects>\hoi4-factory\.work\ext\live-tools | 6b91a2a43edfeab60a415ec2ddd9b71d215b8a56 (shallow) | Python package 1.1.0 (`hoi4_live/__init__.py`); Rust crate `hoi4-live-native` 0.1.0 |
+| HOI4-Mod-Setup (MS) | <projects>\hoi4-mod-setup | 9b7cd08 = release v0.8.0 | 0.8.0 |
+
+Evidence tags used below:
+- [V] I read the code or document myself and the statement is checked.
+- [D] Reported by a delegated reader (two sub-agents did a first pass on LT and MS, because the task spans three repositories). I re-checked the points marked [V] in those sections. Untagged details inside the LT and MS sections come from the delegated pass and were not all re-read.
+- [I] My inference from code or docs. Not tested, not stated by the maintainer.
+
+Things that limit what this audit can say:
+- AT clone is shallow (one commit). I could not verify whether commit 731e64f (the Factory GOAL-S03 pin) is an ancestor of fbc5144, nor map the upstream PR number #42 to a commit. See section 5.1 for how I tie "#42 guards" to the code.
+- The tool names in this Claude Code session are sanitized (`hoi4_focus_inspect`). The server's real names use a dot: `hoi4.focus_inspect` (src/hoi4_agent_tools/mcp/tools/*.ts). [V]
+- A harness filter flagged one phrase in the Mod-Setup sub-agent's report as instruction-shaped (it mentions `.claude/settings.json` as a file Setup installs). I treated it as ordinary data; it contains no instruction.
+
+---
+
+## 1. Executive findings (read this first)
+
+1. AT is a mature, heavily tested, read/analyse/render plus "one-call rewrite" MCP server (28 tools, MCP Tasks, persistent jobs, HTTP with OAuth/tokens, Docker image on node:22-bookworm-slim). It runs on Linux, needs no desktop, no Steam session and never launches the game. It is directly usable from a Factory server container. [V]
+2. AT deliberately has no interactive editor. AGENTS.md of AT says "do not add a dashboard, interactive editor". Event and technology viewers are read-only by design. Factory must build its own browser editors on top of AT's data. [V]
+3. For a browser focus editor, AT already exposes almost all structural data as JSON: absolute grid coordinates, position mode (fixed/relative/auto), prerequisite groups (AND of OR-groups), mutual exclusions, branch/lane, source locations, diagnostics, title/icon resolution metadata, layout metrics and a generated-source map. It does NOT expose connector curve geometry as data (only constants and SVG paths) and icon pixels only exist embedded in SVG/HTML/PNG. [V]
+4. `hoi4.focus_rewrite` is a whole-plan diff API, not an operation API. You send the complete plan (as exported by `focus_inspect`); the engine computes which focuses/fields changed and patches only those byte ranges. Moving, editing fields, adding, removing and linking (prerequisites, mutual exclusion) are all expressed as plan edits. There is no dry-run flag, no per-property edit call and no undo call. [V]
+5. The #42 source-preservation guards exist at fbc5144: `FOCUS_SOURCE_CHANGED_SINCE_PLAN` (stale semantic edit refused, no override) and `SOURCE_ENCODING_NOT_ROUND_TRIPPABLE` (Windows-1252 undefined bytes). Both have unit and integration tests. Factory specs 006/007/009 still cite the older pin 25f5641 that lacks them. [V for code and tests; I for the "#42" label]
+6. There is no single "whole-mod unresolved identifiers" report. A shared SymbolIndex (46 symbol kinds) and a ReferenceRecord table exist, and unresolved references to a small set of kinds become `INDEX_UNRESOLVED_REFERENCE` diagnostics, but `hoi4.mod_index` only returns counts/namespaces/next free ID, and `hoi4.impact_inspect` requires at least one symbol, file or proposed source. Domain tools (event lint, focus lint, tech lint, GUI, map) report their own missing references. Cross-kind coverage (decisions, ideas, characters, scripted effects used by name) is partial. [V]
+7. Live Tools cannot run on a Factory server. The only tools that fire events, run console commands, read variables from saves and capture event windows are in the Windows-only Python package, which drives a visible game window with SendInput, PrintWindow/ffmpeg capture and Windows OCR. The Rust Linux preview needs an X server and one exact game build, enables no mods, reports "mod_qa: separate; unavailable in this runtime", and has only been exercised in an emulated VM at 512x288. Desktop-only, on the user's machine. [V for the installer, tool count, console mechanism, mod_qa string, config; D for the rest]
+8. Mod Setup v0.8.0 has a server-oriented facade (`hoi4_mod_setup::service`) that builds without Tauri and is what Factory's `crates/setup-adapter` consumes. It supports scan, evidence approval, analysis record, plan, hashed approval, conflict decisions, journaled apply with quarantine, and rollback/recovery. Constraints: a confirmed analysis record is required before apply; new-project apply is blocked by the launcher registration requirement (import works); any `scan.*` conflict (symlink, case collision) makes the scan partial and blocks the whole import; update/repair/remove builders live only in the desktop-only `commands.rs`. [V for gates and facade doc; D for line numbers]
+9. `hoi4-mod-setup.manifest.json` is NOT written into a mod. It is the upstream source manifest in klimPaskov/Agentic-HOI4-Modding. The per-mod record is `.hoi4-mod-setup/install.lock.json`. The checked-in snapshot docs/source-manifest/hoi4-mod-setup.manifest.json is schema 5.0.0 and stale (live format is 6). [V]
+10. Docs versus code: mostly accurate. Mismatches found are listed in section 6.4; the important ones are LT tool count (docs 43, code 47), LT default mode (docs "test", config.json "campaign"), AT docs listing `event_render`/`tech_render` as "Writes: -" although they store artifacts, and AT third-party notices omitting the LGPL libvips binaries pulled in by sharp.
+
+---
+
+## 2. HOI4 Agent Tools (AT)
+
+### 2.1 Identity, runtime and packaging [V]
+
+- TypeScript ESM, Node ^22.19.0 || ^24.0.0 (package.json `engines`). Apache-2.0. npm package `hoi4-agent-tools`, MCP registry name `io.github.klimPaskov/hoi4-agent-tools` (server.json).
+- Binaries: `hoi4-agent-tools` (stdio), `hoi4-agent-tools-http`, `hoi4-agent-tools-setup`.
+- Dockerfile: node:22-bookworm-slim (digest pinned), runs `node dist/bin/http.js`, `EXPOSE 3210`, non-root user.
+- Native/binary deps: `sharp` 0.35.5 (libvips prebuilt, includes linux x64 and arm64), `tesseract.js` 7 (WASM OCR for map reference images), `fontkit`, `iconv-lite`, `jose` (OAuth), `express` 5, `zod` 4.6.7, MCP SDK 1.32.1 plus `@modelcontextprotocol/*` 2.x.
+- Protocol: serves 2025-era clients through a stateful adapter and 2026-07-28 clients through a "modern operation/task adapter", on stdio and HTTP (docs/jobs.md). Optional MCP Tasks negotiated; clients that do not negotiate get ordinary synchronous results.
+- Tool naming: dotted (`hoi4.focus_inspect`). Many LLM provider APIs restrict function names to `[A-Za-z0-9_-]` (general knowledge, not from the repo), so Factory's broker needs a name map. [I]
+- `tools/list` size: the 2026-10-11 audit (docs/plans/tool-audit.md) measured 70 KB for 28 tools (41 KB of it input schemas). Factory should expose per-task subsets. [V]
+
+### 2.2 Architecture facts that matter for reuse [V]
+
+- Parser: project-owned lossless lexer and concrete syntax tree over original bytes (`src/hoi4_agent_tools/core/source/lexer.ts`, `parser.ts`; ADR 0002). Trivia, duplicate keys, ordering, unknown assignments, operators and exact byte ranges are kept. Edits are non-overlapping byte-range replacements. Nesting limit 256, file limit 32 MiB (`core/source/limits.ts`: SOURCE_MAX_NESTING 256, SOURCE_MAX_BYTES 33,554,432). Localisation has its own BOM-aware line grammar (`core/source/localisation.ts`). Encodings: UTF-8, UTF-8 BOM, Windows-1252 (`core/source/encoding.ts`).
+- Index: `SymbolIndex` (core/index.ts) with `SymbolKind` of 46 values (focus_tree, focus, continuous_focus(_palette), decision(_category), event, idea, leader, formable, scripted_effect, scripted_trigger, script_constant, mtth_variable, ai_strategy(_plan), sprite, texture, gui_element, scripted_gui, technology(_folder/_category/_tag), equipment(_module), sub_unit, unit_category, building, ability, combat_tactic, doctrine_*, localisation, variable, flag, event_target, state, province, province_color, strategic_region, adjacency, supply_node, railway). Layers: game, DLC, dependencies, mod, with load order and `replace_path` handling (config doc).
+- Reference edges recorded in the core index (ReferenceRecord) are limited to: technology and tech folder/category/tag/building references, focus prerequisite, focus exclusion, focus relative_position_id, focus/continuous-focus icon to sprite, gui sprite to sprite, scripted_gui window to gui_element, state to province. Event-call, scripted-effect-call and decision/idea edges are produced by separate domain/semantic scanners (event/source-analysis.ts, core/impact-semantic.ts, core/semantic-dependencies.ts), not by the core ReferenceRecord table. (core/index.ts lines ~800-1360, `addReference` call sites)
+- Artifacts: content-addressed, provenance-stamped, stored under `workspaceStorageRoot/<id>/artifacts` (or `.hoi4-agent/artifacts` inside the mod when `workspaceStorageRoot` is unset; docs/configuration.md). Served as MCP resources `hoi4-agent://workspace/{workspaceId}/artifact/{sha256}/{provenanceHash}/{name}` with `?offset=&length=` ranges (docs/tools.md). Inline results are capped at 32 KB structured content; pictures are never inline.
+- Transactions: all mod writes go through `core/transactions.ts` (atomic replace, stale-source check, journal, rollback; ADR 0007, 0047). Public API never exposes transaction ids, plan hashes or apply tokens (AT AGENTS.md "Engineering boundaries").
+- Isolation: workers are separate Node processes with fixed registered operations; HTTP has principal-to-workspace grants, Origin/Host validation, scopes `hoi4:read`/`hoi4:write`, static tokens (always read+write) or OAuth/OIDC (docs/http.md, tests/integration/http-authorization.test.ts, http-security.test.ts).
+
+### 2.3 Tool catalogue (all names verified against `name:` literals under src/hoi4_agent_tools/mcp)
+
+Registered: 28 tools + 1 prompt (`hoi4.probability_analysis`) + 2 optional ChaosX tools (`chaosx.focus_country_assets`, `chaosx.visual_revision`) only on stdio with `HOI4_AGENT_TOOLS_CHAOSX=1`, never on HTTP. 19 domain tools accept negotiated MCP tasks; the 7 reference tools and 2 job tools are foreground only (docs/tools.md, docs/jobs.md; both match the code). Writes column: R = reads source only; A = writes review artifacts to server storage; M = edits mod source.
+
+| Tool | What it computes | Key inputs (schema file) | Output | Writes |
+|---|---|---|---|---|
+| hoi4.reference_context | Cited doc pointers per modding surface (general, event, decision, idea, focus, technology, gui, map, localisation, ai) plus known-mistake rules | workspaceId, surface, question?, limit (<=24, default 16) (schemas/reference.ts) | Up to 16-24 short cited sections; `missing`/`omittedSources` | R |
+| hoi4.reference_search | Ranked search of installed game docs (`gameRoot/documentation`), offline wiki (`<mod>/paradox_wiki`), script_docs dump | query (2-160 chars), sources[], limit (<=12) | Hits with file, lines, revision, matchLine | R |
+| hoi4.reference_read | Revision-bound section read | id (64 hex), revision (64 hex), source?, startLine, startColumn, maxLines (<=80, default 40) | <=80 lines / 8,000 bytes, continuation | R |
+| hoi4.source_lookup | Definitions and usages of a symbol across game, DLC, mod; or the definition containing path+line; structure navigation by keyPath | symbol or path+line(+column), kind, includeReferences, maxDefinitions, maxReferences, view, keyPath, childOffset, fromLine/fromColumn, expectedRevision | <=3 definitions (2,000 B each), <=10 usages, load order, override status, suggestions within 3 edits | R |
+| hoi4.script_validate | Syntax, command kind and declared scope of an effect/trigger snippet or a whole mod file against installed `effects_documentation.md`/`triggers_documentation.md` (or a script_docs dump); player-text warnings; event popup repeat; 7 known-mistake rules | source+kind+scope+bindings, or path; documentation game_doc/script_doc; limit <=32 (schemas/script-validation.ts) | `valid` true/false/null, `checksPerformed`, `parametersChecked: false` (literal), findings with code/status/line/column/suggestions, `unresolvedCount`, `argumentBlocksUnchecked` | R |
+| hoi4.error_log | Parses `logs/error.log` of the last game launch into categories (syntax, duplicate, localisation, effect, trigger, scope, graphics, interface, map, missing_reference, other), patterns, known mistakes, files changed since log, new/persisting/resolved vs previous launch | scope all/mod/unlocated, category, query, limit <=50, offset (schemas/mod-tools.ts) | grouped entries with source file/line/layer, `sinceLastLaunch` | R (keeps its own history file in server state) |
+| hoi4.mod_index | `overview`: descriptor fields, counts per symbol kind, files/bytes per folder, event namespaces with number range; `next_id`: next free numbered id for event/focus/decision/idea/leader/technology across all layers | mode, layer mod/all, kind, prefix or namespace | Compact JSON; NOT a symbol list or reference graph | R |
+| hoi4.focus_inspect | Imports focus trees/continuous palettes into typed plans, lays them out, lints, optional completed-focus scenario | mode national/continuous, relativePath, treeId, paletteId, previous layout, laneSpacing, nodeSpacing, scenario.completedFocusIds (schemas/focus-requests.ts) | Inline counts + diagnostics; linked `focus-inspect.<rev>.json` with `plans`, `layouts`, `continuousFocusPalettes`, `presentation`, `sourceHashes`, `diagnostics` | A |
+| hoi4.focus_render | Renders one tree or palette | relativePath (required), treeId/paletteId, horizontal/verticalSpacing, reviewScale (0.25-1), cropFocusIds (<=16), columns, padding, png (default true) | `<stem>.focus.html/.svg/.png/.json/.source-map.json/.plan.json`, optional problem-crop PNGs + manifest | A |
+| hoi4.focus_rewrite | Create a tree/palette from a complete plan, or reflow an existing national tree (`layoutMode: compact`) | relativePath, treeId, plan, createIfMissing, layoutMode authored/compact, compactFocusIds, pinnedFocusIds, symmetryGroups, spacing/padding/reviewScale, requestKey | Result with drift status, execution applied/blocked/unchanged, file and artifact counts; proposed and final artifacts | M (+A) |
+| hoi4.gui_inspect / gui_render / gui_rewrite | Scripted GUI scene graph, state/resolution matrix, click regions, text overflow, asset/loc checks; PNG galleries; rewrite as full source, structured helpers or exact patches with up to 32 extra text files / 16 MiB | windowName, scenario, states, resolutions, relatedScenarios, generatedScenarios (seeded), comparisonScenario, sourceBaseline, tooltip; rewrite: mode source/helpers/patches, helper, additionalFiles, requestKey (schemas/gui-requests.ts) | JSON reports, PNG galleries, deltas; rewrite returns changed files | A / A / M |
+| hoi4.map_inspect / map_rewrite | Map catalog, search, layer/tile/area renders, border-naturalness, script-reference checks; rewrite: create/split/merge/renumber states and provinces, supply, positions, adjacency, `assign_territory`, `repartition_states`, `create_world` (from a reference image or a geography model) | map_inspect: provinceIds, stateIds, query, layer, overlays, tile, area, quality, references; map_rewrite: `operations[]` (kinds in schemas/map.ts), `preview: true` (docs/map.md) | PNG layers/tiles, JSON reports; rewrite writes map files + `.hoi4-agent-world.json` inventory | A / M |
+| hoi4.event_inspect | Modes scan, roots, trace, explain_path, state_flow, lint, impact, helper_expansion, compare (graph diff incl. `proposedSources` overlays) | selector (event/namespace/file/source/node/manifest), direction, maxDepth, maxNodes, maxEdges, expandHelpers, stateSubject, impactSubject, before/after, proposedSources (schemas/event.ts) | Inline summary; linked graph snapshot JSON (`event-graph-<rev>.json`) | A (tool annotated read-only) |
+| hoi4.event_render | Views overview, neighborhood, options, entries, reachability, timing, state, targets, scope, terminals, unresolved | view, selector, direction, maxDepth (default 4), maxNodes (<=240, default 120), expandHelpers, includeHtml | `<prefix>.json` (authoritative), `.svg`, `.png`, optional `.html`, manifest for large overviews | A |
+| hoi4.tech_inspect / tech_render | Technology and doctrine graph: scan, folders, trace, explain, unlocks, bonus_coverage, lint, impact (remove/rename), helper_expansion, compare; render views summary, folder, dependencies, technology, doctrine, exclusive, memberships, bonuses, grants, unlocks, metadata, assets, unresolved, comparison | technologyId, folderId, categoryId, targetKind/targetId, direction, maxDepth, maxNodes; render: view, scenario{year,researchedTechnologyIds} | JSON (authoritative), SVG, PNG, optional HTML | A |
+| hoi4.probability_inspect / probability_analyze | AI weights (`ai_will_do`, `ai_chance`), MTTH, `random_list`, AI strategies, declared custom pools; compare, sweep, simulate, sequence, render | source{path,line,identifier}, candidatePool, scenarioSet, analysis, sweep, adapter (schemas/probability*.ts) | Rankings with weight/probability/MTTH and `missingInputs`; linked JSON | R (+A) |
+| hoi4.impact_inspect | Cross-system consumer graph for symbols, changed files or in-memory proposed sources; optional scenario-suite lookup | symbols[<=64], changedFiles[<=64] (display paths like `mod:common/...`), proposedSources[<=64], scenarioSuites, maxNodes<=50k, maxEdges<=100k, maxDepth<=64, expectedRevision, refresh. Schema refuses a call with none of symbols/changedFiles/proposedSources (schemas/analysis.ts) | Summary + JSON report with added/removed consumers, unresolved dynamic cases, `affectedFilePaths` (<=64) | R (+A) |
+| hoi4.decision_inspect | Inventory active decisions/missions, or evaluate one under declared scenarios (actor, state, flags, scopes); cost/payment analysis; compare with proposedSources | mode inventory/inspect/compare, id, scenarios[<=64], proposedSources | JSON; unknown gates stay unresolved | R (+A) |
+| hoi4.mechanic_test | Interprets declared effect steps (scripted_effect, event_option, decision, focus_reward) on a copied scenario state and checks assertions (e.g. conservation, single_payment) | test{scenario, steps, assertions} (schemas/mechanic-test-input.schema.json) | Pass/fail/unresolved with trace; unsupported effects stay unresolved; `advance_days` only expires modelled timed flags | R (+A) |
+| hoi4.package_check | Declarative package check: definitions, calls, registrations (path+token), localisation keys, assets, required cases | manifest (schemaVersion 1.0, id, ...) (schemas/package-manifest.schema.json) | Per item present/absent/shadowed/unresolved with hashes and locations | R (+A) |
+| hoi4.scenario_test | Runs named mechanic/package/read-only tool cases from an inline suite or `suitePath`, in resumable batches | suite or suitePath, maxCases, continuation | Per-case artifacts, counts, continuation token bound to suite content and source revision | R (+A) |
+| hoi4.job_inspect / job_cancel | Status or completed result of a background job; cooperative cancellation | jobId (`job_` + 64 hex) | Bounded status / original tool result | job state |
+
+Notes on writes: the docs table (docs/tools.md) lists `event_inspect`, `event_render`, `tech_*`, `probability_*`, `impact_inspect`, `decision_inspect`, `mechanic_test`, `package_check`, `scenario_test` as Writes "-" and their MCP annotation is `readOnlyHint: true`, yet event_render and tech_render store JSON/SVG/PNG in the artifact store (event/service.ts around lines 1580-1650). Harmless to the mod only when `workspaceStorageRoot` is set. [V]
+
+### 2.4 Direct answers to the specific questions
+
+#### 2.4.1 Does `hoi4_mod_index` or `hoi4_script_validate` build a symbol index / reference graph and report unresolved identifiers? Duplicates?
+
+- `hoi4.mod_index` (reference/mod-index.ts): calls `engine.scan(...)` which builds the full SymbolIndex, then only reports counts per kind, folder totals, event namespaces and the next free id. It does not return symbols, references or diagnostics. `next_id` scans every layer so a new id cannot collide with game or dependency ids. [V]
+- `hoi4.script_validate`: does not build a reference graph. It checks syntax, command kind and scope against installed documentation. Unknown helpers and native argument blocks stay `unresolved` (valid: null). It treats the mod's scripted effects and triggers as known commands (reference.md) but does not check that event ids, focus ids, localisation keys or sprites referenced inside bodies exist. It adds seven known-mistake rules, one of which (`event_namespace_missing`) is a missing-namespace check. [V]
+- The shared SymbolIndex does emit diagnostics: `INDEX_UNRESOLVED_REFERENCE` (error) or `INDEX_UNRESOLVED_REFERENCE_PARTIAL` (warning when a skipped source could define it), only for references that originate in workspace-owned sources, and `INDEX_SYMBOL_COLLISION` (error) when several active definitions share a key at the same load level in workspace-owned files (core/index.ts around lines 1560-1620). Reference kinds covered are the ones listed in 2.2. These diagnostics surface through domain tools (event graph, tech graph, map validation, post-write validation), not through a dedicated whole-mod tool. [V]
+- Per-domain checks (codes found in source): event lint (EVENT_REFERENCE_MISSING, EVENT_HELPER_UNRESOLVED, EVENT_DYNAMIC_DISPATCH_UNRESOLVED, EVENT_DUPLICATE_ID, EVENT_LOCALISATION_MISSING, EVENT_OPTION_DANGLING, EVENT_SCOPE_MISMATCH, EVENT_GATE_WITHOUT_WRITER, EVENT_TARGET_READ_BEFORE_SAVE ...), focus lint (FOCUS_PREREQUISITE_MISSING, FOCUS_RELATIVE_TARGET_MISSING, FOCUS_ICON_REFERENCE_MISSING, FOCUS_LOCALISATION_REFERENCE_MISSING, FOCUS_GAMEPLAY_REFERENCE_MISSING, FOCUS_DUPLICATE_ID, FOCUS_DUPLICATE_COORDINATE, FOCUS_PREREQUISITE_CYCLE, FOCUS_UNREACHABLE ...), tech lint (TECH_*_MISSING, TECH_DUPLICATE_ID, TECH_PREREQUISITE_CYCLE ...), GUI (GUI_MISSING_SPRITE, GUI_MISSING_TEXTURE, GUI_MISSING_LOCALISATION, GUI_REFERENCE_UNRESOLVED ...), map (MAP_*_DUPLICATE). [V]
+- Gaps (inference from the absence of codes in the source listing): no checker I could find for missing localisation keys of decisions, ideas or characters; no cross-kind "scripted effect/trigger used but not defined" report outside event/tech helper analysis and `script_validate` unresolved flags; no whole-mod report that lists all unresolved identifiers by kind. [I]
+- `hoi4.impact_inspect` is the closest thing to a reference graph. Per docs/analysis.md it "connects source-backed event, focus, decision, idea, technology, scripted-helper, localisation, GUI, sprite, and texture references where a typed static edge can be established", with unresolved dynamic names, missing definitions, skipped sources, cycles and traversal limits explicit. It is seeded per symbol/file, bounded (64 seeds), not a global dump. [V for schema, docs; I for global use being awkward]
+
+#### 2.4.2 What does `hoi4_focus_rewrite` support?
+
+All three are done by sending a plan (JSON validated by schemas/focus.ts, published as schemas/focus-plan.schema.json). The plan carries `provenance.sourcePath/sourceHash/importedPlanHash`, which the drift guard uses.
+- Create a tree or palette in a new file (`createIfMissing: true`; refuses to repurpose an existing file: `FOCUS_CREATE_REQUIRES_NEW_SOURCE`). For continuous palettes a plan is mandatory and `layoutMode` must stay `authored`.
+- Edit fields: `updateFocusTreeSource` (focus/source-update.ts) computes, per focus, which field projections differ between the imported plan and the target plan (icon, cost, availability, bypass, allow_branch, completion_reward, ai_will_do, search_filters, prerequisites, mutually_exclusive, position, and so on) and replaces only those assignment byte ranges; focuses not in the plan are removed, new focuses are appended; unchanged text is untouched. [V]
+- Move nodes: change `position` (mode fixed with x,y; mode relative with relativeTo; mode auto). The layout engine (focus/layout.ts) resolves relative anchors to absolute grid coordinates. In `authored` mode fixed/relative/pinned positions are preserved and automatic ones are placed collision-free. [V]
+- Add/link focuses: add a focus object and set its `prerequisites.groups` (each group is an OR list, groups are ANDed) and `mutuallyExclusive`. [V]
+- Compact reflow of an existing tree with no plan: `layoutMode: "compact"` + `treeId` (rejects `createIfMissing`). Optional `compactFocusIds` (bounded repair), `pinnedFocusIds` (anchors), `symmetryGroups` (<=64). Refuses invalid geometry (overlap, bad parent order, crossings, connectors through nodes, off-centre canvas). [V]
+- Refusals relevant to Factory (source-update.ts): `FOCUS_UNSAFE_COMMENTED_REWRITE` (the assignment to change contains a `#` comment), `FOCUS_UNSAFE_RAW_TREE_REWRITE` / `FOCUS_UNSAFE_RAW_FIELD_REWRITE` / `FOCUS_UNSAFE_RAW_PALETTE_REWRITE` (raw passthrough of unknown fields differs), `FOCUS_UNSAFE_SCALAR_REWRITE`, plus parse-error refusals and the two #42 guards. [V]
+- Side effect to plan for: each rewrite also writes `<source>.focus-plan.json` (planning sidecar: branch, lane, pinned, reveal, working labels, AI route flags) beside the focus file inside the mod (focus/planning.ts `focusPlanningSidecarPath`; service.ts lines ~444-660). HOI4 ignores it, but it enters the repo that Factory treats as source of truth. [V]
+- Not supported: per-property micro-edit call, dry-run/preview, undo/rollback call (transactions are internal), rename-with-reference-closure, editing shared focuses beyond ids, inline scripts. No x/y handling for `@constants` (see 5.2). [V/I]
+- Background use: `requestKey` is accepted for background rewrites (see 2.4.6).
+
+#### 2.4.3 What layout/render data does a browser focus editor need, and what is exposed as data?
+
+Exposed (all JSON, all deterministic, all verified in code):
+- `focus-inspect.<rev>.json` (focus/tool-operations.ts ~line 700): `schemaVersion`, `revision`, `plans[]` (full FocusTreePlan), `layouts[]` ({treeId, layout{nodes[{id,x,y,laneId,preserved,sourceMode}], decisions[], diagnostics[], metrics, connectorMeasurements, layoutHash}, diagnosticCount, scenario?}), `continuousFocusPalettes`, `presentation` (resolved titles/descriptions with source locations and icon metadata without pixel data), `sourceHashes`, `diagnostics`.
+- Per focus in the plan (schemas/focus.ts): id, label, branchId, laneId, `prerequisites {operator:'and', groups:[{operator:'or', focusIds, rawPassthrough, sourceLocation}]}`, `mutuallyExclusive[]`, `routeLocks[]`, availability/bypass/allowBranch raw blocks, `position` (fixed/relative/auto), visibility, reveal, convergence, sharedSupport, icons[{kind static|dynamic, sprite}], localisation{titleKey, descriptionKey, workingLabel}, ai, filters, links (decision, decision_category, event, idea, leader, formable, helper), cost (number or `@constant`), completionReward, sourceLocation, rawPassthrough.
+- `*.focus.json` from focus_render (render.ts `svgDocument`, `graph`): tree header, `layout` (hash, nodes, decisions, metrics, connectorMeasurements), `focuses[]` with position, `prerequisiteGroups`, `mutualExclusions`, branch, lane, visibility, convergence, `terminal`, ai, filters, icons, localisation, `resolvedPresentation`, links, sourceLocation; `diagnostics`; `sourceHashes`; `generatedSourceMap`.
+- `*.focus.source-map.json`: generated ranges mapped to plan nodes and imported source locations.
+- Coordinates: integer grid units (HOI4 x,y). Pixel constants in geometry.ts: 176 px per column, 116 px per row, node 144x76. Render adds padding 80 by default.
+- Diagnostics have codes, severity, category and `location`.
+
+Not exposed as data (gaps for a custom canvas):
+- Connector curve geometry (bezier/path points). The SVG contains the path strings and `focusConnectorCurve` exists in geometry.ts, but JSON gives only spans (`connectorMeasurements`: horizontal/vertical/manhattan spans and a `long` flag). A Rust/React canvas must re-derive curves or reuse the SVG. [V]
+- Icon pixels: only embedded as data URIs inside SVG/HTML and in the PNG; decoded only when `png` is true (`decodeIcons: rasterize`, tool-operations.ts lines ~841 and ~896). With `png:false`, SVG shows "ICON" placeholders. No separate icon endpoint. Factory's game-reference rules (spec 006: raw game files are never served) therefore need a deliberate decision about serving derived icon crops. [V/I]
+- A per-focus "type" for shared focuses: `sharedFocusIds` is a list of ids only. [V]
+
+#### 2.4.4 Event, decision, tech, GUI, map specifics
+
+- Event graph snapshot (event/model.ts): nodes of kind event/option/entry/helper/unresolved/terminal; edges with `reason` (option_branch, immediate/hidden/after/delayed/random/weighted event calls, scripted_effect_call/expansion, on_action/focus/decision/mission/country_setup/state_setup/implicit entries, unresolved_dynamic_reference, terminal), `conditions[]`, `helperStack`, `location`, `confidence` (confirmed/high/medium/low/unresolved), `timing`, `weight`, `scope` transition; plus `stateAccesses`, `stateLinks`, `issues`, `unresolved`. Snapshots are retained as artifacts up to 128 MiB canonical JSON, else `EVENT_GRAPH_SNAPSHOT_OMITTED`. This is a ready-made data source for an event-chain viewer. It is read-only: no event writer. [V]
+- Decisions: `decision_inspect` inventories and evaluates under declared scenarios; gates with unknown inputs remain unresolved; cost payment is checked for double or missing payment. No decision writer. [V]
+- Tech: `tech_render` folder view reads real GUI item geometry and year labels from the game's `techtree_*` GUI; scenario year/researched list shows blockers. No writer (AT AGENTS.md: "Technology Tree Viewer read-only"). [V]
+- GUI: deep fidelity work (bitmap fonts, nine-slice, masked shields, shader interpretation, scrollbars, scripted-GUI conditions, tooltips). `gui_rewrite` has three modes (source, helpers, patches) and is the only upstream path for editing GUI. Real-game parity checks are in tests/local (not in CI). [V]
+- Map: `map_inspect` and `map_rewrite` are the largest area (48 source files under map/, 52 unit test files with "map" prefix). `create_world` from a reference image or geography model is explicit about "offline validation is separate from native campaign acceptance" (README). [V]
+
+#### 2.4.5 Probability, mechanics, package, scenario
+
+- `probability_*` use adapters: decision_ai_will_do, mission_ai_will_do, national_focus_ai_will_do, technology_ai_will_do, doctrine_ai_will_do, research_weight_factor, effective_mtth_days, categorical_weighted, custom_weighted_pool. Version-independent; records observed game build from `launcher-settings.json` (docs/probability.md).
+- `mechanic_test` is a bounded source interpreter, not a simulator. `scenario_test` composes cases and supports resumable batches. `package_check` verifies presence of definitions/calls/registrations/loc keys/assets and that required cases are declared. [V]
+
+#### 2.4.6 Jobs and `requestKey` (docs/jobs.md, core/job-*.ts) [V]
+
+- Domain tools run in separate worker processes; warm workers stay `jobWorkerIdleSeconds` (default 180). Heap ceiling `jobWorkerMaxHeapMiB` (default quarter of RAM, 2-8 GiB).
+- Persistent tasks need an operator-owned `serverStateRoot`. Task ids are opaque, authenticated and principal-private.
+- A native background rewrite MUST carry a caller-generated `requestKey` (1-256 chars). The receipt namespace is scoped to principal + workspace identity + roots and binds tool, inputs and tool version. Same key + identical request returns the same task and result; same key + different inputs fails explicitly. Mutation receipts stay durable after visibility expires so a retry cannot duplicate a write. Ordinary synchronous rewrites do not need a key.
+- Commit boundary: the server binds an applied rewrite to its transaction journal before replacing source; after a crash it reads the journal and reconstructs the result without replanning. Cancelling a rewrite after the commit boundary reports the real outcome.
+- Read-only jobs have a deadline (`jobDeadlineSeconds`, default 1,800, `JOB_DEADLINE_EXCEEDED`) and cancel grace (`jobCancelGraceSeconds`, default 10). Rewrites are never killed by the deadline. `maxSharedTools` (default 4) and `maxConcurrentTools` (default 2 over HTTP) bound parallelism.
+- For Factory: matches spec 006's "reconcile job or receipt before retrying" and "tool protocol must negotiate task support". The key must be stable per intended operation; Factory's C-04 operation id is a natural source. [I]
+
+### 2.5 Determinism and source-preservation guarantees [V unless marked]
+
+- Determinism: AT AGENTS.md requires stable sorting, canonical JSON, seeded algorithms, fixed render inputs, content-addressed artifacts. Acceptance test "stores byte-deterministic HTML, SVG, real PNG, and JSON artifacts through FocusWorkbench" (tests/acceptance/focus-acceptance.test.ts). Seeded GUI scenario generation. PNG bytes depend on sharp/libvips version, so byte equality across a version upgrade is not guaranteed. [I]
+- Source preservation: no-change round trip returns the original bytes (tests/unit/core-source.test.ts: "preserves every byte, comment, duplicate key, ordering, and unknown block on no-change round trip"; property tests with fast-check in tests/unit/source-property.test.ts "round-trips arbitrary safe unknown fields, duplicate keys, comments, BOMs, and newlines byte-for-byte"); targeted edits keep BOM/CRLF/Windows-1252 elsewhere; malformed source is not rewritten; unrepresentable edits are refused.
+- #42 guards:
+  - `FOCUS_SOURCE_CHANGED_SINCE_PLAN` (focus/drift.ts `assertNoSemanticSourceDrift`, `hasSemanticSourceDrift`): a plan imported from an older source revision cannot overwrite a semantic change made since; formatting-only changes and sources already equal to the plan are accepted; there is no override. Applies to trees and continuous palettes. Tests: tests/unit/focus-source-drift-guard.test.ts (4 tests), tests/integration/mcp-focus-source-guards.test.ts (4 tests: stale semantic edit refused, accepted after re-import, formatting-only external change preserved, Windows-1252 edit leaves every other byte unchanged).
+  - `SOURCE_ENCODING_NOT_ROUND_TRIPPABLE` (core/source/encoding.ts): a file that is not valid UTF-8 and contains bytes 0x81, 0x8D, 0x8F, 0x90 or 0x9D cannot be rewritten (iconv-lite would otherwise write 0x9D for each); reads still work and carry a warning. Also applied to map text tables. Tests: tests/unit/source-encoding-guards.test.ts (6 tests).
+  - CHANGELOG 4.5.0 (2026-10-25) states both and says "Reported by the HOI4 Factory S01 EXP-02 probe". I tie "#42" to these two entries by that text and by Factory's own record (maintainer-decisions-2026-10-24.md line 206; GOAL-S03 line 31). [I for the PR-number mapping]
+- Concurrency/staleness primitives available: scan `revision` (sha256) and `expectedRevision` on impact/decision/etc., `expectedSourceHash` on proposed sources, GUI `GUI_SOURCE_STALE`/`GUI_EXPECTED_SOURCE_HASH_REQUIRED`, transaction `TRANSACTION_STALE`.
+
+### 2.6 Limits [V]
+
+- Focus: 10,000 nodes, 50,000 edges, depth 256, layout work 8,000,000, lint work 2,000,000, 2,000 diagnostics (focus/limits.ts). Plans larger than 200 focuses rasterize at 0.5 scale by default.
+- Render: max dimension 16,384 px, 50,331,648 px per image, 67,108,864 aggregate, 4,096 distinct raster operations (core/render-budget.ts).
+- Scan defaults: 100,000 files, 256 MiB, 64 MiB per file (docs/configuration.md); event graph snapshot 128 MiB; transaction ceiling 15,000 files, 32 MiB manifest (CHANGELOG 4.4.0).
+- Inline response 32 KB; reference read 80 lines / 8,000 bytes; source lookup 3 definitions / 10 usages.
+- Cold start (ADR 0045, measured 2026-10-11 on a shared machine, Chaos Redux 2,758 files, 262,000 symbols): 14.8 s mod_index, 11.8 s event lint, 32.9 s decision inventory; persistent cache did not shorten it. Warm workers matter for a server. No single-edit focus round-trip latency figure exists in the repo (the 1,024-focus test is functional, not a benchmark); I did not run `npm run benchmark`. [V/I]
+- Game files are read from `gameRoot`; without it, icons/fonts/vanilla symbols and `script_validate` documentation are missing (results say so). The tools never write to `gameRoot`.
+
+### 2.7 Test coverage [V by file counts; not executed]
+
+- 232 `*.test.ts` files (255 files under tests/ including helpers and fixtures); about 1,994 `it(`/`test(` occurrences by grep: unit 1,665 (172 files), integration 209 (45 files), acceptance 59 (6 files: event, focus, gui, map, probability, technology), package 42 (4 files), local 19 (5 files, opt-in, need a real game or external workspaces: gui-native-fidelity, vanilla-fonts, vanilla-icons, external-workspaces, stdio smoke). Counts are approximate (grep of call sites, `.each` cases counted once).
+- CI (.github/workflows/ci.yml): ubuntu + windows, Node 22 and 24: `npm audit --audit-level=high`, `npm run check` (format, lint, typecheck, vitest in 8 shards, fixtures check, schemas check, build, pack check, registry validate), coverage with thresholds 80/80/75/80 on ubuntu/Node 22, MCP inspector run, plus a Docker build. No macOS in the matrix. Fixtures are synthetic and project-owned (fixtures/*, AGENTS.md "CI fixtures must be synthetic").
+- HTTP security tests: authorization, limits, security, streaming. Native task tests over stdio and HTTP. Job recovery and transaction recovery tests.
+- Evidence gap: real-game visual parity (focus, tech, GUI) is shown by maintainer-supplied comparison images in docs/images/comparisons and by opt-in local tests, not by CI. The sample of agent calls behind the tool audit was 304 calls; focus_*, error_log and mod_index did not appear in it (docs/plans/tool-audit.md), so field evidence for those tools is thinner than for gui_render and script_validate. [V]
+- Dogfooding: 83 of 95 failed calls in the sampled transcripts were argument errors, fixed by 4.0.0 shorthands. Known-mistake rules: 7.
+
+### 2.8 Docs and README claims versus code [V]
+
+Matches: tool counts (28 = 19 + 7 + 2), tasks support, `png:false`, 200-focus half-scale threshold (LARGE_FOCUS_RENDER_NODE_THRESHOLD = 200), `plans` array in the inspect artifact, drift guard, encoding guard, "does not run the game", HTTP never exposes ChaosX tools, no interactive editor.
+Mismatches or soft spots:
+1. docs/tools.md Writes column "-" for event_render/tech_render/probability/impact etc. versus artifacts written to server storage; docs/tools.md says review files never go to the mod, but docs/configuration.md says that without `workspaceStorageRoot` they live in `<mod>/.hoi4-agent/`. Factory must set `workspaceStorageRoot`.
+2. docs/focus.md describes the `.focus-plan.json` sidecar as optional "may be stored"; the rewrite engine writes it as part of every national rewrite.
+3. docs/third-party-notices.md lists only Roboto and Tesseract. npm-shrinkwrap.json also contains LGPL-3.0-or-later `@img/sharp-libvips-*` prebuilt binaries (10 packages, plus 4 "Apache-2.0 AND LGPL-3.0-or-later" sharp platform packages), all optional per platform, and MPL-2.0 lightningcss (dev only). A Factory container image that ships libvips needs the LGPL notice. [V from shrinkwrap; the notice gap is a documentation observation]
+4. Importer reads only numeric `x`/`y` (focus/importer.ts `scalarNumber` regex); script constants such as `x = @col` are not handled for position (cost constants are, via FOCUS_COST_CONSTANT_PATTERN). I found no diagnostic for this case. Not covered by any test I found. [I - inferred from code reading]
+
+---
+
+## 3. HOI4 Live Tools (LT)
+
+Central answer: **desktop only, on the user's own Windows machine, for anything that actually tests a mod in the game. Not server-usable.**
+
+### 3.1 What the repo contains [V for item list; D for details]
+
+| Piece | Platform | Status |
+|---|---|---|
+| `hoi4_live/` Python package + `install.py` + `hoi4-live-tools.cmd` | Windows 10/11 only (`install.py` `check_platform` raises "installs on Windows only"; Linux and macOS code paths only provide paths and process discovery; on Linux window, capture and input classes raise "unavailable") | "Stable release" 1.1.0; mod-testing tools and play attempts; "no clean two-year run or full campaign has passed" |
+| `native/` Rust crate `hoi4-live-native` 0.1.0 | Linux x86_64 only | "Developer preview"; README: Windows and macOS adapters planned, not live-tested |
+| `third_party/clausewitz_mcp` | n/a | Unchanged MIT upstream source (smerss/Clausewitz-MCP), not in the installer payload |
+
+### 3.2 MCP tools
+
+Python runtime: 47 tools (verified by grepping `@tool("hoi4_...` in hoi4_live/tools): hoi4_advance, hoi4_army, hoi4_briefing, hoi4_click, hoi4_clock, hoi4_console, hoi4_construction, hoi4_decisions, hoi4_diplomacy, hoi4_drag, hoi4_eval_effect, hoi4_fire_event, hoi4_focus, hoi4_front, hoi4_governor, hoi4_hover, hoi4_journal, hoi4_key, hoi4_launch, hoi4_load, hoi4_lock, hoi4_logs, hoi4_map, hoi4_memory, hoi4_navy_air, hoi4_new_game, hoi4_ocr, hoi4_orders, hoi4_peace, hoi4_politics, hoi4_popups, hoi4_production, hoi4_research, hoi4_save, hoi4_save_query, hoi4_scenario, hoi4_screen, hoi4_screenshot, hoi4_scroll, hoi4_shutdown, hoi4_standing, hoi4_state, hoi4_status, hoi4_telemetry, hoi4_time, hoi4_type, hoi4_wait_for. [V]
+Mod-test group (family `testmode`, `test_only=True` for the first three): hoi4_console (commands[], read_output, keep_open), hoi4_eval_effect (effect, scope), hoi4_fire_event (event pattern `[A-Za-z0-9_.]+`, tag, answer none/first, wait_s <=30; returns command, response, popups[] or answered[], new_error_lines, errors[] and a screenshot), hoi4_logs (log error/game/system/setup/text/exceptions; since a named mark; grep; limit; tail; set_mark), hoi4_save_query (save, query info/keys/get/find/variables/flags/diff), hoi4_scenario (steps[] with expectations text/not_text/error, writes `.md` and `.json` reports). [V for fire_event/eval_effect/logs code; D for the rest]
+docs/tools.md documents 43; the registry has 47 (hoi4_front, hoi4_governor, hoi4_memory, hoi4_wait_for are missing from docs; no test guards the drift). [V]
+
+Native Rust runtime: `tools()` in native/src/protocol.rs advertises 21 base tools plus two construction tools; owner-bound sessions add up to 7 (max 30) [D]: hoi4_capabilities, hoi4_overview, hoi4_economy, hoi4_army, hoi4_input_geometry, hoi4_research, hoi4_technology_list, hoi4_research_folders, hoi4_research_ui, hoi4_research_slot_control, hoi4_research_category, hoi4_research_node_detail, hoi4_research_nodes, hoi4_focus_list, hoi4_focus_completed, hoi4_focus_search_state, hoi4_focus_node_detail, hoi4_focus_selected_detail, hoi4_production_lines, hoi4_construction_queue, hoi4_wait_for (+ construction controls/find_view; lease/time/attempt/governor tools when bound). There is no console, event, effect, log, save, screenshot or OCR tool in the native runtime; the capabilities response says `"mod_qa":"separate; unavailable in this runtime"` and `"windows_macos":"unverified native adapters"` (protocol.rs line 409). [V]
+Names `hoi4_army`, `hoi4_research`, `hoi4_wait_for` exist in both runtimes with different schemas. [D]
+
+### 3.3 How it attaches to the game [D unless tagged]
+
+Python/Windows - everything outside the game except an optional telemetry mod:
+- Launch: starts `hoi4.exe` directly with `subprocess.Popen` (game/process.py). Whether the Steam client must run is unknown.
+- Input: Win32 `SendInput` with scan codes after bringing the window to the foreground (platform/windows_input.py).
+- Capture: `PrintWindow(PW_RENDERFULLCONTENT)` then ffmpeg `ddagrab` fallback (client must be fully visible for the fallback).
+- OCR: Windows OCR through a persistent PowerShell host; config `ocr.language: en-US`.
+- Console: toggled by the grave key (`console.toggle_key: grave` in config.json; game/console.py [V]); command text is pasted via clipboard because typed characters drop; responses are read back by OCR. Commands used: `event <id> [TAG]`, `eval_effect`, `tag`, `save`, `pause_in_hours`.
+- Telemetry mod: `hoi4live_telemetry` is generated into `<user_dir>/mod/` (telemetry/modgen.py [V]); its `on_daily`/`on_weekly` scripts for the player country `log` flat-JSON `HOI4LIVE "k":"day",...` lines into `game.log`, which the server tails; registered variables/flags go into `watch` lines. It edits `dlc_load.json` (backups kept). Event lines cover war, peace, faction, annex and control changes, not custom mod events.
+- Logs: tails error.log, game.log etc. by byte-offset marks. Saves: plain-text `.hoi4` parsed offline (variables, flags, diffs).
+- `hoi4_memory`: bounded read-only Windows process snapshot.
+
+Rust/Linux preview:
+- State: `process_vm_readv` on a game it launched as child; checks /proc identity, ELF build id, SHA-256 (platform/linux.rs). Input: X11 XTEST via x11rb at a hard-coded 512x288 profile. Launch: game executable with `-userdir=<fresh dir>`, `env_clear`, DISPLAY/XAUTHORITY, `SDL_AUDIODRIVER=dummy`, fresh `dlc_load.json` with `enabled_mods: []`. Clients connect over a 0600 Unix socket. No screenshots, no memory writes, no raw click tool.
+- docs/OWNED_LINUX_LAUNCHER.md [V]: prerequisites include a licensed installed game, the exact Linux x86_64 build (a different hash or build id is refused), "a task-owned local X11 server with its actual PID ... it does not provision or discover a desktop".
+
+### 3.4 What it can verify
+
+Python test mode (Windows): fire an event and read popups (title, text, options by OCR) with screenshots; run console commands and effects; step days and answer popups; capture error.log delta since a mark (4 known-mistake hints in game/log_hints.py); read variables/flags from saves and diff saves; watch variables/flags daily via telemetry; take control of a country (`hoi4_new_game` with tag); click/hover/type by OCR text; assert in `hoi4_scenario`. Limits: windowed or borderless UI scale 1, OCR language must match game language, the console key must be grave, mods load only at launch, Ironman and multiplayer refuse console and manual saves, a save takes ~20 s, UI actions are slow, campaign play unreliable (docs/STATUS.md). [D]
+Native: can observe and verify own-country research, focus, production and construction, set clock/speed, start research and focus, queue and place construction. Cannot fire events, read variables/flags, read error.log, or screenshot. [D, consistent with the capabilities string V]
+
+### 3.5 Headless/server verdict
+
+- Windows package: needs an interactive desktop, a visible game window, SendInput, Windows OCR. Desktop only. [V for installer and design, D for the rest]
+- Linux preview: no Wine/Proton; native Linux build only; needs an X server, a licensed install, an exact build, no mods enabled. Only tested in a QEMU TCG x86 guest on a Mac: ~6 min to start at 512x288, a 1920x1080 window stayed at "Loading GUI" >30 min; docs say 1080p "needs a KVM or native Linux host" (docs/LINUX_RUST_HANDOFF.md line ~50; docs/CLAUSEWITZ_VALIDATION.md) [V for the doc lines].
+- Inference [I]: Xvfb + llvmpipe on native x86 may start the preview, but no run is recorded, mod loading is disabled, and a licensed Linux copy plus per-user Steam access would be needed per tenant. Both runtimes assume one game, one user_dir and one shared desktop lock (`%TEMP%/hoi4_live_desktop.lock`). No multi-tenant isolation.
+- Therefore Factory spec 006's statement "The hosted service does not run the game, so Live Tools is not part of the server deployment" is confirmed. [V]
+
+### 3.6 Security, config, license, maturity
+
+- Config: config.json (`game_dir` and `user_dir` "auto", `mode` "campaign", `play_mode` "fair", lock path, window, capture, console, OCR, launch, timeouts). Env overrides HOI4_LIVE_GAME_DIR / USER_DIR / ARTIFACTS / MODE / CONFIG / CALL_LOG. There is no allowed-path list; the mod under test is whatever `dlc_load.json` enables. Stdio MCP only; the only listener is the dev helper `scripts/bridge.py` on 127.0.0.1:8765 (unauthenticated). [D]
+- Writes: artifacts/, telemetry mod, `dlc_load.json` (+ backups), `hoi4live_*` saves. [D]
+- Licences: Apache-2.0 project; MIT Clausewitz-MCP derived files (listed in native/PROVENANCE.md); PyPI deps numpy (BSD-3), Pillow (HPND), opencv (Apache-2.0, wheel bundles LGPL-2.1 FFmpeg); tests/fixtures/screens contain cropped vanilla UI screenshots (do not vendor). [D]
+- Tests: ~806 Python test methods in 60 files, ~1,088 Rust `#[test]` + 28 ignored; CI runs compileall + unittest + protocol smoke on Windows/Linux/macOS and cargo fmt/clippy/test; CI never runs the game. [D]
+- Docs vs code mismatches [V]: default mode (docs/LEGACY_WINDOWS_USAGE.md line 302 says `test` default; config.json and config.py default to `campaign`, in which console/event/effect tools are refused and set_mode back to test is refused once campaign is latched [D]); tool count 43 vs 47; stale native `clock.rs` capability text about construction stages [D]; README says tested Linux build 1.19.3 while Python release was verified on 1.19.2 [D].
+
+### 3.7 What Factory could reuse (all [I])
+
+- Telemetry mod generator and log/save parsers are plain Python and could run server-side on files a user uploads (error.log, game.log, saves). Their output would have to be recorded as user-reported observation per spec 006 ("Import observation"), never as server-verified.
+- A user-run local bridge would need a relay because the server has no network listener.
+
+---
+
+## 4. HOI4 Mod Setup (MS) v0.8.0
+
+Reading note: line numbers and several details come from the delegated pass [D]. I re-verified: manifest path constant (`crates/hoi4-setup-core/src/manifest.rs:16` = "hoi4-mod-setup.manifest.json"), lock path (`src-tauri/src/agent_setup.rs:26` = ".hoi4-mod-setup/install.lock.json"), the analysis gate string (`src-tauri/src/transaction.rs:267`), the launcher-registration test (`src-tauri/src/service/builder_tests.rs:260-265`), the `Ownership` enum (models.rs:104), the facade operation list (`service/mod.rs` public methods inspect, approve_evidence, record_analysis, confirm_analysis, build_plan, decide_conflict, approve_plan, apply, inspect_recovery, recover) and docs/39_service_facade.md, and the snapshot-manifest counts below.
+
+### 4.1 Layout and reuse surface
+
+- Workspace members (Cargo.toml): `crates/hoi4-setup-core` (pure, wasm-portable: models, manifest parse/validate/select, three-way merge diff3/TOML/JSON, descriptors, adaptation, client registry, project profile, export/ZIP), `crates/hoi4-setup-web` (wasm-bindgen cdylib for the web edition), `src-tauri` (package `hoi4-mod-setup`, lib `hoi4_mod_setup`: scanner, transaction, git, source, safe_fs, process, readiness, service facade, and the desktop-only `commands.rs`), `tools/updater-signature-verify`. [V directory listing, D descriptions]
+- Core is not "the core crate" alone: pure logic is in `hoi4-setup-core`; the scanner/transaction/Git engine and the server facade live in the `hoi4-mod-setup` package. The facade builds without Tauri and without the OS keyring: `cargo build -p hoi4-mod-setup --lib --no-default-features` is a CI job (.github/workflows/ci.yml) [D]. `tauri-build` stays an unconditional build-dependency [D, I that it still compiles in an embedding build].
+- Facade (docs/39_service_facade.md [V]): `SetupService` (injected `CredentialStore`, optional `PlanBuilder`, optional `NodeRuntime`, optional post-install runner), `SessionConfig{workspace_root, state_root}` (both existing, absolute, link-free, disjoint), `SetupSession` per account/onboarding (own scan evidence, analyses, prepared plans, approvals), `plan_sha256`, `root_identity`, `DeniedCredentialStore`. Synchronous and blocking (std Mutex, blocking reqwest, spawned `git`); must be called off the async runtime (also noted in Factory CLAUDE.md).
+- Shells: Tauri desktop app (React in `src/`), web edition in `dist-web/` (wasm + worker; "nothing uploaded", ZIP output, GitHub Pages), `relay/` Cloudflare Worker proxy for a free OpenRouter assistant, `site/` landing page. Rust pinned 1.88.0; pnpm 11.9.0; Node 22 for the frontend.
+- Runtime external dependencies: `git` on PATH; a publisher-verified Node (on Linux only Debian's packaged `/usr/bin/node` via dpkg database, `linux_trust.rs`); npm and Python (for `.tools/check.py` and the MCP bootstrap).
+
+### 4.2 Scan
+
+- Entry: `scanner::scan_project_with_progress(root, &ScanOptions, progress) -> ScanResult` (scanner.rs:412); facade `SetupSession::inspect` re-checks the root identity token before and after. `ScanResult`: scan_id, read_only, partial/cancelled/limits_hit, counts, `findings[]` (id, category, value, status, confidence, blocking, evidence[detector, path, excerpt_sha256, line range]), `conflicts[]` (id, path, kind, severity, details), summary, profile_stats. [D]
+- Reads: descriptor (parses repeated `replace_path`, multi-line blocks, BOM, comments), thumbnail (decoded and validated), root CLAUDE.md/AGENTS.md/README.md, docs/ one or two levels, agent folders (.claude, .agents, .codex, others), MCP config files, `install.lock.json`, git evidence (branch, HEAD, dirty/staged/unstaged/untracked, remotes, submodules, hooks, ignore files, tracked secret-like paths) with bounded read-only git runs on setup paths only. [D]
+- Project profile pass (separate): samples up to 256 files x 32 KiB without git; records localisation encoding class (utf8_bom / utf8 / non_utf8) and dominant namespace/prefix (docs/35_project_profiling.md). [D]
+- Limits: 150,000 files, 200,000 dirs, depth 64, 256 MiB total, 16 MiB per text file, 10 min deadline; ignored dirs include .git, .tools, paradox_wiki, node_modules, build. [D]
+- Gap for Factory: the scan is not a file inventory; it does not enumerate or hash gameplay files and does not probe tool versions. Factory's intake crate must do its own inventory. [D]
+
+### 4.3 Ownership and protection
+
+- `Ownership` = Managed | Merged | Generated | External (models.rs:104), declared per manifest component destination. `LocalState` = Absent | Unmodified | Modified | Unknown. Merged: CLAUDE.md, AGENTS.md, .gitignore, .mcp.json, .codex/config.toml. Generated: descriptor, thumbnail, README, state. External: outside the project (launcher `.mod`). Anything not declared by a component is user-owned and untouched (mod content `common/`, `events/`, `gfx/`, `localisation/` is never written). [D, README claim V]
+- First-import preservation: a valid existing descriptor.mod, thumbnail.png, README.md are kept (`LockedFile.preserved_local`); removal also keeps them. A differing existing file with no recorded base is a "user-owned conflict" with choices keep / replace / rename (`name.incoming.ext`) / skip; undecided conflicts become `Skip`. Replace/delete go through a journaled same-directory quarantine with hash checks. [D]
+
+### 4.4 Plan / apply / recovery
+
+- `InstallationPlan`: operations (Create, Replace, Merge, Rename, Skip, DeleteManaged, Generate, Chmod, External), conflicts, external_actions, generated_artifacts, download_ledger, approvals, source identity, git_setup, transaction stages (12), root-identity binding. [D]
+- Approval is a hash of the exact plan; any conflict decision withdraws approval; apply consumes it; builder output must be unapproved and write nothing outside the project root. [V from facade doc]
+- Journal and backups live under the state root, not in the project (paths.rs:116-124 [D]); partial apply allows rollback only (resume and discard refused) (facade doc `recover` row, V). Unresolved incomplete journals block new transactions. Fault-injection hooks at every stage boundary. [D]
+- Hard gates for Factory: (a) apply requires "a confirmed selected-provider analysis" except pure removals (transaction.rs:267, V); the facade accepts a host-supplied reply via `record_analysis` through the same validator (V from doc); (b) account-tool providers (codex, Claude account, Gemini/Grok CLI) are refused on the server (doc row `analyze`, V); (c) new-project apply stops at `launcher.registration` because the launcher `.mod` lives in the player's mod folder (builder_tests.rs, V); imports apply. (d) `DefaultPlanBuilder` does not read `install.lock.json`, so rerunning it on an already prepared mod treats edited managed files as unbased conflicts [D, I]. Update/repair/remove plan builders are in `commands.rs` (desktop feature); only building blocks (`update_operations`, `repair_operations`, `managed_removal_operations`) are public in `transaction.rs`. [D]
+- Platform readiness difference: `mcp.hoi4_agent_tools` selected but not set `ready` blocks readiness only when the host is Windows (`cfg!(target_os="windows")`); macOS reads as `unsupported_platform`; a Linux server with no runner passes readiness but installs nothing [D, I]. Matches Factory CLAUDE.md note.
+
+### 4.5 Manifest, lock, reimport
+
+- Upstream manifest `hoi4-mod-setup.manifest.json` (RemoteManifest, models.rs:368): schema_version, manifest_id, generated_for_revision, repository, components[] (id, category, source{kind,path,include,exclude,template_engine}, destination{path,ownership}, dependencies, platforms, required_tools, expected_files[{path,sha256,size}], conflict_policy, validation, update{strategy,remove_obsolete}), profiles[], wiki, update_policy, signing, coding_environments[], image_generation, live_testing. Schemas are closed (docs/schemas/remote-manifest*.json). `signing.required=true` is rejected: signature verification is not implemented (manifest.rs:820-826 [D]). The checked-in snapshot is schema 5.0.0, generated for revision 4ce68a2f, 60 components (51 managed, 9 merged), 1,665 expected files, 85.8 MB. [V]
+- Per-mod record `.hoi4-mod-setup/install.lock.json` (InstallationLock, models.rs:1099 [D]): schema_version "1.0.0", project_id, script_prefix, primary_namespace, source{repository, mode latest|pinned_commit|pinned_release, revision, manifest_sha256}, coding environment selection, components[], files[] (path, component_id, source_path/revision/sha256, base_sha256, installed_sha256, ownership, preserved_local, installer_created ...), merge_choices, local_modifications, rollback_records. Desktop also writes `.hoi4-mod-setup/state.json` for new mods only. [D]
+- Reimport/update: current files skip, unmodified replace, missing create; user edits with nothing new from source are "keep_reviewed_edit" and not asked again; CLAUDE.md/AGENTS.md are three-way merged from a base rebuilt at the recorded revision; repeated update with nothing new yields zero conflicts (docs/USER_GUIDE.md "Existing mods" [V], unit tests in repo [D]). Review record is Windows-only (docs/development/2026-10-24-app-review.md [D]).
+
+### 4.6 What it installs into a mod (snapshot 5.0.0 numbers [V]; live format-6 contents not available locally)
+
+- Instructions: CLAUDE.md (canonical, merged) and AGENTS.md projection from templates filled with mod name, prefix, game dir, Workshop dir.
+- Skills/agents: 32 skill directories under `.claude/skills/` and 23 agent files under `.claude/agents/` in the snapshot manifest (my count from expected_files; the delegated pass said 25 and 19), plus `.claude/settings.json`, agent-map; generated projections for `.agents`, `.codex`, `.cursor`, `.qoder`, `.opencode`; format 6 adds more clients.
+- MCP config: `.mcp.json`, `.codex/config.toml`, `.cursor/mcp.json`, `.qoder/mcp.json`, `opencode.json`. Never writes user/IDE/cloud settings.
+- Tools: in-project `.tools/sync/*.py`, `.tools/check.py`, `.tools/mcp/` bootstrap, `docs/`, `paradox_wiki/` (188 files, ~3.7 MB, manifest marks licence `not_found`), tool settings adapted from mod name/prefix. Outside the project: `hoi4-agent-tools@4.0.3` in the snapshot (pinned with sha512, installed into the user npm prefix by the Python bootstrap, Windows and Linux only); the snapshot's `live_testing` providers are `clausewitz_mcp` (native Linux 1.19.2), `hoi4_live_tools` v1.1.0 (Windows, experimental) and `none`.
+- Descriptor/thumbnail generation if missing; managed `.gitignore` block (ignores .tmp/, .agents/, .codex/, .tools/, paradox_wiki/, AGENTS.md, .hoi4-mod-setup/backups/, cache/; CLAUDE.md and .claude/ stay tracked [D]). Git mode `initialize | preserve | skip` (default skip); initialize stages only managed paths with `fast-import`, commits as "HOI4 Mod Setup <hoi4-mod-setup@localhost>", never pushes. [D]
+- Upstream fetch: GitHub hosts only (api.github.com, raw.githubusercontent.com, github.com ref advertisement), no redirects, per-file sha256+size from a manifest in the same repo at the same resolved commit; no signature; limits 20,000 files / 1 GiB selection / 512 MiB per file. Pin a commit. [D]
+
+### 4.7 Existing-mod import specifics [D]
+
+Existing .git: read bounded, hardened git; linked worktree warns; `.git` symlink blocks; Initialize over existing is refused (Preserve default). descriptor.mod at root parsed; launcher `<id>.mod` discovery only in the root's parent (<=512 entries) and not in the facade. Workshop mods: `remote_file_id` kept; tested on copies of three Workshop mods (Windows). Any folder layout accepted; only setup-relevant paths inventoried. Descriptors must be UTF-8; localisation encoding classified, never rewritten; merge keeps local line endings, generated files are LF. Case collisions and symlinks (including Windows reparse points, so possibly OneDrive placeholders) are block-severity `scan.*` conflicts; on the facade path any `scan.*` conflict except sensitive/profile/four git ids makes the scan `partial`, and a partial scan approves no evidence, so one symlink or case collision in a setup-relevant path blocks the whole import. Windows paths over ~260 characters are a documented limit.
+
+### 4.8 Security [D unless noted]
+
+`RootedDir` no-follow `openat` (Unix) / retained handle + file id (Windows); plan binds the root identity; untrusted git config (`include`, `includeif`, `filter`, `alias`, `url`, `credential`, `core.hookspath/fsmonitor/sshcommand/excludesfile/attributesfile/pager`) refused before git runs and system/global config disabled; subprocesses: exec + argv array, `env_clear`, exe sha256 pinning, timeouts, output caps, Windows Job Object; persisted JSON refused if credential-shaped.
+
+### 4.9 Maturity and licence
+
+~909 `#[test]` functions (grep), fuzz targets (6, compile-only in CI), CI on ubuntu/windows/macOS, protected main, single maintainer, no 1.0. Facade tests use a synthetic fixture package (`service/fixture.rs`); no facade test against the real Agentic package was found [D]. Documented mismatches: docs/14_transaction_rollback.md says journals are under the project but code uses the state root; scan-result schema lacks `case_collision`/`secret_excluded`; DEVELOPMENT.md still says "Planned toolchain". Licence Apache-2.0; no GPL/AGPL in THIRD_PARTY_NOTICES.md; MPL-2.0 present (cssparser, selectors, dtoa-short, option-ext, arriving via dom_query and dirs-sys); `r-efi` MIT OR Apache-2.0 OR LGPL; the wiki snapshot has `license_status: not_found`. Embedding is by git dependency (no crates.io release indicated). [D]
+
+### 4.10 What Factory can reuse for import
+
+- Best fit: `hoi4_mod_setup::service` with `--no-default-features`: scan, per-account session isolation, root-identity binding, hashed plan approval, conflict decisions, journaled apply with quarantine, rollback and recovery. This is what `crates/setup-adapter` already wraps in Factory.
+- Standalone pieces: core `merge.rs`, `descriptors.rs`, `manifest.rs` (selection and hash verification), `profile.rs` and `proposals::detect`, `safe_fs` and git hardening if exposed.
+- Factory must still: enumerate, hash and Git-commit the mod's own files; produce an analysis reply that passes the validator; keep unmanaged files out of Setup-owned paths; serialize per project (no cross-process lock seen); decide whether hosted workspaces want the agent-tools/bootstrap/check.py parts at all (without a runner, `.mcp.json` and `.codex/config.toml` would point at a package nobody installed) [I].
+
+---
+
+## 5. Factory specs 006, 009 and 007 versus the tools as they are now
+
+### 5.1 Confirmed by current code
+
+| Spec statement | Evidence |
+|---|---|
+| 006: Agent Tools has typed MCP tools, stdio and authenticated HTTP; parser retains bytes; no-op serialization returns original bytes; unsafe parse diagnostics block rewriting | core/source/*, tests/unit/core-source.test.ts, http-authorization tests |
+| 006: transaction executor validates and rolls back; do not expose upstream transaction ids | AT AGENTS.md; core/transactions.ts; core/domain-validation.ts |
+| 006: static bearer grants read+write; narrower access needs explicit workspace grants / OAuth scopes | docs/http.md |
+| 006: tool protocol must negotiate task support; UI disconnect does not mean the tool did not finish; reconcile job or receipt | docs/jobs.md, requestKey receipts |
+| 006: render operations that write review artifacts are distinct from source mutation, even if a generic read-only hint is false | event_render/tech_render are annotated read-only but store artifacts; focus_* annotated `readOnlyHint:false, idempotentHint:true` |
+| 006: server game reference mounted read-only; tools need no desktop or Steam | docs/http.md "mounted read-only ... does not need a desktop or Steam session" |
+| 006: Live Tools not part of server deployment; Python release is a different target from the native preview; native mod QA unavailable | LT section 3; protocol.rs:409 |
+| 006: mechanic interpreter treats unsupported effects as unresolved; `advance_days` only expires modelled timed flags; package_check case presence is not execution | docs/mechanics.md |
+| 006: preserve BOM/newline; unsupported encodings remain inspectable and read-only | encoding guard (SOURCE_ENCODING_NOT_ROUND_TRIPPABLE reads continue with a warning) |
+| 009: render path includes HTML, SVG, JSON, source maps and default PNG; 1,024-focus test exists | render.ts `storeFocusRenderArtifacts`; tests/integration/mcp-large-focus-workflow.test.ts (two tests: 1,024-icon render and 1,024-focus create/compact/inspect/render) |
+| 009: event and technology tools are inspect/render, not editors | AT AGENTS.md, docs |
+| 009: prerequisites are groups; keep mutual exclusion and relative-position relationships; sidecar is derived data bound to the source hash | schemas/focus.ts; focus/planning.ts (sidecar carries sourceHash; `FOCUS_PLANNING_SIDECAR_STALE/_SOURCE_MISMATCH` codes) |
+| 009: upstream rewrite is single-operation with internal planning and recovery; do not invent an apply token | AT AGENTS.md |
+| 009: repeated compaction second operation unchanged | tool result `execution: 'unchanged'`; large-focus test covers repeat-compaction (per spec text; I read the test names, not the assertion bodies) |
+| 007: stale projection cannot overwrite newer source; stale-base conflict | `FOCUS_SOURCE_CHANGED_SINCE_PLAN`, `expectedRevision`, `expectedSourceHash`, `TRANSACTION_STALE` |
+| 007: coordinates are proposals in the source's layout units | layout nodes are integer grid units; only changed `x`/`y` are patched |
+
+### 5.2 Outdated, incomplete or needing a decision
+
+1. **Pin and version.** Specs cite Agent Tools `25f5641` (4.3.0 audited, "setup may install 4.0.3"). Current is 4.6.1+ (fbc5144). GOAL-S03 already says "731e64f or later" for the #42 guards; spec 006/007/009 text and acceptance rows (VIS-04, VIS-05, stale external edit) are now implementable against the guards, but the specs still describe them as open (EXP-02 in 007). The Setup snapshot still pins `hoi4-agent-tools@4.0.3`; the live format-6 manifest is not available locally, so skew between what Setup installs into a mod and what Factory runs server-side is unverified. [V/I]
+2. **"Edit property: minimal typed edit" (009 table).** No such upstream operation. The edit unit is the whole focus plan. Factory needs a plan-diff editor layer (state held server-side per session, hashes from `provenance`), and must accept that each edit is a full `focus_rewrite` call with full import + validation + transaction + sidecar write. No latency data exists; VIS-11 / the 100 ms drag-feedback target must be met in the browser with the proposal round trip asynchronous, as 007 already says. [V/I]
+3. **Preview before apply (006, 009).** Still no dry-run for `focus_rewrite` or `gui_rewrite`, so the "isolated proposal workspace" approach stands. New since the audit: `map_rewrite` has `preview: true`; event/tech/decision/impact/probability support in-memory `proposedSources` comparison (static what-if without writing); `gui_render` has `sourceBaseline` for before/after pixel deltas. [V]
+4. **Expression-based positions (007 VIS-03, 009 "distinguish literal from computed").** The focus importer only understands numeric x/y; I found no diagnostic for `@constant` or other expressions, so such nodes may import as auto or 0 silently. Needs a probe (open question O-3). [I]
+5. **Sidecar in the repo.** Spec 009 treats the sidecar as derived data; in practice every national rewrite writes `<file>.focus-plan.json` into the mod. Decide whether Factory keeps it in Git, ignores it, or suppresses it. [V]
+6. **Artifact storage.** Spec 006 says artifacts are stored by content hash in the object store; AT's own store is content-addressed under `workspaceStorageRoot` and served as MCP resources. Factory must set `workspaceStorageRoot` outside the repo and decide whether to mirror AT's store or read it through the resource protocol. [V/I]
+7. **Icons.** Spec 009 says the browser receives the rendered preview, not game files. Only SVG/HTML/PNG carry icons (embedded data URIs); there is no icon-per-sprite endpoint. A canvas editor that draws its own nodes would need derived icon crops, which touches the game-rights review in 006. [V/I]
+8. **Event/decision/tech editors (009 roadmap).** Confirmed read-only upstream; GUI and map do have rewrite tools; so "later editor families" for events/decisions/tech must use plain file edits plus AT compare/lint, while GUI and map can wrap `gui_rewrite` / `map_rewrite`. [V]
+9. **Static analysis coverage.** Spec 006 relies on CWTools for parameters/references. Confirmed necessary: `script_validate` sets `parametersChecked: false` and leaves helpers/native argument blocks unresolved. AT does not replace a rule-based validator. [V]
+10. **Undo/redo (007).** AT has no inverse operation and hides rollback, so undo must be Factory-level (inverse plan or Git). [V]
+11. **Cold start.** Spec has no number for AT start-up; ADR 0045 gives 12-33 s cold on a 2,758-file mod. A per-project worker pool with warm workers (default 180 s idle) or a long-lived HTTP instance is needed for interactive use; spec 006's "supervised worker" model fits but needs a keep-warm policy. [V/I]
+12. **Tool naming.** Specs do not name tools; the dotted names need a broker mapping. [I]
+13. **Live Tools wording.** Spec 006 says "native Windows/macOS adapters ... unavailable"; accurate for the Rust runtime. It does not mention that the Python Windows package is the only one with event firing, console, log and save tools, which is what a "user-operated observation" import would most likely come from. Also the Python default mode is `campaign` (config.json), which refuses those tools until set to `test`. [V]
+14. **Licences.** libvips LGPL notice for a container image; Setup's MPL deps and the wiki snapshot's `not_found` licence if the `paradox_wiki/` is bundled. [V/D]
+
+---
+
+## 6. Capability matrix
+
+Maturity vocabulary: **tested** = automated tests on synthetic fixtures in CI plus docs consistent with code; **tested (local-only fidelity)** = same plus real-game checks that only run opt-in or are shown by maintainer images; **experimental** = stated preview/experimental or no acceptance; **partial** = some of the capability exists; **missing** = not found. "Server" = usable inside a Factory server container.
+
+| Capability | Provided by | Maturity | Output format | Server-usable |
+|---|---|---|---|---|
+| Focus render | AT `hoi4.focus_render` | tested (local-only fidelity: comparison images in docs/images/comparisons; 1,024-focus workflow test; byte-determinism acceptance test) | HTML, SVG, PNG (decoded icons unless `png:false`), JSON, source-map JSON, plan sidecar JSON, problem-crop PNGs | Yes (Node 22/24, Linux incl. arm64; needs read-only game files for icons; sharp/libvips LGPL) |
+| Focus structured layout data | AT `hoi4.focus_inspect` artifact `focus-inspect.<rev>.json` and `*.focus.json` | tested | JSON: plans, layout nodes (x,y,laneId,sourceMode), prerequisite groups, mutual exclusions, metrics, connectorMeasurements, presentation metadata, diagnostics with locations | Yes. Gaps: no connector curve points, no icon pixels as data, `@const` x/y (inferred) |
+| Focus rewrite (create, edit, move, link, add/remove, compact) | AT `hoi4.focus_rewrite` | tested; guarded (#42 guards; FOCUS_UNSAFE_* refusals); no dry-run | Writes mod files + `.focus-plan.json`; returns drift/execution status and artifacts | Yes (needs per-project writable workspace dir, `requestKey` for background) |
+| Event render | AT `hoi4.event_render` | tested | JSON (authoritative), SVG, PNG, optional HTML, manifest | Yes |
+| Event chain graph | AT `hoi4.event_inspect` (scan/trace/explain_path/state_flow/lint/impact/compare/helper_expansion) | tested; static only, dynamic dispatch stays unresolved | JSON graph snapshot (nodes, edges with reason/conditions/timing/weight/scope), inline summaries | Yes (large graphs bounded, snapshot omitted >128 MiB) |
+| Decision inspect | AT `hoi4.decision_inspect` (+ `probability_*` for AI score) | tested; scenario-declared, unknowns unresolved | JSON | Yes |
+| GUI render | AT `hoi4.gui_inspect` / `hoi4.gui_render` | tested on synthetic; real-game parity local-only (tests/local/gui-native-fidelity) | PNG galleries, JSON scene/delta reports | Yes (needs game fonts/textures read-only) |
+| GUI rewrite | AT `hoi4.gui_rewrite` (source / helpers / patches) | tested | Writes .gui/.gfx/scripted_guis/localisation (<=32 files, 16 MiB) | Yes |
+| Tech render | AT `hoi4.tech_render` / `tech_inspect` | tested; read-only by design | JSON, SVG, PNG, optional HTML | Yes |
+| Map inspect | AT `hoi4.map_inspect` | tested (largest area) | PNG layers/tiles/overlays, JSON reports | Yes in principle; CPU/memory heavy [I] |
+| Map rewrite | AT `hoi4.map_rewrite` | tested offline; `create_world` explicitly separate from native campaign acceptance | Map files, `.hoi4-agent-world.json` inventory | Yes, same caveat |
+| Reference graph / unresolved identifiers | AT SymbolIndex diagnostics (`INDEX_UNRESOLVED_REFERENCE[_PARTIAL]`), `event_inspect lint`, `focus_inspect`, `tech_inspect lint`, `impact_inspect` (per seed), `package_check` (declared), `source_lookup` (single symbol) | partial: no whole-mod report; limited reference kinds in the core table | JSON diagnostics / impact graph artifact | Yes |
+| Duplicate IDs | AT: EVENT_/FOCUS_/TECH_DUPLICATE_ID, `INDEX_SYMBOL_COLLISION`, MAP_*_DUPLICATE, `mod_index next_id` | partial (per domain; collision only among workspace-owned same-level definitions) | Diagnostics | Yes |
+| Localisation checks | AT: LOCALISATION_BOM_MISSING / MALFORMED_LINE / LANGUAGE_MISSING, EVENT_/FOCUS_/TECH_/GUI_ missing-key codes, `script_validate` player-text warnings, `package_check` loc keys | partial (no general checker for decisions, ideas, characters found) | Diagnostics | Yes |
+| Script command/scope validation | AT `hoi4.script_validate` | tested; parameters unchecked | JSON findings | Yes (needs game `documentation/`) |
+| Probability / MTTH analysis | AT `hoi4.probability_inspect` / `analyze` | tested (acceptance + examples) | JSON, rendered analysis | Yes |
+| Scenario / mechanic tests | AT `hoi4.mechanic_test`, `scenario_test` | tested; bounded interpreter, not a simulator | JSON per case, resumable batches | Yes |
+| In-game test (fire event, read state, screenshot) | LT Python package `hoi4_fire_event`, `hoi4_console`, `hoi4_eval_effect`, `hoi4_logs`, `hoi4_save_query`, `hoi4_scenario`, `hoi4_screenshot` | experimental/stable-with-caveats (1.1.0; no campaign acceptance; docs/tools.md drift; default mode campaign) | JSON + base64 PNG + .md/.json scenario reports | **No**: Windows desktop, visible game window, SendInput, Windows OCR |
+| In-game observation on Linux | LT native Rust preview | experimental (developer preview; QEMU-only evidence; no mods enabled; no mod QA) | JSON digests | **No** (needs X server, exact licensed build, unproven headless) |
+| error.log parsing | AT `hoi4.error_log` (offline parse, categories, known mistakes, since-last-launch); LT `hoi4_logs` (live delta tail) | tested (AT: mcp-mod-tools integration test) / experimental (LT) | JSON | AT: yes if a log file is provided where `gameUserRoot/logs/error.log` is read [I]; LT: no |
+| Mod index | AT `hoi4.mod_index` (overview, next_id) + `source_lookup` | tested; summary only, no symbol list | JSON | Yes (12-15 s cold on a large mod) |
+| Package check | AT `hoi4.package_check` | tested | JSON | Yes |
+| Import preservation | AT byte-preserving parse/rewrite + guards; Setup `service` facade (scan, ownership, plan/apply, quarantine, rollback) | tested (AT property tests; Setup ~909 tests, facade tested on a synthetic package, real-mod review Windows-only) | AT: files; Setup: journal, `install.lock.json`, receipts | AT yes; Setup yes with constraints (Debian Node, analysis record, `scan.*` blocking, import only) |
+
+---
+
+## 7. Open questions and unverified items
+
+- O-1: Is 731e64f an ancestor of fbc5144, and does PR #42 equal the 4.5.0 guards? Needs a full clone (shallow here).
+- O-2: Does a Factory-pinned Setup revision install `hoi4-agent-tools@4.0.3` or a newer pin? Live format-6 manifest from Agentic-HOI4-Modding was not available.
+- O-3: What does the focus importer do with `x = @const` and other non-numeric positions in practice? Needs a probe on a synthetic file; I only read the code.
+- O-4: Single-edit latency of `focus_rewrite` on 200/1,000/2,000-focus trees (no benchmark in repo, none run).
+- O-5: Whether AT's persistent analysis cache can be shared across tenants for the read-only game layer (ADR 0045 says the cache barely helps cold start; sharing semantics not checked).
+- O-6: Whether icon crops derived from game textures may be served to the browser (game-rights review in spec 006).
+- O-7: Whether `hoi4.error_log` can be pointed at an uploaded log cleanly (relies on `gameUserRoot/logs/error.log`; reading code at reference/error-log.ts lines ~190-296 only).
+- O-8: LT: does `hoi4.exe` launched directly need the Steam client; is `-debug` required for console `event`/`eval_effect`; native preview performance on KVM; whether the 1.1.0 zip defaults to test mode.
+- O-9: Setup: behaviour with the real live manifest through the facade (only a synthetic fixture is tested); relaxation of `scan.link.*` / `scan.case_collision.*` blocking on the server path; non-UTF-8 filenames and OneDrive placeholders.
+- O-10: Hosted legality of running licensed HOI4 for any tenant (spec 006 already makes the rights review a release gate).
+
+## 8. Evidence index (absolute roots)
+
+- AT: <projects>\hoi4-factory\.work\ext\agent-tools - README.md, AGENTS.md, CHANGELOG.md, docs/tools.md, docs/focus.md, docs/events.md, docs/jobs.md, docs/http.md, docs/configuration.md, docs/reference.md, docs/analysis.md, docs/mechanics.md, docs/technology.md, docs/probability.md, docs/adr/0002, 0004, 0045, docs/plans/tool-audit.md; src/hoi4_agent_tools/mcp/tools/*.ts, schemas/{focus,focus-requests,event,analysis,mod-tools,script-validation,reference,gui-requests,map}.ts, focus/{render,tool-operations,source-update,drift,importer,layout,geometry,planning,limits}.ts, core/{index,source/encoding,source/parser,render-budget}.ts, reference/{mod-index,error-log}.ts, event/{model,service}.ts; tests/unit/{focus-source-drift-guard,source-encoding-guards,core-source,source-property}.test.ts, tests/integration/{mcp-focus-source-guards,mcp-large-focus-workflow,mcp-mod-tools}.test.ts, tests/acceptance/focus-acceptance.test.ts; .github/workflows/ci.yml; Dockerfile; package.json; npm-shrinkwrap.json.
+- LT: <projects>\hoi4-factory\.work\ext\live-tools - README.md, config.json, install.py, hoi4_live/tools/*.py, hoi4_live/game/console.py, hoi4_live/telemetry/modgen.py, native/src/protocol.rs, docs/OWNED_LINUX_LAUNCHER.md, docs/LINUX_RUST_HANDOFF.md, docs/CLAUSEWITZ_VALIDATION.md, docs/LEGACY_WINDOWS_USAGE.md, docs/tools.md, CHANGELOG.md.
+- MS: <projects>\hoi4-mod-setup - README.md, docs/USER_GUIDE.md, docs/39_service_facade.md, docs/LINUX.md, docs/source-manifest/hoi4-mod-setup.manifest.json, crates/hoi4-setup-core/src/{manifest,models}.rs, src-tauri/src/{transaction,scanner,agent_setup}.rs, src-tauri/src/service/{mod,builder,builder_tests}.rs.
+- Factory specs: <projects>\hoi4-factory\docs\03-subsystem-specs\006-hoi4-tools-and-validation.md, 007-visual-state-synchronization.md, 009-focus-and-other-editors.md; docs/02-architecture/maintainer-decisions-2026-10-24.md (line 206); docs/06-agent-handoffs/GOAL-S03.md (line 31).

@@ -1,0 +1,361 @@
+# 01 - Hagane Works as a visual development reference
+
+Researcher: Claude (Sonnet 5.5), research agent for HOI4 Factory
+Date of research / access date for every source below: 2026-10-31
+Mode: read-only, public pages and public GitHub data only. No account, no sign-in, no token, no call to the hosted API or MCP endpoint, no download or execution of any binary. Nothing posted or sent to anyone.
+
+Evidence labels used throughout:
+- [V] verified directly in a page or file I read (URL or path with line numbers given)
+- [D] claimed by documentation or by the project itself, not independently confirmed
+- [I] inferred by me from verified facts (reasoning stated)
+- [U] unverified (reason stated)
+
+Copyright note: the skills repo is CC BY-NC-SA 4.0 and the new studio repo is GPL-3.0-only. I paraphrased and cite paths/lines. No passage is reproduced.
+
+---------------------------------------------------------------------
+
+## 0. Headline findings
+
+1. [V] The hosted platform is closing. The platform's own Updates page (2026.10.28 entry) says online service stops on 2026-11-11, new registrations and purchases are already closed, game preview is already discontinued, and existing projects can still be exported until closure. Pass orders were fully refunded; other purchases refunded by usage. The team says it plans to publish suitable parts of the code and build a local tool. (https://scharnhorst.hagane.works/en/updates; raw HTML re-fetched with curl and the text confirmed.) That is 11 days after today. Nothing that depends on the hosted API, MCP endpoint or tokens will survive.
+
+2. [V] The brief's premise "the org has one public repo and no platform source" is out of date. A second GitHub organization, `hagane-works` (with a hyphen; created 2026-10-30), published `hagane-works/hagane-studio` on 2026-10-30: a local-first Windows desktop edition of Hagane Works, GPL-3.0-only, Go backend plus React/TypeScript frontend, about 233k non-test Go lines and about 106k TS/TSX lines, 149 documented tools, v0.1.2, single squashed commit 1e831623ed162e1a64763c242c55b249376ba20c. I shallow-cloned it to `.work/ext/hagane-studio`.
+
+3. [V]+[I] Authenticity of that repo is very likely but not confirmed by the team's own channels. Evidence for: the brand icon file is byte-identical to the one the live site serves (git blob SHA-1 04ccf82b... equals the SHA-1 of the live file I streamed into a hash without saving it); the repo's tool names match the hosted MCP tool names documented in the skills repo (7 of 7 checked); the commit email domain is hagane.works; the timing matches the 2026-10-28 announcement. Evidence against / gaps: not linked from the official site or the original `haganeworks` org as of my fetches; the account that made it public (`mickvale`) was created 2026-10-30, one minute before the org; the commit is unsigned. Confirm with the team before relying on its license grant.
+
+4. [V] The original hosted platform's own source (Next.js frontend, Python and Go backend, Asset Lab, AI gateway, billing) is NOT public. `hoi4-modmaking-skills` (CC BY-NC-SA 4.0, HEAD ef7028c12cd021216bfb7660f85ad93e5efc93e1, tag v1.5.0 = 927b3660...) is documentation and skills only and its LICENSE grants no rights to the platform or its source.
+
+5. [V] It is a hosted web workbench (Next.js site behind Cloudflare, Stripe checkout, Google OAuth or email login), with a free Windows "Local Assistant" helper and, since 2026-10-30, a separate open-source local desktop edition. It was never primarily a desktop app.
+
+6. [V] Architecture: the platform owns the project (typed rows, IDs, namespaces, derived localisation keys) and regenerates mod files on export. Its own generated coverage table (web/src/generated/exportCoverage.ts) shows what that costs on import round-trips: for example 99 focus files in to 7 out, 115 decision files in to 2 out, 2334 of 2525 state filenames renamed, and about 43 vanilla directories not routed at all (kept only by overlaying onto the original mod). This is the opposite of HOI4 Factory's native-files-as-truth design and is the main reason it is an inspiration, not a base.
+
+7. [V] Best reusable ideas for HOI4 Factory (all classified in section 3): edit-revision tokens that refuse stale agent writes; a write receipt that separates "saved" from "verified"; preview-then-apply with per-item discard; a coverage/fidelity ledger with named statuses; a flags-set-but-never-read lint; the focus graph interaction model; DLC-aware project settings; draw.io sketch import; honest "export never blocks" policy.
+
+8. [V] Licensing: CC BY-NC-SA 4.0 material cannot go into HOI4 Factory (AGPL-3.0, planned paid credits), the Apache-2.0 kit, or Chaos Redux. Creative Commons lists no non-CC license as compatible with BY-NC-SA 4.0 (https://creativecommons.org/share-your-work/licensing-considerations/compatible-licenses/). GPL-3.0-only material from `hagane-studio` CAN be combined into an AGPL-3.0 project (GPLv3 section 13, LICENSE lines 552-560 of the cloned repo), but cannot be relicensed into the Apache-2.0 kit. Facts and ideas remain free to use; expression is not.
+
+9. [V] The studio repo contains a copy of the field reference (42 files; 12 byte-identical to the CC BY-NC-SA copy, 28 reworded, 2 new) under GPL-3.0. Because the same authors hold both copyrights, they may license both ways, but see item 3 before relying on it.
+
+10. [I] Direct integration is not possible in any useful sense. The hosted service ends in 11 days and has no licensed API for us; the local edition is Windows/WebView2-oriented, Go, keeps its own JSON project store, and would duplicate the source of truth.
+
+---------------------------------------------------------------------
+
+## 1. Source availability, repositories, licenses, SHAs (Question 1)
+
+### 1.1 Everything found
+
+| Artifact | What it is | License | Exact revision | Evidence |
+|---|---|---|---|---|
+| github.com/haganeworks (org) | Original org, created 2026-07-10, 1 public repo, 0 followers, location Singapore, unverified org | n/a | n/a | [V] `gh api orgs/haganeworks` |
+| haganeworks/hoi4-modmaking-skills | 13 skills (instruction packs), 40 field-reference files, 1 guide (en and zh), README in 8 languages. Drives the hosted API/MCP. 15 stars, no GitHub releases, 16 tags v1.0.0 to v1.5.0 | CC BY-NC-SA 4.0 (GitHub shows "Other / NOASSERTION" because LICENSE is custom text) | main HEAD ef7028c12cd021216bfb7660f85ad93e5efc93e1 (2026-09-15); v1.5.0 = 927b366064d15352bb3518ef2a114d9a5e657c9a; local clone matches `git ls-remote` | [V] LICENSE:1-54 in clone; `gh api repos/haganeworks/hoi4-modmaking-skills/tags` |
+| LICENSE scope statement | The license covers repo contents only and grants no rights to the platform, its source code, or the game | - | - | [V] `.work/ext/hagane-skills/LICENSE:46-48` |
+| github.com/hagane-works (org, hyphenated) | Created 2026-10-30T02:47:37Z, description "Open-source tools for game mod creators. Independent community project." 1 public repo | n/a | n/a | [V] `gh api orgs/hagane-works` |
+| hagane-works/hagane-studio | Local-first visual HOI4 modding studio. Windows desktop (WebView2) plus `hw.exe` CLI and loopback tool API. Go 1.25, React 19, Vite, Tailwind 4, @xyflow/react | GPL-3.0-only (README and LICENSE; no per-file SPDX headers) | main = tag v0.1.2 = 1e831623ed162e1a64763c242c55b249376ba20c; one commit "Initial open-source release", author/committer "Hagane Works <opensource@hagane.works>", authored 2026-10-30T17:10:50Z, unsigned | [V] `gh api repos/hagane-works/hagane-studio/commits`; clone at `.work/ext/hagane-studio` |
+| hagane-studio GitHub release v0.1.2 | Published 2026-10-30T10:35:41Z by github-actions. Assets: source zip 11,958,806 B; windows-x64 25,122,765 B; windows-x86 24,549,173 B; windows-arm64 23,605,056 B; SHA256SUMS.txt 405 B | GPL-3.0-only | see provenance caveat below | [V] `gh api .../releases/tags/v0.1.2`. NOT downloaded. |
+| Submodule third_party/cwtools-hoi4-config | CWTools HOI4 config, only the modifiers catalog is read | MIT (stated in internal/cwtools/cwtools.go:20) | not checked out in my shallow clone | [V]/[U] contents not inspected |
+| npm / PyPI / Docker Hub packages | None found for hagane, haganeworks, hagane-works, hoi4-modmaking-skills, hagane-studio | - | - | [V] registry queries returned 0 / 404 |
+| GHCR (GitHub container registry) | Could not list (needs read:packages scope) | - | - | [U] |
+| GitLab.com, Codeberg, Gitee | No Hagane repos found by search | - | - | [V] search APIs |
+| The skills docs mention an internal GitLab ("MR !427") and platform source paths such as `backend/app/mcp_data/fields/` and `go/projectapi/*.go` | These exist inside the private platform repo, not public | - | - | [D] CHANGELOG.md:139-146, 176-185 and commit message 3a4f9a3 |
+| Third-party repos that mention hagane.works | `BoatChinasAreFake/hoi4-studio` (cites the Scharnhorst workbench for ideas and the skills repo as a factual reference, says no code or text copied); `thelight0211/test-sheep-1.19-universal` (a project that vendored the skills and field-reference files); `bzhant/huore-nianhua` (a mod whose README describes exporting from the platform and unzipping over the repo root before commit); `kuyueliuhun-ctrl/HOI4_mod_builder-4-` (mentions the platform in src/workbench.py) | unknown | - | [V] `gh api search/code` hits; contents read for the first and third only |
+| Discord | Server "hagane.works" exists (public invite metadata). Announcements are only readable after joining | - | - | [V] invite metadata; channels [U] "requires account, not inspected" |
+| Reddit, Paradox forums, Steam, YouTube | Web searches (three queries, English and Chinese) returned nothing about Hagane Works. The search tool is weak and US-only, so this is absence of evidence, not evidence of absence | - | - | [V] searches run; [U] coverage |
+
+### 1.2 Is the platform source public? Is it a desktop app?
+
+- Hosted platform source: no. [V] The skills LICENSE says so, and the org has no other repo. The 2026-10-28 closure notice says the team plans to publish "suitable portions" of the code gradually, scope and timeline to be announced. [V] updates page.
+- Is it a desktop application? Primary product was a hosted web workbench (account login, server-side projects, server-side AI, Stripe checkout). [V] landing page and docs. A free "Windows Local Assistant" companion installs the exported mod, imports local mods, opens the launcher and reads logs, each action confirmed on the web page. [V] https://scharnhorst.hagane.works/en/docs/game-view. A standalone desktop edition now exists as the open-source `hagane-studio`. [V]
+- Frontend stack of the hosted site: Next.js (Turbopack build ids in the HTML, `/_next/static`), Cloudflare in front (CDN bot blocking is documented in the skills CHANGELOG 18af295). [V] page source; [D] CHANGELOG.md:288-299.
+- The deployment id of the live site includes "login-notice" and a date stamp 20261029, i.e. the 2026-10-29 deploy added the closure notice at login. [V] `data-dpl-id` attribute in raw HTML.
+
+### 1.3 The closure notice (key context)
+
+[V] Updates page, 2026.10.28 entry (raw HTML text extracted):
+- Service stops 2026-11-11; after that, projects are not reachable through the website. Export and back up before then.
+- Closed beta began 2026-05-22. The team reports nearly 10,000 creators and more than 30,000 original mods [D, self-reported].
+- Reason given: revenue stayed below server and maintenance costs after paid access was introduced, including after the GUI editor launched.
+- Model-export and animation repair help offered for Asset Lab users, no credit charge.
+- Planned: reorganize the project, release suitable parts of the code, build a local tool.
+Earlier updates: 2026.10.27 (import fixes: starting divisions, hidden technologies, ideology order, legacy Windows text encodings, reimport required for affected projects) and 2026.10.26 (DLC selection for preview, focus tree overlap fixes, export fixes).
+
+### 1.4 Authenticity assessment of hagane-works/hagane-studio
+
+For [V]:
+- `web/public/brand/hagane-icon-96.png` is 7,441 bytes with git blob SHA-1 04ccf82b7c42dab8466b556e5ec51949abc0dab3. I computed the same SHA-1 over `"blob 7441\0" + <bytes of https://scharnhorst.hagane.works/brand/hagane-icon-96.png>` by streaming through `sha1sum` (nothing saved).
+- Tool names in `docs/cli.md` include all seven MCP tool names the skills repo uses (`get_states`, `seed_states_from_vanilla`, `edit_state`, `create_country`, `export_project`, `list_raw_templates`, `create_raw_from_template`). The skills CHANGELOG says the hosted MCP tools resolve onto the same service as the web editor (CHANGELOG.md:67-72).
+- `internal/toolapi/fieldsdata/*.md` is the field reference with "platform" reworded to "program".
+- Git author/committer email opensource@hagane.works; the team's other addresses are on the hagane.works domain (org email pneuma@hagane.works; README contact scharnhorst@hagane.works).
+- Locales: the repo ships the same 8 UI locales as the hosted site.
+
+Against / gaps:
+- The official site, its Roadmap and the original org do not link to it as of my fetches (grep of saved pages found only the skills repo link). [V]
+- Repo made public by user `mickvale`, whose account has no other activity and was created 2026-10-30T02:45:58Z. Org created 02:47:37Z. [V]
+- Release published 10:35:41Z, but the current single commit that the tag points to was authored 17:10:50Z and committed 17:20:47Z. The release notes link a compare range from v0.1.1, and no v0.1.1 tag exists now. [I] History was squashed or force-pushed after the release; the release binaries may have been built from a pre-squash commit. A fork (henryxuy/hagane-studio, pushed 10:36:22Z) may preserve the earlier history. I did not examine it.
+- Org description calls it an "Independent community project". README says "fan-made". Not contradictory.
+
+Confidence: high that it is the team's continuation (a 233k-line coherent port that matches the hosted tool surface is not casual impersonation), but the legal question "who is the licensor" should be settled by the maintainer contacting the team (scharnhorst@hagane.works or opensource@hagane.works, or Discord) before anything is copied.
+
+### 1.5 Provenance caveats for any reuse
+
+- No LICENSE copyright line naming a holder (the file is the stock GPLv3 text), no per-file headers, no signed commits, no DCO. Inbound=outbound is stated in CONTRIBUTING.md.
+- The history is one commit, so I cannot attribute authorship of any module.
+- Repo is 49 MB checked out, 3,899 files.
+
+---------------------------------------------------------------------
+
+## 2. Implemented features (Question 2)
+
+Sources: (A) public website pages saved as text under `.work/research/raw/*.txt` (converted from raw HTML fetched with curl), (B) skills repo documentation, (C) the new studio repo. WebFetch summaries were used only to find pages; every fact below was re-checked against raw page text or files. One WebFetch summary garbled the game's name on the landing page, which is a reminder to trust raw text.
+
+### 2.1 Hosted platform: workbenches and editors
+
+Seen on public website (https://scharnhorst.hagane.works/en/docs/*) [V]:
+
+| Area | What is claimed to exist |
+|---|---|
+| Countries | Vanilla roster (348) or fictional TAGs, flags, map colours, graphical culture, per-ideology names, cascade rename of a TAG across a dozen-plus entity types, cascade-delete preview, read-only reference graph per country |
+| Focus trees | Drag-and-drop canvas, double-click to add, bottom handle = prerequisite, side handles = mutual exclusion, multiple AND groups coloured per group, undo/redo, duplicate, auto-layout, PNG export, icon library plus upload plus AI generation, reward and condition script boxes with reference dropdowns (trigger event, add spirit, activate decision), effect-tooltip text for effects the game does not describe, "+ Tree", import of focus files, draw.io sketch import, AI generate/edit with diff preview, validate button (prerequisite cycles, empty rewards). Known limits: completion weeks capped 1 to 50 in the form; right-hand preview is script text (the visual game preview was a separate feature) |
+| Events and super-events | Namespaces first, event type, picture upload or AI, flags, triggers, options with conditions and effects, live preview card that scrolls to and highlights the field you click, script tab, "Use as template" from a browsable library of about 6,900 vanilla events (structure only), bulk picture apply, AI generate from plain language. Super-events: fullscreen, music, auto-fire toggle with delay, 460x310 picture; quote and button text EN/ZH only |
+| Characters and custom traits | All character types with type-specific fields, advisor roles, traits (thousands, searchable; unknown trait flagged), custom leader/commander/scientist traits, portrait upload and AI generation, "replace existing vanilla character" |
+| Ideas / national spirits | 26 idea types, hidden ideas, design companies, modifiers as name=value rows, advanced fields as raw JSON text, vanilla idea library (about 5,479) with template use, live political-panel preview, AI with diff preview, first edit of an imported idea asks keep / override / copy |
+| Decisions | Categories first (vanilla-collision warning with one-click rename), cost/time/conditions/effects, mission mode, targeting; state targets are text inputs (no map picker) |
+| Technology | Research-tree canvas by branch, auto-layout, prerequisites, bonuses via dropdowns, reachability view for story-locked techs. One global tech table (country-specific techs need an ID prefix convention) |
+| Provinces and States | Edit existing states only (no create/delete, province partition read-only), list and map views, per-language rename as a localisation override, state and province buildings, VPs, resources, cores, claims; unmodelled blocks preserved verbatim |
+| Dynamic modifiers, scripted localisation, scripted effects/triggers | Typed form plus plain-text bodies (no syntax checking in the form), round-trip edit of imported rows |
+| Translate | One-click AI translation of the whole mod into the 10 HOI4 languages, markup protection that refuses translations that break colour codes, scopes, variables, icons or line breaks; bring-your-own-key |
+| History files, bookmarks | Day-0 country state (ruling party, popularities, ideas, techs, OOB, diplomacy), scenario bookmarks |
+| Military | MIOs, equipment plus variants, sub-units, division templates (live combat width/HP/attack), deployments, air and naval OOB, special projects, doctrines, intelligence agencies, autonomy states; DLC gates flagged |
+| Others (REST/MCP only, per skills repo) | opinion modifiers, modifier definitions, wargoals, custom traits, UI panels (scripted_gui, beta), raw-template domains (defines, balance of power, music, peace conference) |
+| Game preview ("GameView Editor") | Server-rendered reconstruction of game screens from the user's own game data (politics, focus trees, events, decisions, research, production, MIOs, division and equipment designers, deployment, diplomacy, factions, trade, logistics, intelligence, war goals, scenarios, country select). UI Edit, Content Edit, Map Studio, MOD Agent. DISCONTINUED 2026-10-28 |
+| Map Studio | Paint provinces to countries, 8 terrain types, rivers, new land on the sea, whole new world from scratch; paid "creative pass" |
+| Asset Lab | AI 3D unit model generation from a picture, exported as installable mod; paid credits |
+| AI Master Agent | Chat plus quick-start templates plus live canvas of proposed nodes; nothing is written until Apply; apply or discard per node, all-or-nothing rollback, undo only for creations |
+| Knowledge community | Login-free tutorials, cases with verification levels (static-checked or game-tested), script reference index |
+| Command Wiki | 1,909 commands (553 effects, 596 triggers, 760 modifiers) extracted from the game's own script documentation for 1.19.2; the page says that reference text is Paradox Interactive's property |
+| Roadmap | Delivered: AI-assisted authoring, command wiki, custom maps, game preview, import/export, knowledge community, Asset Lab, visual workbench. Future: CK3 mod editor, cloud collaboration (permissions and conflict handling "still being designed") |
+
+### 2.2 Import, reimport, preservation, export
+
+[V] from https://scharnhorst.hagane.works/en/docs/platform-features and /advanced-faq:
+- Import reads a mod folder (Chromium native picker; other browsers fall back to uploading the folder). It parses descriptor, characters, focus trees, technologies, ideas, events, decisions, bookmarks, country history, states, icons and portraits into editable entities. Background import with progress. Supplemental import into an existing project with per-kind selection and an overwrite/skip policy.
+- Known gaps stated by the platform: OOB history, custom GUI, music/sound and other unmodelled directories land in an "unrecognized" bucket and survive only via the overlay export; intelligence upgrade trees and MIO policy subdirectories not imported; super-events share a checkbox with events.
+- Export is a job: check (validation) then download. Three modes: Standalone (only modelled kinds; documented as lossy for large imported mods), Overlay onto the original mod (upload the base ZIP; platform output is merged over it; unmodelled files preserved verbatim), and Differential merge (field-by-field conflicts, use mine / use base / manual). "Also pack imported content" is off by default.
+- Reimport: the 2026-10-27 update says existing projects are not repaired automatically; users must back up and import the mod again. [V] There is no merge on reimport.
+- Write-back to a folder works only in Chromium (File System Access API).
+- Provenance model: each entity carries source `imported` or `created`; editing an imported entity flips it to `created`; default export emits created only (a patch/addon), `include_imported: true` re-emits everything. [D] skills `field-reference/_editing-existing-mods.md:6-36`.
+- Vanilla edits are done by "overlay": a same-ID override file plus a hidden event fired at game start that applies the trait/portrait/leader change. [V] getting-started doc ("Core philosophy") and narrative-politics doc (Characters). The platform is "append-only" for submods and cannot suppress base-mod content except through the raw-file override escape hatch. [D] skills `hoi4-submod/SKILL.md:18-39`.
+
+### 2.3 Validation
+
+[V] public docs (advanced-faq) and [D] skills docs:
+- In-editor lint banners (for example a flag that is set but never checked), a Validate dialog per focus/decision/event with error / warning / info levels, per-line diagnostics in script boxes, pre-export "Check my mod" across all workbenches, an "Edit Target" badge for loaded-existing mods, a map-health light for states.
+- Errors never block export (the button becomes "Download anyway"). The docs repeat that a green check is not engine-level validation. [V]
+- REST validation endpoints (documented in skills repo): `POST /api/go/projects/{pid}/export/validate` (cross-references closed, localisation complete, assets shipped), `GET /api/go/lint/tree-validation/{pid}` (token legality and structure), `GET .../relations/graph|entity/{kind}/{id}|country/{tag}` (edges carry `resolved:false` for dangling references), `POST/GET .../scripted-symbols` (used-but-undefined and name collisions). [D] `_validation-tools.md:6-39`.
+- Silent drops: unresolved cross-references (for example a typoed event id) are dropped on export and reported in `native_warnings` and in log files at the ZIP root (`_CROSS_REF_SKIPPED.log`, `_TOKEN_LINT.log`, `_MODMADE_EXPORT_FINDINGS.json`, `_RAW_OVERRIDE_FILES.log`). [D]/[V] CHANGELOG.md:67-104, `_editing-existing-mods.md:61-63`; constants in `internal/hoi4/exportengine/cross_ref_lint.go`.
+- Under-reporting lesson: the skills CHANGELOG (v1.4.0) measured the old route family reporting 283 issues vs 284, and 165 vs 173 event findings (8 unterminated quotes missed). [D] CHANGELOG.md:67-104.
+- Is it schema-aware? [I] Only in the entity-field sense. The "schema" in the studio repo is `internal/schema/tables.json` (a relational-style table and column list) used to fill defaults. Script validation is a hand-written Clausewitz parser with trivia, cross-reference closure, loc file structure checks, DLC-conditional lint and token lint (finding codes such as `clausewitz.unterminated_quote`, `localisation.invalid_key`, `politics.*`, `refs.focus_missing.*`). CWTools rules are used only to read the modifier-name catalog (`internal/cwtools/cwtools.go:22`). So there is no full grammar-driven validation of effects and triggers.
+
+### 2.4 IDs, collisions, namespacing
+
+- [D] README says IDs are auto-suffixed and entities auto-prefixed so they never clash with vanilla or each other (README.md:15-20). The new-project dialog describes ID prefixing, collision avoidance and descriptor generation as automatic. [V] getting-started doc.
+- [V] UI collision handling: red field plus one-click rename for vanilla collisions on decision categories, techs and dynamic modifiers; soft confirm when a custom TAG collides with vanilla; `baseModIdCollision.json` and `createCollision.json` locale files in the studio repo.
+- [D] Quirks: re-POSTing a focus tree creates stacked `<focus_id>_1` duplicates (hoi4-build-api/SKILL.md:121-123); a custom TAG that equals a vanilla TAG silently binds to the vanilla country (SKILL.md:143-145).
+- [V] Studio tool API reports `id_reassigned` when it stored a different ID than requested (docs/cli.md:120-122; `internal/toolapi/id_selfcheck.go`).
+- [V] Provenance flags and `edit_revision` per focus tree.
+
+### 2.5 AI features
+
+- [V] Hosted: AI Master Agent (project-wide generation with preview and apply), per-editor AI assist with diff preview, MOD Agent inside game preview (uses purchased "AI chats", own keys not allowed), AI Art (credits), Translate (own key required), Asset Lab (credits). Platform-funded default model with a daily call limit; BYOK Anthropic key unlocks Haiku/Sonnet/Opus. [V] platform-features doc.
+- [V] External agents: MCP and REST, below.
+- [V] Studio repo: a grep for provider names and API keys found nothing. The local edition has no built-in model calls; AI is expected to come through the local tool API from the user's own agent.
+
+### 2.6 Access, MCP, tokens
+
+Documented in skills repo [D]:
+- Personal access tokens (`hoi4pat_` prefix), created under the account menu "Access tokens", optional expiry 30/90/365 days or never, shown once, sent as `Authorization: Bearer` (README.md:62-106).
+- MCP server over Streamable HTTP at `https://scharnhorst.hagane.works/mcp/` with PAT bearer auth (README.md:69-89). OAuth was not built at the time of the MCP launch commit 5467f40 (2026-07-10). Resources `hoi4://fields/<workbench>` serve the field reference (CHANGELOG.md:23-27).
+- Named MCP tools mentioned in the skills repo: `export_project` (returns `artifact_url`), `list_raw_templates`, `create_raw_from_template(template, key)`, `seed_states_from_vanilla`, `get_states(name_query)`, `edit_state`, `create_country`. Super-event MCP create rejects "dormant" configurations. The full hosted tool list is not enumerated anywhere I could read. [I] It is the same as the studio's 149-tool list because the skills say MCP tools resolve onto the same Go service and the seven names match.
+- DeepSeek was tested as a driving model; any MCP client works (README.md:47-58). [D]
+
+Seen on public website [V]: only the "Access tokens" menu entry (getting-started doc), no MCP mention on any public page. I did not probe the endpoint.
+
+Hosted REST surface documented in skills repo [D] (`skills/hoi4-build-api/SKILL.md:68-103`, `field-reference/_editing-existing-mods.md:28-59`, `skills/hoi4-submod/SKILL.md:47-55`):
+- Per-project resources under `/api/go/projects/{pid}/`: countries, focus-trees (+ nested nodes, upload-icon), events (+ namespaces, upload-picture), super-events, decisions (+ categories), ideas (upload-picture), characters (upload-portrait), dynamic-modifiers, opinion-modifiers, modifier-definitions, scripted-snippets, scripted-localisations, bookmarks, technologies, custom-traits, states (+ seed-from-vanilla, bulk-delete), history-files, wargoals, mios, doctrines, intelligence-agencies, equipment, sub-units, division-templates, division-deployments, oob-units/* (air-wing-groups, air-wings, fleets, task-forces, ships, snapshot, import, preview), special-projects (+ specializations, projects, validate), autonomy-states, ui-panels (+ files), translate (languages, run), relations, scripted-symbols, raw-files and from-template.
+- Uniform CRUD protocol: GET list, GET one, POST create (body = GET shape minus id), PUT partial update, DELETE.
+- Export: `POST /api/go/export/jobs` then poll `/api/go/export/jobs/{pid}/{job_id}` then `GET .../download`; response carries `sha256` and `native_warnings`. Merge operations on the older route family: `append-to-existing`, `diff-preview`, `diff-resolve`, `full-mod-files`.
+- Import: scan-and-parse upload flow (loaded-existing projects), base-mod reference index (`import/stage-files` then `import/basemod-index`, `basemod-index/refs?type=`, `basemod-index/ideology-registry`).
+- Known platform bugs recorded by the authors (useful as lessons): custom technologies did not render in game (0 of 718 sampled) because the tech view only draws techs inside vanilla grid boxes (CHANGELOG.md:124-138); special-project exports could produce lexer-rejected tokens; idea picture legality rule corrected after the platform wrongly dropped valid vanilla sprites (CHANGELOG.md:43-59).
+
+Local studio tool API [V] (`.work/ext/hagane-studio/docs/cli.md`, README.md:153-157):
+- `hw.exe` CLI (`status`, `tools`, `describe`, `call`, `fields`) over a loopback JSON API (`GET /api/tools`, `GET /api/tools/{name}`, `POST /api/tools/{name}`, `GET /api/tools/fields[/{name}]`) with a bearer "tools-token" file; refuses non-loopback hosts and web-page origins.
+- 149 tools claimed (I counted about 147 distinct tool-name literals in `internal/toolapi`, approximate; not a registry run). Groups: offline knowledge (`search_knowledge`, `get_knowledge_article`), projects (`validate_project`, `export_project`), generic entities (`list_entities`, `get_entity`, `batch_update_entities`, `preview_delete_entity`, `delete_entity`), focus trees (create/update/get tree, create/update/connect/delete focus, `set_focus_mutual_exclusion`), characters, events, decisions, ideas, countries and history, ideology management with preview/apply delete, technology surface branches, equipment, doctrines, military and OOB, MIOs, agencies, special projects, autonomy, states and map (`check_world_map`, `repair_world_map`, `undo_world_map_change`), world-from-picture generation, scripting, raw files and templates, UI panels and GUI overlay editing.
+- Conventions worth copying are in section 3 (edit revisions, mutation receipts, id_reassigned, knowledge-first).
+
+### 2.7 Pricing, beta status, terms, privacy
+
+- Beta: closed beta from 2026-05-22 [V updates page]; open public beta by v1.2.3 on 2026-07-24 [D CHANGELOG.md:202-207]; closing 2026-11-11 [V].
+- Free forever (per site): editing, checking and exporting in workbenches; donations voluntary. Paid: AI chats beyond a daily free allowance, AI Art and Asset Lab credits, and a "creative pass" unlocking UI Edit, Content Edit and Map Studio (30 days per pass, or annual). Annual reference prices on the GameView page are in HK dollars (GUI Beta Pass HK$192; Gold HK$264 to HK$336; Diamond HK$354 to HK$1,596) with credit bundles that never expire. Checkout via Stripe. [V] https://scharnhorst.hagane.works/en/docs/game-view
+- Terms of service and privacy policy: no pages found. `/terms`, `/privacy`, `/en/terms`, `/en/privacy`, `/en/legal`, `/en/pricing`, `/en/purchase` all returned 404. The landing FAQ states data handling in prose (projects and AI conversations stored on the server, access controlled by account and operator permissions; AI input and project context pass through the platform to model services, including when the user brings their own key). [V] The purchase page and refund flow require sign-in: "requires account, not inspected".
+- The landing page says it is an independent creator project, not affiliated with Paradox. [V]
+
+### 2.8 Open-source studio v0.1.2: what is in it (for the reuse assessment)
+
+[V] unless marked.
+- Project format: `<creation folder>/<project>/project.json`, `data/<table>.json` (one file per kind of content), `files/` (imported and uploaded assets). Atomic temp-and-rename saves. Not native HOI4 files. (README.md:78-88)
+- Scale (my counts): `internal/hoi4` 709 files, about 123.5k non-test Go lines (parser, emitters, export engine, import services, GUI renderer about 23k lines, map generation about 6.6k, draw.io importer 398); `internal/domains` about 81.5k lines; `internal/toolapi` about 16.5k lines. TS/TSX about 106k lines including tests, 414 non-test .tsx files, about 159 entries under `web/src/components/workbench`. Test files: about 524 Go `_test.go` and 317 TS test files. I did not run any of them. [U] pass/fail status.
+- Parser: `internal/hoi4/paradox` keeps leading/trailing comments and whitespace as "trivia" on blocks and entries, but [I] emission is a canonical regeneration, not a byte-preserving printer (inferred from the coverage ledger below, which reports rewritten and consolidated files). Several packages are named `pycompat`, which [I] indicates a port of Python behaviour from the hosted backend (float repr, unicode tables).
+- Import: `importjob`, `importsvc` (about 12k lines), `importassets`; `block_text_policy.go` canonicalises imported script block text; archive safety budget 512 MiB compressed, 20,000 entries, 256 MiB per entry, 1 GiB uncompressed, compression ratio 200 (`internal/hoi4/exportmerge/target.go:44-47`); decodes legacy encodings (charmap, GBK imports in the same file).
+- Export: `exportengine` (142 files), `exportmerge` (append, diff, folder targets), `exportplan` (history, timeline), a native-text tree. Focus trees carry a per-file "file policy" (emit mode, target layer, origin kind) and `edit_revision` (internal/domains/focus/model.go). Every row has `Source` and `RawExtras` for unmodelled fields.
+- Fidelity ledger: `web/src/generated/exportCoverage.ts` has 41 rows: 22 modeled_roundtrip, 4 parsed_partial, 5 preserved_verbatim, 6 not_routed (one row groups 43 directories), 1 metadata_only, 2 imported_not_exported; overlay behaviours coexists 22, overwritten 5, survives_in_base 12, sibling_preserved 1. Measured in/out examples: focus 99 files in, 7 out (1087/1087 nodes); decisions 115 in, 2 out; ideas 11 in, 1 out; states 2525 in, 2525 out with 2334 renamed; scripted effects 198 files in, 196 out, 12741 of 12754 blocks parsed; scripted localisation parser gap 7.6 percent. Lines 24, 46, 67, 139, 270, 339 of that file. The measurement corpus is not named. [U]
+- Knowledge: `internal/knowledge/articlesdata` has 96 files (bilingual articles plus a tiny reference set of 5 effects, 3 triggers, 6 modifiers). The 1,909-entry command wiki from the hosted site is NOT included, consistent with Paradox owning that text. [I]
+- Validation inputs: CWTools modifiers catalog (submodule, not checked out), `internal/reftables/defaults/*.json` (ideologies, alerts, text colours), `internal/hoi4/staticcatalog/data/modifier_zh.yml` (Chinese modifier names written by the team).
+- Not included: accounts, billing, Stripe, AI model calls, Asset Lab, translation, cloud collaboration. [V] grep for provider names and keys was empty; README lists the local-only scope.
+- CI: GitHub Actions on windows-latest only; README build instructions require Windows 10/11. There are `*_other.go` stubs for window, fatal and start code. [I] The backend may build on Linux with `--no-window`, but I did not try. [U]
+- Dependencies: Go (x/image, x/sync, x/sys, x/text, go-webview2, go-winloader); web: React 19, @xyflow/react 12.10, Monaco, Tailwind 4, base-ui, zustand, SWR, recharts. All permissive per THIRD_PARTY_NOTICES.md.
+
+---------------------------------------------------------------------
+
+## 3. Comparison with HOI4 Factory and concrete opportunities (Question 3)
+
+HOI4 Factory (from the brief): hosted Rust/axum server, Postgres with RLS, per-account Git workspaces, Setup integration (scan, plan, apply, recovery, byte preservation), native Rust agent loop with durable tasks, grants and scoped tools calling hoi4-agent-tools (focus/event/GUI/tech/map inspect+render, focus/GUI/map rewrite, script validate, mod index, reference search; the maintainer's MCP also exposes decision/impact/package/probability/scenario/mechanic tools), React/TS client; planned S04 focus tree editor, source-preserving edits, semantic diffs, GitHub PRs, memory. Native mod files plus Git are the source of truth.
+
+Classification key: DI = direct integration (only possible if code/API is licensed and suitable); RC = reusable component (code or data that could be adapted under a compatible license); AI = architectural inspiration (idea or pattern, re-implemented); OI = original implementation (nothing to take, or what exists does not fit).
+
+Overall: DI is not available (section 0 item 10). RC is limited to GPL-3.0 studio code and data, and only after authenticity is confirmed. Most value is AI.
+
+| # | Opportunity | What Hagane does (evidence) | Class | Why / caveats |
+|---|---|---|---|---|
+| 1 | Focus tree editor interaction model for S04 | xyflow canvas; prerequisite via bottom handle, exclusion via side handles; per-AND-group colouring; auto-layout; undo/redo; duplicate; PNG export; ruler, legend, context menu; icon library; DLC-aware branches; draw.io sketch import; big-tree load performance. Docs narrative-politics (focus section); studio `web/src/components/workbench/focus-graph/*` (about 3k lines), `lib/focusTreeGraph.ts` (1,329 lines), `focusTidyLayout`, `focusEdgeDisplay`, `exportTreePng.ts` | AI primarily; RC for small pure modules | @xyflow/react is MIT, so use it directly. The Hagane components are coupled to their `FocusNode` row type, API client and i18n. Our editor must express moves, reconnects and renames as source-preserving text edits on native files, which their row-and-regenerate model never needed, so their state layer does not transfer. Candidates to port (GPL to AGPL is allowed): tidy layout, edge display rules, PNG export, the draw.io importer (398 Go lines, spec-by-reading). Keep GPL notices and attribution if any code is adapted. |
+| 2 | Focus data model checklist | Fields incl. relative_position_id, offsets, shared pools, initial_show_position, continuous focus panel position, `search_filters`, `allow_branch` AST, `load_focus_tree` rules, raw extras (internal/domains/focus/model.go) | AI | Use as a completeness checklist for our parser/editor, verified against game files rather than copied. These are facts about HOI4 syntax. |
+| 3 | Event editor: live in-game card with click-to-edit | Preview card scrolls to and highlights the clicked field; vanilla event library with structure-only templates | AI + OI | Rendering uses their server-side preview emitters and the user's game files. We already have hoi4_event_render in the maintainer's MCP; the opportunity is binding that render output to editable spans (click a region, jump to the source range). Original implementation. |
+| 4 | Decision editor and cross-entity lints | Category-first flow; collision rename; banner when a flag is set but never checked; relations graph with `resolved:false` edges; scripted-symbol index with used-but-undefined and name collisions | AI | Build on hoi4_mod_index and hoi4_impact_inspect; a global flag/variable read-write graph is a cheap high-value lint. Their lists of silent traps (flag never set, prerequisite cycle, state event missing a line) are a test-case source. |
+| 5 | Character editor | Type-specific field reveal, unknown trait flagged, portrait crop; "replace vanilla" via same-ID file plus hidden startup event | AI; avoid the overlay trick | The hidden-event overlay changes semantics (the change occurs at day 0, not at definition) and is surprising to modders. With native files we can edit or override the character file directly (same-name shadowing or replace_path), which is more honest and Git-visible. |
+| 6 | Visual editing combined with agent changes | Preview-then-apply with per-node apply/discard and all-or-nothing rollback; diff preview before AI edits; undo only for creations; agents write to the same store and the open editor picks changes up on reload; `edit_revisions` for focus_tree and bookmark writes refuse stale tokens; `mutation_receipt` distinguishes write_status from verification_status and reference_check; `id_reassigned` | AI | Map directly onto durable tasks and grants: per-file content hash or revision token on every agent write, a receipt that says "saved" vs "verified in game", and a diff the human can accept per hunk. Improve on them with live push to the editor and a Git commit per agent task; their editor only refreshes on reload. Original implementation over native files. |
+| 7 | Reliable import and preservation | Honest coverage ledger with eight statuses and overlay behaviours; measured in/out counts; whole-file custody for some dirs; legacy encodings; archive safety budget | AI; facts reusable | Adopt a fidelity ledger in Setup scan output (per path pattern: parsed, edited-by-span, preserved byte-exact, not understood). Our design already avoids their main loss (rewritten and consolidated files), so the ledger would show 100 percent byte preservation where they show filename churn. Their encoding fixes (GBK and cp1252 imports stalled in 2026-10-27) are a reminder to test non-UTF-8 uploads on both our machines. Archive limits are facts to compare with our upload caps. |
+| 8 | Reimport | Reimport is a manual backup and re-import with no merge | OI | We can do better with Git: re-scan the workspace, 3-way merge the user's new upload against the last known base, surface conflicts per entity. Their `diff-preview` and `diff-resolve` concept (per-entity conflict report, use mine / use base) is the closest prior art and a UI inspiration for semantic diffs. |
+| 9 | Schema-aware authoring | Typed forms from a table schema; raw-script fields store inner text and the exporter wraps them (the field list is in `_raw-script-fields.md`); field reference served as MCP resources and by `hw describe` and `hw fields` so agents see field semantics beside the input schema | AI; RC for CWTools | Pattern worth copying: ship per-field guidance in the tool schema description. For real grammar-level validation use the CWTools HOI4 config (MIT) directly (the same submodule Hagane declares), not Hagane. Hagane's validation is mostly cross-reference and syntax lint, not a rules engine. |
+| 10 | Validation and game compatibility | Silent-drop reporting; log artifacts at ZIP root; DLC-conditional lint; project-level DLC selection that changes preview and checks; verification level and game version on knowledge articles; "export never blocks" | AI | Keep our validation advisory with a clear "not engine-level" disclaimer, store DLC ownership per project, stamp reference material with game version and verification kind (static-checked vs game-tested), matching the repo's evidence discipline. |
+| 11 | MCP tools plus visual editors | Same tool layer drives agent and GUI (the web editor drove 41 of 44 project calls on the same Go channel as MCP, per CHANGELOG v1.4.0); drift between two channels caused real under-reporting | AI | Make the visual editor and the agent call the same server operations (we already plan this). Test parity between routes. |
+| 12 | Skills and field-reference content | 13 skills and 40 field files teaching the hosted API; also contain many game-behaviour facts and traps | Facts only | Do not copy text. Treat each trap as a hypothesis to verify in game or against vanilla files, then write our own text. Examples of claims to verify (all [D]): research_bonus is not valid inside a focus completion reward (use add_tech_bonus with a real category); idea picture legal iff GFX_idea_<name> is a declared sprite (they report 4,257 names in 1.19.2); custom techs render only within a vanilla grid box; one active country_leader per ideology; `custom_effect_tooltip` needed for variable-only rewards. |
+| 13 | Migration funnel | Hosted users must export before 2026-11-11 and then have only standard mod ZIPs with consolidated files | Original | A short "import your Hagane Works export" note and a Setup scan that recognises Hagane export artifacts (the `_*.log` files, `_MODMADE_EXPORT_FINDINGS.json`, hidden startup events used for overlays, flag naming) would help refugees. Time-limited, 11 days. Uploading a user's own export involves no license issue. |
+| 14 | Reading their local project format | `project.json` plus `data/<table>.json` | OI / low priority | A converter from a studio project folder to native files could help users who adopt the open-source edition and later want Git. Needs schema reading of `internal/schema/tables.json`. Not evaluated. |
+| 15 | Game preview | Server reconstruction of game screens from the user's installed game files (internal/hoi4/guirender about 23k lines) | AI; RC unlikely | Worth studying how they avoid shipping Paradox assets (read from the user's install). Our hosted setting cannot read a player's local game, so our renderer path (hoi4-agent-tools render tools) is a different design. Porting 23k lines of Go to Rust for little gain is not recommended. |
+| 16 | Local sidecar helper | Windows Local Assistant installs the project into the mod folder with backups, rollback, log reading; every action confirmed in the web page | AI | Informs a possible HOI4 Factory desktop helper (install to mod folder, read error.log). Out of current scope; mention only. |
+
+What not to take: platform-owned IDs and automatic prefixing (conflicts with mods that own their IDs), regenerate-on-export, the hidden-event overlay, and standalone-vs-overlay export modes.
+
+---------------------------------------------------------------------
+
+## 4. Licensing analysis (Question 4)
+
+This is an engineering reading, not legal advice. A lawyer should review before shipping anything derived.
+
+### 4.1 What each license is
+
+- Skills repo (docs, skills, field reference, guides): CC BY-NC-SA 4.0. Attribution, NonCommercial, ShareAlike. The LICENSE adds that it grants no rights to the platform, its source code or the game, and that mods built with the skills belong to the user. [V] LICENSE:22-48.
+- Studio repo (source, docs, original art, original knowledge articles): GPL-3.0-only, with `third_party/` and files with their own licenses staying under those. [V] README.md:165-175; THIRD_PARTY_NOTICES.md. The game's own files are not included. External sources cited by the articles are not relicensed.
+- Paradox: command definitions, scopes and descriptions on the Command Wiki come from the game's script documentation and the site says they belong to Paradox. [V] https://scharnhorst.hagane.works/en/wiki. No Hagane license covers them. Likewise the game's text, sprites and vanilla files.
+
+### 4.2 Compatibility matrix
+
+| Target | CC BY-NC-SA 4.0 skills content | GPL-3.0-only studio content |
+|---|---|---|
+| HOI4 Factory (AGPL-3.0; planned paid credits via Stripe) | Not allowed to copy or adapt. (1) ShareAlike requires adaptations to stay under BY-NC-SA or a CC-designated compatible license; Creative Commons lists no non-CC license as compatible with BY-NC-SA 4.0 [V]. AGPL forbids added restrictions, and NC is one. (2) NonCommercial: material used in a service that sells credits is at least arguably "primarily directed toward commercial advantage"; a free tier does not clearly cure that. | Allowed. GPLv3 section 13 expressly lets a GPLv3 work be combined with an AGPLv3 work into one combined work; the GPL terms continue for that part and AGPL section 13 network terms apply to the combination [V LICENSE:552-560]. Paid credits do not conflict with GPL or AGPL. Obligations: keep notices and the license text, mark changes, offer corresponding source (already needed for AGPL). "GPL-3.0-only" (no "or later") is fine because section 13 handles the AGPL case. |
+| Apache-2.0 Agentic HOI4 Modding Kit | Not allowed (same ShareAlike and NC conflicts; Apache would re-permit commercial use). | Not as Apache. GPL material cannot be relicensed under Apache-2.0. Apache code can flow into GPLv3 but not the other way. If a GPL-derived file were included it would have to sit as a separately licensed, clearly labelled component, and anyone who builds a combined work with it is bound by GPL. The simplest rule: keep GPL-derived material out of the kit. |
+| Chaos Redux (licence not stated in the brief) | Not allowed unless Chaos Redux itself is released under BY-NC-SA 4.0. The "mods you create are yours" note applies to output the platform generates, not to copied field-reference text. | Only if Chaos Redux's license is GPL-3.0-compatible and its owner accepts that. Same logic as the kit. |
+
+Other points:
+- Aggregation: shipping a CC BY-NC-SA file unmodified, separately labelled, inside a larger distribution is not itself adaptation, but the NC clause then limits how that distribution is used commercially. Not recommended for a hosted paid product.
+- Facts and ideas: not protected. HOI4 script rules, "decisions are global by default", the shape of a focus node, API endpoint paths and tool names as facts about how a service works, measured counts (4,257 sprites, 0 of 718 techs rendering) are facts. Re-expressing them in our own words and verifying them against the game is fine. Expression is protected: the wording of SKILL.md files, tables laid out as documentation, descriptions in tool schemas, example prompts and templates, and the selection and arrangement of the field reference as a whole. Copying small tables verbatim is risky even if each fact is free. Where the EU applies, a substantial investment database (for example the 40-file field reference or 96-article knowledge base) can also carry a sui generis database right, which makes bulk extraction riskier than copying one fact.
+- Workflows: a method (for example "validate before export", "preview then apply", "seed states from vanilla") is an idea. Do not copy their step-by-step prose or recipes.
+- Tool and endpoint names: interface names are low risk to reuse for compatibility, but the descriptions and input-schema wording are expression. Our MCP tool names already differ.
+- Brand: "Hagane Works", the logo and the hosted site design are trademarks and brand assets, not covered by GPL (the GPL does not by itself grant trademark rights). Do not reuse the icon or imply endorsement. Attribute honestly if any code is adapted.
+- The identical copy of the field reference in the GPL repo means the authors have offered that text under GPL-3.0 as well. That would, in principle, let HOI4 Factory adapt the GPL copy. Caution: [U] authority of the publisher (section 1.4), the copy has no explicit copyright line, and 28 of the 40 shared files differ from the CC version, so you must take the GPL repo's version only, never mix versions. Even then, a bulk copy is optional; a rewrite from game files is cleaner.
+- Outbound transport: any GPL-derived code in the Rust server or TS client means the AGPL-3.0 source release of HOI4 Factory must carry the GPL notices for those files.
+- Paradox content: do not republish command descriptions from the Hagane Command Wiki as ours; rely on game files via the maintainer's reference tools.
+
+### 4.3 Recommended policy (for the maintainer to decide)
+
+1. Treat everything under `haganeworks/hoi4-modmaking-skills` as read-only reference. No copy, no close paraphrase of structure.
+2. Treat `hagane-works/hagane-studio` as the only Hagane source we may adapt, subject to authenticity confirmation, and keep any adapted file in a directory with a provenance note (path, commit 1e83162, license GPL-3.0-only) and headers.
+3. Prefer clean-room original implementations for anything touching source-preserving edits, since the fit is poor anyway.
+4. Record the decision in docs/02-architecture/maintainer-decisions-2026-10-24.md as the instructions require.
+
+---------------------------------------------------------------------
+
+## 5. Architecture trade-offs visible from outside (Question 5)
+
+Hagane's choice: the platform owns the project (typed rows in a database; JSON tables in the local edition), owns IDs and namespaces, derives localisation keys, and generates mod files on export. Vanilla and base mods are touched only additively: same-ID overrides, hidden startup events, filename shadowing, and an explicit raw-file override escape hatch. HOI4 Factory's choice: mod files are the source of truth, Git is history, and edits are source-preserving.
+
+| Dimension | Hagane (platform-owned, regenerate) | HOI4 Factory (native files + Git) |
+|---|---|---|
+| Round-trip fidelity of existing mods | Lossy by design. Modelled kinds are re-emitted canonically, filenames change and files are consolidated (99 to 7 focus files, 115 to 2 decision files in their own measurement), comments probably survive only partly [I] (the parser captures comment trivia, but output is regenerated), about 43 directories not routed at all and kept only by overlaying onto the original ZIP. The platform itself warns that not every file can be edited or preserved. | Byte-for-byte preservation of untouched content is a stated design goal (Setup). Harder engineering (CST with spans, minimal text edits) but the loss class disappears. |
+| Reimport | Manual: back up, import again; existing projects not healed. No merge. | Possible via Git history and 3-way merge. |
+| Lock-in | High. Project data lives in the platform. The 2026-11-11 shutdown shows the risk: users must export before the date, and what they get is a generated mod, not their project. The local edition now offers JSON files but the project model is still not the mod. | Low: the repository is the mod. |
+| Merge-ability with Git | Poor. Exports rewrite files, so a diff against the previous commit shows churn; a real mod repo (bzhant/huore-nianhua README, claimed [D]) describes unzipping each platform export over the repo root then committing. Overlay and differential merge exist because of this. | Native: small, reviewable diffs, PRs, blame. |
+| ID safety and cross-reference closure | Strong in the platform: it can enforce uniqueness, prefix IDs, derive loc keys, and know every reference (relations graph). Because it owns the namespace it can auto-suffix. Cost: mods that already own IDs must be adapted; silent dropping of unresolved references. | Weaker by default (we cannot rename a user's IDs). Needs a mod index and impact analysis (we have hoi4_mod_index and hoi4_impact_inspect) and loud reporting rather than silent drops. |
+| Concurrency | Simple: row revisions, one writer wins, stale writes refused for trees and bookmarks. | File hashes or revision tokens plus Git conflict handling. Multi-writer (human plus agent) needs the same stale-write protection. |
+| Agent ergonomics | Excellent: typed tools with field docs; agent cannot produce invalid syntax in typed fields, but raw script fields still hold unvalidated text. | Agents edit real script; needs strong validation and source-aware edit tools. |
+| Vanilla edits | Additive tricks (hidden startup events). Safe for load order, but changes semantics and can diverge from what modders expect. | Honest overrides via files. Needs care with replace_path and load order. |
+| Fit with submods | Strongly additive, can never suppress base content. | Can choose either. |
+| Hosting economics | They ran server-side rendering, 3D generation and LLM calls and could not cover costs. | Native files and agent calls are cheaper to host but credits must still cover model spend. A cautionary data point for pricing. |
+
+Evidence for the economics claim: the closure notice's stated reason [V]; the cost structure inferred from the products [I].
+
+---------------------------------------------------------------------
+
+## 6. Unverified items, risks, and questions for the maintainer
+
+Unverified or not done (by design or limits):
+- I did not sign in, create tokens, call the hosted API or probe `https://scharnhorst.hagane.works/mcp/`. The hosted tool list is therefore inferred ([I]) from the studio docs.
+- I did not build or run hagane-studio, did not run its tests, and did not download any release asset. Whether the backend builds and runs on Linux or macOS is unknown. Quality claims (tests, round-trip numbers) are from the repo's files, not reproduced.
+- The submodule `cwtools-hoi4-config` was not cloned. I did not inspect the fork's earlier history.
+- The "measured" fidelity numbers come from a generated file in the repo; the corpus used is unnamed.
+- Discord channels, any Steam Workshop pages and Reddit/Paradox forum threads were not readable or not found.
+- Purchase page, refund flow and account pages require login: not inspected.
+- GHCR packages: could not be listed without a scope.
+- WebFetch summaries were used only for discovery. Page text was re-read from raw HTML saved to `.work/research/raw/` (HTML removed afterwards, text copies kept).
+
+Risks:
+- Evidence on the public site may disappear on or after 2026-11-11. The text copies in `.work/research/raw/` and the clones are the only archived evidence I made. I did not use any web archive service because that would be an external write.
+- If the studio repo turns out not to be authorised by the team, adapting it would carry licensing risk.
+- The squashed history means the binaries and the source tag may not correspond.
+
+Questions to settle in one batch (for the maintainer):
+1. May I (or a later agent) contact the Hagane team at scharnhorst@hagane.works or opensource@hagane.works, or via Discord, to confirm the studio repo is official and to ask for a link from their site? Needed before any code or text reuse.
+2. Policy: allow adapting GPL-3.0-only studio modules into the AGPL-3.0 repo with attribution, or require clean-room only? Which modules, if any (focus layout and PNG export, draw.io importer, field-reference rewrite)?
+3. Should a "migrate from Hagane Works" note and Hagane-export recognition in Setup scan be scheduled before 2026-11-11? That would be a stage proposal, not started.
+4. Should someone with Windows run hagane-studio v0.1.2 in a sandbox to evaluate focus tree UX, after verifying SHA256SUMS against a trusted source? I did not execute binaries.
+5. Is a Wayback Machine capture of the closure notice and docs desired? It would require an external request, so I did not do it.
+
+Suggested follow-ups for later agents (not started): run `gh api repos/hagane-works/hagane-studio/commits` weekly for further releases; diff `exportCoverage.ts` rows against Setup's own fidelity ledger when one exists; compare their `focus.md` field list with our parser coverage.
+
+---------------------------------------------------------------------
+
+## 7. Sources
+
+All accessed 2026-10-31.
+
+| Source | URL / path | Revision / note |
+|---|---|---|
+| Hagane Works site, landing | https://scharnhorst.hagane.works/en/landing (also /) | Pages fetched with curl and text-extracted: landing, docs index, getting-started, narrative-politics, systems-data, scripting-text, military-forces, platform-features, advanced-faq, effect-recipes, game-view, model-generation, roadmap, updates, knowledge, wiki, donate. Saved as `.work/research/raw/*.txt` |
+| Updates (closure notice) | https://scharnhorst.hagane.works/en/updates | Entries 2026.10.26, .27, .28 |
+| Roadmap | https://scharnhorst.hagane.works/en/roadmap | 8 delivered, 2 future |
+| Docs | https://scharnhorst.hagane.works/en/docs and /en/docs/{getting-started, narrative-politics, systems-data, scripting-text, military-forces, platform-features, advanced-faq, effect-recipes, game-view, model-generation} | |
+| Command wiki | https://scharnhorst.hagane.works/en/wiki | 553 / 596 / 760 entries |
+| robots.txt, sitemap.xml | https://scharnhorst.hagane.works/robots.txt, /sitemap.xml | |
+| Missing pages | /terms, /privacy, /en/legal, /en/pricing, /en/purchase | HTTP 404 |
+| Brand icon | https://scharnhorst.hagane.works/brand/hagane-icon-96.png | 7,441 bytes, blob SHA-1 04ccf82b7c42dab8466b556e5ec51949abc0dab3 (streamed, not saved) |
+| Skills repo | https://github.com/haganeworks/hoi4-modmaking-skills | main ef7028c12cd021216bfb7660f85ad93e5efc93e1; v1.5.0 927b366064d15352bb3518ef2a114d9a5e657c9a; local clone `.work/ext/hagane-skills` (read: README.md, LICENSE, CHANGELOG.md, skills/hoi4-build-api/SKILL.md, skills/hoi4-submod/SKILL.md, field-reference/README.md, _validation-tools.md, _editing-existing-mods.md, _raw-script-fields.md, focus.md, plus tool-name greps over all skills) |
+| Original org | https://github.com/haganeworks | `gh api orgs/haganeworks` |
+| Studio repo | https://github.com/hagane-works/hagane-studio | 1e831623ed162e1a64763c242c55b249376ba20c = tag v0.1.2; clone at `.work/ext/hagane-studio` (read: README.md, CONTRIBUTING.md, SECURITY.md, LICENSE, THIRD_PARTY_NOTICES.md, docs/cli.md, docs/release/START-HERE.en.txt, web/package.json, web/src/generated/exportCoverage.ts, internal/* sampled) |
+| Studio org | https://github.com/hagane-works | created 2026-10-30T02:47:37Z |
+| Studio release | https://github.com/hagane-works/hagane-studio/releases/tag/v0.1.2 | published 2026-10-30T10:35:41Z; assets listed, not downloaded |
+| Creative Commons compatible licenses | https://creativecommons.org/share-your-work/licensing-considerations/compatible-licenses/ | no non-CC license listed for BY-NC-SA 4.0; GPLv3 listed one-way for BY-SA 4.0 |
+| GPLv3 section 13 | `.work/ext/hagane-studio/LICENSE:552-560` | (gnu.org returned HTTP 429, so I read the identical text in the repo) |
+| Discord invite metadata | https://discord.gg/hw5UH4NmuA (via discord.com public invite endpoint) | server "hagane.works" |
+| Third-party GitHub repos | BoatChinasAreFake/hoi4-studio README lines 153-157; bzhant/huore-nianhua README lines 46-50; thelight0211/test-sheep-1.19-universal (file list only) | |
+| Registry checks | npm search API, PyPI JSON, Docker Hub API, GitLab, Codeberg, Gitee search | all negative |
+| Web searches | 3 queries (English and Chinese) | no relevant hits |
+
+Commands run (summary): `gh api` for orgs, repos, commits, tags, releases, events, search; `git ls-remote`; `git clone --depth 1` of hagane-studio into `.work/ext/hagane-studio`; `curl` GET of public pages; HEAD of the icon; line counts and greps over both clones. No write to anything outside `.work/ext/hagane-studio`, `.work/research/` and the session scratchpad.
+
+Local evidence files (all git-ignored under .work): `.work/research/raw/*.txt` (page text), `.work/ext/hagane-skills`, `.work/ext/hagane-studio`.

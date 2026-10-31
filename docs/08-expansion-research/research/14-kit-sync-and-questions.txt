@@ -1,0 +1,497 @@
+# 14 - Kit workflow synchronization (FR-4) and the upfront-questions rule (FR-1)
+
+Research report 14. Read-only research for the expansion plan. Nothing in any repository was edited. Two established requirements are covered: Part A (FR-4, workflow synchronization with the seven acceptance criteria) and Part B (FR-1, upfront questions rule). Both are requirements, not ideas; this report proposes how to meet them.
+
+## 0. Method, scope and evidence rules
+
+Repositories read (all read-only):
+
+- Kit: `<projects>\agentic-hoi4-modding`, branch main. At the end of the audit `git log -1` showed `1dd36a5 chore: refresh setup package manifest` and `git status --short` was empty (0 lines), before and after my runs. Earlier report 04 saw 4d9b309; the manifest-only commit arrived in between (not by me).
+- Chaos Redux (CR): `<hoi4-mod-folder>\chaos_redux`, HEAD c8782e065e, tree has the maintainer's uncommitted edits (untouched).
+- HOI4 Mod Setup clone: `<projects>\hoi4-mod-setup`, HEAD 04626bd. Read for how Setup installs and runs the kit.
+- HOI4 Factory: `<projects>\hoi4-factory` (CLAUDE.md, `scripts/sync_skills.py`, skill bodies, `docs/08-expansion-research/00-decision-record.md`).
+- Ignored by instruction: `.tools/wiki/`, `paradox_wiki/`, and the other session's worktree `.claude/worktrees/wiki-overhaul-3e5835`.
+
+Commands that ran (all non-writing):
+
+- Kit: `py -3 -B .tools/sync/sync_instructions.py --check`, `sync_agents.py --check`, `sync_skills.py --check`, `check_guidance_size.py`, and `py -3 -B .tools/check.py full --only generators guidance`. All exit 0. (`python` is a Microsoft Store stub on this machine; `py -3` works. `-B` stops bytecode files.)
+- Scratch simulations in the session scratchpad only (`...\scratchpad\sim` and `sim2`): copies of the sync tools plus agents, runtime folders and three skills (sim) or the full 52 MB skill library (sim2). Used to observe tool behaviour when canonical files change. The kit tree itself was never mutated.
+- `gh api` reads: branch protection and rulesets of klimPaskov/Agentic-HOI4-Modding, and `gh run list`.
+- `curl` (not WebFetch, which runs a model) of `https://code.claude.com/docs/en/hooks.md` and `permissions.md`, piped to grep/sed, nothing saved. Hook and permission facts below come from those pages as fetched on 2026-10-31.
+- No model was called. No paid operation.
+
+Conventions: `path:line` citations were checked with grep -n or sed against the files as they stand now. "(inference)" marks my reading. "(not verified)" marks things I could not test. Proposed names (files, flags, ids) are placeholders for the plan, not existing things.
+
+Earlier reports 04 (sections 5, 6.3, 11) and 05 (sections 1-2) are not repeated; only new facts or corrections are given.
+
+## 1. Key findings
+
+1. The kit has three generators plus one checker, all in `.tools/sync/`: `sync_instructions.py` (CLAUDE(_template).md to AGENTS(_template).md), `sync_agents.py` + `agent_sync_common.py` (agents to Codex/Cursor/Qoder/OpenCode plus maps), `sync_skills.py` (skills to `.agents/skills` and `.qoder/skills`), and `check_guidance_size.py`. Config: `instruction_projection.json`, `agent_profiles.json`, `read_limits.json`. There are no other tools in that folder.
+2. Nothing runs the generators automatically. No Claude Code hook (`.claude/settings.json` has only `permissions.deny` for `.env`), no Codex/Cursor/Qoder/OpenCode hook, no git hook, no pre-commit config, no `core.hooksPath`. The only triggers are prose in `CLAUDE_template.md:167-175`, `HOI4 Mod Setup` running `check.py setup` after install/update/repair, `check.py quick|full`, and two GitHub workflows.
+3. `sync_skills.py --check` passes vacuously in the source repo and in CI: the mirrors are gitignored (`.gitignore:23-26`), so the tool prints "No skill mirrors exist..." and exits 0 (observed). CI therefore cannot detect a stale skill mirror, and the tool's drift logic is not exercised by any test (the only callers are a live-tree `--check` in `scripts/test_agent_sync_contract.py:148` and a stub in `.tools/tests/test_setup.py:51`).
+4. Agent add, modify and remove are detected correctly by `sync_agents.py --check` (observed in simulation, section A4). Two friction points: `scripts/test_agent_sync_contract.py:82` hard-codes `len(agents) == 23` (plus `EXPECTED_TIERS`/`READ_ONLY` at 22-35), which contradicts `.tools/sync/README.md:30` ("adding an agent never requires editing a script"); and a non-Haiku agent needs a `tier_policy` entry in `agent_profiles.json` or `--verify` fails.
+5. "Never hand-edit generated files" is enforced nowhere. `--check` reports the same `DRIFT` line whether canonical or generated was edited, and a plain sync run silently overwrites a hand edit (observed). AGENTS.md has no generated marker: the only text is `CLAUDE_template.md:11` (stripped by the installer with the Placeholder Guide) and `:162`.
+6. GitHub: `main` is not protected and there are no rulesets (`gh api`: "Branch not protected", `[]`), so no CI result is a required check. Both workflows run the sync checks (Validate on every pull request and on path-filtered pushes, Publish after every push to main), but a failure cannot block a merge.
+7. Installed mods have no CI and no git hook: the manifest installs no `.github` or `.git*` files (0 matches). The only automatic protection there is Setup's finishing step (`check.py setup` runs the three synchronizers in write mode) and whatever the agent chooses to run.
+8. Setup constraints that any design must respect: it rejects a repository whose local `.git/config` sets `core.hooksPath` (`hoi4-mod-setup/src-tauri/src/git.rs:1420`, test at `:3210`); `check.py setup` may rewrite only `.gitignore`, `AGENTS.md`, `.claude/agent-map.md`, `.tools/quality_baseline.json` and files under `.codex/ .cursor/ .opencode/ .qoder/ .agents/` and any other tracked change is refused (`src-tauri/src/agent_setup.rs:33-43`, `docs/15_update_repair.md` "Development tools step"); a settings.json change flows through the `runtime.claude` component (replace_if_unmodified).
+9. CR has its own divergent copies. Notably CR's `sync_agents.py` has no `--check` (only `--verify`, which compares model and effort), and CR's `.codex/config.toml` has 20 `[agents.*]` rows for 23 canonical agents: `chaosx_equipment_units_worker`, `chaosx_map_states_worker`, `chaosx_technology_tree_worker` are missing (observed). That is a live example of a silently stale projection.
+10. Smallest design that meets all seven criteria (section A5): one declarative generator registry (path to generator, with `needs` ordering), one shared runner reused by `check.py` (`generators` check, a new write mode, `setup`), one Claude Code `PostToolUse` hook that runs only the affected generators, one CI step that runs the same check plus a required-status-check rule, deny rules for generated paths in `.claude/settings.json`, a fix for the vacuous skill check, and a Factory job-completion check using a pinned copy of the tool. The Chaos Redux engine-skill generator becomes one more registry entry, ordered before the skill mirror.
+11. Part B: the kit has no consultation rule. The nearest rule is `CLAUDE_template.md:365` ("ask a focused question" when an indispensable input is missing), which is reactive and mid-task, and is copied verbatim in CR (`CLAUDE.md:328`). The template has 55 bytes of headroom under its 60,000-byte ceiling (59,945 bytes), so any new rule must land together with the P11 slimming. Placement, wording outline, per-project records, autonomy behaviour and conflicts are in Part B.
+
+---
+
+# PART A - Workflow synchronization (FR-4)
+
+## A1. What each tool generates or checks
+
+Authoring model (kit `README.md`, `docs/runtimes.md`, `.tools/sync/README.md:3`): Claude Code files are canonical; everything else is one-way generated. All tools are standard-library Python 3.9+.
+
+| Tool | Inputs (canonical) | Config | Outputs | Tracked in kit source? | Marker in output? |
+| --- | --- | --- | --- | --- | --- |
+| `.tools/sync/sync_instructions.py` | `CLAUDE.md`, `CLAUDE_template.md` (pairs in config; a pair whose source file is absent is skipped, which is how one config serves both the source package and an installed mod) | `instruction_projection.json` (2 pairs, 1 replacement: "Install this template as `CLAUDE.md`" to "...`AGENTS.md`") | `AGENTS.md`, `AGENTS_template.md` (59,945 bytes, same as the Claude file; differ on line 11 only) | Yes (`AGENTS_template.md` tracked; `AGENTS.md` exists only in installed mods) | No. Only prose: `CLAUDE_template.md:11` (stripped on install) and `:162`. |
+| `.tools/sync/sync_agents.py` (thin) + `agent_sync_common.py` (`load_agents`, `render_*`, `expected_outputs`, `synchronize`, `verify`, `main`) | `.claude/agents/*.md` (frontmatter name/description/model/effort, optional `disallowedTools`) | `agent_profiles.json` (tier policy, effort policy, Codex efforts and sandbox, Cursor/OpenCode model, Qoder tools) | `.codex/agents/<snake>.toml`; the `[agents.<snake>]` rows of `.codex/config.toml` (portrait agent wrapped in `# HOI4_MOD_SETUP_PORTRAITS_*` markers); `.cursor/agents/*.md`, `.qoder/agents/*.md`, `.opencode/agent/*.md`; `agent-map.md` in `.claude/ .cursor/ .qoder/ .opencode/` | Yes, all tracked | Yes for agent files ("Generated from .claude/agents/<file> by .tools/sync/sync_agents.py", `agent_sync_common.py:194-195`) and for maps ("Generated by .tools/sync/sync_agents.py. Do not hand-edit."). No marker on the `config.toml` rows, only on the portrait block. |
+| `.tools/sync/sync_skills.py` | `.claude/skills/<name>/` (any folder with `SKILL.md`) | none | `.agents/skills/<name>/` (Codex, DSH) and `.qoder/skills/<name>/` (Qoder), byte-identical copies, or junction/symlink with `--mode link` | No. `/.agents/skills/` and `/.qoder/skills/` are in `.gitignore:23-26`; Setup materializes them. | No (byte-identical copies by design). |
+| `.tools/sync/check_guidance_size.py` | `CLAUDE.md`, `AGENTS.md`, `CLAUDE_template.md`, `AGENTS_template.md`, `.claude/skills/*/SKILL.md`, `.claude/agents/*.md` | `read_limits.json` (20,000 tokens x 3 bytes = 60,000; `root_skill_max_bytes` 58,000) | nothing; exit 1 with `OVER:` lines | n/a | n/a |
+
+Behaviours that matter for the design (read in source):
+
+- `--check` modes: instructions prints `DRIFT:` (exit 1); agents prints `DRIFT:`/`STALE:` per file (exit 1) and `ERROR:` for malformed frontmatter (exit 1); skills prints `DRIFT:` per skill (exit 1) but exits 0 with a note when no mirror exists (`sync_skills.py:110-113`); guidance prints `OVER:`.
+- `sync_agents.py` maintains a runtime only when its folder (or map) exists (`runtime_present`, `agent_sync_common.py:317-322`), and deletes only files carrying its marker whose canonical agent is gone (`generated_files`, `:308-314`).
+- `sync_agents.py --verify` adds the tier/effort policy check from `agent_profiles.json` and then reuses `synchronize(check=True)` (`:357-387`).
+- `sync_skills.py` compares raw bytes (`filecmp.cmp(shallow=False)`); the other two normalise CRLF to LF before comparing. (inference: on Windows with `core.autocrlf=true` a CRLF canonical skill versus an LF mirror written by Setup would report drift; not reproduced.)
+- None of the tools accepts a root path (`MOD_ROOT` is derived from the script location: `sync_instructions.py:26`, `sync_skills.py:31`, `agent_sync_common.py:34`) or a per-item scope (no `--skill`, no `--agent`).
+- Timing on this Windows machine: instructions check 234 ms, agents check 956 ms, skills check 206 ms with no mirror, guidance 132 ms, bare Python start 98 ms. With a full 52 MB mirror (sim2, 32 skills, 890 files) `sync_skills.py --check` takes 3.6 s and an unchanged write run 0.5 s.
+
+`check.py` (the repository check suite) wraps the tools: `GENERATORS` (`.tools/check.py:138-145`) maps three generators to input prefixes; `guidance` is a separate check (`:207`). `.tools/lib/setup.py:34` has its own `SYNCHRONIZERS` tuple. These are two hard-coded copies of the same knowledge (plus the CI step list and RELEASING.md): four places to update when a generator is added.
+
+## A2. When the tools run today
+
+### GitHub Actions (`.github/workflows/`, four files)
+
+| Workflow | Trigger | What it runs (sync-related) |
+| --- | --- | --- |
+| `validate-hoi4-mod-setup-manifests.yml` | `workflow_dispatch`; `push` to main with a 36-entry `paths:` list that includes `CLAUDE_template.md`, `AGENTS_template.md`, `.claude/**`, `.codex/**`, `.cursor/**`, `.qoder/**`, `.opencode/**`, `.tools/sync/**`, `.tools/check.py`, `.tools/lib/**`; `pull_request` with no path filter (`:44-45`) | `scripts/test_agent_sync_contract.py` (`:61`), `check.py full --only script-rules gfx guidance generators quality` (`:71`, includes the three `--check` runs), `check.py setup --save-game-dir` on a fresh Linux checkout (`:73-75`), then again directly `sync_agents.py --check`, `sync_instructions.py --check`, `check_guidance_size.py`, `sync_skills.py --check` (`:76-79`), `check_release_package.py`, `validate_published_manifests.py` |
+| `publish-hoi4-mod-setup-manifest.yml` | `push` to main, `paths-ignore: hoi4-mod-setup.manifest.json` (`:3-7`) | `unittest`, `test_agent_sync_contract.py`, the four sync/guidance commands (`:34-37`), wiki verify, `check_release_package.py`; then regenerates manifest evidence and commits only the manifest as the bot |
+| `mcp-runtime.yml` | PR touching `.tools/mcp/bootstrap_hoi4_agent_tools.py`, its test or itself; dispatch | no sync step |
+| `pages.yml` | push to main touching `docs/site/**`; dispatch | no sync step |
+
+Observed state: recent runs of both main workflows succeeded on PRs #29-#32; one PR run failed (feat/check-setup-command, 2026-10-25 18:40) and the next passed. `main` is unprotected and `rulesets` is `[]`, so nothing requires these checks (read via `gh api` on 2026-10-31; this may be changed by the maintainer at any time).
+
+### Hooks
+
+- Git hooks: `.git/hooks` has only `*.sample`; no `.githooks`, `.husky`, `.pre-commit-config.yaml`; `core.hooksPath` unset.
+- Claude Code: `.claude/settings.json` has `permissions.deny` for `./.env` and `./.env.*` only. No `hooks` key.
+- Codex, Cursor, Qoder, OpenCode: `.codex/config.toml`, `.cursor/settings.json`, `.qoder/settings.json`, `.opencode/settings.json`, `opencode.json` contain no hook configuration (grep). Whether those clients have a hook feature was not checked (not verified).
+
+### Repository checks
+
+- `.tools/check.py quick` runs the `generators` check only when `git status --porcelain` lists a changed path under one of a generator's `inputs` (`check.py:222-237`, `:248`, `:159-167`); `.tools/` changes rerun all three. `full` always runs them. `CLAUDE_template.md` rule 4a.1 (`:371`) tells agents to run `quick` before review and `full` at the end of a large task; neither is automatic.
+- `check.py quick` with nothing uncommitted prints "quick: no changed paths" and exits 0 (`:297-299`). A canonical change that was committed without regenerating is invisible to `quick`.
+- `check.py setup` runs `sync_instructions.py`, `sync_agents.py`, `sync_skills.py` in write mode (`lib/setup.py:119-127`) and prints their last line; their exit codes do not change the command's own status (`run` returns the doctor status, `:139-150`).
+
+### Release path
+
+- `RELEASING.md:11-35` lists write runs, then `--check`/`--verify` runs, then the test suites and `check_release_package.py` (manual).
+- `scripts/check_release_package.py:19-23` asserts every file under `.claude/skills/` and `.claude/agents/` is covered by a manifest component; `:33-34` rejects "Chaos Redux|chaos_redux|chaosx" in skills. It does not run any sync check. The release gate is the CI workflows plus the manual list.
+
+### HOI4 Mod Setup install path (read in the Setup clone and the manifest)
+
+- Manifest (schema 5.0.0, 60 components): `core.agents` installs `AGENTS_template.md` as `AGENTS.md` and `core.claude.instructions` installs `CLAUDE_template.md` as `CLAUDE.md`, both with `template_engine: agents_adaptation_v1` and `three_way_merge`; `runtime.agent_sync` installs `.tools/` (60 expected files, `replace_if_unmodified`, `remove_obsolete: true`); `runtime.codex.skills` copies `.claude/skills` (excluding portrait/live/super-event/comfy skills unless their components are selected) into `.agents/skills/` itself; `runtime.codex.agents` installs the committed `.codex/agents/hoi4_*.toml`; `codex.config` is a `toml_merge`; `runtime.claude` installs `.claude/settings.json` and `.claude/agent-map.md` (`replace_if_unmodified`).
+- So Setup consumes the kit's committed projections and builds the skill mirror directly; it does not run `sync_*.py` as part of the transaction.
+- After every install, update, repair or reinstall that leaves `.tools/check.py` in the project, the desktop app runs `python -B .tools/check.py setup --save-game-dir <folder>` as a reviewed finishing action (`src-tauri/src/agent_setup.rs:24-63`; `docs/15_update_repair.md`, "Development tools step"). It hashes tracked files before and after, accepts changes only to the rewritable allowlist (`agent_setup.rs:33-43`), records new hashes in the lock, and refuses/reports any other tracked-file change. It never fails the installation; the Ready screen shows a non-blocking "Development tools" line; Repair reruns it. It needs a Python 3.9+ on PATH (not the Store stub) (docs, same section).
+- Setup docs list 16 clients in manifest format 6 (`docs/36_coding_environment_catalog.md`: Claude Code, Codex, Cursor, Qoder, OpenCode plus Copilot, Gemini CLI, Antigravity, Grok Build, Kilo, Kiro, Qwen, Cline, Devin, Augment, Continue, Aider). Per its status section, format 6 is published "only" once the kit source merges it; the kit manifest today is 5.0.0 with five `coding_environments`. Format 6 adds copied skill roots (`.grok/skills/`, `.kiro/skills/`, `.qwen/skills/`) and generated subagents (`.gemini/agents/`, `.kiro/agents/` ...) that today's `sync_skills.py` `TARGETS` (agents, qoder only) and `RUNTIMES` (five) do not know.
+
+### Gaps where a canonical change can leave a projection silently stale
+
+| # | Gap | Evidence |
+| --- | --- | --- |
+| G1 | No automatic write-mode trigger anywhere; the instruction is prose | `CLAUDE_template.md:167-175`; settings.json has no hooks; no git hooks |
+| G2 | `sync_skills.py --check` is vacuous in the source repo and CI; mirror drift logic is untested | observed "No skill mirrors exist..." exit 0; `.gitignore:23-26`; only callers `test_agent_sync_contract.py:148`, `test_setup.py:51` (stub) |
+| G3 | The agent that edits skills (`hoi4-skill-maintainer`) and template section 9 (skill maintenance, `:457-485`) never tell the editor to run a synchronizer; section 9 names only `check_guidance_size.py` (`:477`) | grep of `.claude/agents/*.md` for `sync_`: no hit; section 9 has no `sync_instructions/agents/skills` mention |
+| G4 | `check.py quick` sees only uncommitted changes | `check.py:222-237, 297-299` |
+| G5 | `check.py generators` silently skips a generator whose script is missing or whose canonical source folder is absent, and reports "0 error" with zero generators evaluated | `check.py:162-164` |
+| G6 | `check.py setup` ignores synchronizer failures in its exit status; Setup treats the whole step as non-blocking | `lib/setup.py:119-127, 139-150`; `docs/15_update_repair.md` |
+| G7 | No required status checks; the publish workflow checks after merge | `gh api` 404 and `[]`; `publish-...yml:3-7` |
+| G8 | Hand edits to generated files are indistinguishable from canonical drift and are overwritten silently | observed, scratch test T1b |
+| G9 | Test tripwires contradict the documented "no script edit to add an agent"; invites weakening | `test_agent_sync_contract.py:22-35, 82` vs `.tools/sync/README.md:30` |
+| G10 | Four hard-coded copies of the generator list (`check.py`, `setup.py`, workflow steps, RELEASING.md) | sections A1, A2 |
+| G11 | Installed mods have no CI and no git hook | manifest: 0 `.github`/`.git*` paths |
+| G12 | Format 6 clients and any new generator (CR engine skills) are not representable | `TARGETS`/`RUNTIMES` dicts; Setup docs/36 |
+| G13 | `.tools/README.md:118` says "Generated files are tracked so a checkout works immediately" but skill mirrors are ignored | `.gitignore:23-26` |
+| G14 | No generated marker on AGENTS.md, skill mirrors, or `config.toml` rows | A1 |
+| G15 | CR: no `--check` for agents, registry rows not maintained, no CI | section A3 |
+
+## A3. Chaos Redux copies and HOI4 Factory, compared briefly
+
+Chaos Redux `.tools/sync/` (7 files, read-only): `README.md`, `agent_profiles.json` (7,273 bytes), `instruction_projection.json` (5,863 bytes, 6 replacements, 1 pair), `read_limits.json` (adds `line_limit` 6000, no `checked` list), `sync_agents.py` (27,599 bytes monolith), `sync_instructions.py` (3,116 bytes), `sync_read_limits.py` (8,196 bytes). Nothing under `.tools/sync` is in the kit's `scripts/shared_tools.json` (0 matches), so the two families diverge by hand; CR's `sync_instructions.py` docstring says it was adopted from the kit.
+
+| Aspect | Kit | Chaos Redux |
+| --- | --- | --- |
+| Structure | `agent_sync_common.py` + three thin entry points | one `sync_agents.py` doing claude-map, codex, qoder, cursor, opencode and the skill mirror |
+| Skill mirror | separate `sync_skills.py`, copies by default, `--check` | part of `sync_agents.py skills`, junction by default with copy fallback, no `--check` |
+| Drift check for agents | `--check` (byte-level, DRIFT/STALE) and `--verify` | only `--verify`: compares each runtime's model and effort field with the policy (`sync_agents.py:564-615`). A changed prompt body is not detected. Missing outputs are reported "output missing". |
+| Stale handling | removes marked stale files | reports and leaves stale files ("never deleted") |
+| Codex registry | rewrites `[agents.*]` rows in `.codex/config.toml` | does not touch `config.toml` (grep: no reference). Result observed: 20 rows for 23 agents; the three CR-only workers have no registry row. Whether Codex needs a row to find an agent file is not verified (inference: yes, by the kit's design). |
+| Authority class | derived from `disallowedTools` | stored per agent in `agent_profiles.json`; a new agent needs a profile entry or the generator stops |
+| Instruction projection | 1 replacement; no check that a replacement still matches | 6 replacements; `UNUSED:` finding when a replacement source line no longer occurs (`sync_instructions.py:53-56`) - a useful safeguard the kit lacks |
+| Read limits | `check_guidance_size.py` (check only) | `sync_read_limits.py` also writes read budgets into Codex/Claude/OpenCode/DSH settings |
+| Tracked projections | all except `.agents/skills`, `.qoder/skills` | ignored: `.cursor/ .qoder/ .opencode/ .agents/skills/ .codex/agents/` (`.gitignore:95-113`); tracked: `AGENTS.md`, `.claude/agent-map.md`, `.codex/config.toml`, `.codex/README.md` |
+| CI | yes (two workflows) | none (no `.github`) |
+| Hooks | none; git-lfs hooks only (`pre-push`, `post-commit`, `post-merge`, `post-checkout`) | same |
+| check.py integration | `GENERATORS` of 3 | `GENERATORS` of 5 (catalog CSV, formable puzzles, Event 016 catalog, AGENTS.md, agent mirrors); finding vocabulary `Would update ...` / `GEN-FAILED` |
+| Markers | agent files and maps carry "Generated from ..." | agent files carry none; only the Claude map and READMEs say generated |
+
+CR already shows the pattern the plan needs: a `GENERATORS` tuple with `inputs` prefixes in `check.py:151-165`, with `.tools/` changes rerunning everything. A CR engine-skill generator fits that tuple; the CR `.codex/README.md:79-86` "Anti-interference and instruction changes" paragraph is the prose version of the "do not hand-edit generated files" rule.
+
+HOI4 Factory `scripts/sync_skills.py` (159 lines): canonical source is `docs/07-developer-workflow/skill-workflows/<name>/BODY.md` plus `skills.json`, not the Claude folder; it generates `.claude/skills`, `.codex/skills`, `.agents/skills` (with an `agents/openai.yaml` sidecar for the last two) and `skill-hashes.json`, and writes AGENTS.md as a byte copy of CLAUDE.md (ADR-024). `--write` regenerates, `--check` is read-only (default), JSON status output, exit 0 / 1 (drift) / 2 (error), refuses symlinked or escaping destinations (`assert_owned`), rebases Markdown links per client. `validate_package.py:259-264` runs it. No CI, no hooks, no agents sync. Convention differences worth unifying: Factory and `check.py` use exit 2 for "cannot run"; the kit tools use exit 1 for both drift and malformed input.
+
+## A4. The seven acceptance criteria today
+
+Evidence from the simulations (scratch copies; kit untouched):
+
+- T1 append a line to `CLAUDE_template.md`, run `sync_instructions.py --check`: `DRIFT: AGENTS_template.md differs from the projection of CLAUDE_template.md.` exit 1. Plain run regenerates. Hand-edit `AGENTS_template.md` instead: identical DRIFT message, exit 1; a plain run then silently removed the hand edit (T1b).
+- T2 edit a skill with no mirror: `No skill mirrors exist ...` exit 0. After `--target agents`, a changed skill gives `DRIFT: .agents/skills/hoi4-mtth: changed SKILL.md` exit 1; a new canonical skill gives `missing SKILL.md` exit 1.
+- T3 add an agent: DRIFT for 9 outputs (the TOML, `config.toml`, three markdown agents, four maps); remove it: `STALE:` for the four generated agent files and DRIFT for config and maps; malformed file: `ERROR: canonical agent definitions need fixing: bad.md: the file must start with a '---' frontmatter block` exit 1; body-only edit: DRIFT on that agent's four files and the maps; a Sonnet agent with no `tier_policy` entry: `--verify` exit 1 with "model is sonnet; policy requires haiku".
+
+| # | Criterion | Met today? | Why |
+| --- | --- | --- | --- |
+| 1 | Canonical instruction change updates or flags AGENTS.md | Partly | Flagged by CI (PR and push) and by `check.py quick|full`; updated only by a manual run or Setup's finishing step. In an installed mod nothing flags it unless an agent runs `check.py`. |
+| 2 | Canonical skill change updates or flags runtime copies | No (CI), partly (local) | CI check is vacuous (G2). Locally `check.py quick` flags it only if mirrors exist and the change is uncommitted. Nothing updates it automatically (G3). |
+| 3 | Agent add/modify/remove updates or flags projections | Partly | Detection is correct and complete (T3), including stale and malformed. Update is manual. Test tripwires force script edits (G9). |
+| 4 | Unrelated source edits trigger no unnecessary sync work | Yes, trivially | Nothing runs automatically. `check.py quick` is already path-aware. In CI the PR trigger is unfiltered and the checks run twice in Validate (`:71` and `:76-79`) and once in Publish, but they cost about 2 s, so the waste is negligible. |
+| 5 | CI detects outdated projections | Partly | Yes for instructions and agents on PRs and pushes; not for skill mirrors (G2); not required (G7); Publish runs after merge. |
+| 6 | HOI4 Mod Setup and supported runtimes stay compatible | Yes today | Setup consumes committed projections and reruns the synchronizers itself. Risks for the proposal are listed in A5.6. |
+| 7 | Failed sync is visible; cannot silently pass required checks | Partly | Every tool returns non-zero on failure and `check.py` converts it. Silent paths: G2, G5, G6, G8, and `quick` on committed changes (G4). There are no required checks (G7). |
+
+## A5. Proposed design (smallest portable set that meets all seven)
+
+### A5.1 Parts
+
+1. Registry. One declarative file `.tools/sync/generators.json` listing every generator and checker with: `id`, command and `--check` form, `inputs` (canonical sources, config files and the generator script itself), `outputs`, `needs` (ordering), optional per-item scope (for skills `--skill <name>`), and `kind` (`generate` or `check`). It replaces the four hard-coded lists (G10). Initial entries: `instructions`, `agents`, `skills`, `guidance` (check-only; same input mapping so a size overrun is reported at edit time). Sketch (names are placeholders):
+
+   ```json
+   {"version": 1, "generators": [
+     {"id": "instructions", "run": ".tools/sync/sync_instructions.py",
+      "inputs": ["CLAUDE.md", "CLAUDE_template.md", ".tools/sync/instruction_projection.json"],
+      "outputs": ["AGENTS.md", "AGENTS_template.md"]},
+     {"id": "agents", "run": ".tools/sync/sync_agents.py",
+      "inputs": [".claude/agents/*.md", ".tools/sync/agent_profiles.json"],
+      "outputs": [".codex/agents/*.toml", ".codex/config.toml", ".cursor/agents/*.md", ".qoder/agents/*.md",
+                  ".opencode/agent/*.md", "*/agent-map.md", ".claude/agent-map.md"]},
+     {"id": "skills", "run": ".tools/sync/sync_skills.py", "scope": "--skill {skill}",
+      "inputs": [".claude/skills/{skill}/**"], "outputs": [".agents/skills/{skill}/**", ".qoder/skills/{skill}/**"]},
+     {"id": "guidance", "kind": "check", "run": ".tools/sync/check_guidance_size.py",
+      "inputs": ["CLAUDE*.md", "AGENTS*.md", ".claude/skills/*/SKILL.md", ".claude/agents/*.md", ".tools/sync/read_limits.json"]}
+   ]}
+   ```
+
+2. Shared runner in a shared library module (for example `.tools/lib/generators.py`, in the byte-identical shared set already used for `.tools/lib/*`): load registry, map changed paths to generators (glob match, capture `{skill}`), expand with `needs`, order topologically, run in `write` or `check` mode, serialise concurrent runs with a lock file (parallel tool calls can fire two hooks at once; both would write the same outputs), return findings. Consumers: `check.py`'s `generators` check (replacing the `GENERATORS` tuple), a new `check.py sync [--check] [--paths ... | --hook | --all]` mode (precedent: `setup` already writes), and `lib/setup.py` (replacing `SYNCHRONIZERS`, and returning non-zero when a generator fails: G6).
+3. Tool changes, all small: add `--root <dir>` to the four tools (needed for temp-dir tests and for Factory running a pinned copy against a workspace), `--skill <name>` to `sync_skills.py`, make `sync_skills.py` distinguish source package from installed mod (see A5.4), and port CR's `UNUSED:` replacement check into `sync_instructions.py`. Use exit 0 ok / 1 drift / 2 cannot run everywhere (matches `check.py` and Factory).
+4. Claude Code hook, one entry in the shipped `.claude/settings.json`:
+
+   ```json
+   "hooks": {"PostToolUse": [{"matcher": "Edit|Write",
+     "hooks": [{"type": "command", "timeout": 30,
+                "command": "sh \"$CLAUDE_PROJECT_DIR/.tools/py.sh\" \"$CLAUDE_PROJECT_DIR/.tools/check.py\" sync --hook"}]}]}
+   ```
+
+   The runner reads the hook JSON on stdin, takes `tool_input.file_path`, normalises Windows backslashes, finds the repository root by walking up from that path (not from `CLAUDE_PROJECT_DIR`, which stays at the main checkout when Claude works in a worktree - docs; this matters for the maintainer's worktree-based parallel work), maps the path through the registry, and then:
+   - path is a registry input: run only the affected generators in write mode (skills narrowed to the edited skill), plus the guidance check for that file; exit 0 and print a `hookSpecificOutput.additionalContext` line naming the regenerated outputs so the agent commits them together; on any failure print the reason to stderr and exit 2 (Claude sees stderr; docs exit-code table);
+   - path is a registry output: run the check only and exit 2 with "X is generated from Y; edit Y" (never overwrite without the canonical change);
+   - anything else (all mod content): exit 0 immediately, no generator started.
+   Hook facts checked in the docs: `PostToolUse` matches on tool name (`Edit|Write`); the file path arrives absolute with native separators (backslashes on Windows); hooks configured in settings also run inside subagents, so a `hoi4_skill_maintainer` edit triggers it too (closes G3); shell form runs in Git Bash on Windows and `sh -c` on macOS; a `PostToolUse` hook does not fire when a Bash command or outside process rewrites the file; the Bash `bashEditDiff` list is beta, best effort and omits git-ignored files, so it is not relied on; `FileChanged` watches only literal file names in the working directory, so it cannot cover `.claude/skills/**`. Each `if` filter holds exactly one rule, so path-specific `if` handlers would need one handler per prefix; one handler with a fast exit costs about 100 ms of Python start per edit (measured 98 ms) and starts no generator for unrelated edits, which is what criterion 4 asks.
+5. One launcher `.tools/py.sh`: a POSIX sh script that picks the first working Python 3.9+ (`python3`, `python`, `py -3`), because three callers need the same discovery (hook, optional git hook, docs) and this machine's `python` is a Store stub. Precedent: Factory's `scripts/py.sh`. If the maintainer prefers no new script, the fallback is the docs' plain `python`, and a missing Python then shows as a visible non-blocking hook error (not silent).
+6. Enforcement of "do not hand-edit generated files":
+   - `permissions.deny` entries in the shipped `.claude/settings.json`, e.g. `Edit(/AGENTS.md)`, `Edit(/AGENTS_template.md)`, `Edit(/.agents/**)`, `Edit(/.qoder/skills/**)`, `Edit(/.codex/agents/**)`, `Edit(/.cursor/agents/**)`, `Edit(/.qoder/agents/**)`, `Edit(/.opencode/agent/**)`, `Edit(/.claude/agent-map.md)`. Docs: `Edit` rules apply to all built-in file-editing tools (permissions.md line 341) and `Write(...)` path rules never match (line 358), so write them as `Edit(...)`. They do not stop `python .tools/...` via Bash, so the generators still work, and they do not stop a Bash `sed -i` (the check still catches that).
+   - Output edits that happen anyway are caught by the hook (output branch above), `check.py quick|full`, CI and the optional git hook.
+   - Keep AGENTS.md without a header marker: `AGENTS_template.md` is 59,945 bytes against the 60,000 ceiling, so a header line would break `check_guidance_size.py` today. The existing sentence at template `:162` is the marker. Agent files and maps keep theirs. Skill mirrors stay byte-identical (a marker would break identity and add text to skills).
+   - Optional: `.gitattributes` `linguist-generated=true` for generated paths so pull-request diffs collapse them (not verified in this repo).
+7. CI: replace the five separate sync steps with `python -B .tools/check.py full --only generators guidance` (the registry drives it), keep the pull-request trigger unfiltered for that job (a path-filtered required check never reports and blocks merges), and ask the maintainer to add a ruleset or branch protection requiring the Validate job with a bypass for `github-actions[bot]` because the publish workflow pushes the manifest commit directly to main (`RELEASING.md:57` already anticipates this). The check must fail when zero generators were evaluated (G5).
+8. Release gate: `scripts/check_release_package.py` also runs the generators in check mode and asserts every registry output is either gitignored or covered by a manifest component (it already asserts coverage for skills and agents at `:19-23`).
+9. Optional local gate for non-Claude runtimes and humans: `check.py setup --git-hook` writes `.git/hooks/pre-commit` (never `core.hooksPath`, which Setup rejects and which would switch off CR's git-lfs hooks) containing three lines that run `.tools/py.sh .tools/check.py sync --check --staged`. Off by default. It is not in Setup's reviewed `expected_writes`, so Setup is unaffected. If Python is missing the hook warns loudly and lets the commit through.
+
+### A5.2 Dependency-aware path mapping (examples)
+
+| Edited path | Generators run (write) | Checks |
+| --- | --- | --- |
+| `CLAUDE.md` or `CLAUDE_template.md` | `instructions` | `guidance` on the file |
+| `.tools/sync/instruction_projection.json` | `instructions` | - |
+| `.claude/agents/<x>.md` or `.tools/sync/agent_profiles.json` | `agents` (about 1 s) | `guidance` on the file |
+| `.claude/skills/<name>/**` | `skills --skill <name>` | `guidance` if `SKILL.md` or a reference |
+| `.tools/sync/*.py` or `generators.json` | all generators | all |
+| `events/**`, `common/**`, `localisation/**`, `gfx/**` | none | none |
+| a registry output (for example `AGENTS.md`) | none | `--check`, exit 2 "generated; edit the canonical file" |
+
+### A5.3 Chaos Redux engine skills as one more generator
+
+P10 (decision record `00-decision-record.md:76`) generates CR engine-system skills as kit text plus a Chaos Redux section, with a check that fails on direct edits. With the registry this is one entry plus one dependency edge:
+
+- `engine_skills`: inputs = a pinned snapshot of the kit skills inside CR (for example `.tools/kit_skills/<name>/**` with a recorded kit commit and file hashes - pinned, not pulled, which is what R1 requires: "Pinned sync with checks stays", decision record `:85`), the overlay files (`.claude/skill-overlays/<name>.md`) and a small mapping file (kit skill to CR skill name); outputs = `.claude/skills/chaos-redux-<engine-skill>/**`; narrowed per skill like `skills`.
+- `skills` (the `.agents/skills` mirror) gets `needs: ["engine_skills"]`, so the chain is kit snapshot + overlay to CR canonical skills to mirror, in order, in one runner call.
+- A change to the snapshot or the mapping regenerates all engine skills; an overlay edit regenerates one.
+- The CR check recomputes the expected bytes and fails on any difference, which is the P10 requirement. A provenance marker (HTML comment under the frontmatter, or a sibling provenance file) is a choice for the plan; a `deny` glob cannot select "generated skills only" because skills must sit flat under `.claude/skills/`, so for CR the check is the enforcement.
+- The kit's `check_release_package.py:33-34` ban on "Chaos Redux" in kit skills is unaffected because the overlay lives in CR.
+- CR's other generators (catalog CSV, formable puzzles, Event 016) become registry entries; CR's `check.py` `GENERATORS` tuple is deleted.
+- The sync tools themselves should have one source. Proposal: the kit is the source (it has `--check`, stale handling, split modules); CR adopts them with its own `agent_profiles.json`; add `.tools/sync/` and the new `lib/generators.py` to the shared-tool mechanism. Today `scripts/shared_tools.json` declares CR as upstream, so the direction needs a decision.
+
+### A5.4 Fixing the vacuous skill check
+
+- Source package (detected as today by `CLAUDE_template.md` present and `CLAUDE.md` absent): the mirrors are generated at install, so the contract test builds a temporary root with `--root`, runs `sync_skills.py` to create the mirror, then asserts `--check` passes, mutates one file, and asserts it fails. CI therefore tests the tool's real logic every time.
+- Installed mod: if `.codex/` exists then `.agents/skills` must exist and match, if `.qoder/` exists then `.qoder/skills` must exist and match; a missing required mirror is DRIFT, not a note. (DSH has no marker folder, so DSH-only mods are not covered; inference.)
+- Format 6 clients add their own skill roots to `TARGETS` as data rather than code.
+
+### A5.5 HOI4 Factory job-completion validation
+
+When a job's diff touches any registry input path, the job-completion check runs the generators in check mode; if stale it runs write mode inside the job worktree and adds the regenerated outputs to the same commit, then re-checks; a residual DRIFT or a generator error fails the job with a finding. Security: the project's own `.tools/sync/*.py` is repository-supplied code and must not be executed in the hosted service. Run Factory's pinned copy of the tool (Python standard library only) with `--root <workspace>`; read `generators.json`, `instruction_projection.json` and `agent_profiles.json` as data; run only generator ids on Factory's allowlist and report unknown ids as "unverified" (never as pass). This is consistent with A4 (project `CLAUDE.md`/`AGENTS.md` are labelled data without authority, decision record `:97`). An alternative is a Rust reimplementation of the three built-in generators; the Python route reuses tested code and is the smaller change (inference).
+
+### A5.6 Setup and runtime compatibility constraints for the design (criterion 6)
+
+- No `core.hooksPath` (Setup refuses such repositories).
+- Every new generated path must be inside Setup's rewritable allowlist (`agent_setup.rs:33-43`), or `check.py setup` is refused/reported after it regenerates it. A cross-repository contract test is needed: every registry `outputs` entry for the installed layout is covered by that allowlist. Adding a runtime folder (format 6) needs a Setup change as well.
+- Shipping hooks and deny rules changes `.claude/settings.json`, which belongs to `runtime.claude` (replace_if_unmodified, preserve_local_additions). Installs with an unmodified file update cleanly; installs with a user-modified file go through Setup's conflict flow. Not tested (not verified): update a mod whose settings.json already contains user hooks.
+- A project-level hook is code that runs on the user's machine on every edit. It points at hash-tracked files installed by Setup, but it is new behaviour for Setup's security documentation (docs/13); the maintainer should decide whether Setup's review screen should mention it.
+- `check.py setup` should exit non-zero when a generator fails and Setup should keep treating the step as non-blocking (as today) but show the failure on the Ready line.
+- Regenerating AGENTS.md overwrites a hand-maintained or three-way-merged `AGENTS.md` without a backup (inference from `core.agents` being a three-way-merged managed file and `AGENTS.md` being in the rewritable list). Worth a one-time warning in `setup` when the existing AGENTS.md differs from the projection of its CLAUDE.md before overwriting.
+- Shared working trees (kit `hoi4-shared-git-commit`, CR concurrency rules): the hook's `additionalContext` must tell the agent which outputs changed so they are committed with the canonical change; otherwise the next `--check` flags drift.
+- Template and test constraints for any text added to the template: `scripts/test_agent_sync_contract.py:160-182` requires certain headings, forbids "Chaos Redux", "chaosx", "OneDrive", "klimp" in the template, and fails on mid-sentence hard wraps in `CLAUDE_template.md`, `AGENTS_template.md`, `docs/runtimes.md` and `.tools/sync/README.md`.
+
+### A5.7 Deliberately not proposed
+
+- A `Stop` hook as a second net: `check.py quick` at completion (already mandated by template rule 4a.1) plus the git hook and CI cover Bash rewrites without a third mechanism.
+- `core.hooksPath` (Setup rejects it; CR's git-lfs hooks).
+- Auto-pull of kit skills (rejected as R1).
+- Path filters on the required PR check.
+- A generated-marker header in AGENTS.md (size ceiling).
+- Hash-lock files recording the last generated hashes: they would tell "hand edit" from "canonical change" but add churn and merge conflicts on every sync in parallel branches.
+
+### A5.8 Suggested order of work (each step independently useful)
+
+1. Registry, runner, `--root`/`--skill`, exit-code convention; `check.py` and `setup.py` consume the registry; fix G2, G5, G6.
+2. Mutation-style tests for the three tools (A6), remove the `== 23` tripwire (derive the count and tiers from `agent_profiles.json` and the folder).
+3. Hook plus deny rules plus `.tools/py.sh` in the shipped settings; CI single step; branch protection (maintainer action).
+4. Release gate additions; Setup allowlist contract test; Setup docs note.
+5. Factory job-completion check; CR adoption of the shared tools plus `engine_skills` entry (after P10 is built); format 6 runtimes as data.
+
+## A6. Demonstration test plan per criterion
+
+Mutation-style, matching the kit's test philosophy (`CLAUDE_template.md` rule 4a.2: one valid and one invalid fixture per rule). Suggested home: `scripts/test_sync_tools.py` using a small fixture mod under `.tools/tests/fixtures/` (CLAUDE.md, 2 agents, 2 skills, runtime folders) copied to a temp directory per test. Hook tests feed synthetic stdin: `{"tool_name":"Edit","cwd":"<root>","tool_input":{"file_path":"<abs path, Windows form with backslashes>"}}`.
+
+| Criterion | Demonstration | Expected result | Today's result |
+| --- | --- | --- | --- |
+| 1 instruction edit | Append a rule to the fixture `CLAUDE.md`. (a) Hook with that path. (b) No hook; `check.py full --only generators`. (c) Hand-edit `AGENTS.md`, then hook with the `AGENTS.md` path. | (a) exit 0, AGENTS.md equals projection, additionalContext names it. (b) exit 1, finding `GEN-STALE`. (c) exit 2 "generated from CLAUDE.md; edit that". | (a) no hook exists. (b) works (observed T1). (c) message is the same DRIFT; a write run deletes the edit (T1b). |
+| 2 skill edit | Edit `.claude/skills/A/SKILL.md` in an installed-mod fixture with `.codex/` and `.agents/skills`. (a) Hook. (b) Delete `.agents/skills`. (c) Source-package fixture: round-trip self-test. | (a) only `.agents/skills/A` changes (assert other skills' bytes unchanged). (b) check fails: required mirror missing. (c) passes unmutated, fails after a mutation. | (a) none. (b) passes silently as "No skill mirrors exist". (c) not testable (no `--root`). |
+| 3 agent add/modify/remove | Add, modify, remove an agent file. Also a malformed one and a Sonnet agent without tier policy. | add: all runtime files, maps and `config.toml` row written, count derived not hard-coded; modify: only that agent's files and the maps; remove: STALE files deleted and row removed; malformed: hook exit 2 with `ERROR:`; missing tier policy: clear `--verify` failure. | Detection works (T3). Update manual. `test_agent_sync_contract.py` fails on legitimate add. |
+| 4 no unnecessary work | Hook with paths `events/x.txt`, `localisation/english/x.yml`, `docs/specs/a.md`. Register a sentinel generator that appends to a log when run. | exit 0 in about 100-150 ms, sentinel log empty, no output mtime changes. Also: editing one skill never starts the agents generator, and an agent edit never touches skill mirrors. | n/a (no hook). Measure with a timer in the test. |
+| 5 CI detects | In a temp copy run `check.py full --only generators guidance` after each mutation: instruction drift, agent drift, missing/changed mirror (installed fixture), size overrun. Then on GitHub: a throwaway draft PR that edits `CLAUDE_template.md` without regenerating. | exit 1 each time with a `GEN-STALE` or `GUIDE-SIZE` finding. The PR's Validate job is red and, with the proposed rule on, the merge button is blocked. | instruction/agent: yes. Mirror: vacuous. Merge not blocked. |
+| 6 Setup and runtimes | In a disposable mod installed by Setup (RELEASING.md:58 flow): install, edit CLAUDE.md locally, run Update; run Repair; install with only Claude Code selected and with Codex added. Assert after each: `check.py full --only generators` exits 0, Setup's lock accepted all regenerated files (no "refused tracked file change"), `git config core.hooksPath` unset, settings.json hooks present and unmodified or conflict-flow shown. Contract test: registry `outputs` (installed layout) subset of Setup's rewritable allowlist. | all green; allowlist test red if a new output path is added without a Setup change. | Works for current five clients; format 6 not covered. |
+| 7 failure visible | Break each link: syntax error in a sync script; delete a script that the registry lists; delete the registry; make a generator exit 3; run `check.py setup` with a failing generator. Run the hook with Python missing. | `check.py full` and `quick` exit 2 ("could not run"), never 0; zero generators evaluated is an error; hook exit 2 with stderr (or a visible hook error when Python is missing); `setup` exits non-zero and prints the failing generator; CI red. | Deleted script is silently skipped (G5); setup exit unchanged (G6); no required check (G7). |
+
+Manual acceptance in a live Claude Code session (cannot be automated here): ask Claude to add one line to `CLAUDE.md` with the Edit tool and confirm `AGENTS.md` changes within the same turn; ask it to edit `AGENTS.md` and confirm the deny rule blocks it; spawn `hoi4_skill_maintainer` to edit a skill and confirm the mirror updates; repeat on macOS and on Windows from a worktree to confirm root discovery.
+
+## A7. Decisions for the maintainer (Part A)
+
+1. Should the hook write (regenerate) or only flag? Suggested: write, because the outputs are deterministic and fast; an output-edit attempt only flags.
+2. Add `.tools/py.sh` (portable launcher) or rely on plain `python` in hook and docs? Suggested: add it.
+3. Turn on a ruleset requiring the Validate job on main with a bot bypass? Suggested: yes.
+4. Which repository owns the sync tools after P10: the kit (suggested) with CR adopting them, or keep two families?
+5. Offer the optional pre-commit hook in `check.py setup --git-hook` (default off)? Suggested: yes, off by default.
+6. Should Setup's Rust allowlist and the kit registry be kept in sync by a shared test? Suggested: yes (Setup repo test reads the kit manifest/registry).
+7. Do format 6 runtimes belong in the same registry (as data) when the kit merges format 6? Suggested: yes.
+8. Provenance marker style for CR generated engine skills (comment in `SKILL.md` or sibling file)?
+
+---
+
+# PART B - The upfront questions rule (FR-1)
+
+Requirement (decision record `00-decision-record.md:26`): inspect first; separate established requirements, independent decisions and genuine questions; ask once in an organized initial consultation with suggested answers and explanations (batches for large tasks); record the answers in the specifications; then continue without avoidable interruptions; never ask about routine implementation choices; respect the three autonomy levels (presets of a checkpoint policy, `:95` A2) and the idea-selection rounds (Adopt, Adapt, Defer, Reject).
+
+## B1. Inventory of rules about asking
+
+Classes: SUPPORTS (consistent with the new rule), GATE (hard stop to keep), LATE-ASK (a reactive mid-task question to reclassify), CONFLICT (needs rewording), EXCLUDE (a question type the agent must not ask), SELF (the word "ask" is design self-questioning, not a user question).
+
+### Kit - `CLAUDE_template.md` (59,945 bytes; AGENTS_template.md identical except line 11)
+
+| Line | Rule (short) | Class |
+| --- | --- | --- |
+| 111 | `hoi4-debug-playtest` only when the user names it or explicitly authorizes autonomous playtest for the task | GATE; the consultation must not auto-offer it |
+| 144 | `hoi4.error_log` only for user-supplied or explicitly requested logs | EXCLUDE (never ask for logs) |
+| 185 | Claude Code asks once before starting a project MCP server | client behaviour, n/a |
+| 244-246 | Distinguish explicit user decisions, accepted design with basis, evidence, proposals; record the user decision or parent acceptance | SUPPORTS; this is the record target |
+| 248 (dispositions) | Each plan or addendum gets one disposition: implemented, promoted, queued, rejected, superseded, blocked | SUPPORTS; maps to Adopt/Adapt/Defer/Reject (B6) |
+| 268-270 | Do not use all-country on_actions unless the user explicitly asks; "If you believe a whole world iteration is required, stop and ask for permission" | LATE-ASK/GATE; becomes an intake item whenever the spec implies world iteration |
+| 355 | Never launch HOI4 during normal work | EXCLUDE |
+| 356 | Do not ask for, request or search for logs; do not tell the user to run in-game validation; assume reload | EXCLUDE |
+| 357 | Design fallbacks and reductions require user approval unless already authorized; source review and local checks are preauthorized | LATE-ASK; under autonomy it must be answered at intake as a "fallback policy" |
+| 365 | "If an indispensable design choice or input is missing, finish independent work and ask a focused question." | CONFLICT (the root rule; reactive; no suggested answer; no batching) |
+| 380 | On a failing check, fix it or "report it with its reason and get the rule owner's decision" | GATE |
+| 390-391 | State an indispensable obstacle once and finish independent work; do not wait for user-owned game testing | SUPPORTS; EXCLUDE (no testing requests) |
+| 409 | Completion list: "a fallback or simplification was used without explicit approval" | ties to 357 |
+| 447 | "...use only a fallback listed here or ask the maintainer for another route" (image generation) | LATE-ASK; provider capabilities are known at intake |
+
+### Kit - skills (SKILL.md and references, `.claude/skills/...`)
+
+| File:line | Rule | Class |
+| --- | --- | --- |
+| hoi4-feature-planning/SKILL.md:35-50 (section 2 Input) | Treat the idea as a starting point; expand if rough; no consultation step | gap; natural home of the pointer |
+| hoi4-feature-planning/references/focus-tree-path-design.md:26,47,324 and hoi4-focus-trees/SKILL.md:114 | Path-level design unless the user explicitly asks for a focus-by-focus blueprint; final exact shape is the implementer's | SUPPORTS (decide, do not ask) |
+| hoi4-focus-trees/SKILL.md:885, hoi4-decisions-missions/SKILL.md:879, hoi4-subagents/SKILL.md:185 | Active small-patch subagents need no separate permission prompt | SUPPORTS (never ask about routine) |
+| hoi4-improvement-loop/SKILL.md:50,54,125-127,180,196 | "ask whether the new surfaces are connected...", "Ask what the player expects" | SELF |
+| hoi4-improvement-loop/SKILL.md:121 | Record the explicit user decision or parent acceptance for each accepted claim | SUPPORTS |
+| hoi4-improvement-loop/SKILL.md:284-292 | Planner not re-deployed until the previous addendum is resolved; "The main agent decides what to do with the addendum. It can implement it now, queue it, reject it with a reason, or ask for a narrower pass." | the kit loop is parent-decided; the user-facing rounds are not yet specified (B6) |
+| hoi4-debug-playtest/SKILL.md:10, 22-34, 186-202 | Do not infer permission from a request to implement; explicit invocation contract (`mod_root`, `log_root`, `max_repair_cycles`, `artifact_root`); a hard stop writes "the exact decision needed" | GATE; the invocation contract already is an intake, do not duplicate |
+| hoi4-live-playtest/references/hoi4-live-tools.md:9, 58, 147 | Live testing only when requested; enabling the telemetry companion mod edits the playset, "so ask first" | GATE |
+| hoi4-save-inspection/SKILL.md:20, 28, 62 | May offer one concrete save request; ask once to set `save_as_binary=no`; ask for pre/post saves | LATE-ASK; pre-answerable at intake when saves are in scope |
+| hoi4-super-events/SKILL.md:471, 494, 599, 632, 649 | Track reuse, longer than 2 minutes, non-music cue need explicit user approval; "reject the track or ask the user for the missing information" | LATE-ASK; foreseeable per super-event, batch at intake |
+| hoi4-text-audio-research/SKILL.md:10, 23 | Optional; handoff says what "still needs approval" | SUPPORTS |
+| hoi4-feature-assets/SKILL.md:916 | "Do not invent a substitute asset unless the user explicitly approves it." | LATE-ASK; fallback policy at intake |
+| hoi4-frame-animation/SKILL.md:28, 86 | Mockup only if asked; with no precedent "report a blocker or ask for permission to run a narrow exploration pass" | LATE-ASK; foreseeable from the spec |
+| hoi4-3d-model-pipeline/references/production-guide.md:51, 181, 183; source-reference-policy.md:17, 19; SKILL.md:48 | Substitutions need explicit approval; "Do not ask the user for confirmation before the initial model generation..."; "Do not ask for credit-spend confirmation"; source-free fallback needs an explicit request | mixed: spend is preauthorized (EXCLUDE per-operation asks); substitutions are LATE-ASK |
+| hoi4-units-divisions/SKILL.md:355, hoi4-map-states/SKILL.md:264 | World-wide iteration needs explicit permission | GATE (same as template 269-270) |
+| hoi4-subagents/SKILL.md:12 | Parent owns integration, validation and completion claims | SUPPORTS (subagents never talk to the user) |
+
+### Kit - agents (`.claude/agents/`)
+
+| File:line | Rule | Class |
+| --- | --- | --- |
+| hoi4-documentation-curator.md:59 | On conflicting design claims "ask the parent for a decision through the handoff" | SUPPORTS (subagents ask the parent, not the user) |
+| hoi4-icon-artist.md:27, 81; hoi4-generated-feature-art.md:24 | No configured image route: stop and report the blocker | SUPPORTS (foreseeable at intake) |
+| hoi4-3d-model-pipeline.md:58, 60 | Ordinary paid operations are preauthorized; never ask for confirmation or credit-spend confirmation | EXCLUDE; must be reconciled with a budget question asked once |
+| hoi4-asset-source-researcher.md:38 | Reject unsuitable sources "unless the parent agent explicitly approves them" | SUPPORTS |
+
+Other agents mention "ask" only as "when the parent asks" (a parent instruction). Docs (`README.md`, `docs/*.md`, `.tools/README.md`) contain no question rules.
+
+### Chaos Redux (read-only)
+
+| File:line | Rule | Class |
+| --- | --- | --- |
+| CLAUDE.md:199-212 | decision/acceptance language and dispositions, `blocked` names the "indispensable missing input, permission" | SUPPORTS |
+| CLAUDE.md:233-234 | same world-iteration rule, first-person ("when I explicitly ask") | GATE/LATE-ASK |
+| CLAUDE.md:319 | no logs requests | EXCLUDE |
+| CLAUDE.md:320-321 | fallbacks need approval; preauthorized checks | LATE-ASK |
+| CLAUDE.md:328 | "If an indispensable design choice or input is missing, finish independent work and ask a focused question." | CONFLICT (identical to the kit's) |
+| CLAUDE.md:355, 372 | do not wait for game testing; fallback without approval is a completion failure | EXCLUDE / ties to 320 |
+| skills chaos-redux-events/SKILL.md:510, 517 | `Playable` needs explicit approval; do not hold completion for it | GATE |
+| chaos-redux-3d-model-pipeline/SKILL.md:94, 220 | no renewed approval for Blender completion; paid path preauthorized, do not ask | EXCLUDE |
+| chaos-redux-event-assets/SKILL.md:28, 58, 149 | do not pause to ask about ImageGen cache; small portrait families only when requested; deleting LFS objects is a user decision | EXCLUDE / GATE |
+| chaos-redux-super-events/SKILL.md:562 | ask for missing audio metadata | LATE-ASK |
+| chaos-redux-improvement-loop/SKILL.md:285; chaos-redux-subagents/SKILL.md:241 | main agent decides; no permission prompt for small fixes | SUPPORTS |
+| chaos-redux-debug-playtest/SKILL.md:8, 122, 757 | explicit invocation; do not read "test everything" as permission to redesign | GATE |
+| chaos-redux-event-planning/ | no rule about asking; planning runs from ideas and catalog snapshots | gap |
+
+### HOI4 Factory
+
+| File:line | Rule | Class |
+| --- | --- | --- |
+| CLAUDE.md:13 | "Ask the maintainer every question you can foresee up front and in batches, so later work never stalls on input. Pick sensible technical defaults yourself and record them." | SUPPORTS; the engineering-side ancestor of the new rule |
+| CLAUDE.md:11 | Continue routine work within authorization without asking again | SUPPORTS |
+| skill-workflows/ui-design-iteration/BODY.md:12, 23 | One question with one option per variant; batch independent pages; ask before an API/dependency change | SUPPORTS / GATE |
+| skill-workflows/start-implementation-stage/BODY.md:14 | `scope.md` lists unresolved questions and stop conditions | SUPPORTS |
+| skill-workflows/capture-engineering-lessons/BODY.md:15; production-readiness-review/BODY.md:24 | Ask only for changes that widen authority, cost, scope, or raise a real business/legal question | GATE |
+| docs/08-expansion-research/00-decision-record.md:26 (FR-1), :77 (P12), :78 (P13), :95 (A2), :97 (A4) | consultation requirement; design brief tiers; origin tags locked/derived/open; autonomy presets; runtime reads project instructions as labelled data | design inputs |
+
+## B2. Conflicts with the new rule
+
+1. `CLAUDE_template.md:365` (and CR `CLAUDE.md:328`): "ask a focused question when something indispensable is missing" is the opposite pattern (mid-task, one at a time, no default offered). Replace with the rule's late-question clause.
+2. `:357` / CR `:320` and `:409` / CR `:372`: approval of fallbacks and reductions is a mid-task stop. Under fully autonomous presets this stalls. Resolve by asking the policy once at intake (suggested answer: stop and report instead of substituting) and treating the answer as standing authorization.
+3. `:269-270` / CR `:233-234` and the skill copies (`hoi4-map-states:264`, `hoi4-units-divisions:355`): "stop and ask for permission". Keep as a gate, but when the spec implies world iteration it is a foreseeable intake item.
+4. Per-operation approvals and "ask the parent" notes in super-events (`:632`), frame-animation (`:86`), feature-assets (`:916`), template `:447`, save-inspection (`:28`): all are foreseeable from the spec and become intake or next-batch items.
+5. "Do not ask" rules (`:356`, `:391`, 3D `production-guide.md:181,183`, agent `hoi4-3d-model-pipeline.md:58,60`) are not conflicts but must be mirrored as an exclusion list in the rule so a consultation never asks for logs, in-game testing, or per-call spend. The spend question is a single budget authorization at intake; in HOI4 Factory the platform's per-user/per-task budgets (D-11) supersede and the agent never asks.
+6. `hoi4-debug-playtest` and `hoi4-live-playtest` require an explicit user invocation: the consultation must not propose live testing by default (keeps `:111` intact); the user may still volunteer it in an answer.
+7. `hoi4-improvement-loop/SKILL.md:292` leaves the disposition to the parent; the Adopt/Adapt/Defer/Reject rounds exist only in the maintainer's planning workflow (decision record) and Factory UI design. Not a conflict, a gap (B6).
+8. CR is not listed among FR-1's repositories (`:26`: kit, HOI4 Factory runtime) and P12 says "No change to Chaos Redux planning" (`:77`). CR's `CLAUDE.md` is separate, 59,920 bytes against the same ceiling (80 bytes of headroom). Backporting the rule to CR is a maintainer decision (B9).
+9. Factory `CLAUDE.md:13` asks up front for every foreseeable question without the three-bucket separation or suggested answers: compatible, less specific. No change needed.
+
+## B3. Placement and outline wording (not final text)
+
+### One canonical rule in `CLAUDE_template.md`
+
+Place a new `### Upfront consultation` subsection in section 0 immediately after `### Specs and Plans` (`:237-252`), because that is where decisions are already recorded, and replace the sentence at `:365` with a one-line pointer to it. Skills reference it; they do not restate it. Keep the rule runtime-neutral (no tool names) because AGENTS.md copies it to Codex, Cursor, Qoder, OpenCode, DSH and, with format 6, to every client that reads AGENTS.md.
+
+Outline (about 10 short lines, one sentence per physical line to satisfy the hard-wrap test):
+
+1. When it applies: a substantial task is one that creates or reshapes a feature, system, country, route set or asset set, spans three or more surfaces, or has no accepted spec. Bug fixes, single-surface edits and follow-ups inside an accepted spec skip it.
+2. Inspect first: project instructions, relevant specs and plans, the decisions record, and the mod files the task touches. Never ask what a file can answer.
+3. Sort every open point into three groups: established (stated by the user, a spec or the decisions record), yours to decide (derivable from instructions, precedent, vanilla or the engine rules, including every routine implementation choice), and genuine questions (change player-visible design, scope, canon, cost, risk or an irreversible action, cannot be derived, and have no safe reversible default).
+4. Present the genuine questions once, in one message, grouped by surface, each with a suggested answer and a one-line reason; show the decided items as a short list the user may overrule. For large tasks announce the batches up front (intake, then named later points such as "after the spec draft") with at most about seven questions each.
+5. Record every answer and every default in `docs/specs/<feature_slug>/decisions.md` (and the spec it affects) with origin: user, established, or agent default (wording of template `:244-246` for the acceptance basis).
+6. Then work without re-asking recorded points. A later question is allowed only when it was not foreseeable or hits a hard gate (spend above the authorized budget, permission-gated actions listed in this file, widening scope). Ask it once, batched with others, with a suggested default, and continue independent work meanwhile.
+7. Never ask about naming, file layout inside the established layout, localisation keys, code factoring, tool choice, ordering of work, check selection or retries, nor for logs or in-game testing.
+8. Subagents have no user channel: they put open items in their handoff, the parent folds them into the next batch.
+9. Autonomy: follow the project's checkpoint policy for where and how often the consultation is held; the contents of the consultation do not change with the level (B5).
+
+Hard constraint: the template has 55 bytes of headroom (59,945 of 60,000). This block is roughly 1.5-2.5 KB, so it can land only in the same change as the P11 slimming (dedupe or move to references, never drop, with a diff audit; decision record `:70`). Candidates already identified in report 04 section 11: the skill routing list (`:88-111`, 4.9 KB, restating descriptions), the Subagents block (9.7 KB, restating `hoi4-subagents`), the Agent runtimes block (2.9 KB, restating `docs/runtimes.md`). With the hook from Part A, `check_guidance_size.py` reports an overrun at edit time.
+
+### Skills reference it (one line each, no restating)
+
+- `hoi4-feature-planning` section 2 Input: "Hold the upfront consultation from CLAUDE.md before drafting; its answers are locked inputs." Put the catalog of typical genuine questions in a new reference file `hoi4-feature-planning/references/consultation-questions.md` (per surface: depth and scale, route count, fallback policy, asset source mode, audio reuse, spend authorization, world iteration, scope boundary, canon). On-demand, so the template stays small. HOI4 Factory can load the same file as versioned HOI4 knowledge (A4).
+- `hoi4-improvement-loop`: one line in "Parent agent responsibility" - present proposals as one round; record dispositions in `decisions.md` (B6).
+- `hoi4-subagents`: one line - subagents never ask the user; open items go to the handoff.
+- Skills with foreseeable late asks (super-events, frame-animation, feature-assets, save-inspection, 3D): replace "ask the user" with "list it as a consultation item (see CLAUDE.md)" - five or six one-line edits, no new text.
+- `hoi4-debug-playtest`: unchanged; its invocation contract is its own intake.
+
+## B4. Where answers are recorded, by project type
+
+| Project | Record | Notes |
+| --- | --- | --- |
+| Kit-installed mod (generic) | `docs/specs/<feature_slug>/decisions.md`: table of item, decision, origin (user / established / agent default), date, basis; plus the affected spec part | Fits `Specs and Plans` (`:237-252`). The acceptance basis wording already exists at `:244-246`. |
+| Chaos Redux | the event's spec pack `docs/specs/<event_id>_<event_slug>_specs/` (a decisions part following the pack's naming) | With P13 (stable IDs, origin tags locked/derived/open, `:78`) the three buckets map directly: established and user answers = locked, agent defaults = derived, pending = open. P13 applies to new CR packs only. File name is CR's call (inference). |
+| HOI4 Factory product (a user's mod) | the same repo file as the kit (`docs/specs/<slug>/decisions.md`), plus the platform's review queue and decision history (A2); project policy answers (autonomy preset, budget, merge checkpoint) live in project settings, not in the mod | Git stays the source of truth; Claude Code, Codex and Factory sessions on the same repo all read the file, so "do not re-ask" survives a change of client or autonomy level. |
+| HOI4 Factory engineering | maintainer decision record `docs/02-architecture/maintainer-decisions-2026-10-24.md` (CLAUDE.md "Purpose and authority"); during expansion research `docs/08-expansion-research/00-decision-record.md` | Unchanged; CLAUDE.md:13 already covers it. |
+
+## B5. Behaviour under each autonomy level
+
+Levels are presets of one checkpoint policy over design brief, visual review, plan, diff, commit, merge or publish, each `auto | ask | notify` (A2, `:95`). The consultation is the design-brief checkpoint (P12's tiers: story gaps, design calls with a recommendation, quick confirms with defaults, `:77`; P12 is adopted for HOI4 Factory only). Proposed mapping (inference where marked):
+
+| | Fully autonomous | Semi-autonomous | Human-in-the-loop |
+| --- | --- | --- | --- |
+| Intake consultation | `ask`, exactly once, whole task. If the project's policy sets the design brief to `auto` (no human reachable), apply every suggested answer as an agent default tagged for review and show them in the completion notice (inference) | `ask` at intake | `ask` at intake, in smaller batches per surface or phase |
+| Later checkpoints | none for design; merge `ask` by default, owner may set standing `auto` (A2 change) | the configured ones (plan, visual review, diff) carry batched questions | every configured checkpoint carries its own small batch |
+| Late (unforeseeable) question | only a hard gate (budget, permission-gated action, widening scope): the job pauses with a notification; no other questions | batched with the next checkpoint, with a default; independent work continues | asked at the next small checkpoint, with a default |
+| Routine implementation choices | never asked | never asked | never asked (the level changes how often non-trivial decisions are surfaced, not what counts as trivial) |
+| Idea-selection rounds | the parent decides and logs dispositions (kit behaviour) | one round per tranche, answered Adopt/Adapt/Defer/Reject | same, possibly per proposal |
+
+Switching level mid-job (A2: "switchable mid-job at the next checkpoint without widening grants") keeps all recorded answers because they are in the repo.
+
+## B6. Interaction with the improvement loop and the Adopt/Adapt/Defer/Reject rounds
+
+- Separate mechanisms. The consultation settles requirements and missing decisions once, before work. The improvement loop proposes new design depth after a tranche; its rounds are scheduled checkpoints, not interruptions that could have been asked earlier. The consultation announces them in advance ("after the first implementation tranche I will bring improvement proposals; answer each with Adopt, Adapt, Defer or Reject").
+- Vocabulary map to the kit's six dispositions (template `:248`, improvement-loop skill): Adopt = implemented or promoted to a named spec; Adapt = promoted with the change recorded; Defer = queued with a reason; Reject = rejected with a reason. Superseded and blocked stay as they are. One mapping sentence in the improvement-loop skill is enough.
+- Answers go to the same `decisions.md` (with the proposal id), so a later session or autonomy level does not re-propose a rejected idea.
+- The existing guard "planner not re-deployed until the previous addendum is resolved" (`SKILL.md:284`) already prevents proposal stacking; the rounds present one batch per resolved addendum.
+- In the maintainer's own research sessions the rounds are the interactive workflow recorded in `00-decision-record.md` (choices defined at `:5`); that stays a maintainer-level process and is not a product rule.
+
+## B7. How runtime projections pick it up
+
+- The rule lives only in `CLAUDE_template.md`. `sync_instructions.py` writes `AGENTS_template.md`; Setup installs both (`core.claude.instructions`, `core.agents`) and after install `check.py setup` regenerates `AGENTS.md`. Codex, Cursor, Qoder, OpenCode and DSH read AGENTS.md; with format 6 Copilot, Gemini (imports AGENTS.md), Kilo, Kiro, Qwen, Cline and others do too (docs/36 catalog). No per-runtime copy of the rule is needed; no `instruction_projection.json` replacement is needed.
+- With Part A in place, an edit to the template triggers the instruction generator and the size check immediately (hook), then CI.
+- The new reference file and the one-line skill pointers flow through `sync_skills.py` and Setup's `runtime.codex.skills` copy like any skill text.
+- Subagent prompts already say "Always read and follow CLAUDE.md before work", so the rule reaches subagents without editing 23 agent files.
+- HOI4 Factory's runtime does not obey a project's AGENTS.md (it is labelled data, A4, `:97`). Factory implements the same rule in its own policy engine: the three buckets are the design-brief content; the question catalog file is loaded as versioned HOI4 knowledge; autonomy comes from the checkpoint policy.
+- Not verified: how each non-Claude client presents a batched question. The rule should say "ask in one message" and mention structured multiple-choice tools only in `docs/runtimes.md` per client.
+
+## B8. Verification outline (not run; needs model runs, none made here)
+
+1. Static: after the change, `check_guidance_size.py` passes, the hard-wrap test passes, the template contains no "Chaos Redux"/"chaosx" strings, `sync_instructions.py --check` passes, and a grep shows each skill has at most a one-line pointer.
+2. Scenario fixtures (recorded-real replay under Factory's evidence policy, not live calls in this session): a rough idea with no spec (expect one consultation, items sorted correctly, defaults logged), the same task re-run with a populated `decisions.md` (expect zero repeated questions), a bug fix (expect no consultation), a world-iteration need discovered late (expect a single gated question), and a subagent-only run (expect no user question, open items in the handoff).
+3. Per autonomy preset: assert question counts: fully autonomous at most one batch before work; human-in-the-loop never asks anything on the exclusion list.
+
+## B9. Decisions for the maintainer (Part B)
+
+1. Land the rule together with the P11 slimming, or store only a 400-600 byte stub in the template and keep the detail in `hoi4-feature-planning/references/consultation-questions.md`? Suggested: stub plus reference, so the template stays under the ceiling without waiting.
+2. Backport the rule to Chaos Redux `CLAUDE.md` (80 bytes of headroom; FR-1 and P12 currently exclude it)? Suggested: not now; CR gets the catalog only through generated skills.
+3. Record file name and location: `docs/specs/<slug>/decisions.md` (suggested) versus a section inside the first spec part.
+4. In fully autonomous mode with the design brief set to `auto`: apply the suggested answers and flag them for review (suggested), or refuse to start?
+5. Should the fallback policy ("stop and report" versus "substitute and report") be a standard intake question for every substantial task? Suggested: yes, default stop and report.
+6. Is a short mapping Adopt/Adapt/Defer/Reject to the six dispositions acceptable in the improvement-loop skill? Suggested: yes.
+
+---
+
+## Evidence index and limits
+
+- Kit files read in full or by section: `.tools/sync/*` (all), `.tools/check.py`, `.tools/lib/setup.py`, `.tools/README.md` (sections), `.github/workflows/*.yml` (all four), `.gitignore`, `.gitattributes`, `.claude/settings.json`, `RELEASING.md`, `scripts/check_release_package.py`, `scripts/test_agent_sync_contract.py`, `hoi4-mod-setup.manifest.json` (component records via a JSON script), `CLAUDE_template.md` (sections around the cited lines), skills and agents by grep for ask, permission and approval wording (all 32 skills and 23 agents were searched, references included; counts per file were taken first).
+- Chaos Redux: `.tools/sync/*` (all), `.tools/check.py` generator section, `.gitignore`, `CLAUDE.md` and skills by grep, `.codex/README.md`, `.codex/config.toml` row count and diff.
+- Setup: `src-tauri/src/agent_setup.rs` (head), `src-tauri/src/git.rs` (hooksPath rejection and test), `docs/15_update_repair.md`, `docs/36_coding_environment_catalog.md`, `docs/09_component_dependency_model.md`, `docs/13_security_model.md`, `CHANGELOG.md`/`SKILL.md` mentions of the finishing step.
+- Factory: `CLAUDE.md`, `scripts/sync_skills.py`, skill bodies, `docs/08-expansion-research/00-decision-record.md` (whole), `docs/01-product/visual-and-autonomy-model.md` (grep only).
+- Claude Code docs facts (hooks, permissions) were read on 2026-10-31 and can change; re-check before implementing.
+- Not verified: Codex or other clients' hook support; Windows CRLF drift between `sync_skills.py` and Setup-written mirrors; whether Codex requires a registry row to find an agent file; GitHub rendering of `linguist-generated`; Setup behaviour on updating a settings.json that already contains hooks; how non-Claude clients present batched questions.
+- Not done: no code or document in any repository was changed; no tests were added; Part B behaviour was not exercised with a model.

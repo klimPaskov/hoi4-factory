@@ -1,0 +1,330 @@
+# Research 08: Open-source orchestration, jobs, drift and worktree tooling for HOI4 Factory
+
+Date accessed: 2026-10-31. Read-only research. Nothing was cloned, installed, built or run. All evidence came from `gh api` (file contents, metadata, compare), WebFetch and WebSearch. No paid model calls. Licenses were read from LICENSE files (or Cargo.toml / package metadata) where GitHub's detector said NOASSERTION.
+
+Legend for "Depth" in the tables: Code = I read source files; Docs = I read project documentation pages; README = README only; Meta = repository metadata and license only.
+
+---
+
+## 0. Bottom line
+
+1. No new runtime dependency is justified for jobs, orchestration, worktrees or drift. Every candidate is either a different runtime (Go + Dolt, Electron, tmux TUIs, Dagger), a different storage engine, a license problem, or abandoned. The useful content is invariants, field lists and UX patterns, which are cheap to build natively on PostgreSQL and the existing `git`-CLI workspace crate (`crates/workspace`, "git CLI only").
+2. Beads is the best model for the task graph (typed edges, ready-work rule, atomic claim, lease/heartbeat/reclaim with a grace window). Adopt its invariants, not its code, CLI, Dolt backend, hash IDs or its last-write-wins tracker sync. The HOI4 Factory plan (lease + fencing generation) is already stronger than Beads' reclaim, which has no fencing of the old owner.
+3. Gas Town and Gas City: nothing changed that alters the earlier verdict. Gas Town has had 7 commits since the pin and no release since 2026-06-06. Gas City's v1.5.1 notes (2026-10-24) fix the same hazard class the plan already guards against (releasing claims the controller cannot vouch for). Keep adapting invariants only.
+4. Blacksmith is a one-author, 30-commit, Unix-only Rust CLI that requires `bd` and the `claude` CLI, last touched 2026-03-05. Reject as a dependency. Three small ideas are worth adapting: glob "affected sets" for conflict-aware scheduling (plus a post-hoc comparison against the real diff), single-flight integration with a bounded fix-attempt circuit breaker, and a periodic reconciliation run that flags the last N integrations.
+5. Pane is an Electron desktop app (AGPL-3.0 plus extra UI-attribution and naming terms). Reject. Adapt its nine-section handoff note, its "agents ask through a notify tool" pattern and its status cues.
+6. Of the orchestrators, the data models worth reading are vibe-kanban (Rust + Postgres issue schema, now sunsetting by the vendor but still committed to by a small group), Backlog.md (task file fields: acceptance criteria, Definition of Done, plan, notes), Plane (state groups, relation vocabulary) and agtx (Rust; shows autonomy modes as policy over one board, and two anti-patterns). Reject Claude Squad, Crystal, uzi, Sculptor, container-use, OpenHands, Task Master, Huly, Conductor as dependencies, each for a stated reason.
+7. Drift Bot as documented is narrow: a PR/MR reviewer that compares changed code to Blueprints and Requirements, posts one summary comment plus a few inline comments, and sets a pass/fail `drift-bot` commit status. The docs say nothing about how detection works, severity, false positives, suppression or approval of intentional deviations. Plan the product's own version with: versioned requirement IDs and a "stale" state (Tracey), a findings table with categories and caps (spec-kit analyze), CRITICAL/WARNING/SUGGESTION plus "not applicable is not skipped is not failed" (OpenSpec verify), a baseline/budget with justified bumps for accepted deviations (ArchUnit freezing, Imbue ratchets), and a rule that only deterministic checks can fail a gate.
+8. Git: keep the git CLI. gitoxide cannot yet do checkout/merge/rebase/push or move/remove/repair of linked worktrees; libgit2 (git2-rs) can add/lock/prune worktrees but diverges from CLI behavior; jj is a different VCS. Adopt cleanup invariants (never delete a pre-existing branch; delete a task branch only when its merged PR head equals the branch tip or merging adds nothing; record the base SHA; per-task target branch). Mergiraf (GPL-3.0-only, separate process) is an optional later add for JSON/YAML/TOML/Rust/TS conflicts. It has no Clausewitz support.
+
+---
+
+## 1. Re-check of Beads, Gas Town and Gas City (against the pins in 01-research-sources.md / evidence-b.json)
+
+| Project | Pinned SHA (2026-10-23) | Main on 2026-10-31 | Ahead | Latest release | License | Stars / forks / open issues | Contributors* | Last commit |
+|---|---|---|---|---|---|---|---|---|
+| gastownhall/beads (steveyegge/beads redirects here) | bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb | 4a92834d575f3bd581e37c4c9a4a9c0dd6f27b4e | 73 commits, 300+ files | v1.3.2 (2026-10-24) | MIT (Apache-2.0 third-party notices for Dolt) | 28,320 / 1,912 / 1,617 | ~513 | 2026-10-31 |
+| gastownhall/gastown (steveyegge/gastown redirects here) | ef70b0bf9e588dce00708e36564bfc06b51fac2c | 466aa41c83ee73b1fa0eb79eb9d172fb1eca9476 | 7 commits | v1.2.1 (2026-06-06) | MIT | 18,636 / 1,693 / 503 | ~370 | 2026-10-28 |
+| gastownhall/gascity | 87a47634d0cebe611874df321c723bba95dcffea | d1a150cac8f82649cf7f16d943cb25c3505a4379 | 163 commits, 300+ files | v1.5.1 (2026-10-24) | MIT | 1,470 / 460 / 1,729 | ~215 | 2026-10-31 |
+
+*Contributor counts come from the GitHub contributors API last-page count with anonymous included, so they are upper bounds.
+
+Both `steveyegge/*` URLs redirect to the `gastownhall` organization. The Go module path inside the source still reads `github.com/steveyegge/beads`.
+
+What changed that matters:
+- Beads: Dolt is now the only storage backend (embedded in-process by default, `dolt sql-server` for multi-writer). `.beads/issues.jsonl` is described as a passive export, "not the database, not the sync protocol, and not a backup". v1.3.2 (2026-10-24) is a fix-only patch with no schema migration; the notes say it closes two ways retention and backup paths could lose data. The project charter (engdocs/PROJECT_CHARTER.md) states Beads must not know about orchestration layers and must not become a storage engine, and that per-issue extension data goes in `metadata` before new fields are added.
+- Gas Town: effectively quiet at repo level since June. README now lists convoys (batched tracking units, `mountain` label for stall detection and skip logic), a Bors-style bisecting merge queue (Refinery), a scheduler that caps polecat concurrency, and "Wasteland" federation over DoltHub. CONTRIBUTING still calls it experimental.
+- Gas City: v1.5.1 highlights include multi-city deployments sharing a rig store, where orphan sweeps stop releasing claims the controller cannot vouch for, plus a fix so text sent to a Claude session can no longer approve a pending permission prompt, plus a split-storage migration repair. It still describes itself as an orchestration-builder SDK and states internal packages are private to `gc`.
+
+Verdict unchanged: adapt invariants, do not depend. Evidence depth: Code (Beads claim.go, lease.go, ready_work.go, blocked_state.go; Gas Town handoff.go, refinery/batch.go), Docs (Beads core-concepts, dependencies, gates, formulas, reclaim; Gas Town convoy, mountain-eater design), Releases (all three).
+
+---
+
+## 2. Beads and Gas Town: model, ready work, handoff, molecules, sync, and what to adopt
+
+### 2.1 Beads issue model (docs/architecture/index.md, docs/core-concepts/*)
+Fields on every issue: `id` (content-derived hash such as `bd-a1b2`, extended on collision), `title`, `description`, `design`, `acceptance_criteria`, `notes`, `status` (`open`, `in_progress`, `blocked`, `deferred`, `closed`, `pinned`, `hooked`, extendable), `priority` 0-4, `issue_type` (bug, feature, task, epic, chore, decision, message, molecule, gate, spike, story, milestone), `assignee`, `estimated_minutes`, timestamps, `created_by`, `closed_at` + `close_reason`, `external_ref` (for example `gh-9`), free `metadata` JSON, labels, typed dependencies, comments. Field groups for scheduling (`due_at`, `defer_until`), claim leasing (`lease_expires_at`, `heartbeat_at`), gates (`await_type`, `await_id`, `timeout`), and molecule/wisp state (`ephemeral`, `mol_type`, `bonded_from`). Internal-only: `content_hash` (SHA-256 of canonical content, for change detection).
+
+### 2.2 Dependency edges and "ready work"
+- Blocking edge types: `blocks` (default), `parent-child` (children blocked when the parent is blocked), `conditional-blocks` (runs only if the other fails), `waits-for` (waits for all or any children of a spawner; `gate` metadata `all-children` or `any-children`).
+- Non-blocking, annotation only: `related`, `tracks`, `discovered-from`, `caused-by`, `validates`, `supersedes`; also graph-link types such as `duplicates`, `replies-to`.
+- Ready work = claimable status (open plus any custom status whose category is "active") with no open blocking dependency, not deferred (`defer_until` in the future, including children of a deferred parent), and not held by a gate. Filters: priority, label, assignee, unassigned, type, parent descendants, sort.
+- Cycles are rejected at write time by `bd dep add`; bulk wiring can skip per-edge checks but still runs one final whole-graph check before commit.
+- `is_blocked` is a denormalized, recomputed column. blocked_state.go contains a comment about a case where one close took about 39 seconds to recompute on a 50k-issue / 100k-edge database until the correlated EXISTS queries were split per index. There is also a `recompute-blocked` command and a blocked-consistency checker. Lesson: derive readiness with indexed queries on demand, and only denormalize if measured, then in the same transaction plus a consistency check.
+- Gates are issues: types `human` (closed only by explicit resolve), `timer`, `gh:run`, `gh:pr`, `bead`. A gate blocks its waiter through a normal dependency edge, so no polling by agents.
+
+### 2.3 Claim, lease, reclaim (internal/storage/issueops/claim.go, lease.go; docs/cli-reference/reclaim.md)
+- Claim is compare-and-swap inside a transaction: allowed when the issue is claimable and unassigned, already assigned to the same actor (idempotent re-claim), or assigned to a configured pool alias; otherwise a typed "already claimed" error. Every status/ownership mutation rewrites a random `row_lock` cell so concurrent reclaim and close collide instead of cell-merging (a Dolt-specific hazard; Postgres gets this from row locks / expected-version).
+- Lease: default 5-minute TTL, kept alive by a heartbeat that does not touch the issue row (it lives in a separate ephemeral table to avoid commit bloat and merge conflicts). A dead worker's lease goes stale; `bd reclaim` reverts `in_progress` to `open` only after the lease expired by more than a grace window (the doc suggests about 2x the TTL), clears the assignee and records a recovery event. A lease is only meaningful on the replica that granted it; reclaim skips foreign leases unless forced.
+- Gap relative to HOI4 Factory: reclaim does not fence the old owner's later writes. The plan's fencing generation and effect-boundary check is the stronger design; keep it.
+
+### 2.4 Handoff fields
+- Beads has no dedicated handoff object. Handoff-relevant fields are `design`, `acceptance_criteria`, `notes`, `metadata`, `close_reason`, `discovered-from` edges, and a `bd prime` context command.
+- Gas Town models a handoff as a pinned bead titled "<role> Handoff" whose description holds the content, and `gt handoff --collect` gathers hooked work, inbox, ready beads and in-progress items. The rendered template carries role, current work, status, git branch, dirty flag, pending mail count, ordered next steps, notes. Any molecule on the hook auto-continues in the fresh session.
+- Pane's note (section 5) is the more complete field list and is the one to copy.
+
+### 2.5 Molecules and formulas
+Formula (TOML or JSON: `formula`, `version`, `type`, `[vars.*]` with `required`, `[[steps]]` with `id`, `title`, `needs`, `type = "human"`) is cooked into a proto (template epic with `{{vars}}`), then poured into a molecule (persistent beads) or a wisp (ephemeral beads, purged later). Steps flow through ready-work like any other issues. Adoptable idea: a project-level "workflow template" is just a DAG of tasks with variables and human-approval steps; it needs no new engine, only a template table and an instantiate-in-one-transaction function. Defer until the plain task graph is stable.
+
+### 2.6 Sync design
+- Beads internal sync: Dolt push/pull with history under `refs/dolt/data` on the git remote. HOI4 Factory has PostgreSQL as the system of record, so none of this applies.
+- External trackers (`bd github|gitlab|jira|linear|ado|notion`): bidirectional sync, conflict policy flags `--prefer-github`, `--prefer-local`, `--prefer-newer` (the default). Last-write-wins by timestamp is the opposite of "GitHub stays authoritative". Do not copy the default.
+- GitHub REST now models what the mirror needs natively (docs.github.com, API version header shown as 2026-03-10): `blocked_by` / `blocking` issue dependencies (POST body takes an `issue_id`; GET lists in both directions, 100 per page max), sub-issues (same repository owner as the parent; reorder endpoint), `sub_issues_summary` and `issue_dependencies_summary` fields on issues. Write endpoints warn about secondary rate limiting when called quickly. Map `blocks` to blocked_by and `parent-child` to sub-issues; keep non-blocking edge kinds local-only or as labels.
+
+### 2.7 Gas Town items worth adapting
+- Convoy vs swarm: a persistent tracking unit versus the ephemeral set of workers currently assigned. HOI4 already separates task from attempt; keep the separation explicit in the UI as well.
+- Mountain-Eater design note ("No Agent Holds the Thread"): state is derived from the graph on each check ("Discover, Don't Track"); after N failures on the same issue it is marked blocked, skipped, and the next ready work is fed; stranded convoys (ready work, no worker) are detected on a periodic scan. Stage-launch validates the DAG and computes waves with Kahn's algorithm.
+- Refinery (internal/refinery/batch.go): batch-then-bisect merge queue; defaults max batch 5, wait 30 s, retry the whole batch once before bisecting to avoid blaming an innocent MR for a flaky test; MRs blocked by MRs outside the batch are excluded. Too large for hobbyist scale; record as a later option.
+- Do not adopt: tmux role provisioning, role zoo (Mayor, Witness, Deacon, Dogs, Polecats), federation, Wasteland. CONTRIBUTING documents a refinery/fork-routing limitation, a reason not to import automatic merge policy wholesale.
+
+### 2.8 Data-model invariants to adopt for Rust + PostgreSQL (consolidated, with source)
+
+Task graph
+1. Typed edges; only a small closed set affects readiness (`blocks`, `parent-child`; later `waits-for`, `conditional-blocks`). Informational kinds (related, discovered_from, validates, supersedes, duplicate) never block. [Beads]
+2. Reject cycles in the same transaction as the edge insert (advisory lock per project plus recursive-CTE check; bulk import does one whole-graph check at commit). [Beads]
+3. Ready = status category is claimable AND no open blocking edge AND no unresolved gate AND not deferred (own or ancestor) AND dependencies satisfied by the explicit rule below. A blocked parent blocks its children. [Beads]
+4. Derive readiness from indexed queries or a view first; denormalize only after measurement, in the same transaction, with a consistency checker. [Beads blocked_state.go]
+5. A dependency is satisfied only when the target is completed and accepted. A missing target fails closed (task stays blocked with `blocked_reason`). Do not copy agtx, where a dependency in Review counts as done and an unknown dependency id counts as satisfied (src/db/schema.rs `deps_satisfied`), and where dependencies are a comma-separated string.
+6. Claim = compare-and-swap on expected task version; idempotent for the same owner; typed `already_claimed` error; a claim creates the attempt row and lease in one transaction. [Beads, matches SPEC-003]
+7. Lease heartbeats live outside the hot task row; reaper acts only after TTL plus grace (about 2x TTL), writes a recovery event, and never re-queues work with an `unknown_effect` attempt. Fencing generation stays. [Beads + Gas City]
+8. Status names are configurable but each maps to a fixed category (Plane: backlog, unstarted, started, completed, cancelled, triage; 8090 work orders use five of these) and all logic keys on category. [Plane, 8090]
+9. Same-transaction event row for every transition (already in SPEC-003).
+10. IDs: UUID primary key plus a human-readable sequential short ID allocated in the transaction by `UPDATE counter ... RETURNING`. Choose the counter scope once. vibe-kanban started with a per-project counter and later shipped a migration that renumbered every issue to a per-organization counter and backfilled denormalized notification payloads (crates/remote/migrations/20260313000000). Keep `external_source` + `external_id` (Plane) or `external_ref` (Beads) for the GitHub mapping; GitHub numbers are per repository. Hash IDs (Beads) solve offline multi-writer creation, which the hosted design does not need.
+11. Task <-> PR is many-to-many, unique on (pr_url, project) (vibe-kanban 20260316 migration).
+12. Sortable board order: floating `sort_order` per column (vibe-kanban `sort_order DOUBLE PRECISION` and `parent_issue_sort_order`; Plane `sort_order` float default 65535) with occasional rebalance.
+13. Acceptance criteria as an ordered checklist (item text + checked flag), a separate reusable Definition-of-Done checklist, an implementation plan section and an implementation notes section, `references`, `documentation`, `modified_files`, `milestone`, `ordinal`, `type`, `parent_task_id`. [Backlog.md serializer.ts]
+14. Verification results are rows with claim, command, exit code, revision tested and evidence reference, and a task cannot complete on an unproven claim ("phantom completion" check: file exists, diff present, symbol pattern, dead-code check, per spec-kit-verify-tasks). [verify-tasks, SPEC-003 completion policy]
+15. Skip-after-N-failures and circuit breaker: after N failed attempts or integration fix attempts, mark `blocked` with a reason and escalate; work flows around it. [Gas Town witness/mountain-eater, Blacksmith CircuitBreaker]
+16. Roll-ups (epic progress) are computed from the graph on read, not stored (GitHub's `sub_issues_summary` follows the same idea). [Gas Town, GitHub]
+17. Waves: validate the DAG and compute launch waves (Kahn) for "run all ready tasks" and for the Kiro-style "independent tasks in parallel". [Gas Town, Kiro docs]
+18. Handoff record (structured, required fields): goal and definition of done; current state; done and verified (command, result, commit); in progress (quote failures exactly); next steps (first one concrete); decisions and constraints (including approaches that failed); open questions; how to verify; git state (repo, branch, head SHA, pushed, uncommitted files that matter). Reject a handoff with a missing or empty field ("None" allowed). The host rewrites the git-state header at send time so it is never stale, and appends receiver instructions (check head commit, run verify, continue from next steps). [Pane note-template.md; Gas Town template]
+19. Autonomy modes are a policy table on one state machine, not three machines: checkpoints such as `spec_approved`, `plan_approved`, `diff_reviewed`, `merge_approved`, each `auto | ask | skip` per mode and per project. Backlog.md names the same three review points (spec, plan, code). agtx ships a human-in-the-loop `void` plugin and an unattended `oneshot` skill over the same board. [Backlog.md, agtx]
+
+---
+
+## 3. Blacksmith (https://github.com/ozten/blacksmith)
+
+Facts: SHA 6bb0015f1250709bee5214af7e6fb603048e6899, committed 2026-03-05. License MIT (LICENSE read, copyright Austin King). Rust, edition 2021, version 0.1.5. 1 star, 0 forks, 0 open issues; all 30 commits by one author over 2026-02-14 to 2026-03-05. Dependencies include tokio, axum (optional), rusqlite (bundled SQLite), clap, nix (Unix-only), fs2, zstd. The README says it depends on `bd` (Beads) for tasks and `claude` for `blacksmith init`, and that its API is unstable. It runs a supervised agent loop (watchdog for stale sessions, retry/backoff, STOP-file shutdown, metrics in SQLite), optionally with parallel workers in git worktrees. Docs index links to pages that are absent from the tree (only five doc files exist). Its companion `ozten/speck` (spec-driven planning, 0 stars) says "Not Ready for Use".
+
+From code (Depth: Code):
+- scheduler.rs: ready beads (open, all deps closed) are filtered by overlap of `affected:` globs declared in the bead's `design` field against in-progress work; overlap is a conservative literal-prefix test (empty set = "affects everything"); a bead without an affected set is allowed to run in parallel and conflicts are caught at integration. SPEC-v7 lists the three failure modes it wants to fix: missing, wrong, and stale-after-refactor affected sets.
+- worktree.rs: directory `worker-{worker_id}-{bead_id}`, created with `git worktree add --detach <path> <base>` (no branch is created, so there is no branch to clean up), removed with `git worktree remove --force` plus temp-file cleanup.
+- integrator.rs: one integration at a time. Merge main into the task branch (never push the branch to main), apply a task manifest for shared files, run compiler checks, on failure run an integration agent up to 3 attempts, then trip a per-bead circuit breaker and escalate to a human, then fast-forward main. A reconciliation tracker runs the full suite every N successful integrations and flags the last N beads for review if it fails. A rollback path exists.
+- Architecture analysis (fan-in, god files, circular imports, boundary violations on `use crate::`) is a small regex/import-graph analogue to ArchUnit for Rust.
+
+Overlap with HOI4 Factory: partial (scheduling, integration queue). Integration cost to depend: high (a CLI, SQLite per project, requires Beads and a CLI agent, Unix-only, unstable API, no library surface).
+
+Recommendation: REJECT as dependency. ADAPT (a) affected-set scheduling, but invert the default for hobbyist mod repos: a task with no declared path set conflicts with everything, and after each attempt compare the declared set to the real diff and record "scope drift" as a finding; (b) the integration pipeline order and bounded fix attempts; (c) the every-N reconciliation run.
+
+---
+
+## 4. Pane (https://github.com/greenfield-inc/Pane)
+
+Facts: SHA 212ea64a59652cec8f90d40ccd7d2beb2e25d282, committed 2026-10-31; latest release v2.4.212 (2026-10-31). 594 stars, 234 forks, 203 open issues, about 26 contributors but 87 of the last 100 commits are by one author. TypeScript (Electron `main/`, React `frontend/`, native module, mobile app, glasses client). GitHub detects NOASSERTION because the LICENSE is AGPL-3.0 with Section 7(b) additional terms: visible attribution to the owner in the application UI, and no use of the owner's name or logo (and the former name "foozol") for endorsement.
+
+What it does: a terminal-first desktop manager for any CLI agent. Each "pane" is one worktree + branch + agent. Features: remote host daemon reachable from a phone browser, "workspaces" to run commands on other machines over Tailscale, `runpane handoff`, a notify MCP tool (agents ask questions through a tool; the answer is returned as the tool result), status cues (blocked on approval, working, done), "Loops" (cron-scheduled agent runs, each in a fresh worktree, at most hourly), per-pane isolated port ranges, `.env` mirroring.
+
+Handoff (Depth: Code/skill docs): the nine required sections are Goal, Current state, Done and verified, In progress, Next steps, Decisions and constraints, Open questions, How to verify, Git state. The CLI rejects a note with a missing or empty section, rewrites the front matter (origin machine/pane/session, repository, branch, head SHA, remote, pushed) at send time, appends receiver instructions (verify the head commit, run "How to verify", continue from "Next steps", push without force, report back to the sender), and for same-agent handoff checks the receiver actually resumed the session (`continued`, `inconclusive`, `not-continued`, `fresh-agent`).
+
+Overlap: UI patterns only. Integration cost: not integrable (desktop Electron app, Tailscale/remote-daemon model, attribution term).
+
+Recommendation: REJECT. ADAPT the handoff schema and the "verified resumption" check (a handoff is not done until continuation is confirmed or a fallback is accepted), the ask-through-a-tool pattern for `waiting_for_input`, and the three-state status cue.
+
+---
+
+## 5. Other orchestration, parallel-development and tracker projects
+
+| Project (SHA, date of last commit) | License / AGPL-3.0 fit | Maintenance | What it does (Depth) | Overlap and verdict |
+|---|---|---|---|---|
+| BloopAI/vibe-kanban (7c3807084daad0d9d315064f60fa869de254f027, 2026-10-28) | Apache-2.0 / compatible | 28,529 stars, ~66 contributors. README banner: "Vibe Kanban is sunsetting"; vendor announcement dated 2026-04-10 says the company shuts down, remote services removed after 30 days, project continues as community-maintained and fully local. Commits since April: 27 across about 6 people; the last 2026-10-28. | Rust workspace (crates/server, db, executors, services, remote, mcp, tauri-app) + React packages. Kanban issues, workspaces (branch + terminal + dev server per agent), diff review with inline comments, PR creation, 10+ agents. The `remote` crate uses sqlx + PostgreSQL migrations (Depth: Code). | Closest data-model match to the jobs system (Rust + Postgres: `issues`, `project_statuses`, `issue_relationships` blocking/related/has_duplicate, `issue_assignees`, `tags`, `issue_comments`, `workspaces.issue_id`, `pull_requests` + `pull_request_issues`). Reject as dependency (sunsetting, ElectricSQL sync coupling, local-agent runtime). ADAPT schema ideas and invariants 10-12 above. |
+| smtg-ai/claude-squad (ce1ffb4392b01f38e2c4599c7c84d2a93973b138, 2026-08-20) | AGPL-3.0 / compatible, but nothing reusable | 8,707 stars, ~20 contributors | Go TUI over tmux + worktrees. Branch = configured prefix + session name, sanitized; worktree dir under the config folder with a hex-timestamp suffix; stores base commit SHA and `isExistingBranch`, and does not delete a branch that existed before the session (Code: session/git/worktree.go) | Reject. Adapt: record base SHA, never delete pre-existing branches. |
+| stravu/crystal (1e18e0bc981225f75b5226f82a300fa741970c6f, 2026-02-26) -> Nimbalyst/nimbalyst (46472d85f885a5a4a339f043c083a257085f591b, 2026-10-31) | MIT / compatible | Crystal deprecated February 2026, replaced by Nimbalyst (2,006 stars, ~63 contributors) | Electron desktop apps with worktree-isolated sessions (README) | Reject: desktop product, no server model. |
+| dagger/container-use (2e43e625e95216b719ec9338f4034fd3a0be2734, 2026-08-12) | Apache-2.0 / compatible | 4,083 stars, ~36 contributors, README says "experimental" | Go MCP server on Dagger. Each environment is a container plus a branch in a separate fork repo registered as the git remote `container-use` in the user's repo; history and state live in git notes; review by `git checkout`; `merge-base --is-ancestor` to list descendants (Code: repository/repository.go) | Reject: needs the Dagger engine, conflicts with the gVisor tool-container design. Adapt: keep agent branches in a separate namespace so a user branch is never touched; review by checkout. Note its fork repo inherits user git config through an `include` directive, convenient on a laptop and the pattern CLAUDE.md warns against for untrusted repos. |
+| imbue-ai/sculptor (ea2a9dffea1327c48504936ad67776fab40e49ce, 2026-10-28) | MIT (LICENSE.md) / compatible | 242 stars, ~12 contributors; "experimental research preview", limited external contributions | Desktop app. Workspace modes: worktree (default), clone, in-place. Branch pattern `<user>/<slug>`; per-workspace target branch; branch cleanup policy never / only when safe / always; per-repo setup command. Uses a lint "ratchet" budget file (Docs + Code) | Reject as dependency. Adapt cleanup policy enum, per-task target branch, `<owner>/<slug>` naming. |
+| devflowinc/uzi (421685f65d66180152fb5f63128111ec12566ea5, 2025-06-04) | MIT / compatible | 582 stars, ~4 contributors, no commits in 17 months | Go CLI: many agents in parallel via worktrees + tmux (README) | Reject: stale, superseded. |
+| OpenHands/OpenHands (2e92e7ec6935f31e36f08eb8dd2c5cef347df120, 2026-10-31) | MIT (root LICENSE) / compatible | 92,323 stars, ~590 contributors | README now presents "Agent Canvas": a self-hosted control center that runs OpenHands, Claude Code, Codex and others over ACP across local, remote and cloud backends, with scheduled and webhook automations (README) | Different product category (agent host). Reject; HOI4 Factory runs its own Rust loop (ADR-011). |
+| MrLesk/Backlog.md (3a296c0f6f949b31e458b849b9617702c56c1023, 2026-10-29) | MIT / compatible | 7,219 stars, ~63 contributors, active | Bun/TypeScript. Markdown task files in the repo, terminal and web Kanban, MCP and CLI instructions, search. Serializer shows the field set: id, title, status, assignee, reporter, dates, labels, milestone, dependencies, references, documentation, modified_files, parent_task_id, subtasks, priority, type, ordinal, onStatusChange hook; body sections for acceptance criteria, definition of done, implementation plan and notes, comments (Code: src/markdown/serializer.ts) | Best field list for the task record and for review checkpoints. Reject as dependency (Node, files-as-database does not fit RLS Postgres). Adapt invariant 13. |
+| eyaltoledano/claude-task-master (c0c98d367c55296bfe69e65680625b6db437af02, 2026-04-23) | MIT + Commons Clause (LICENSE read) / NOT compatible: the clause forbids selling, including hosting for a fee | 28,280 stars; last release v0.43.1 on 2026-03-31 | AI task decomposition, dependencies, tags/workstreams, complexity analysis, MCP tools (README) | Reject for license. |
+| github/spec-kit (7370e592f3cd9c06e5b698983957e227c75b30e2, 2026-10-30) | MIT / compatible | 144,179 stars, ~333 contributors | Specify, plan, tasks, implement slash-command templates; `analyze` is a read-only LLM prompt over spec.md, plan.md, tasks.md; `checklist` generates "unit tests for requirements writing"; extension and preset catalogs (Code: templates/commands/analyze.md; catalog.community.json) | Adapt the analyze report structure (section 6.3). Not a dependency (prompt templates). |
+| Fission-AI/OpenSpec (27c0515724decc633818c735ee596481eec78a8b, 2026-10-30) | MIT / compatible | 73,501 stars, ~150 contributors | Node CLI. Change folders (proposal, specs deltas ADDED/MODIFIED/REMOVED/RENAMED, design, tasks); deterministic validator (requirement text must contain SHALL or MUST, at least one `#### Scenario:`, delta count warning); `archive` applies deltas to main specs; `/opsx:verify` is an agent skill with Completeness, Correctness, Coherence and CRITICAL/WARNING/SUGGESTION (Code: src/core/validation/constants.ts; Docs: docs/commands.md) | Adapt delta-spec pattern and severity/status vocabulary. Reject as dependency (Node, markdown-file model). |
+| cline/kanban (abd4912c27ce6b7f18b5a8106c145fd838e90cc4, 2026-09-04) | Apache-2.0 / compatible | 1,376 stars, ~19 contributors, "research preview" | Local web board; each card gets its own worktree; card links create dependency chains that auto-start on completion; auto-commit; symlinks gitignored dirs (README) | Adapt: dependency-driven auto-start is how autonomous mode feeds work. Reject as dependency. |
+| OrchestratorInc/agent-orchestrator (formerly ComposioHQ/agent-orchestrator; ea9182a9939f3604c1a763202d577e594f2a9fac, 2026-10-31) | Apache-2.0 / compatible | 13,946 stars, ~134 contributors | Go desktop workspace: orchestrator agent plans and starts workers per worktree; lanes derived from agent, PR, CI and review state; failed checks, review comments and merge conflicts are routed back to the worker that owns the branch (README) | Adapt: reaction routing to the owning attempt with bounded retries. Reject as dependency. |
+| fynnfluegge/agtx (8ae68682f10b05ad77a8d1b307569946d871f814, 2026-10-02) | Apache-2.0 / compatible | 1,727 stars, ~17 contributors | Rust TUI + tmux + SQLite. Phases Backlog, Planning, Running, Review, Done; MCP orchestrator agent; unattended `oneshot` skill; plugin choice includes a human-in-the-loop `void` mode; mobile web view (Code: src/db/schema.rs; README) | Useful as evidence that modes are policy over one board. Anti-patterns noted in invariant 5. Reject as dependency (tmux/terminal model). |
+| automazeio/ccpm (3294c85b92b7846c1aec328ef40068022c841c5e, 2026-10-19) | MIT / compatible | 8,424 stars, ~9 contributors | Agent skill: PRDs to epics to GitHub issues, parallel agents (README only) | Confirms GitHub Issues as the system of record is a workable model; no code to reuse. |
+| makeplane/plane (b98e1defb0e089d4505712d89ee9e137fd0935cd, branch `preview`, 2026-10-29) | AGPL-3.0 (LICENSE.txt) / same license | 61,767 stars, ~179 contributors | Django + Next.js PM platform. Issue model: parent FK, state FK with groups (backlog, unstarted, started, completed, cancelled, triage), priority, start/target dates, per-project sequence_id, float sort_order, labels M2M, `external_source`/`external_id`; relations with explicit inverse pairs: blocked_by/blocking, relates_to, duplicate, start_before/start_after, finish_before/finish_after, implemented_by/implements (Code: apps/api/plane/db/models/issue.py, state.py) | Whole PM product, wrong stack, too large. Adapt state groups, relation inverse pairs, external id fields. |
+| hcengineering/platform (Huly) (e637ee7471b5088bded5eae3699057dc666b2157) -> Platform-Collective/platform (5128103d44309f01581a86f54d58210214283180, 2026-10-31) | EPL-2.0 / treat as incompatible with AGPL inclusion (EPL-2.0 is GPL-compatible only if the licensor designates a Secondary License; not checked) | Original repo is frozen and hosted Huly has shut down per its README; successor repo created 2026-06-26, 125 stars | TypeScript business-app platform (README) | Reject. |
+| Conductor (conductor.build) | Closed source (search results; not inspectable) | n/a | macOS parallel-agent worktree app | Reject: cannot be inspected or embedded. |
+| Kiro (kiro.dev/docs/specs) | License not stated on the page; not verified | n/a | Specs produce requirements.md (or bugfix.md), design.md, tasks.md; runs independent tasks concurrently in waves from a dependency graph; the page documents no sync or drift mechanism | Pattern only (waves, three artifacts). |
+
+Notes on depth: the spec-kit community extensions listed in section 6.4 were read from the catalog descriptions (and two READMEs), not audited as code.
+
+---
+
+## 6. Drift Bot (8090 Software Factory) and open-source analogues
+
+### 6.1 What the 8090 documentation says Drift Bot does (verified by reading the page text of docs.8090.ai/codebase/overview and related pages; changelog read for dates)
+- Scope: reviews pull requests (GitHub) and merge requests (GitLab) on a connected repository. It checks the changed code against the project's Blueprints and Requirements and flags code that contradicts a Blueprint or Requirement and code that none of them cover yet.
+- Triggers, both off by default: "On commit to branch with open PR" (when a PR is opened or receives new commits; drafts are skipped until ready for review) and Manual (a `/driftbot` comment on the PR; stays enabled whenever the first option is on).
+- Output: one summary comment that lists each possible drift finding with the Blueprint or Requirement concerned and the file and lines, or states that no drift was found. The most important findings also get their own line comments. A `drift-bot` commit status passes with no drift and fails when drift is found or the run fails. Changelog: introduced 2026-06-09 (v0.40.0), inline review comments 2026-06-16 (v0.41.0), anchored comments limited to the top two findings per PR 2026-07-01 (v0.43.0).
+- Access and ownership: each run uses the access of the person who triggered it (PR author on GitHub; the person who opened or updated the MR on GitLab; the commenter for manual runs), who must be an organization member with a linked GitHub or GitLab account. Only one project per repository can enable it. Saving settings needs the Codebase Connection Editor permission (built-in Owner and Editor roles).
+- The surrounding model: Requirements (product overview and per-feature requirements) -> Blueprints (technical specs in Container, Component and Feature categories) -> Work Orders (tasks with acceptance criteria, dependencies, phases, linked PRs) -> code. Blueprints hold code links (repository files and line ranges), which the agent creates when authoring or reverse engineering and which Detect Code Drift updates.
+- Separate push-time automations (not Drift Bot): Detect Code Drift (runs after the repository is reindexed on a push; compares changed files with the code linked to blueprints; leaves drift comments on the blueprint and on the linked feature requirements; updates code links), Sync Blueprints and Requirements, Check Blueprint References. They have the run-as user's permissions, cannot create or edit blueprints, requirements, work orders, feedback or themes, and their comments carry the user's name plus "via" and the automation name.
+- Guidance in the docs: drift comments are evidence to investigate, not instructions; only behavior the code contradicts counts as drift and features not yet built do not; resolve each comment thread once document or code is back in line; work orders do not update themselves when blueprints change, so ask the agent to review them. Early changelog entries (2025-11-16 "proactive drift detection", 2026-04-28 drift as comments with sync flows treating those comments as the source of truth) show the design evolved from push-time comments to PR-time review.
+
+### 6.2 What is not documented
+- How detection works (static analysis, LLM judgment or both), which model, confidence, cost or rate limits for PR runs.
+- Severity levels, ranking criteria for "most important", false-positive handling, dismiss/ignore/baseline.
+- Any approval path for intentional deviations. The closest features are resolving a comment thread and accepting or rejecting tracked suggestions on a spec. The changelog states nothing on exceptions or approved deviations.
+- Whether a failing `drift-bot` status is intended to block merges (branch protection is not discussed), and how re-runs and force-pushes behave.
+- How "code that no spec covers" is separated from incidental code (tests, refactors, tooling).
+
+### 6.3 Open-source analogues and what each contributes
+
+| Analogue | License / fit | Nature (Depth) | What to take |
+|---|---|---|---|
+| bearcove/tracey (66008a85e22fc3d4e437a8e78fee4f5f99c644b0, 2026-10-08) | Apache-2.0, Rust, 254 stars, ~19 contributors | Deterministic spec coverage. Requirements in markdown as `r[auth.login]`, code and test comments `r[impl auth.login]` / `r[verify ...]` / `depends` / `related`; versions as `+N`; a requirement referenced only at an older version is reported "stale", not "covered", and the developer must re-review and bump the annotation; coverage, reverse coverage (code with no spec), matrix, web dashboard, MCP tools. Scans comments via tree-sitter for major languages, YAML and JSON5 (Docs + spec read) | The stale-on-spec-change invariant is the single most useful drift mechanism: spec text changes bump a version, every link at an older version becomes a finding. Whether it handles Clausewitz `.txt` comments is unverified. Use the idea natively; optional dev-time use on this repo's own REQ IDs. |
+| github/spec-kit analyze (Code) | MIT | Read-only LLM pass over spec, plan, tasks. Detection passes: duplication, ambiguity, underspecification, constitution alignment (conflict with a MUST principle is automatically CRITICAL), coverage gaps (requirement with no task, task with no requirement), inconsistency. Severity CRITICAL, HIGH, MEDIUM, LOW. Findings table (ID, category, severity, location, summary, recommendation), coverage table, metrics, cap of 50 findings with overflow summary; remediation offered but never applied automatically | Report structure, categories, caps. It compares spec artifacts to each other, not spec to code. |
+| spec-kit `checklist` (Code, header read) | MIT | "Unit tests for requirements writing": quality checks of the requirements text, not of the implementation | Separates requirement quality checks from implementation conformance. |
+| Fission-AI/OpenSpec validate + verify (Code + Docs) | MIT | Deterministic structure validator (SHALL/MUST, at least one scenario, delta limits, task checkbox numbering); `/opsx:verify` is an LLM skill reporting Completeness, Correctness, Coherence with CRITICAL / WARNING / SUGGESTION; its own spec says "not applicable" is reported distinctly from skipped or failed | Matches the project's pass / fail / unavailable / not-applicable verdict vocabulary; delta specs (ADDED, MODIFIED, REMOVED, RENAMED) as the way an approved spec changes. |
+| datastone-inc/spec-kit-verify-tasks (eab64d40c17af9848a3122be6e00cd16663f49f3, MIT) (README) | Community spec-kit extension, 7 stars | Verifies every task marked done through a cascade: file exists, git diff present, content pattern for declared symbols, dead-code check (and further layers) | Mechanical proof for completion claims; counters models marking work done without doing it. |
+| Other spec-kit community extensions seen in the catalog (descriptions only): bgervin/spec-kit-sync ("detect and resolve drift... AI-assisted resolution with human approval", 26 stars, one day of activity), stn1slv/spec-kit-reconcile, SuhaibAslam/spec-kit-reconcile ("intent"), ashbrener/spec-kit-arch-governance ("read-only, fail-closed validator" with citation slots), raccioly/docguard, ismaelJimenez/spec-kit-verify, dacunao/software-humano-speckit ("conformidad": absences declared as approved exceptions) | MIT per GitHub where checked | Catalog text and, for some, repository metadata only; code not audited | Confirms the pattern space: sync/reconcile (update the spec to match accepted code), fail-closed validators, declared exceptions. Low adoption and young; treat as ideas only. |
+| TNG/ArchUnit (0aa50c0811f0de9385562c11dce0ddd047e437d6, Apache-2.0, 3,884 stars) (Docs) | Java | Architecture rules as tests. `FreezingArchRule` records current violations in a store kept in version control, later runs fail only on new violations, fixed ones are removed, moved-line violations stay known, CI can forbid creating or updating the store, `refreeze` accepts a new baseline | Baseline-and-freeze mechanism for accepted deviations. Not usable directly (Java). |
+| imbue-ai/ratchets (7253cda987981148054aac7a2337d711116b828e) | PROPRIETARY view-only license (read): cannot be modified, redistributed or used commercially | Rust lint budget tool. Budgets per rule per region may only decrease; `ratchets bump` raises one and requires a justification in the commit message; `tighten`; `check --since <ref>`; JSONL output for agents. Sculptor uses it with a counts file whose header says counts can only be reduced or explicitly bumped with justification | Idea only: deviations as budgets that can be raised only with a recorded reason. Do not copy code. |
+| Archaven (crate; found by search, not inspected beyond the docs.rs summary) | Unverified | Rust, ArchUnit-style module dependency rules over `use` paths via `syn` | Possible dev-time check for this repo's crate boundaries; outside the product's drift scope. |
+| OpenFastTrace (GPL-3.0, Java), StrictDoc (Apache-2.0, Python), Doorstop (LGPL-3.0, Python), sphinx-needs (MIT, Python) | Licenses read from LICENSE files / API | Mature requirements-traceability tools (Meta + README for StrictDoc) | Heavy, different runtimes, document-centric. Tracey already reads StrictDoc `.sdoc`. Reject for the product. |
+| oasdiff (Apache-2.0), Schemathesis (MIT), Specmatic (MIT), Pact (MIT) | Meta only | API contract diff / contract testing | Relevant to client-server API drift, not to spec-versus-mod drift. Not assessed further. |
+
+### 6.4 Design proposal for the product's Drift (synthesis, not a quote of any source)
+Treat drift as findings produced by checks against approved, versioned requirement records, in this order of authority:
+1. Deterministic checks (fail-able): each requirement has a stable ID and integer version; each task, artifact or test link names `id+version`; a link at an older version is `stale`; a requirement with no accepted link is `uncovered`; an artifact path with no requirement is `unspecified` (warning). Machine-checkable predicates evaluated by the existing HOI4 tools (for example: this focus exists, has this prerequisite, parses with no validator errors) are `verified` or `contradicted` with the tool's evidence reference.
+2. Model-judged checks (advisory only, never fail a gate): "possible drift: evidence to investigate", with a confidence label, the same wording the 8090 docs use.
+3. Findings carry stable IDs by category (as in spec-kit), severity (CRITICAL / WARNING / SUGGESTION), spec reference with version, artifact path and range, evidence, status (open, accepted_deviation, resolved, unavailable, not_applicable), cap on inline anchors (8090 uses two), one summary plus one pass/fail status per run, comment-only authority (the checker never edits specs or code; resolution is a code change, or a spec change through a tracked proposal).
+4. Intentional deviation: a `deviation` record keyed by finding fingerprint (requirement ID + version + artifact anchor), with reason, approver and role, optional expiry, and link to a decision. It lapses automatically when the requirement version or the artifact anchor changes, so exceptions cannot rot. This takes the baseline idea from ArchUnit freezing and the justified-bump idea from ratchets, and fills the gap 8090 leaves undocumented.
+5. Trigger and gating by autonomy mode: autonomous = run on every attempt completion and before merge, deterministic CRITICAL blocks merge; semi = same checks, block only at configured checkpoints; human-in-the-loop = run on request and at review. Skip draft or in-progress work. One drift policy per project.
+
+---
+
+## 7. Git and worktree management for agents
+
+| Tool (SHA, date) | License / fit | Maintenance | What it does (Depth) | Verdict |
+|---|---|---|---|---|
+| max-sixty/worktrunk (2c04fb3704275aab69237db0bc322e33b3775b6a, 2026-10-31) | MIT OR Apache-2.0 (README badge; GitHub shows NOASSERTION) / compatible | 9,605 stars, ~82 contributors, Rust, active | CLI. Worktrees addressed by branch name with path computed from a template; hooks (pre-merge, pre-remove); `wt merge` squashes and rebases, fast-forwards the target, removes the worktree; `wt remove` deletes the branch only when merging it would add no changes to the default branch (works for squash and rebase workflows); `-D` forces (Docs) | CLI for humans; no library API verified. Adapt the cleanup rule. |
+| coderabbitai/git-worktree-runner "gtr" (2d4852d97d28fe9d51fbd2b877555c6292a50e3b, 2026-10-28) | Apache-2.0, Bash / compatible | 1,802 stars, ~28 contributors | `clean` skips worktrees with untracked files unless forced, prunes locked phantom entries only after confirmation, and treats a branch as merged only when a merged PR/MR exists whose head SHA equals the branch tip, so reused branch names do not match older PRs and squash merges are handled (Code: lib/provider.sh, lib/commands/clean.sh) | Adapt the tip-match rule (it needs the provider API, which the GitHub App already gives). Not a dependency. |
+| smtg-ai/claude-squad, imbue-ai/sculptor, dagger/container-use, ozten/blacksmith | See above | | Branch naming, base SHA, pre-existing-branch protection, cleanup policy, separate namespace, detached worktrees | Adapt as listed. |
+| mergiraf/mergiraf (Codeberg d88acb6233cab7fb703fdaf14aaeac73d9a94de9, 2026-10-27; v0.20.0 2026-09-26) | GPL-3.0-only (Cargo.toml). Compatible with AGPL-3.0 under GPLv3 section 13; use it as a separate process (git merge driver), not linked | 469 stars, 87 open issues, Rust, tree-sitter based | Syntax-aware merge driver for about 30 languages plus JSON, YAML, TOML, XML, HTML and others; the docs describe adding a language through a tree-sitter grammar. Clausewitz/Paradox script is not supported (languages page). A Paradox tree-sitter grammar exists (Acture/tree-sitter-paradox, AGPL-3.0, 5 stars, last commit 2026-10-10); HOI4 coverage unverified | Optional, later. Only if real conflicts in supported formats appear. Not for mod script. |
+| tummychow/git-absorb (debdcd28d9db2ac6b36205bda307b6693a6a91e7, 2026-02-14) | BSD-3-Clause | 5,752 stars; uses git2 | Auto fixup commits for staged hunks (Cargo.toml read) | Human tidy-up tool; no agent role. Reject. |
+| jj-vcs/jj (f5b5be1f408b8772d5025d25afdf5127186931c4, 2026-10-31) | Apache-2.0 / compatible | 32,315 stars, ~397 contributors; `jj-lib` manifest describes it as a library for an "experimental" VCS | First-class conflicts recorded in commits (rebase succeeds, resolve later), auto-rebase of descendants, operation log with undo and restore, lock-free concurrent operations, Git backend (Docs) | Model, not dependency. Ideas: record an operation log of workspace mutations for undo and audit (the plan's apply journal and receipts already do this); treat a conflicted merge as a recorded state of the task (`needs_resolution`) instead of a failed attempt. |
+| GitoxideLabs/gitoxide (95194788d750cfa4ea3437782246a88798b146e1, 2026-10-31; `gix` 0.61.0) | MIT OR Apache-2.0 / compatible | 12,092 stars, ~233 contributors | crate-status.md (read): status, diff, merge-base, rev-parse, create linked worktrees are checked; checkout/switch/reset, merge/cherry-pick/revert, rebase, push, and move/remove/repair of linked worktrees are unchecked | Not sufficient as the writer. Optional later for read-only calls if process spawn cost is measured. Note CLAUDE.md's config-discovery hazard applies to any library as well. |
+| rust-lang/git2-rs (bcf8b998c001ecebccf664d621d7a49f401ee12f, 2026-10-31; git2 0.21.0 / libgit2-sys 0.18.8+1.9.7) | MIT OR Apache-2.0 | 2,122 stars, ~284 contributors | libgit2 bindings; worktree API includes add (with lock and checkout-existing options), lock/unlock, validate, prune | Another C dependency with behavior that differs from the CLI (hooks, filters, config includes). The existing choice of the git CLI stays. |
+
+Recommended git/worktree policy (adopting the above; no new dependency):
+- One worktree per attempt-owning task under a server-controlled root, never inside the repository, named from task short ID and a unique suffix (claude-squad, Blacksmith). Prefer a named branch `<owner>/<task-id>-<slug>` sanitized for illegal characters (a Windows domain user produced a backslash in claude-squad's case) for tasks that open PRs; use detached worktrees for read-only or scratch attempts.
+- Record at creation: repo, base branch, base commit SHA, branch name, whether the branch pre-existed, target branch for this task.
+- Cleanup: never delete a branch that pre-existed; after merge, delete only if the merged PR's head SHA equals the branch tip (gtr) or merging adds no changes to the target (worktrunk); otherwise keep and mark `needs_attention`. Refuse removal with untracked or uncommitted files unless the task is cancelled and the owner confirms. A policy enum `never | when_safe | always` per project, default `when_safe` (Sculptor).
+- Agent branches live in their own ref namespace or remote so a human branch is never touched, and a human reviews by checking out (container-use).
+- Integration: single-flight per target branch. Merge target into the task branch, run gates, bounded fix attempts, then fast-forward or squash through the GitHub PR (GitHub stays authoritative for the merge). Run a reconciliation suite every N merges (Blacksmith). Batch-then-bisect (Gas Town) is deferred until a measured queue exists.
+- Locks: use `git worktree lock` with a reason for active attempts and `prune` only after the lease has expired, to avoid removing a live worktree (git2-rs exposes the same operations; the CLI has them too).
+
+---
+
+## 8. License and AGPL-3.0 compatibility summary (not legal advice)
+
+| Category | Projects |
+|---|---|
+| Permissive, may be included in an AGPL-3.0 product with notices | MIT: Beads, Gas Town, Gas City, Blacksmith, speck, spec-kit, OpenSpec, Backlog.md, Crystal/Nimbalyst, uzi, Sculptor, OpenHands, sphinx-needs, ccpm, Schemathesis, Specmatic, Pact. Apache-2.0: vibe-kanban, container-use, cline/kanban, agent-orchestrator, agtx, Tracey, ArchUnit, jj, gix (MIT or Apache), git2-rs (MIT or Apache), gtr, StrictDoc, oasdiff. BSD-3-Clause: git-absorb. |
+| Same license | AGPL-3.0: Plane, Claude Squad, Acture/tree-sitter-paradox. |
+| Compatible only as a separate process or with care | GPL-3.0-only: Mergiraf (run as an external merge driver). GPL-3.0: OpenFastTrace. LGPL-3.0: Doorstop. |
+| Additional terms to carry | Pane: AGPL-3.0 plus section 7(b) UI-attribution and naming terms. |
+| Not usable | Task Master (MIT + Commons Clause), imbue-ai/ratchets (proprietary view-only), Conductor (closed), Huly/EPL-2.0 (treat as incompatible unless a Secondary License designation is found). |
+
+---
+
+## 9. Consolidated recommendation (one dependency per responsibility)
+
+| Responsibility | Decision | External dependency |
+|---|---|---|
+| Jobs / task graph / ready work / claims / leases | Build natively in PostgreSQL with RLS using invariants 1-19 (sections 2.8). Keep the SPEC-003 lease + fencing design. | none |
+| Orchestration and the three autonomy modes | One state machine; modes are per-project checkpoint policies (`auto/ask/skip`) at spec, plan, diff and merge. Dependency-driven auto-start feeds ready work (cline/kanban pattern); failures route back to the owning task with bounded retries and a circuit breaker; stranded-work scan and skip-after-N from Gas Town. Single writer first, then conflict-aware parallelism with declared path sets compared against real diffs (Blacksmith). | none |
+| Worktrees and git | git CLI through the existing workspace crate, with the branch, base-SHA, cleanup and namespace rules in section 7. | the git CLI (already in use) |
+| Structural merge of conflicting files | Not needed now. Revisit only when real conflicts in JSON/YAML/TOML/Rust/TS appear. | optional, deferred: Mergiraf as an external merge driver (GPL-3.0-only, separate process) |
+| Drift Bot | Native, deterministic-first checker over versioned requirement records, with stale detection, findings table, caps, comment-only authority, and justified deviation records (section 6.4). | none (optional dev-time: Tracey on this repository's own docs, not part of the product) |
+| GitHub mirror | Native, GitHub authoritative: inbound by webhook/poll with per-field mirror hash, outbound as effects with intent-before-effect and read-back reconciliation; map `blocks` to blocked_by and `parent-child` to sub-issues; never last-write-wins. Keep a single tracker rule: a task is mirrored to at most one external tracker. | none new |
+| Kanban/list UI and board ordering | Native React using float `sort_order`, status categories, priority enum and the vibe-kanban / Plane field vocabulary. | none |
+| Handoff | Native structured record with the nine required fields and verified-resumption check (section 2.8 item 18). | none |
+
+Do not add: Beads, Gas Town, Gas City, Blacksmith, Pane, Claude Squad, container-use, Task Master, spec-kit or OpenSpec CLIs, gitoxide, git2, jj.
+
+---
+
+## 10. Questions for the maintainer (batch)
+
+1. Short task IDs: per project or per account? (Recommend per project, never renumbered; show the GitHub issue number alongside once mirrored.)
+2. Is "dependency satisfied" equal to completed-and-accepted, or merged? (Recommend accepted; the PR merge is an effect of acceptance.)
+3. Default for a task with no declared path set when parallel agents exist: serialize against everything (recommended) or run optimistically (Blacksmith)?
+4. Drift gating: may a failed deterministic CRITICAL drift check block merge in semi-autonomous mode, or only warn? Who may approve a deviation (owner only, or any member with a role), and should deviations expire?
+5. Branch cleanup default: `when_safe` (recommended), `never` or `always`?
+6. Is a GPL-3.0-only helper binary (Mergiraf) acceptable inside the tool container image if structural merge is added later? And for Clausewitz script, should a custom merge driver built on the existing HOI4 parser be considered instead of a tree-sitter grammar?
+7. Should the GitHub mirror support Projects v2 fields (priority, status columns) in the first release, or only issues, sub-issues and dependencies? (Projects v2 was not researched in depth here.)
+
+---
+
+## 11. Unverified or limited items
+
+- Contributor counts are upper bounds (anonymous included).
+- 8090: detection method, model, severity, false positives, deviation approval and merge-blocking behavior are not documented; the WebFetch summaries were cross-checked against raw page text for the overview, blueprints and automations pages only. The requirements, work orders, reverse-engineering, introduction and changelog findings come from WebFetch summaries and were not re-read as raw text.
+- Tracey: whether it scans Clausewitz `.txt` comment syntax is unverified. Tree-sitter-paradox: HOI4 coverage unverified.
+- Huly EPL-2.0 Secondary License designation not checked. Kiro licensing not stated on the fetched page. Conductor's closed-source status comes from search results.
+- spec-kit community extensions: catalog descriptions only (two READMEs read); code not audited. Archaven, oasdiff, Schemathesis, Specmatic, Pact, OpenFastTrace, StrictDoc, Doorstop, sphinx-needs: metadata and license only.
+- jj-lib API stability policy not verified. gitoxide status read from crate-status.md on main only.
+- Nothing was executed; no build, test or install of any third-party tool.
+
+---
+
+## 12. Sources (all accessed 2026-10-31)
+
+| URL | SHA / version | License | Depth |
+|---|---|---|---|
+| https://github.com/ozten/blacksmith | 6bb0015f1250709bee5214af7e6fb603048e6899 (2026-03-05) | MIT | Code |
+| https://github.com/ozten/speck | bd4418eeb64d74ca0c723c41897e25c9521657bc (2026-03-03) | MIT | README |
+| https://github.com/gastownhall/beads (from steveyegge/beads) | 4a92834d575f3bd581e37c4c9a4a9c0dd6f27b4e (2026-10-31); v1.3.2; prior pin bc0cc87fd9fda412e2eaca669fa6ae3ec2c713fb | MIT + Apache-2.0 notices | Code + Docs |
+| https://github.com/gastownhall/gastown (from steveyegge/gastown) | 466aa41c83ee73b1fa0eb79eb9d172fb1eca9476 (2026-10-28); v1.2.1; prior pin ef70b0bf9e588dce00708e36564bfc06b51fac2c | MIT | Code + Docs |
+| https://github.com/gastownhall/gascity | d1a150cac8f82649cf7f16d943cb25c3505a4379 (2026-10-31); v1.5.1; prior pin 87a47634d0cebe611874df321c723bba95dcffea | MIT | Release notes + compare |
+| https://github.com/greenfield-inc/Pane | 212ea64a59652cec8f90d40ccd7d2beb2e25d282 (2026-10-31); v2.4.212 | AGPL-3.0 + section 7(b) terms | README + handoff skill |
+| https://github.com/smtg-ai/claude-squad | ce1ffb4392b01f38e2c4599c7c84d2a93973b138 (2026-08-20) | AGPL-3.0 | Code |
+| https://github.com/BloopAI/vibe-kanban | 7c3807084daad0d9d315064f60fa869de254f027 (2026-10-28) | Apache-2.0 | Code (migrations) |
+| https://www.vibekanban.com/blog/shutdown | dated 2026-04-10 | n/a | Web page |
+| https://github.com/stravu/crystal | 1e18e0bc981225f75b5226f82a300fa741970c6f (2026-02-26) | MIT | README |
+| https://github.com/Nimbalyst/nimbalyst | 46472d85f885a5a4a339f043c083a257085f591b (2026-10-31) | MIT | Meta |
+| https://github.com/dagger/container-use | 2e43e625e95216b719ec9338f4034fd3a0be2734 (2026-08-12) | Apache-2.0 | Code |
+| https://github.com/imbue-ai/sculptor | ea2a9dffea1327c48504936ad67776fab40e49ce (2026-10-28) | MIT | Docs |
+| https://github.com/imbue-ai/ratchets | 7253cda987981148054aac7a2337d711116b828e (2026-06-22) | Proprietary, view-only | README + LICENSE |
+| https://github.com/devflowinc/uzi | 421685f65d66180152fb5f63128111ec12566ea5 (2025-06-04) | MIT | README |
+| https://github.com/OpenHands/OpenHands (from All-Hands-AI/OpenHands) | 2e92e7ec6935f31e36f08eb8dd2c5cef347df120 (2026-10-31) | MIT | README |
+| https://github.com/MrLesk/Backlog.md | 3a296c0f6f949b31e458b849b9617702c56c1023 (2026-10-29) | MIT | Code + README |
+| https://github.com/eyaltoledano/claude-task-master | c0c98d367c55296bfe69e65680625b6db437af02 (2026-04-23); task-master-ai 0.43.1 | MIT + Commons Clause | README + LICENSE |
+| https://github.com/github/spec-kit | 7370e592f3cd9c06e5b698983957e227c75b30e2 (2026-10-30) | MIT | Code (analyze, checklist) + catalog |
+| https://github.com/Fission-AI/OpenSpec | 27c0515724decc633818c735ee596481eec78a8b (2026-10-30) | MIT | Code + Docs |
+| https://kiro.dev/docs/specs/ | n/a | not stated | Web page |
+| https://github.com/cline/kanban | abd4912c27ce6b7f18b5a8106c145fd838e90cc4 (2026-09-04) | Apache-2.0 | README |
+| https://github.com/OrchestratorInc/agent-orchestrator (from ComposioHQ/agent-orchestrator) | ea9182a9939f3604c1a763202d577e594f2a9fac (2026-10-31) | Apache-2.0 | README |
+| https://github.com/fynnfluegge/agtx | 8ae68682f10b05ad77a8d1b307569946d871f814 (2026-10-02) | Apache-2.0 | Code (schema) + README |
+| https://github.com/automazeio/ccpm | 3294c85b92b7846c1aec328ef40068022c841c5e (2026-10-19) | MIT | README |
+| https://github.com/makeplane/plane | b98e1defb0e089d4505712d89ee9e137fd0935cd (preview, 2026-10-29) | AGPL-3.0 | Code (models) |
+| https://github.com/hcengineering/platform and https://github.com/Platform-Collective/platform | e637ee7471b5088bded5eae3699057dc666b2157 (frozen); 5128103d44309f01581a86f54d58210214283180 (2026-10-31) | EPL-2.0 | README + Meta |
+| https://www.conductor.build (via search results) | n/a | closed source (per search results) | Search |
+| https://docs.8090.ai/codebase/overview and /modules/blueprints, /modules/automations, /modules/requirements, /modules/work-orders, /opinions/reverse-engineering, /general/introduction, /resources/changelog, /roles-and-access-control/permissions-reference, /llms.txt | pages as served 2026-10-31 | n/a | Web pages (overview, blueprints, automations re-read as raw text) |
+| https://github.com/bearcove/tracey | 66008a85e22fc3d4e437a8e78fee4f5f99c644b0 (2026-10-08) | Apache-2.0 | README + guide + spec |
+| https://github.com/TNG/ArchUnit and https://www.archunit.org/userguide/html/000_Index.html | 0aa50c0811f0de9385562c11dce0ddd047e437d6 (2026-10-27) | Apache-2.0 | User guide (freezing) |
+| https://github.com/datastone-inc/spec-kit-verify-tasks | eab64d40c17af9848a3122be6e00cd16663f49f3 (2026-09-15) | MIT | README |
+| https://github.com/bgervin/spec-kit-sync, stn1slv/spec-kit-reconcile, ashbrener/spec-kit-arch-governance, raccioly/docguard | f8c4f72e5542fe44373ca1c4510d1c67f57c00b8; f1f0ce41c00de36e84dff792473ce5fa52b36056; 5ac80346a3aa31595f03e7fe192fd44bb61ec518; 062b28f9aa4b8067a27648850993edb2713670b3 | MIT | Catalog + Meta |
+| https://github.com/itsallcode/openfasttrace, strictdoc-project/strictdoc, doorstop-dev/doorstop, useblocks/sphinx-needs | e51e323b3b279997ab25cc55ac223ee0b172f7bd; 54aeb144c4105d7b35645e027769254941c967a7; d72d44244e76268ce24a859b32bc3321ba83f296; cc38e36646e5114ffca0b0111070281555b1f4d8 | GPL-3.0; Apache-2.0; LGPL-3.0; MIT | Meta + LICENSE |
+| https://github.com/oasdiff/oasdiff, schemathesis/schemathesis, specmatic/specmatic, pact-foundation/pact-reference | 44e85a31dd74b2bcc8dd0a8a417b517b11da07ab; 92811758b8cfb919628ec8b9b7a10084083b5b46; cbc0f29975ecf685e0c4814f3c9bdae429e4a767; 8e61686ac03d34d4e5825ad04a5c04fa404d7e8c | Apache-2.0; MIT; MIT; MIT | Meta |
+| https://github.com/max-sixty/worktrunk | 2c04fb3704275aab69237db0bc322e33b3775b6a (2026-10-31) | MIT OR Apache-2.0 | Docs |
+| https://github.com/coderabbitai/git-worktree-runner | 2d4852d97d28fe9d51fbd2b877555c6292a50e3b (2026-10-28) | Apache-2.0 | Code |
+| https://codeberg.org/mergiraf/mergiraf and https://mergiraf.org/languages.html | d88acb6233cab7fb703fdaf14aaeac73d9a94de9 (2026-10-27); v0.20.0 | GPL-3.0-only | Cargo.toml + docs |
+| https://github.com/Acture/tree-sitter-paradox | 9a21dfcfdb5d6f6d6cec4c4d931c95c7a927286c (2026-10-10) | AGPL-3.0 | Meta |
+| https://github.com/tummychow/git-absorb | debdcd28d9db2ac6b36205bda307b6693a6a91e7 (2026-02-14) | BSD-3-Clause | Cargo.toml |
+| https://github.com/jj-vcs/jj | f5b5be1f408b8772d5025d25afdf5127186931c4 (2026-10-31) | Apache-2.0 | Docs |
+| https://github.com/GitoxideLabs/gitoxide | 95194788d750cfa4ea3437782246a88798b146e1 (2026-10-31); gix 0.61.0 | MIT OR Apache-2.0 | crate-status.md |
+| https://github.com/rust-lang/git2-rs | bcf8b998c001ecebccf664d621d7a49f401ee12f (2026-10-31); git2 0.21.0 | MIT OR Apache-2.0 | Code (worktree.rs) |
+| https://docs.github.com/en/rest/issues/issue-dependencies and /en/rest/issues/sub-issues | API version 2026-03-10 | n/a | Web pages |

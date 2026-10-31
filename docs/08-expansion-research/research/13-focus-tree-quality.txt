@@ -1,0 +1,657 @@
+# 13. Focus-tree quality (FR-3 investigation)
+
+Why AI-made Hearts of Iron IV focus trees look poor although structural checks pass, and what to change in hoi4-agent-tools and the agent workflow. Research only: nothing in any repository or mod was changed.
+
+Date: 2026-10-31. Author: research agent (read-only). Scope: ESTABLISHED REQUIREMENT FR-3 (no separate focus MCP).
+
+---------------------------------------------------------------------------------------------------
+
+## 0. Method, evidence labels, limits
+
+Evidence labels used throughout:
+
+- [M] measured by me with a script or tool run (reproducible, see Appendix A).
+- [C] read in code or documentation (file and function named).
+- [I] inference from [M] and [C]; may be wrong.
+- [U] unverified or unavailable; says why.
+
+Versions and inputs:
+
+- hoi4-agent-tools source: shallow clone at commit fbc5144 (package version 4.6.1) at `<projects>\hoi4-factory\.work\ext\agent-tools`. [C]
+- Code I executed: the installed 4.6.1 runtime the MCP server itself runs (`<local-appdata>\Local\hoi4-agent-tools\runtime-v461\...\dist\hoi4_agent_tools\focus\*.js`), imported read-only in Node, called on in-memory plans. Functions used: `parseClausewitz`, `importFocusTrees`, `layoutFocusTree`, `lintFocusTree`, `compactFocusTreePlan`. No rewrite tool was called and no mod file was written. [M]
+- MCP tools called (read-only): `hoi4_focus_inspect`, `hoi4_focus_render` (once each, on `ireland_total_overhaul`), `hoi4_reference_context` (once). These store review artifacts in the tool's own artifact store under `<local-appdata>\Local\hoi4-agent-tools\workspaces\...` (normal tool behavior, outside the research folder). `hoi4_focus_rewrite` and every other rewrite tool were never called. [M]
+- Vanilla: Hearts of Iron IV 1.19.3.0, `common\national_focus` (81 files, 67 trees with at least 8 focuses). Maintainer mods: zin, ireland_total_overhaul, an unpublished maintainer mod, chaos_redux (read-only). [M]
+- Kit: `<projects>\agentic-hoi4-modding` (pins agent-tools 4.0.3 in its docs, so its text describes an older tool contract than the 4.6.1 runtime). [C]
+- Supplied report: `...\.work\focus-tree-reports\2026-10-31-soviet-tree-weird-branching.webp` (sha256 c8e36056...f898b2).
+- The source file of the supplied tree was NOT found. I searched all `*.yml`, `*.txt`, `*.json`, `*.md` under the Projects folder and the Paradox mod and user folders for "Employ Tsarist Officers", "Form CHEKA", "Consolidate the Revolution", "Found the Soviet Union", "Consolidate the Plan", "Left Opposition Prevails", "Defend the Revolution" (this matches decision D-10 in the expansion decision record). [U] Consequence: every number about the supplied tree comes from a reconstruction read off the screenshot (section 2.2), accurate to about half a grid column, with prerequisite edges inferred from visible connectors.
+- I did not launch the game, made no paid model calls, and did not view any in-game footage other than the supplied screenshot. In-game connector geometry is therefore known only from that one screenshot. [U for anything beyond it]
+
+Work files (all under `<projects>\hoi4-factory\.work\research\13-work\`): scripts, `vanilla.json` (per-tree measurements), `mods_*.json`, `recon\` (reconstruction), `renders\` (orthogonal in-game-style drawings I generated), `dumps\`, `crops\`.
+
+---------------------------------------------------------------------------------------------------
+
+## 1. Executive summary
+
+### 1.1 What is wrong with the supplied tree (verified on the image, then measured on a reconstruction)
+
+All six reported defects are real (section 2.1). Measured on the reconstruction (58 focuses, 70 prerequisite links, 27 columns x 19 rows):
+
+- Staircase: the first six generations of the main line step left by 2, 2, 1, 3, 4 and 1 columns (root x=0 to "Found the Soviet Union" x=-12 within five rows). Each fan-out cohort is centred 1 to 1.5 columns left of its parent, so the error accumulates. [M]
+- Floating right branch: "The Soviet Military Council" subtree (10 focuses, 5 rows deep) sits at x=+4..+13 while 90 percent of the focuses are left of the root. Largest empty rectangle inside the bounding box: 18 x 13 cells = 42.5 percent of the box (vanilla trees with 40 to 120 focuses: p90 0.18, maximum 0.30; vanilla trees with 120 to 500 focuses: p90 0.26, maximum 0.48). [M]
+- Side balance 0.64 and mass skew -0.40 (vanilla small and medium trees: p90 0.24 and 0.13, maximum 0.34 and 0.22). [M]
+- A seven-focus run of single-parent single-child focuses (Permanent Revolution to Convene a Workers' Congress); vanilla trees with 40 to 120 focuses never exceed 4. [M]
+
+### 1.2 Why the current tooling lets it through
+
+1. Silent checks for fixed coordinates. Sibling symmetry and anchor diagnostics are computed only for focuses whose position mode is `auto`. A tree read back from a `.txt` file has `fixed` or `relative` positions, so inspect reports `siblingCohortCount: 0`. The same coordinates marked `auto` produce five symmetry diagnostics. [C][M]
+2. The only global balance metric is bounding-box centring (`boundingCenterOffsetTwice`). The supplied layout scores 1 (passes) because the far leaf at x=+13 cancels the far leaf at x=-14, although the mass is left-heavy. [M]
+3. The tool's `focus_inspect` returns `status: ok` and "no blocking diagnostics" when only warnings exist. What fires on the reconstruction: 14 `FOCUS_LAYOUT_LINEAR_DETOUR` warnings (small kinks in single-child chains) and 10 crossing warnings that are artefacts of the Bezier connector model (all-to-all bundles). Nothing about the staircase, the floating branch, the empty canvas or the wedged leaf. [M]
+4. The documented repair path fails on real trees. `focus_rewrite` with `layoutMode: "compact"` was refused with `FOCUS_COMPACT_QUALITY_BLOCKED` on all six real trees I tried (vanilla Estonia, Iceland, USA, Finland; Unpublished mod A; Zin Aenor; 21 to 70 seconds of computation each) and on the reconstruction. The gate demands zero rendered crossings in a connector model that differs from the game. [M]
+5. The tool draws connectors as cubic curves; the game draws right-angle connectors. Across 54 vanilla trees (8,926 prerequisite links) the Bezier model reports 766 crossings, an orthogonal model reports 86; 27 trees the tool would flag have no orthogonal crossing at all. [M, with assumption O1 in 3.4]
+6. The agent never sees a picture by default: `focus_render` returns `resource_link` entries only (PNG, SVG, HTML as links), the tool description says "Images are linked artifacts, not inline", and no code path returns an image content block. [C]
+
+### 1.3 Why agents produce this layout in the first place (root causes, ranked)
+
+1. [I, supported by M] The coordinates were not produced by the tool's own solver. Running the real solver with all positions `auto` on the same reconstructed graph gives width 18 (was 27), mass skew +0.09 (was -0.40), side balance 0.19 (was 0.64), largest empty rectangle 0.23 (was 0.42), spine drift +3 (was -10), in 33 to 231 ms. The supplied layout looks hand-typed (agents writing x/y), probably because (a) the documentation's example plan uses `fixed` and `relative` positions, (b) compact reflow is refused on real trees, (c) the kit says the implementation agent "owns x/y positions". [C]
+2. The design plan stops at "path architecture". The planning skill says the spec "should not try to lock every final focus coordinate", so no lane map, row plan or balance target exists before coordinates are written. [C]
+3. The kit's layout rules are slogans ("compact, symmetrical, centered") with no numbers, and they claim the MCP reports "unbalanced branches", "off-center layouts", "excessive gaps" and "dangling connectors". Of these the tool implements only partial versions (3.6). [C]
+4. Completion is prose. No scorecard, no rendered-image evidence and no checkpoint binds "layout reviewed" to the final source hash. [C]
+5. Part of the imbalance is topological: one subtree holds 46 of 58 focuses. Layout algorithms only recover part of it (section 2.5). Design-level choices (branch order, orientation, lane widths) decide the rest, so the workflow must plan lanes before laying out. [M, I]
+
+### 1.4 What to build (details in sections 7 to 9)
+
+- A measurable rubric (section 7.1) with hard defects, soft metrics calibrated on vanilla 1.19.3.0 (two size buckets) and a short list of things only a human or model looking at the picture can judge.
+- A layout verdict in every inspect and rewrite result (`blocked`, `revise`, `review`, `pass`) so that "structure ok" can no longer read as "done".
+- Mode-independent symmetry, balance and empty-region metrics; orthogonal in-game connector model; bundle-aware crossing rules; fix hints in diagnostics.
+- A plan-first workflow: design brief, lane plan, solver layout with `auto` positions and lanes, inline render and crops, scorecard, bounded revisions, approval checkpoint, in-game check.
+- Today in TypeScript: metrics, verdict, diagnostics, descriptions, docs, inline images, calibration data. Later in the Rust engine: the real layout engine, partial relayout and branch insertion, shared geometry for render and metrics, offset/trigger resolution (section 7.10).
+
+---------------------------------------------------------------------------------------------------
+
+## 2. The supplied tree
+
+### 2.1 Verification of the reported defects against the image
+
+Grid conversion: the game wiki says one x unit is 96 px and one y unit is 130 px (paradox_wiki "National focus modding", Position). The screenshot shows 48 px per x unit and 64.9 px per row (half scale); adjacent siblings are 2 units apart (96 px). [C][M]
+
+| Reported defect | Verified? | Measured evidence (reconstruction, columns relative to root) |
+|---|---|---|
+| Main line descends as a diagonal staircase to the lower left, each generation further left | Yes | Root 0; War Communism -2; Form CHEKA -4; Red Terror -5; The New Economic Policy -8; Found the Soviet Union -12. Heavy-path steps: -2, -2, -1, -3, -4, -1, then 0, +2, 0, 0, +1, -2, +1, +1, 0, 0, 0. Fan-out centres: War Communism children at -4 and -2 (centre -3, parent -2); Red Terror children at -8 and -5 (centre -6.5, parent -5); NEP children at -12, -10, -8, -6 (centre -9, parent -8). |
+| Right branch (Soviet Military Council, Defend the Revolution, five children) short and floating top right, canvas mostly empty | Yes | Council +4, Defend the Revolution +7 (3 columns from its only parent), children +5, +7, +9, +11, +13 (centre +9, 2 columns right of their parent). Subtree height 5 rows of 19. Largest empty rectangle 18 x 13 cells (0.425 of the box). |
+| Children not centred under parents | Yes | Parent-centre offset: mean 0.63 column, maximum 3 (Council to Defend). 2 of 34 parents are off by 2 or more. This metric alone is NOT discriminating: vanilla p90 of the mean is 0.58 to 0.62 and the maximum 0.75. The cumulative drift is what hurts. |
+| Connectors cross and overlap through the five-year-plan section | Partly (as ambiguity, not as perpendicular crossings) | In an orthogonal model the three prerequisites of "Begin the Second Five-Year Plan" (Stabilize the Collective Farms, Set the Plan Targets, Build Magnitogorsk) merge onto one bar; "Set the Plan Targets" has a two-row vertical line running 0.2 column from the plaque of "Stabilize the Collective Farms" (visible in the screenshot). I measure 0 perpendicular crossings in the section and 0 stem-through-node, so the problem is attribution ambiguity (which parent feeds which child), not crossings. [I] |
+| Three columns below the three-way exclusive choice drift apart unevenly | Yes | Left lane x: -13, -14, -14, -14, -14, -14, -13, -12 (staircase right at the end). Middle lane: -11, -11, -11, -10 (Launch the First Five-Year Plan), -10, -10, -10, with a side path Collectivize -12 to Stabilize -11 to Begin the Second Five-Year Plan -10. Right lane: -9, -9, -8, -7, -6, -7, -7, -8 (zigzag). They rejoin at "Consolidate the Plan" (x=-10). |
+| "Consolidate the Plan" joined by a dotted OR line, then a long empty vertical gap to "A New Era: 1936" | Yes | Consolidate the Plan row 16, A New Era row 18: one empty row between a single parent and a single child. Dotted lines are OR groups in game (wiki: OR = several focuses in one `prerequisite` block) [C]. |
+| Employ Tsarist Officers is a leaf wedged between the two main branches | Yes | x=0 between War Communism (-2) and the Council (+4); no children; sits directly under the root. |
+
+Additional observations (screenshot, [M] unless noted): eleven of 58 focuses (19 percent) are leaves; the three exclusive choices have all-to-all links to three parents (visible as one bar) and re-converge at one focus eight rows later, so the exclusivity has no lasting consequence in the drawn graph [I; design judgement, needs a human]; the left lane, the middle lane and the right lane each contain long single-successor chains (7 focuses on the left).
+
+### 2.2 Reconstruction (how the numbers were obtained)
+
+- Node positions: read from the screenshot at 48 px per column and 64.9 px per row, rounded to the grid. All 58 plaques were read; the x of every focus after rounding is in `recon\soviet_reconstruction_positions.json`.
+- Edges: read from the connectors in zoomed crops (`crops\*.png`). Inferred: the three choices each depend on all three parents (AND), the right branch's "Issue Receipts" and "Priority for the Front Depots" depend on the OR pair "Concentrate" / "Dispatch", "Seek Neutral Medical Supplies" on the OR pair of those two, "Begin the Second Five-Year Plan" on three parents, "Consolidate the Plan" on three parents (OR), mutual exclusions on the three choices and the two right-branch pairs.
+- Positions are written as fixed `x`/`y` because the source (and whether it used `relative_position_id`) is unknown.
+- Variants: `soviet_reconstruction.txt` (full), `..._v3.txt` (three choices keep only the same-column parent), `..._v4.txt` (also removes the 2 x 2 OR bundle). v3 and v4 are experiments only (not gameplay-equivalent); they exist because the solver cannot lay out all-to-all bundles under its own gate (section 3.9).
+- Fidelity check: my orthogonal drawing of the reconstruction (`renders\recon_before_ortho.png`) reproduces the screenshot's shape, including the staircase, the floating branch and the bar positions. [M]
+
+### 2.3 What the current diagnostics do on it
+
+Run in-process on the reconstruction with the real 4.6.1 layout and lint code. [M]
+
+| Fired | Count | What it really flagged |
+|---|---|---|
+| `FOCUS_LAYOUT_LINEAR_DETOUR` (warning) | 14 | Single-child chain links with a horizontal jog or a vertical span other than 1: Soviet Military Council to Defend the Revolution (dx 3), Form CHEKA to Red Terror, GOELRO Plan to Electrify the Villages, Left Opposition to Permanent Revolution, Grain Procurement to Launch the First Plan, Expand Voluntary Cooperatives to Cooperative Industrialization, A Workers' Republic to Convene..., Consolidate the Plan to A New Era (vertical gap 2), others. Real but small defects; message says only "uses an unnecessary visual detour". |
+| `FOCUS_LAYOUT_CONNECTOR_CROSSING_UNSATISFIED` and `FOCUS_AVOIDABLE_CONNECTOR_CROSSING` (warnings) | 10 + 10 | All from the 3 x 3 choice bundle and the 2 x 2 right-branch OR bundle under the Bezier model. They cannot be fixed by moving focuses. |
+| Nothing | - | Staircase through multi-child nodes, off-centre fan-outs, mass imbalance, empty canvas, floating branch, wedged leaf, merged bars, the 7-focus chain. |
+
+Why each is invisible: [C][M]
+
+- Staircase: `FOCUS_LAYOUT_STAIRCASE_CHAIN` and `FOCUS_LAYOUT_ZIGZAG_CHAIN` only examine chains where every node has exactly one incoming and one outgoing connector (`fakeComplexityDiagnostics` in `layout.ts`). The spine nodes have two or more children. Mixed patterns such as +, -, - are not flagged either (the code requires all-same or strictly alternating directions).
+- Off-centre fan-outs: `FOCUS_LAYOUT_SIBLING_ASYMMETRY` and `FOCUS_LAYOUT_SIBLING_ANCHOR_DEVIATION` come from `siblingSymmetryDiagnostics`, whose cohorts are built by `automaticSiblingLayout`, which skips every focus whose `position.mode` is not `auto`. With the reconstruction as `fixed`: `siblingCohortCount 0`. With the identical coordinates set to `auto` (preferredX/preferredY equal to the fixed values; run on the v4 variant): `siblingCohortCount 8`, 4 `ANCHOR_DEVIATION` (tool deviation values 2, 2, 3 and 4, covering the root's three children, Form CHEKA/Decossackization, NEP/Confiscation of Grain and the four NEP children) and 1 `ASYMMETRY` (the root's three children). The Ireland inspect result I fetched through the MCP shows the same zeros for a 256-focus fixed tree.
+- Balance: `boundingCenterOffsetTwice` = |minX + maxX| is the only global measure; it is a metric only (no diagnostic code), used as a hard gate only inside compact reflow. Reconstruction: -14 and +13, value 1.
+- Long gaps: `FOCUS_LAYOUT_LONG_CONNECTOR` needs horizontal span above 8, vertical above 4 or Manhattan above 10; the supplied tree's longest connector is 6 columns (Manhattan 7), so none fires.
+- Wedged leaf: `FOCUS_TERMINAL_WITHOUT_PAYOFF` only checks payoff metadata, not where the leaf sits.
+
+Result envelope: `status: "ok"`, `validation.passed: true`, message "Focus source, references, and layout have no blocking diagnostics" (the same envelope I received for the Ireland tree). Only `error` and `blocker` severities block. [C][M]
+
+### 2.4 What the tool's own machinery does on the same graph
+
+All in memory on the reconstruction. Grid-unit metrics are defined in section 7.1. `det` = linear-detour edges.
+
+| Variant | width x rows | fill | empty rect | side bal. | mass skew | det | spine drift | notes |
+|---|---|---|---|---|---|---|---|---|
+| Supplied (reconstruction v1) | 27 x 19 | 0.22 | 0.425 | 0.64 | -0.40 | 13 | -10 | tool: 14 detour + 20 crossing warnings |
+| Tool solver, all positions `auto` (v1) | 18 x 18 | 0.32 | 0.233 | 0.19 | +0.09 | 5 | +3 | 231 ms (33 ms on the v4 variant); 2 ANCHOR_DEVIATION, 1 ZIGZAG, crossing warnings remain (bundles) |
+| Tool compact reflow (v1, v3) | refused | | | | | | | `FOCUS_COMPACT_QUALITY_BLOCKED`, regressions: hardLayoutDiagnostics, connectorCrossingCount |
+| Tool compact reflow (v4, bundles removed) | 18 x 18 | 0.32 | 0.275 | 0.49 | -0.25 | 6 | -6 | 2.6 s; new ZIGZAG and ANCHOR_DEVIATION warnings; spine still drifts |
+| Bounded repair, War Communism subtree selected, root pinned | 27 x 19 | - | 0.40 | - | -0.36 | 7 | - | accepted, 6.2 s, 0 focuses moved outside the selection |
+| Bounded repair, Council subtree (10 focuses) | 20 wide | - | 0.344 | - | -0.295 | 12 | - | accepted, 1.4 s |
+| My prototype: order-preserving relaxation (rows and row order kept, x re-optimised by weighted isotonic regression) | 18 x 19 | 0.31 | 0.316 | 0.50 | -0.25 | 7 | -7 | prototype only, 3 connector-through-node and 1 crossing appear |
+| Same, heavy-path straightening weight | 16 x 19 | 0.34 | 0.281 | 0.47 | -0.23 | 7 | -5 | prototype only |
+
+Reading: [I] the tool's solver is capable of a markedly better arrangement of this graph when it is allowed to place everything; compaction of an existing hand layout and local relaxation only recover part of the imbalance, because most of the problem is that one branch carries 80 percent of the focuses and the right branch is short.
+
+### 2.5 Root causes of the supplied tree's defects (ranked)
+
+1. Coordinates written or kept by hand (fixed), not produced by the solver [I; check the session transcript for `hoi4_focus_rewrite` calls and the source for `relative_position_id`].
+2. No lane or branch plan before placement: the heavy subtree is simply stacked as a spine, each fan-out centred a little off its parent, errors accumulating. [I]
+3. Verification could not see it: mode-dependent symmetry diagnostics, bounding-box centring as the only balance measure, a crossing gate in the wrong connector model, "ok" status with warnings, and no image in the response. [C][M]
+4. The repair tool refuses real trees, so an agent that saw a poor layout had no working one-call fix. [M]
+5. Branch topology (46 of 58 focuses in one subtree, a 5-row side branch, three parallel 8-focus lanes) needs a design decision, not only a layout pass. [M][I]
+
+---------------------------------------------------------------------------------------------------
+
+## 3. Existing tools in code (4.6.1)
+
+### 3.1 Surface and what an agent is told
+
+- `hoi4.focus_inspect`: description "Find focus branches, prerequisites, layout problems and missing references in national trees and continuous-focus palettes. Example: {"treeId":"my_focus_tree"}. Returns counts and the main diagnostics inline; the full report is a linked resource." Inputs: `relativePath`, `treeId`, `previous` (prior layout), `laneSpacing`, `nodeSpacing`, `scenario.completedFocusIds`. Output: counts, `layoutMetrics` (bounds, connectors, spacing, symmetry), top diagnostics, linked JSON artifact. [C][M]
+- `hoi4.focus_render`: "Preview a focus tree or palette with its icons. Export PNG, HTML, SVG and JSON source maps; png:false skips the PNG and cropFocusIds adds close-ups. ... Images are linked artifacts, not inline." Inputs include `horizontalSpacing`, `verticalSpacing`, `reviewScale`, `cropFocusIds` (max 16), `png`. [C]
+- `hoi4.focus_rewrite`: "Create focus trees and continuous-focus palettes, or rearrange existing branches. Use createIfMissing with a complete plan to create content, or layoutMode to arrange an existing tree." Inputs: `layoutMode` authored|compact, `compactFocusIds`, `pinnedFocusIds`, `symmetryGroups` (max 64 groups), `plan`, `createIfMissing`, spacing. [C]
+- The MCP input schema hides the plan: `plan` is `z.unknown().describe('Complete national or continuous focus plan.')` (`schemas/focus-requests.ts`), so the agent sees no field list; it must read `docs/focus.md` and `schemas/focus-plan.schema.json`. The JSON schema carries no descriptions at all (`"description"` count: 1), so nothing explains `fixed` vs `relative` vs `auto`, `preferredX`, lanes or `pinned`. [C][M]
+- Server-level instructions (all of it): "Start with the matching inspect tool; use hoi4.probability_inspect for weights and timing. Find local documentation with hoi4.reference_context, hoi4.reference_search and hoi4.reference_read, and source definitions with hoi4.source_lookup. Rewrite tools edit mod source. Results describe offline source and scenario models, not observed game behavior. Unresolved states are not confirmed coverage." No layout, balance or visual-review guidance. [C]
+- `docs/focus.md` "Create a tree" gives one worked example whose root is `fixed (0,0)` and whose second focus is `relative (0,1)`. It does not show `auto` positions or lanes. It recommends `layoutMode: "compact"` for "a large automatically arranged tree" and for cleanup. [C]
+- Usage evidence: `docs/plans/tool-audit.md` (2026-10-11) found no `focus_*` calls in 304 sampled calls from Chaos Redux transcripts (small sample, before the 4.0.0 argument shorthands). [C]
+
+### 3.2 How positions are resolved
+
+[C] `focus/importer.ts`, `focus/layout.ts` `placeFocus`, `focus/compiler.ts`, `focus/source-update.ts`.
+
+- Import: `relative_position_id` present -> `mode: relative` (offset x,y); `x`/`y` present -> `fixed`; neither -> `auto`. The `offset = { x y trigger }` block is not a known focus key, so it stays raw passthrough and is NOT applied to positions. [C]
+- Layout: `fixed` kept as is; `relative` = anchor's resolved position plus offset, recursively (matches the wiki: relative offsets accumulate and the anchor's own relative position is applied first); missing target -> `FOCUS_LAYOUT_RELATIVE_TARGET_MISSING`; cycles -> `FOCUS_RELATIVE_POSITION_CYCLE` / `FOCUS_LAYOUT_DEPENDENCY_CYCLE`; `auto` placed by the solver (3.3). Nodes are placed in order fixed, relative, previously-placed automatic, new automatic, alphabetical within each group.
+- Output: auto and compact results are written as absolute `x`/`y`. Sidecar `.focus-plan.json` remembers `autoPosition` so a later inspect can restore auto intent (Chaos Redux sidecar: 45 of 45 focuses; Unpublished mod A sidecar: 0 of 103). Neither of the two sidecars in the maintainer's mods defines any `branchGroups` (0 and 0), so the lane machinery is unused in practice. [M]
+- Consequence for vanilla measurement: 13 of 67 vanilla trees raise `FOCUS_LAYOUT_COORDINATE_CONFLICT` / `FOCUS_LAYOUT_VISIBLE_OVERLAP` (both `error`) because conditional `offset` blocks (for example DLC-dependent shifts of `AST_campbells_men`) are not applied. Any quality gate calibrated on vanilla must exclude or resolve these. [M]
+- Style difference: vanilla trees are almost entirely relative (german_focus 436 of 438 focuses, soviet_focus 310 of 311, finnish_focus 165 of 166); the maintainer's mods are mostly fixed (zin: all 99 trees and 4,747 focuses fixed; ireland: 256 fixed; an unpublished maintainer mod: 103 fixed; chaos_redux: 71 of 74 trees fixed-only, 272 of 3,987 focuses relative). The wiki calls relative positioning "preferred" because a whole branch then moves with one edit and `offset` only needs the top focus. [M][C]
+
+### 3.3 The solvers (`focus/layout.ts`, `focus/compact.ts`)
+
+Authored mode (default): [C]
+
+- Per focus in `auto` mode: preferred x = median of parent x (mean for flagged convergence nodes; lane base for roots) plus a sibling-cohort offset `floor(((2i-(n-1))*spacing)/2)` for cohorts with the same parent set; preferred y = max(parent y)+1. Then `availableX` searches outward (32 steps of `nodeSpacing`) for a collision-free column that minimises rendered-curve crossings, then distance, then horizontal span.
+- Post passes: `repairConnectorCrossings`, `refineConnectorQuality` (work budget 7,000,000 units; lexicographic quality score with crossings, node hits, long connectors, linear detours, sibling deviation, spans, column count, centring), `centerFullyAutomaticLayout`.
+- Defaults: `nodeSpacing` 2, lane spacing 8 (lane bases spread symmetrically), lane bounds optional. No tidy-tree subtree packing and no global balance objective beyond bounding-box centring and sibling cohorts.
+
+Compact mode: [C]
+
+- Builds candidate plans from the current layout: scale x by 0.2 to 0.9 (up to 500 focuses: 0.55 to 0.8), compress rows, replace rows by longest-path depth, mirror sibling cohorts around the parent, straighten single-child chains, apply user symmetry pairs; every candidate is re-laid out as `auto` positions with preferred coordinates and scored lexicographically: hard diagnostics, crossings, node hits, too-close pairs, aesthetic diagnostic count, long connectors, asymmetry, anchor deviation, spans, rows, columns, layout hash.
+- Gate: whole-tree compact requires no hard diagnostics, zero crossings, zero node intersections, zero too-close pairs and |minX + maxX| at most 1 (`absoluteCompactRegressions`); bounded compact (`compactFocusIds` set) only requires no regression against the baseline (`relativeCompactRegressions`) and returns `FOCUS_COMPACT_ANCHOR_CONFLICT` when anchors cannot be kept.
+- Rewrites all positions to absolute coordinates; relative chains are lost for selected focuses.
+- Observed cost in TypeScript on this machine (single runs): 2.6 s (58-focus reconstruction, bundles removed), 21.5 s (Estonia, 59), 27.4 s (Iceland, 89), 28.1 s (Unpublished mod A, 103), 49.0 s (USA, 135), 69.6 s (Zin Aenor, 140), 67.6 s (Finland, 166), against 33 to 231 ms for a plain auto layout. [M]
+
+### 3.4 Connector and footprint geometry (`focus/geometry.ts`)
+
+- Constants: horizontal grid 176 px, vertical grid 116 px, node 144 x 76 px; connector = cubic Bezier from parent bottom-centre to child top-centre with control points at mid-height, flattened to 24 segments. The same curve is drawn in the SVG and used for crossing and node-hit tests. [C]
+- In-game: unit 96 x 130 px; in the screenshot a plaque is about 80 px wide at 48 px per unit, i.e. about 1.65 columns wide; connectors are right-angle: stem down from the parent, horizontal bar in the gap just above the child row, stem into the child; dotted for OR groups; red/green arrows between exclusives. [C (wiki), M (screenshot)]
+- Consequences:
+  - `focusNodesVisiblyOverlap` is true only for identical coordinates (|dx|*176 < 144 means dx = 0). Two focuses one column apart do not count as "visibly overlapping" in the tool but overlap in game. The only protection is `FOCUS_LAYOUT_SAME_ROW_SPACING_UNSATISFIED`, a warning (required spacing 2). The maintainer's zin trees have same-row spacing 1 in 31 pairs of `zin_aenor` alone and are only warned. [M]
+  - Render proportions are not game proportions (176:116 versus 96:130), so a render reads about twice as wide as the game relative to row height.
+  - Assumption O1 (mine, used for my "ortho" metrics): stem at the node centre, bar centred in the gap above the child row, node plaque 1.6 columns wide and half a row high. Verified against the supplied screenshot for adjacent rows; NOT verified in game for connectors spanning several rows. [I, partly M]
+- Comparison on vanilla 1.19.3.0 (54 trees without the offset artefact, 8,926 edges): Bezier crossings 766, orthogonal crossings 86; trees with zero Bezier crossings 12 of 54, with zero orthogonal crossings 39 of 54; connector-through-node: 301 (Bezier) versus 199 (orthogonal stem through a plaque). The Bezier model therefore both over-reports (27 trees) and cannot see merged bars. [M under O1]
+
+### 3.5 Diagnostic catalogue (what each measures)
+
+Severity in brackets. Codes taken from `lint.ts`, `layout.ts`, `compact.ts`, `tool-operations.ts`. [C]
+
+Structural (script and graph correctness; mostly error or warning, none about appearance):
+`FOCUS_DUPLICATE_ID`, `FOCUS_PREREQUISITE_OUTER_MALFORMED`, `FOCUS_PREREQUISITE_GROUP_MALFORMED`, `FOCUS_PREREQUISITE_GROUP_DUPLICATE`, `FOCUS_PREREQUISITE_MISSING`, `FOCUS_PREREQUISITE_CYCLE`, `FOCUS_ISOLATED`, `FOCUS_UNREACHABLE`, `FOCUS_MUTUAL_EXCLUSION_CONTRADICTS_PATH`, `FOCUS_MUTUAL_EXCLUSION_MISSING` (reciprocity), `FOCUS_RELATIVE_TARGET_MISSING`, `FOCUS_RELATIVE_POSITION_CYCLE`, `FOCUS_ROUTE_LOCK_IMPOSSIBLE`, `FOCUS_ROUTE_LOCK_REFERENCE_MISSING`, `FOCUS_HIDDEN_WITHOUT_REVEAL`, graph and work budget blockers (`FOCUS_GRAPH_*_BUDGET_BLOCKED`, `FOCUS_LINT_WORK_BUDGET_BLOCKED`, `FOCUS_LAYOUT_*_BUDGET_BLOCKED`), source and rewrite safety (`FOCUS_SOURCE_CHANGED_SINCE_PLAN`, `FOCUS_UNSAFE_*`, `FOCUS_CREATE_REQUIRES_NEW_SOURCE`, `SOURCE_ENCODING_NOT_ROUND_TRIPPABLE`).
+
+Reference and presentation completeness (warning): `FOCUS_ICON_MISSING`, `FOCUS_ICON_REFERENCE_MISSING/PARTIAL`, `FOCUS_ICON_TEXTURE_MISSING`, `FOCUS_LOCALISATION_KEY_MISSING`, `FOCUS_LOCALISATION_REFERENCE_MISSING/PARTIAL`, `FOCUS_FILTER_MISSING`, `FOCUS_GAMEPLAY_REFERENCE_MISSING/PARTIAL`, `FOCUS_BRANCH_MEMBER_MISSING`, `FOCUS_MAJOR_ROUTE_AI_MISSING`, `FOCUS_RUNTIME_REPLACEMENT_UNSAFE`.
+
+Design heuristics (warning, category `design`): `FOCUS_TERMINAL_WITHOUT_PAYOFF` (leaf without payoff, terminalKind, reward or link), `FOCUS_WEAK_DANGLING_BRANCH` (one-parent leaf without payoff), `FOCUS_REPEATED_GENERIC_REWARD` (identical comment-stripped reward bodies).
+
+Geometric, measured in grid units on resolved coordinates:
+
+| Code | Severity | Measures | Notes |
+|---|---|---|---|
+| `FOCUS_DUPLICATE_COORDINATE` (lint) and `FOCUS_LAYOUT_COORDINATE_CONFLICT` (layout) | error | two focuses with the same resolved (x, y) | triggers 13 vanilla trees because `offset` blocks are ignored |
+| `FOCUS_VISIBLE_OVERLAP` / `FOCUS_LAYOUT_VISIBLE_OVERLAP` | error | tool-footprint overlap, equal to identical coordinates | does not see in-game overlap at dx = 1 |
+| `FOCUS_LAYOUT_PARENT_NOT_ABOVE` | error | parent y not smaller than child y | |
+| `FOCUS_LAYOUT_LANE_BOUNDS_VIOLATION` | error | x outside a lane's declared bounds | lanes rarely declared |
+| `FOCUS_LAYOUT_SAME_ROW_SPACING_UNSATISFIED` | warning | two same-row focuses closer than `nodeSpacing` (2) | the only in-game overlap guard |
+| `FOCUS_LAYOUT_MUTUAL_EXCLUSION_SPACING_UNSATISFIED` | warning | exclusive pair closer than `nodeSpacing` | |
+| `FOCUS_LAYOUT_CONNECTOR_CROSSING_UNSATISFIED` (layout) and `FOCUS_AVOIDABLE_CONNECTOR_CROSSING` (lint) | warning | Bezier curves of unrelated connectors intersect | bundles produce unavoidable ones |
+| `FOCUS_LAYOUT_CONNECTOR_THROUGH_NODE` | warning | Bezier passes through an unrelated plaque rectangle | |
+| `FOCUS_LAYOUT_LONG_CONNECTOR` | warning | dx > 8, or dy > 4, or dx+dy > 10 | thresholds loose; the supplied tree's longest is 6 / 2 / 7 |
+| `FOCUS_LAYOUT_LINEAR_DETOUR` | warning | single-parent single-child link with dx != 0 or dy != 1 | also fires for a purely vertical gap of 2 or 3 rows; message gives no target coordinate |
+| `FOCUS_LAYOUT_STAIRCASE_CHAIN` / `_ZIGZAG_CHAIN` | warning | chain of such links whose non-zero horizontal steps are all the same sign / strictly alternate | only mechanically linear chains |
+| `FOCUS_LAYOUT_SIBLING_ASYMMETRY` | warning | sibling cohort (same parent set, `auto` focuses only) whose x values are not mirror-symmetric | computed only for `auto` positions |
+| `FOCUS_LAYOUT_SIBLING_ANCHOR_DEVIATION` | warning | cohort centre differs from parent median / convergence mean / lane base / subtree envelope | computed only for `auto` positions |
+| `FOCUS_COMPACT_SYMMETRY_UNKNOWN`, `_DUPLICATE`, `_CONFLICT` | error (rewrite refusal) | validation of the caller's `symmetryGroups` (pairs around a centre focus: x offset at most 1, same row) | measures requested symmetry, not detected symmetry; conflict when a pair conflicts with pinned positions |
+| `FOCUS_COMPACT_QUALITY_BLOCKED`, `_ANCHOR_CONFLICT`, `_SELECTION_EMPTY/UNKNOWN`, `_LAYOUT_REQUIRED`, `_METRICS_REQUIRED`, `_SOURCE_REQUIRED` | error | compact preconditions and gate | refusal body lists regression names and before/after metrics but no remedy |
+| `FOCUS_LAYOUT_*_UNSATISFIED` (lane bounds, parent order), `FOCUS_LAYOUT_LANE_CAPACITY_BLOCKED`, `FOCUS_LAYOUT_DIAGNOSTICS_TRUNCATED` | mixed | solver could not satisfy a constraint | |
+
+Metrics returned (not diagnostics): bounds (columns, rows), connector counts and spans, crossing and node-hit counts, long-connector count, sibling cohort counts and deviations, `boundingCenterOffsetTwice`, same-row spacing statistics.
+
+### 3.6 Claims in the kit versus what the tool implements
+
+Kit text (`layout-rules.md`): "`hoi4.focus_inspect` and `hoi4.focus_render` report overlapping focus boxes, excessive gaps, cramped spacing, connector crossings, path lines that run through focuses or stretch too far, dangling connectors, bad prerequisite presentation, unbalanced branches, off-center layouts". [C]
+
+| Claim | Implemented? |
+|---|---|
+| overlapping boxes | Only identical coordinates (error). Dx = 1 is not an overlap in the tool. |
+| excessive gaps | No code. Vertical gaps appear only inside `LINEAR_DETOUR` (single-child links) and `LONG_CONNECTOR` (dy > 4). |
+| cramped spacing | Yes, warning (`SAME_ROW_SPACING_UNSATISFIED`). |
+| connector crossings, lines through focuses | Yes, in the Bezier model. |
+| stretch too far | Yes, loose thresholds. |
+| dangling connectors | No code (`FOCUS_WEAK_DANGLING_BRANCH` is about a leaf's payoff). |
+| bad prerequisite presentation | No code. |
+| unbalanced branches | Sibling asymmetry for `auto` cohorts only; no branch or whole-tree mass balance. |
+| off-center layouts | A metric only (bounding box); not a diagnostic. |
+
+### 3.7 Tests and fixtures
+
+- `tests/unit/focus.test.ts` (more than 2,600 lines; the last test starts at line 2,629),`focus-geometry.test.ts`, `focus-compact-async.test.ts`, `tests/acceptance/focus-acceptance.test.ts`, `tests/integration/mcp-large-focus-workflow.test.ts` (1,024-focus create, compact, inspect, render), fixtures `fixtures/focus/**` (synthetic 250-focus acceptance tree, invalid variants). Test names show coverage of: determinism, work budgets, sibling mirror spacing, compact idempotence, linear-chain straightening, pinned/selection stability, crossing reduction. [C]
+- No test uses a vanilla or real mod tree for quality (searching the focus tests for "vanilla" returns nothing), although `docs/specs/02_focus_tree_workbench.md` asks for "local integration tests against a large vanilla tree and at least one external mod workspace". No golden metric values, no calibration data, no visual regression of the review PNG. [C][M]
+- ADR 0004 records that ELK and Dagre were evaluated and rejected because they do not keep stable HOI4 coordinates, route lanes and pinned nodes; the evaluation chose a project-owned layered constraint solver and says long connectors, staircase and sibling balance "are prioritized optimization targets rather than independent rejection budgets". [C]
+
+### 3.8 Rendering
+
+`focus/render.ts`: SVG with curved arrowed connectors (dashed = OR), red dashed lines for mutual exclusions, nodes tinted by diagnostic severity, PNG with decoded icons; large trees (200 or more focuses) default to half scale (Ireland, 256 focuses: 5,872 x 1,626 px PNG); HTML review page with search and zoom; `cropFocusIds` up to 16 close-ups. Results are `resource_link` content, never inline images. [C][M] The look differs from the game (curves, dark theme, proportions), so a model reviewing the PNG judges a different picture from the one in the game.
+
+### 3.9 Behaviour of compact reflow on real trees
+
+Run in-memory with `compactFocusTreePlan(plan)` (the function the MCP rewrite calls first), default options, on real trees: [M]
+
+| Tree | Focuses | Result |
+|---|---|---|
+| vanilla Estonia | 59 | refused: hardLayoutDiagnostics, connectorCrossingCount (21.5 s) |
+| vanilla Iceland | 89 | refused: same (27.4 s) |
+| vanilla USA | 135 | refused: plus connectorNodeIntersections (49.0 s) |
+| vanilla Finland | 166 | refused: plus connectorNodeIntersections (67.6 s) |
+| Unpublished mod A (maintainer mod) | 103 | refused: plus connectorNodeIntersections (28.1 s) |
+| zin_aenor (maintainer mod) | 140 | refused: plus connectorNodeIntersections (69.6 s) |
+| supplied tree reconstruction | 58 | refused (v1, v3); accepted only after removing both bundles (v4) |
+| bounded repair on a branch, supplied tree | 10 and 46 of 58 | accepted, nothing outside the selection moved; modest gain |
+| bounded repair, Estonia branch under its first root child | - | refused `FOCUS_COMPACT_ANCHOR_CONFLICT` |
+
+[I] An agent that follows the documented remedy ("call compact") on a real tree receives an error without a remedy and is pushed back to hand-editing coordinates.
+
+---------------------------------------------------------------------------------------------------
+
+## 4. The agent workflow in the kit
+
+Files read: `.claude/skills/hoi4-focus-trees/SKILL.md` (968 lines) and `references/layout-rules.md`, `completion-rules.md`, `route-design.md`; `.claude/agents/hoi4-focus-tree-auditor.md`; `CLAUDE_template.md` (sections "HOI4 MCP" and 7 "Focus Trees and Large Content"); `.claude/skills/hoi4-feature-planning/SKILL.md` section 3.6 and `references/focus-tree-path-design.md`; `docs/systems/hoi4_agent_tools_mcp_integration.md`; Chaos Redux mirror `.agents/skills/chaos-redux-focus-trees/` (`SKILL.md`, `references/layout-and-navigation.md`; read only, it has uncommitted user edits). [C]
+
+### 4.1 Do agents plan the tree before writing it?
+
+- The planning skill produces a design specification at "path architecture" level (route families, anchors, exclusions, convergence). Section 3.6 allows "a high-level branch diagram, lane map, or route sketch" but says the spec "should not try to lock every final focus coordinate" and that "the implementation agent may adjust the final layout". A diagram is optional; coordinates are explicitly not planned. [C]
+- The implementation skill: "Use path-level design ... The implementation agent owns ... x/y positions ... clean in-game layout, symmetrical branch geometry ... the shortest clean connector path for every prerequisite". [C] There is no step "produce a lane map and row plan, then lay out".
+- Chaos Redux (newer) is stronger: "Give each major branch family a coherent lane or bounded cluster", "Record the route architecture map and intended lane order before final coordinates are accepted", plus a first-glance clarity gate and Focus Navigation anchors. It is still a textual instruction with no artifact schema and no tool-side lane assignment. [C]
+- Tool-side lane support exists (`laneGroups`, `branchGroups`, lane spacing 8, lane bounds) but is not mentioned in `docs/focus.md`'s worked example; the two real sidecars have no branch groups. [C][M]
+
+### 4.2 Are they required to render and visually review?
+
+- Required to run `hoi4.focus_inspect` and `hoi4.focus_render` before and after editing and to "review every returned layout and diagnostic"; "Repeat inspect, render, rewrite, and render until the first-glance branch review passes. One clean render is not completion evidence." [C] The Chaos Redux gate asks to "name every major branch, its visible root, its important fork, and its payoff from the render alone", preferably by a second reviewer.
+- Not required: proof that the image was looked at. The renders are links; nothing says how to open them; the same text allows "if rendering is unavailable, inspect the source layout and state that first-glance visual clarity was not observed" (Chaos Redux) and "source review and local checks can support completion when a tool is unavailable" (template). [C] A model that skips the image leaves no trace.
+- `docs/systems/hoi4_agent_tools_mcp_integration.md` row for focus trees: "Layout and diagnostics are evidence, not a completion claim". [C]
+
+### 4.3 Do they stop when structural checks pass?
+
+- By text: no, "Layout quality is a completion requirement" and 20-plus layout checklist items exist. [C]
+- By mechanism: nothing blocks. Inspect says `ok`; the quick check script (`python -B .tools/check.py quick`) "checks localisation keys, icon and sprite wiring, script syntax ... not route logic or layout"; the auditor agent is Haiku with medium effort and its "Audit for" list contains no layout items (layout appears only under "You may patch"). [C] The weakest link is a small model asked to judge a picture.
+- The kit also contains conflicting pressure: "No overlapping connectors" as an absolute rule while vanilla trees contain merged bars and some crossings (3.4, 6.2), and "use the MCP to find deformities" while the MCP reports a different geometry.
+
+### 4.4 Is there a layout or design rubric?
+
+Prose only. Words used: "compact", "symmetrical", "centered", "balanced", "consistent vertical rhythm", "shortest clean practical path", "no unnecessary ladder". No number appears anywhere (no tolerance for centring, no gap limit, no chain-length limit, no balance limit). The design rules (anti-autopilot chains, dead ends, fake non-linearity, branch ownership) are better specified but also unmeasured. [C]
+
+### 4.5 Gap summary
+
+| Need | Present | Missing |
+|---|---|---|
+| Design before layout | route architecture spec; Chaos Redux lane order note | lane/row plan as data, balance targets, orientation decisions |
+| Deterministic placement | `auto` positions, lanes, compact | docs that steer agents to it; working compact on real trees |
+| Measurable review | tool metrics | balance, empty region, spine, chain length; mode-independent symmetry |
+| Look at the picture | links | inline image, crops per branch, proof of viewing |
+| Gate | prose | verdict in tool output, checkpoint bound to source hash |
+| Auditor | Haiku agent | layout audit duty, scorecard output, stronger model for visual review |
+
+---------------------------------------------------------------------------------------------------
+
+## 5. Three quality categories
+
+### 5.1 Structural correctness (can be proven by a parser)
+
+Definition: the tree loads and means what the design says. Examples (all have codes today): prerequisite cycle, missing prerequisite target, OR/AND inversion (one block with two focuses is OR; two blocks are AND), mutual exclusion that contradicts a path, unreachable focus, missing localisation key or icon, `relative_position_id` target missing, hidden branch without a reveal. In the supplied tree none of these is visible in the screenshot; the tool's structural pass would return ok. Enforcement today: lint (tool) and kit checks.
+
+### 5.2 Visual layout (geometry; mostly measurable, some judgement)
+
+Definition: the arrangement of already-correct focuses can be read at a glance in the game. Examples:
+
+- Staircase and drift of the main line; fan-outs not centred on their parent; side branch floating away from the trunk; large empty rectangles; a leaf wedged between branches; one-column kinks in single-child chains; bundles of connectors merging onto one bar; a vertical line running 0.2 column from an unrelated plaque; sibling subtrees interleaving; focuses closer than two columns in a row (overlap in game); connector lengths. Supplied tree: all of these appear (section 2).
+- Measurable now: duplicates, parent order, spacing, kinks, some crossings. Measurable with new code: balance, drift, empty regions, interleaving, ambiguity, bundle-aware crossings. Needs a viewer: composition (does the shape read as a trunk with branches), whether an intentional asymmetry looks intentional, whether a bundle looks like a spiderweb.
+
+### 5.3 Design quality (does the tree play well and read as the designer's plan)
+
+Definition: the route structure, pacing and identity. Examples from the kit's own rules, with where the supplied screenshot (and measured proxies) touch them:
+
+- Autopilot chains: seven consecutive single-successor focuses on the Left Opposition route (proxy `longestLinearChain` = 7; vanilla 40 to 120 focus trees: median 2, p90 4, max 4). The kit forbids "several consecutive focuses with no choice" without a number.
+- Exclusivity without consequence: three mutually exclusive lanes of about eight focuses each that all converge on "Consolidate the Plan". [I, human judgement]
+- Dead ends and weak leaves: 11 of 58 focuses are leaves (19 percent; vanilla 40 to 120: median 27 percent, so this is not unusual); "Employ Tsarist Officers", "Gulags", "Decossackization" hang without a visible follow-up. Only a human can say whether the reward is a real payoff.
+- Branch ownership: the military branch is disconnected from the rest of the tree after the root. May be intended.
+- Fake non-linearity: detours in single-child chains (measurable: 13 detour edges, vanilla maximum 4 per tree of 40 to 120 focuses).
+- Measured properties of a maintainer tree for contrast (no judgement): Unpublished mod A has one chain of 19 consecutive single-successor focuses and eight parallel chains up to 13 rows (103 focuses, 16 columns x 29 rows).
+- Not measurable by layout tools: reward quality, localisation tone, AI, balance. Out of scope for the layout rubric; the kit's other skills own them.
+
+Rule for tooling: deterministic layout tools arrange and evaluate geometry (category 2) and may expose proxies for category 3 (chain length, leaf ratio, convergence count), but never change prerequisites, rewards or names. A fix for category 3 is a prompt to the agent or human, not an automatic edit.
+
+---------------------------------------------------------------------------------------------------
+
+## 6. Representative trees and calibration data
+
+### 6.1 Selected trees (measured properties only; grid units; `ortho` columns under assumption O1)
+
+Vanilla 1.19.3.0 (selection by size and by rework era, not by community ranking, which I cannot verify): Germany (reworked major), Soviet Union (the same country as the supplied report), USA, United Kingdom, Finland, Portugal; small: Estonia, Iceland, South Africa, Czechoslovakia.
+
+| Tree | Focuses | Width x rows | Fill | Empty rect | Side bal. | Mass skew | Detours per 100 edges | Tool Bezier crossings | Ortho crossings | Positions |
+|---|---|---|---|---|---|---|---|---|---|---|
+| german_focus | 438 | 147 x 20 | 0.30 | 0.20 | 0.26 | +0.15 | 0.5 | 168 | 27 | 436 relative |
+| soviet_focus | 311 | 126 x 18 | 0.27 | 0.18 | 0.03 | +0.03 | 0.8 | 56 | 5 | 310 relative |
+| finnish_focus | 166 | 77 x 9 | 0.47 | 0.09 | 0.10 | -0.06 | 0.0 | 9 | 0 | 165 relative |
+| british_focus | 164 | 76 x 10 | 0.42 | 0.10 | 0.06 | -0.01 | 2.1 | 5 | 5 | 160 relative |
+| usa_focus | 135 | 73 x 9 | 0.41 | 0.17 | 0.10 | -0.06 | 0.0 | 1 | 0 | 132 relative |
+| portuguese_focus | 126 | 66 x 10 | 0.37 | 0.20 | 0.10 | +0.06 | 0.7 | 2 | 0 | 125 relative |
+| czech_focus | 89 | 59 x 7 | 0.42 | 0.13 | 0.07 | -0.06 | 0.0 | 3 | 0 | 88 relative |
+| iceland_tree | 89 | 35 x 10 | 0.49 | 0.16 | 0.15 | +0.11 | 0.0 | 2 | 0 | 84 relative |
+| south_african_focus | 80 | 33 x 8 | 0.59 | 0.09 | 0.01 | -0.04 | 3.2 | 0 | 0 | 73 relative |
+| estonia_tree | 59 | 19 x 10 | 0.59 | 0.08 | 0.00 | 0.00 | 1.3 | 7 | 0 | 57 relative |
+| Supplied (reconstruction) | 58 | 27 x 19 | 0.22 | 0.425 | 0.64 | -0.40 | 18.6 | 10 (bundle) | 0 | fixed |
+
+Maintainer mods (properties only, no judgement):
+
+| Tree | Focuses | Width x rows | Fill | Empty rect | Side bal. | Mass skew | Detours per 100 edges | Tool Bezier crossings | Notes |
+|---|---|---|---|---|---|---|---|---|---|
+| zin_aenor | 140 | 28 x 22 | 0.42 | 0.14 | 0.03 | -0.02 | 3.6 | 4 | fixed; 31 same-row pairs closer than 2 columns; 15 roots |
+| zin_lerendor | 127 | 29 x 16 | 0.53 | 0.10 | 0.09 | 0.00 | 1.2 | 2 | fixed |
+| ireland_focus_tree | 256 | 65 x 27 | 0.29 | 0.13 | 0.24 | +0.16 | 1.1 | 0 | fixed; 23 roots; inspect via MCP: 6 warnings, status ok |
+| ATL_focus | 103 | 16 x 29 | 0.40 | 0.17 | 0.12 | +0.08 | 2.7 | 1 | fixed; one 19-focus chain; 3 long connectors |
+| utopia_manifesto_tree (chaos_redux) | 124 | 59 x 17 | 0.24 | 0.17 | 0.09 | -0.06 | 26.2 | 0 | fixed; 33 linear-detour and 8 staircase diagnostics; opening is a descending diagonal |
+| africa_continental_focus_tree (chaos_redux) | 301 | 102 x 46 | 0.13 | 0.17 | 0.49 | -0.24 | 0.0 | 62 | 164 fixed + 137 relative; 52 node hits; 32 long connectors |
+
+Pictures I generated (orthogonal, in-game-style, not the tool's render): `renders\recon_before_ortho.png`, `recon_toolauto_v1.png`, `recon_v4_toolcompact.png`, `vanilla_usa.png`, `vanilla_soviet.png`, `vanilla_estonia.png`, `vanilla_finland.png`, `vanilla_uk.png`, `vanilla_iceland.png`, `an unpublished maintainer mod.png`, `zin_aenor.png`, `utopia.png`; the tool's own PNG of Ireland downscaled: `renders\ireland_overview.png`.
+
+Observed shape patterns in vanilla (from the drawings): a trunk row fanning to three to six lanes, lanes of 3 to 8 rows with mirrored pairs (Estonia is mirror-symmetric about a central axis), exclusive choices adjacent in one row, merges at lane ends, depth varying by lane. None of the vanilla drawings shows a single diagonal spine. [M]
+
+### 6.2 Calibration distributions (vanilla 1.19.3.0, 67 trees)
+
+Two size buckets: 40 to 120 focuses (26 trees) and 120 to 500 (39 trees). Normalised so they can be compared across sizes. The supplied reconstruction's value is in the last column. [M]
+
+Bucket 40-120 focuses (26 trees):
+
+| Metric | p10 | p50 | p90 | max | min | Supplied |
+|---|---|---|---|---|---|---|
+| fillRatio (nodes / ((w/2+1) x rows)) | 0.37 | 0.46 | 0.58 | 0.59 | 0.35 | 0.22 |
+| largestEmptyRectFrac | 0.07 | 0.13 | 0.18 | 0.30 | 0.07 | 0.42 |
+| sideBalance | 0.03 | 0.11 | 0.24 | 0.34 | 0.00 | 0.64 |
+| abs mass skew | 0.00 | 0.05 | 0.13 | 0.22 | 0.00 | 0.40 |
+| rowCentroidRangeFrac | 0.20 | 0.37 | 0.50 | 0.57 | 0.15 | 0.67 |
+| linear detours per 100 edges | 0.0 | 0.0 | 2.75 | 3.2 | 0.0 | 18.6 |
+| parents with owned children off-centre by 2+ (fraction) | 0.00 | 0.04 | 0.10 | 0.15 | 0.00 | 0.06 |
+| mean parent-centre offset (columns) | 0.12 | 0.34 | 0.58 | 0.75 | 0.10 | 0.63 |
+| ortho overlaps per 100 edges | 0.0 | 1.9 | 14.9 | 42.1 | 0.0 | 11.4 |
+| ortho crossings per 100 edges | 0.0 | 0.0 | 0.75 | 3.49 | 0.0 | 0.0 |
+| stem-through-node per 100 edges | 0.0 | 1.75 | 4.55 | 6.6 | 0.0 | 0.0 |
+| bent-edge fraction | 0.51 | 0.67 | 0.77 | 0.81 | 0.49 | 0.61 |
+| max vertical slack (rows) | 0.5 | 1 | 3 | 4 | 0 | 1 |
+| sibling cohorts on mixed rows (fraction) | 0.00 | 0.10 | 0.20 | 0.26 | 0.00 | 0.00 |
+| interleaved sibling subtrees (fraction of pairs) | 0.00 | 0.00 | 0.00 | 0.05 | 0.00 | 0.00 |
+
+Bucket 120-500 focuses (39 trees): fill p10 0.21, p50 0.30, p90 0.47 (max 0.81, min 0.14); largestEmptyRectFrac p90 0.26 (max 0.48); sideBalance p90 0.34 (max 0.62); abs mass skew p90 0.19 (max 0.41); rowCentroidRangeFrac p90 0.57 (max 0.68); detours per 100 edges p90 1.59 (max 2.13); ortho crossings per 100 edges p90 4.65 (max 7.8); stem-through-node per 100 edges p90 6.19 (max 22.1); max vertical slack p90 5.2 (max 7); mixed-row cohorts p90 0.33 (max 0.52); interleaved sibling subtrees p90 0.01 (max 0.16).
+
+Design proxies (vanilla 40-120): longest single-successor chain min 1, median 2, p90 4, max 4; leaf fraction median 0.27, p90 0.36, max 0.41; maximum fan-out median 4, p90 5.5, max 6; convergence nodes median 12; exclusive focuses median 14.5. Supplied: chain 7, leaves 0.19, fan-out 5, convergence nodes 8, exclusive focuses 7. [M]
+
+Findings from calibration:
+
+- Metrics that separate the supplied tree from vanilla: largestEmptyRectFrac, sideBalance, abs mass skew, fillRatio (low), rowCentroidRangeFrac, linear detours per 100 edges, longest chain. [M]
+- Metrics that do NOT separate it (so they must not carry the verdict alone): parent-centre offset (mean, fraction of off-centre parents), bent-edge fraction, mean edge length, crossings and merged bars (vanilla has them), heavy-spine drift and same-direction runs (vanilla p90 run drift 11 columns, run length up to 8; the supplied run is 13 columns over 6 steps). [M]
+- The kit's "no overlapping or intersecting connectors" rule is stricter than vanilla: 15 of 54 vanilla trees have orthogonal crossings and most have merged bars. A hard zero rule is only defensible for agent-made trees with an explicit "intentional bundle" exemption.
+- Vanilla also breaks the tool's hard gates because of `offset` blocks (13 trees with duplicate coordinates); and breaks `FOCUS_LAYOUT_CONNECTOR_CROSSING_UNSATISFIED` in 55 of 67 trees (1,995 occurrences), `CONNECTOR_THROUGH_NODE` in 59 (1,577), `SAME_ROW_SPACING_UNSATISFIED` in 14 (274), `LONG_CONNECTOR` in 45 (282), `LINEAR_DETOUR` in 52 (228). [M]
+
+---------------------------------------------------------------------------------------------------
+
+## 7. Proposals
+
+### 7.1 Layout quality rubric (measurable)
+
+Definitions use resolved integer grid coordinates (after `relative_position_id` chains and, once implemented, `offset` blocks under a declared DLC context). n = focuses, E = prerequisite links. Node footprint for geometry = 1.6 columns x 0.5 row (assumption O1; to be confirmed in game).
+
+Class H = hard, blocks a "pass" and (for new or rewritten trees) a commit. Class S = soft, scored against vanilla. Class D = design proxy, always routed to review. Limits are starting values from section 6.2: "review" = beyond bucket p90, "revise" = beyond bucket maximum.
+
+| # | Metric | Definition | Class | Review limit (40-120 / 120-500) | Revise limit (40-120 / 120-500) | Supplied |
+|---|---|---|---|---|---|---|
+| H1 | duplicate coordinate | two focuses with the same resolved (x, y) after offsets | H | 0 | 0 | 0 |
+| H2 | parent not above | parent y >= child y | H | 0 | 0 | 0 |
+| H3 | in-game overlap | same-row distance below 2 columns, or footprints intersect (plaque 1.6 wide) | H for new/rewritten trees | 0 | 0 | 0 |
+| H4 | connector through plaque | orthogonal stem passing within 0.8 column of an unrelated plaque, not counting bundles | H for new trees (S for vanilla-like) | per-100 p90: 4.6 / 6.2 | max 6.6 / 22 | 0 |
+| H5 | perpendicular crossing | stem of one connector crossing the bar of an unrelated connector (neither shares a parent or child) | S, target 0 for new trees | 0.75 / 4.65 per 100 edges | 3.5 / 7.8 | 0 |
+| S1 | largest empty rectangle | largest empty axis-aligned rectangle in the bounding box / box area | S | 0.18 / 0.26 | 0.30 / 0.48 | 0.425 |
+| S2 | side balance | abs(L - R)/(L + R), nodes left and right of the bounding-box centre | S | 0.24 / 0.34 | 0.34 / 0.62 | 0.64 |
+| S3 | mass skew | abs(mean x - box centre) / (width / 2) | S | 0.13 / 0.19 | 0.22 / 0.41 | 0.40 |
+| S4 | fill ratio (low) | n / ((floor(width/2)+1) x rows) | S | below 0.37 / 0.21 | below 0.35 / 0.14 | 0.22 |
+| S5 | row-centroid wander | range of per-row mean x / width | S | 0.50 / 0.57 | 0.57 / 0.68 | 0.67 |
+| S6 | linear detours | single-parent single-child links with dx != 0 or dy != 1, per 100 edges | S | 2.75 / 1.6 | 3.2 / 2.1 | 18.6 |
+| S7 | branch interleaving | pairs of exclusive sibling subtrees whose x ranges overlap on a shared row / pairs | S | 0.00 / 0.01 | 0.05 / 0.16 | 0 |
+| S8 | cohort off-centre | per fan-out cohort: abs(cohort centre - parent x) in columns; reported per cohort, not in the verdict | S (local) | 2 or more | 3 or more | 3 cohorts |
+| S9 | merged-bar ambiguity | unrelated connectors sharing a bar segment of 1+ column (excluding declared bundles) per 100 edges | S | 14.9 / 23 | 42 / 51 | 11.4 (all from declared bundles) |
+| S10 | vertical slack | y(child) - max y(parent) - 1, maximum | S | 3 / 5 | 4 / 7 | 1 |
+| S11 | cohort mixed rows | sibling cohorts whose members sit on different rows / cohorts | S | 0.20 / 0.33 | 0.26 / 0.52 | 0 |
+| D1 | longest single-successor chain | consecutive focuses with one parent and one child | D | 4 | 4 (small) | 7 |
+| D2 | leaf fraction | leaves / n | D | 0.36 | 0.41 | 0.19 |
+| D3 | exclusive choice with full convergence | exclusive set whose members all reach the same later focus within k rows | D | flag | flag | yes |
+| D4 | single-column dominance | share of focuses in the widest 3 columns, or height/width | D | flag when rows > 2.5 x width/2 | | no |
+
+Notes:
+
+- H1 to H3 must be evaluated with in-game footprints, not the tool's 144/176 footprint. H3 currently exists only as a warning.
+- Do not use heavy-spine drift or same-direction run length as a verdict input: they do not separate the supplied tree from vanilla (6.2). Use them as a locator for "where to look" (they point at the first six rows here).
+- Normalise by size bucket (n 40-120, 120-500) or by continuous interpolation of the percentile curves. Trees below 40 focuses: review limits only, no revise limits (too few vanilla trees: 2 below 30).
+- Bundles: a bundle is a set of at least 2 parents and at least 2 children with all-to-all prerequisite links, or an OR group. It is drawn as one bar in game and must be excluded from H5 and S9 and from the compact gate. The supplied tree has a 3 x 3 and a 2 x 2 bundle.
+- Per-branch evaluation: run S1 to S7 on each lane (branch) and on the whole tree; report the worst lane.
+
+### 7.2 Verdict and scorecard returned by inspect and rewrite
+
+- `layout.verdict`: `blocked` (any H), `revise` (any S beyond its revise limit, or three or more S beyond review), `review` (one or two S beyond review limit, or any D flag), `pass`.
+- `layout.scorecard`: list of metric rows `{id, value, reviewLimit, reviseLimit, vanillaP50, status, where (focus ids or cell), fix}`, sorted by severity, at most 12 rows inline; full list in the artifact.
+- `layout.score` (0 to 100) only as a convenience for before/after: 100 minus weighted excess over the review limits, capped; the verdict is authoritative. Weights are data in a calibration file, not code.
+- Response wording must change: `status: ok` stays, `validation` message becomes "structure ok; layout verdict: revise (6 metrics beyond vanilla range); not evaluated: gameplay balance, visual review", so "ok" cannot be read as "done".
+- For the supplied tree (reconstruction): verdict `revise` (largest empty rectangle, side balance, mass skew, row-centroid wander, linear detours and fill all beyond the revise limit for 40-120 focus trees; chain length 7 flags D1). Only the supplied tree is labelled; no other tree is.
+
+### 7.3 What needs human or model visual review (metrics cannot decide)
+
+- First-glance branch identity: can every major family be named from the render alone (the Chaos Redux gate). Metrics give lanes and cohesion only if lanes were declared.
+- Whether an asymmetry is intentional and looks intentional (a short side branch hanging off the trunk can be a design choice; S1 to S3 are triage, not verdicts, as vanilla Indonesia and Belgium show when they exceed p90).
+- Whether a bundle or a merged bar reads clearly or as a spiderweb.
+- Composition: does the whole tree read as a shape (trunk, branches, payoffs) rather than a ribbon.
+- Convergence and choice meaning (D3): needs the design brief.
+- Icon, name and palette identity per branch.
+- Agreement of the offline render with the game (connector shapes, proportions): needs one in-game screenshot per project and tree.
+
+Process rule: metrics rank and locate; a reviewer (the agent's own multimodal pass on inline crops, a second independent model pass, or the human at the Visual review checkpoint) judges. The tool never calls a model; it supplies images, crops and a fixed question list.
+
+### 7.4 Layout scoring and before/after comparison
+
+- Every `focus_rewrite` result returns `layoutDelta`: `{verdictBefore, verdictAfter, scoreBefore, scoreAfter, improved[], regressed[], movedFocusIds[], unmovedHash, prerequisiteHash, mutualExclusionHash, sourceBytesChanged}`. `unmovedHash` is a hash of (id, x, y, relative anchor) of every focus not selected; `prerequisiteHash` proves gameplay relations are unchanged.
+- `focus_inspect` accepts `previous` (exists) and returns the same delta against it.
+- Render: overlay mode that draws moved focuses and the connectors of changed edges in a highlight colour, side-by-side before and after at identical scale.
+
+### 7.5 Clearer fix recommendations in diagnostics
+
+Add `details.fix = {action, targetFocusIds, suggested, expectedMetricChange, preservesGameplay: true}` to every layout diagnostic, and short imperative messages. Examples derived from the supplied tree:
+
+- Cohort off-centre: "Fan-out under war_communism (x=-2): children form_cheka (-4) and decossackization (-2) are centred at -3. Move both subtrees by +1 column (to -3 and -1) or move war_communism to -3. Moves 36 focuses." (today: no diagnostic for fixed positions; for auto: "is offset from its structural anchor".)
+- Linear detour: "soviet_military_council -> defend_revolution is a single-child link 3 columns wide. Place defend_revolution at x=4 (under its parent) together with its five children (shift by -3)." (today: "uses an unnecessary visual detour".) Pure vertical gaps get "close the 1-row gap by moving consolidate_plan's child up one row", not "detour".
+- Empty region: "An 18 x 13 cell rectangle (42 percent of the canvas) is empty at columns 0 to 17, rows 6 to 18. The soviet_military_council branch (10 focuses, 5 rows) hangs at the top right. Options: lengthen it, move it under war_communism's lane, or recentre the trunk on the heavier subtree (46 of 58 focuses)." Locator only; the choice is a design call.
+- Compact refusal: replace the bare `FOCUS_COMPACT_QUALITY_BLOCKED` with the blocking items: "3 x 3 bundle (codify_constitution, lenin_testament, rebuild_transport -> three choices) cannot be uncrossed; declared as bundle and ignored" (after the bundle rule) or "move X out of Y" if a real crossing remains.
+- Same-row spacing: "x gap is 1 column; the in-game plaque is about 1.65 columns wide, so they overlap. Spread to 2".
+
+### 7.6 Branch grouping and hierarchy
+
+- Make the lane plan a first-class, short artifact: ordered list of branches `{id, label, role (trunk | political | industry | military | diplomacy | expansion | special | capstone), lane order, row start, intended width, exclusive-with, converges-at}` written at design time (existing `branchGroups`/`laneGroups` carry most of this; add `rowStart` and `intendedWidth`). Agents assign each focus a `branchId`; the solver keeps each branch inside its lane band (lane bounds exist) and the metrics evaluate cohesion.
+- Metrics: branch cohesion (share of a branch's focuses inside its band), branch-interleaving (S7), trunk alignment (branch root centred over its band), lane order equals plan order, row rhythm (branch roots on the same row), cross-branch connectors (count, limit) and navigation anchor presence (the kit already requires anchors for large trees).
+- Hierarchy levels as a convention checked by the metrics: opening trunk, branch roots (rows 1 to 3), choice rows (exclusives adjacent in one row, spacing 2), lane body, convergence rows, capstone. Vanilla shows branch roots on a common row and exclusives adjacent.
+- Requirement: trees above about 40 focuses need a lane plan; below that the plan is optional.
+
+### 7.7 Partial-tree layout editing and constraint-aware placement of new branches
+
+Goal: add or repair a branch without moving anything else, keep gameplay relations and the source diff small.
+
+Existing support [C][M]: `compactFocusIds` plus `pinnedFocusIds` keeps everything outside the selection fixed (0 moved in my two runs); writes only changed `x`, `y`, `relative_position_id` scalars through targeted byte replacements; refuses with `FOCUS_COMPACT_ANCHOR_CONFLICT` when anchors cannot be kept. Weaknesses: converts selected relative chains to absolute coordinates; no insertion planning; quality of the result is whatever the compact candidates give; refusal gives no remedy; 1.4 to 12.6 s per call in TypeScript.
+
+Proposed behaviour (engine-side, same MCP names; new optional fields on `focus_rewrite`):
+
+1. `placement: { newFocusIds | branchId, attachTo, preferSide, allowShift }` for new branches.
+2. Subtree layout in isolation (tidy tree on the new branch only) to get relative offsets.
+3. Corridor search: compute free column intervals per row from existing plaques (1.6 wide plus 0.4 margin) and existing orthogonal connectors; candidate anchor positions near `attachTo` in a deterministic order; cost = connector length + side-balance change + crossing and merged-bar penalties; hard constraints: H1 to H3, no new crossing, parent above child.
+4. If no corridor exists: return `needsRoom` with an explicit shift proposal (which block moves, by how many columns, which focuses change coordinates); applied only with `allowShift: true` (a Factory checkpoint) so stable coordinates are the default.
+5. Output new focuses as `relative_position_id` of the branch anchor (the wiki's "preferred" style), so later moves are one-line edits and the source stays vanilla-like.
+6. Guarantees returned and tested: unchanged hash of untouched focuses, unchanged prerequisite and exclusion hashes, source diff limited to the new focuses and any approved shifts, deterministic result, idempotent second call.
+7. Repair mode for an existing weak branch: `compactFocusIds` for the branch, `pinnedFocusIds` for trunk and neighbours, order-preserving coordinate optimisation (convex, row order kept, my prototype in `proto_layout.mjs`) so visual topology is stable, with isotonic projection to enforce spacing.
+
+### 7.8 Previews, revision loops, large trees
+
+- Previews: render returns an inline downscaled overview (longest edge about 1,500 px) and per-branch crops as image content blocks, in an in-game-faithful style (right-angle connectors, in-game proportions, plaque size, red/green exclusion marks, dotted OR), with the focus ids printed small. A no-icon schematic mode is enough for layout review and is cheap.
+- Crops: `cropBranchIds` and `cropRegion` in addition to `cropFocusIds` (limit 16); auto-crop the worst scorecard items.
+- Revision loop contract: after each rewrite the tool returns `layoutDelta`; the agent must name the metric it targets; stop after 4 automatic iterations or when the score improves by less than 5 percent twice, then raise the Visual review checkpoint.
+- Large trees (vanilla 300 to 450 focuses; Ireland 256 renders 5,872 px wide at half scale and is unreadable as one image): evaluate per lane, show a minimap with lane labels, tile at fixed pixel budgets, and report the scorecard per lane first. Vanilla Germany (147 columns) and Soviet (126 columns) are the reference shapes.
+
+### 7.9 Better tool descriptions (draft text)
+
+Current descriptions state the verbs only. Draft replacements (each stays about the same length; examples kept; the plan schema gets field descriptions):
+
+`hoi4.focus_inspect`: "Check a national focus tree: structure (references, prerequisites, exclusions) and layout quality. Returns blocking errors, a layout verdict (pass, review, revise, blocked) with the metrics behind it, and a fix for each item. A tree is not finished while the verdict is revise or blocked, and structure ok never means the layout is good. Example: {"treeId":"my_focus_tree"}."
+
+`hoi4.focus_render`: "Render the tree as an in-game-style picture (right-angle connectors, game proportions) plus per-branch crops, returned inline. Look at it before judging layout: metrics cannot see composition. Example: {"relativePath":"common/national_focus/my_tree.txt","treeId":"my_focus_tree"}."
+
+`hoi4.focus_rewrite`: "Create or change a focus tree. For new trees give branches (lanes) and use position mode auto so the solver centres, spaces and balances branches; hand-written x/y is for exact anchors only. layoutMode compact repairs an existing layout; set compactFocusIds and pinnedFocusIds to change one branch and keep everything else in place. Never changes prerequisites or rewards. Returns the layout delta."
+
+Server instructions (add one sentence): "For focus trees: plan lanes first, place with auto positions, render and look, check the verdict, revise only the failing branch."
+
+Plan schema descriptions: `position.mode`: "fixed = exact grid coordinate; relative = offset from another focus (moves with it); auto = solver places it, optionally near preferredX/preferredY. x unit is about half a plaque width: neighbouring plaques are 2 apart; a child directly below its parent has the same x." `branchId`, `laneId`: "branch family; the solver keeps a lane in one column band".
+
+`docs/focus.md`: replace the fixed/relative sample with an `auto` + lanes sample; add a "Layout workflow" section (plan, place, render, scorecard, revise, approve) and a table of the verdict metrics.
+
+### 7.10 TypeScript now versus the Rust engine
+
+The shared Rust HOI4 engine is planned to host "focus layout evaluation and placement" (decision FR-3 row, architecture draft section 07); agent-tools tools move onto it one at a time behind the same names with existing tests as regression suite. Proposed split:
+
+| Item | Today (TypeScript, agent-tools 4.x) | Wait for / move into the Rust engine |
+|---|---|---|
+| Metrics and verdict | Yes: add `layout.verdict`, `layout.scorecard`, the S/D metrics and the calibration file; compute on resolved coordinates for every position mode. Cheap (linear to quadratic in n; empty-rectangle is O(W x H)). | The Rust port reproduces them from the same golden vectors; Factory UI uses the same crate. |
+| Mode-independent sibling and anchor diagnostics | Yes (a few lines: build cohorts for all modes). | - |
+| Orthogonal connector model in metrics | Yes as a second set of metrics next to the Bezier ones (assumption O1, verified in game first). | Single shared geometry module for render and metrics; retire Bezier. |
+| Bundle detection and bundle-aware compact gate | Yes (graph test). | - |
+| Fix hints and diagnostic wording | Yes. | - |
+| Tool descriptions, schema descriptions, docs, server instruction | Yes. | - |
+| Inline image content and crops | Yes (sharp is already used). | In-game-faithful renderer shared with GUI renders. |
+| Vanilla calibration fixtures and tests | Yes (data plus tests; the TS tests become the Rust regression suite). | - |
+| `layoutDelta` and untouched-hash guarantees | Yes for the existing bounded compact path. | - |
+| `offset` / trigger resolution | Minimal: read `offset` blocks and apply them for a declared DLC set to stop false errors. | Proper trigger evaluation with the game-state context. |
+| Real layout algorithm (tidy-tree plus layered constraint optimisation, lane bands) | No: do not extend the TS candidate-scoring pipeline (21 to 70 s on 59 to 166 focuses). | Yes: deterministic Rust implementation, milliseconds, incremental. |
+| Corridor-based insertion and shift proposals | Prototype only. | Yes: needs fast incremental contours and conflict queries. |
+| Large-tree tiling and minimap | Simple crops. | Yes. |
+| Order-preserving coordinate optimiser | Prototype in research folder only. | Yes (convex solve with isotonic projection per row). |
+
+Rule: ship measurement, guidance and verdict first (they unblock the agent workflow and define the contract), keep solver upgrades for the engine so the contract does not change twice.
+
+### 7.11 Things not to do
+
+- No separate focus MCP (requirement).
+- No automatic edits to prerequisites, rewards, names or icons for visual reasons (the tool docs already say so); design findings go back to the agent or human.
+- Do not make soft metrics hard gates on vanilla-like trees; vanilla itself exceeds p90 by construction and has crossings.
+- Do not use model calls inside the tool. Reviews that need a model run in the agent or in HOI4 Factory with their own budgets.
+- Do not claim in-game truth from the offline render ("Results describe offline source and scenario models" already says so); keep the in-game check as its own evidence rung.
+
+---------------------------------------------------------------------------------------------------
+
+## 8. Proposed agent workflow and where each step is enforced
+
+Enforcement kinds: SKILL = skill or agent text (soft); TOOL = tool response or refusal (hard to ignore); LIST = completion checklist item; FACTORY = HOI4 Factory checkpoint (hard). Checkpoint names are from the proposed autonomy spec (`docs/08-expansion-research/04-autonomy-modes.md`: Intake consultation, Design brief, Visual review, Plan, Diff, Commit, Merge, Publish). Those documents are proposals, not accepted decisions.
+
+| Step | What the agent does | Output artifact | Enforced by |
+|---|---|---|---|
+| 1. Establish the design | Intake questions and the design brief: purpose, country identity, route families, opening choices, size, which branches are mandatory, ideology and route plausibility rules from the kit | Design brief (existing P12) | FACTORY Design brief checkpoint (ask in semi-autonomous and human-in-the-loop; notify in fully autonomous); SKILL (existing route rules) |
+| 2. Plan branches and progression | Write the lane plan: ordered branches with role, row start, intended width, exclusive-with, converges-at, navigation anchors; pick orientation of the heavy branch (centre it, put short branches at the sides); declare bundles | Lane plan (`branchGroups`/`laneGroups` in the sidecar plus a one-screen table) | SKILL (new step), LIST ("lane plan attached"), TOOL (lane plan checked against layout: cohesion, order, interleaving), FACTORY Plan checkpoint |
+| 3. Define prerequisites, choices, convergence | Prerequisite blocks (OR/AND), exclusives, route locks, convergence and capstones; mark bundles and intentional asymmetries | Plan JSON | TOOL (structural diagnostics, `scenario` completed-focus inspection), SKILL (kit rules), LIST |
+| 4. Initial layout | Place with `auto` positions and lanes through `focus_rewrite`; use hand-written coordinates only for named anchors | Source and sidecar | SKILL, TOOL (docs and sample show auto; a rewrite that sets more than a small fraction of fixed positions returns an info diagnostic naming the cheaper path) |
+| 5. Render | `focus_render`: inline overview and per-branch crops, in-game style | Images with hashes | TOOL (images are inline, so skipping them is a visible choice), SKILL ("look before you judge"), LIST (crop ids viewed) |
+| 6. Evaluate against the rubric | Read the scorecard; answer the fixed visual questions (name every branch from the render alone, point at the root and payoff of each, mark ambiguous focuses) | Scorecard plus visual review note | TOOL (`layout.verdict` in every inspect and rewrite response, wording that says "layout not good" when revise), SKILL, LIST ("verdict, scorecard and visual note attached") |
+| 7. Revise | Change only what the metric names: bounded relayout with `compactFocusIds` and pins, or the branch-level fix; record which metric each iteration targets; at most 4 automatic iterations or two stalled ones | `layoutDelta` per iteration | TOOL (delta with moved ids and unmoved hash; refusal bodies with remedies), SKILL (iteration cap), FACTORY (stagnation raises the Visual review checkpoint) |
+| 8. Validate structure and gameplay | Structural lint, reference closure, kit checks, probability audit for weights, scenario inspection (completed-focus sets), kit audit agents | Check outputs | TOOL (existing lint), kit checks, FACTORY (Diff checkpoint and finding delta) |
+| 9. Present for approval when the autonomy mode requires it | Show before/after renders, scorecard delta, moved focus list, lane plan; the user may drag a node or ask for changes | Visual review package bound to the proposal hash | FACTORY Visual review checkpoint (ask for semi-autonomous and human-in-the-loop, notify for fully autonomous; owners can add a rule "always ask for focus tree layouts"); it cannot be passed if the latest scorecard is `blocked` or not bound to the final source hash |
+| 10. In-game verification | Capture the tree screen in game (user-operated test card or HOI4 Live Tools screenshot), compare with the offline render, record build and DLC; confirm connector geometry and spacing assumptions once per project | Game evidence (separate rung from static checks) | FACTORY (evidence kind recorded; absence shown as "not verified in game"), LIST; HOI4 Live Tools `hoi4_screenshot` exists but I found no documented command that opens the focus tree screen [U] |
+
+"Agents must not stop because structural checks pass": enforced in four places. (a) TOOL: inspect and rewrite responses always carry a layout verdict; the validation message never says "no blocking diagnostics" alone. (b) TOOL: `status ok` plus verdict `revise` returns a `nextActions` list (the failing metrics and the one-call remedies). (c) LIST: the kit's completion rules add "layout scorecard with verdict pass or an approved review exception, render viewed, before/after numbers". (d) FACTORY: a job cannot enter `in_review` for a focus change unless a scorecard artifact exists for the final source hash and its verdict is not `blocked`; `revise` requires either another iteration or an explicit human exception recorded at the Visual review checkpoint.
+
+Kit changes implied (kit text is the maintainer's; this is a proposal): replace the slogan list in `layout-rules.md` with the rubric table and the workflow above; move "who judges the picture" from the Haiku auditor to a stronger model or to the human checkpoint; keep Haiku for mechanical coverage tables; require the lane plan before coordinates (Chaos Redux wording, but as an artifact).
+
+---------------------------------------------------------------------------------------------------
+
+## 9. Test plan
+
+1. Metric unit tests (TypeScript now, same vectors for Rust later): synthetic mini-trees with hand-computed values for each metric; invariants: translation invariance, mirror invariance (left-right flip keeps all balance metrics' absolute values), row shift invariance, determinism, order independence of input.
+2. Calibration corpus and data: store the vanilla measurements (the 67 trees, game version 1.19.3.0, file hashes) as `focus-quality-calibration.json` with percentile tables per size bucket; a test recomputes them from the installed game when available (skipped otherwise, marked unavailable with the reason) and fails when the stored file drifts. Re-run on each game update. Use half the trees to fit limits and half to check false-positive rates (target: at most 10 percent of held-out vanilla trees at `review`, at most 3 percent at `revise`; vanilla is not claimed to be flawless).
+3. Supplied tree: publish the reconstruction as a fixture (it is derived from a maintainer-supplied screenshot; confirm they accept that) and replace it with the real source once located. Assertions: today's tool returns `ok` with 14+20 warnings and no balance finding; the new scorecard returns `revise` with S1 to S6 flagged; after the proposed workflow (lane plan, auto placement, bounded repair) the verdict is `pass` or `review` with S1 to S3 within p90 for the 40-120 bucket, gameplay hashes identical (prerequisites, exclusions, ids). Measured baselines to beat (tool auto layout on the same graph): empty rect 0.233, side balance 0.19, skew +0.09, detours 5 (the detour count still exceeds the vanilla maximum, so some chain kinks need a lane-aware fix).
+4. Real-tree regression: run scorecard, bounded repair and branch insertion on the ten selected vanilla trees and the maintainer mods; assertions: untouched focus coordinates identical, source diff limited to coordinates of selected focuses, idempotence, determinism across Windows, macOS and Linux (layout hash equal), runtime budget (target under 1 s for 150 focuses in the Rust engine; the TypeScript compact today takes 21 to 70 s).
+5. Compact gate behaviour: fixtures with all-to-all bundles must not be refused for the bundle alone; fixtures with a real avoidable crossing must still be refused with a remedy in the body; the six real trees that were refused today must be accepted (or return a precise "nothing to improve").
+6. Geometry truth: collect in-game screenshots (maintainer-operated or via HOI4 Live Tools) for: a multi-row connector, a same-row spacing of 1 and of 2, an exclusive pair, an OR group; compare to the model (bar height, stem column, plaque width). Until done, orthogonal metrics are advisory.
+7. Human review calibration: blind ratings by the maintainer on 15 to 20 trees (the supplied one, 4 to 6 vanilla, mod trees, and generated before/after pairs) on a 3-point scale (weird, acceptable, good); correlate with the verdict (Spearman) and adjust weights and limits; record disagreements (metrics high but liked, metrics low but disliked) as new test fixtures. Human review stays the arbiter where metrics cannot decide (7.3).
+8. Agent workflow evaluation (live providers per project rules, spend recorded): 5 to 8 prompts (new 40-focus branch, new 100-focus tree, repair of the supplied tree, add a branch to an existing tree) run with the old skill and tool and with the new; measure verdict distribution, iterations, images viewed (crop ids cited), token and money cost, stalls; faults that cannot be produced on demand are injected into recorded real responses and labelled recorded-real replay.
+9. Honest-failure tests: inline image missing, tool unavailable, verdict `blocked`: the agent must report the limitation and not claim completion (kit "simplifications and blockers are reported").
+10. Property fuzz: random edits (add branch, delete leaf, swap siblings) never produce hard defects when the placement API reports success; the shift proposal lists every moved focus.
+
+---------------------------------------------------------------------------------------------------
+
+## 10. Questions for the maintainer, risks and limits
+
+Questions (to resolve before implementation):
+
+1. Where is the real source of the supplied tree, and which tool calls produced it (session transcript)? This settles whether root cause 1 (hand-typed coordinates) or a solver result is right. [I]
+2. Can you provide one or two in-game screenshots to fix the connector and footprint model: a multi-row connector, two same-row focuses 1 column apart, an exclusive pair, an OR group?
+3. Should new agent-made trees use absolute coordinates (current compile output) or `relative_position_id` anchors per branch (vanilla style, wiki "preferred")? I recommend anchors per branch; it changes the sidecar and partial-edit design.
+4. Policy: are soft metrics advisory (verdict `review`, proceed) or gating (`revise` blocks commit) in fully autonomous mode? I recommend advisory for `review`, gating for `revise` and `blocked`, with a recorded human exception.
+5. Accept vanilla-calibrated limits as defaults, with per-project override? Which trees count as your quality references besides vanilla (you named zin, ireland, an unpublished maintainer mod, chaos_redux; I used them only as comparison data)?
+6. Which model should do the second-pair visual review in autonomous mode (the auditor is Haiku today)?
+7. Willingness to supply 15 to 20 blind tree ratings for calibration (test plan item 7).
+
+Risks and limits of this study:
+
+- Reconstruction accuracy about +/-0.5 column; edges inferred; the real tree may use relative positions, which would change the repair story but not the measured geometry.
+- Orthogonal model O1 is inferred from one screenshot; multi-row bar placement and plaque footprint are unverified in game. Any threshold derived from orthogonal metrics is provisional. The Bezier-versus-orthogonal comparison on vanilla depends on O1.
+- Vanilla `offset` blocks are ignored by the tool and by my measurements; 13 trees show artefact overlaps; I kept them out of crossing statistics and left them in the shape statistics.
+- "Well-regarded" vanilla trees could not be verified; I selected by size and era. Vanilla includes trees that sit beyond p90 on several metrics, so metrics are triage, not truth.
+- Timings are single runs on this Windows machine, TypeScript in Node, with the disk nearly full (8 GB free); relative scale is reliable, absolute values are not.
+- The prototypes (order-preserving relaxation) are experiments to size the potential gain (fill 0.22 to 0.31-0.34, empty rectangle 0.42 to 0.28-0.32); they introduce connector hits and are not proposed code.
+- Design-quality judgements in section 5.3 are mine from one screenshot and need the maintainer's confirmation.
+- The kit documents pin agent-tools 4.0.3 while the runtime is 4.6.1; guidance text must be aligned with the version actually installed.
+
+---------------------------------------------------------------------------------------------------
+
+## Appendix A. Reproduction
+
+Scripts in `<projects>\hoi4-factory\.work\research\13-work\` (Node 24 and Python 3.13 via `py -3`; they import the installed 4.6.1 runtime read-only):
+
+- `lib.mjs`: loaders, tool wrapper, prototype rubric (all metrics in section 7.1).
+- `build_recon.py`: writes `recon\soviet_reconstruction*.txt` from the pixel table.
+- `measure_recon.mjs`: tool diagnostics and metrics on the reconstruction.
+- `auto_layout.mjs`: tool solver with all positions `auto` (before/after).
+- `compact_recon.mjs`, `compact_real.mjs`, `bounded.mjs`: compact and bounded repair runs (in memory).
+- `proto_layout.mjs`: order-preserving relaxation prototype.
+- `sweep.mjs` plus `summarize.py`, `ext_summary.py`, `calib.py`: vanilla and mod sweeps, calibration tables (`vanilla.json`, `mods_*.json`).
+- `design_metrics.mjs`: chain length, leaf fraction, fan-out.
+- `dump_layout.mjs`, `draw.py`: orthogonal drawings (`renders\`).
+- `crop.py`: screenshot tiles (`crops\`).
+
+Commands (examples): `node measure_recon.mjs`; `node auto_layout.mjs recon/soviet_reconstruction.txt dumps/x.json`; `node sweep.mjs "<game>/common/national_focus" vanilla.json 8`; `py -3 calib.py`.
+
+Evidence hashes: screenshot sha256 c8e360560b8cb716384ace88d95c2fe860f85254649ea660a6bb92515df898b2; reconstruction `soviet_reconstruction.txt` sha256 71343b7fa484db6b8ca66469558d69657afd1066f72dc280e966863cfc5e3c77.
+
+## Appendix B. Key code locations (agent-tools fbc5144)
+
+- `src/hoi4_agent_tools/focus/layout.ts`: `automaticSiblingLayout` (auto-only cohorts), `structuralAnchorX`, `availableX`, `connectorCrossings`, `connectorLengthDiagnostics` (thresholds 8/4/10), `fakeComplexityDiagnostics`, `siblingSymmetryDiagnostics`, `layoutMetrics`, `layoutFocusTreeSteps`.
+- `src/hoi4_agent_tools/focus/compact.ts`: `COMPACT_HARD_DIAGNOSTICS`, `COMPACT_AESTHETIC_DIAGNOSTICS`, `absoluteCompactRegressions`, `relativeCompactRegressions`, `compactCandidate`, `compactStrategies`, `compactScore`, `assertCompactLayoutQuality`.
+- `src/hoi4_agent_tools/focus/geometry.ts`: constants 176/116/144/76, `focusConnectorCurve` (Bezier), `focusNodesVisiblyOverlap`.
+- `src/hoi4_agent_tools/focus/lint.ts`: structural, design and geometric lint; `FOCUS_DUPLICATE_COORDINATE`, `FOCUS_VISIBLE_OVERLAP`, `FOCUS_AVOIDABLE_CONNECTOR_CROSSING`.
+- `src/hoi4_agent_tools/focus/importer.ts` (position modes; `offset` not modelled), `compiler.ts`, `source-update.ts` (scalar x/y/relative patches), `tool-operations.ts` (rewrite flow, blockers = error and blocker severities).
+- `src/hoi4_agent_tools/mcp/tools/focus.ts`, `schemas/focus-requests.ts`, `mcp/server/instructions.ts` (agent-facing text).
+- `docs/focus.md`, `docs/adr/0004-focus-layout.md`, `docs/specs/02_focus_tree_workbench.md`, `docs/plans/tool-audit.md`.
+- Kit: `.claude/skills/hoi4-focus-trees/SKILL.md` and `references/layout-rules.md`, `completion-rules.md`; `.claude/agents/hoi4-focus-tree-auditor.md`; `.claude/skills/hoi4-feature-planning/SKILL.md` section 3.6; Chaos Redux mirror `references/layout-and-navigation.md`.

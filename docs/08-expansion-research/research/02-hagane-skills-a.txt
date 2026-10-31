@@ -1,0 +1,1269 @@
+# Hagane Works skills repo, half A: source-based reading, verification ledger and idea catalog
+
+Report 02 (half A). Author: research agent. Date: 2026-10-31.
+Repo read: <projects>\hoi4-factory\.work\ext\hagane-skills, commit ef7028c12cd021216bfb7660f85ad93e5efc93e1, VERSION 1.5.0 (VERSION:1), license CC BY-NC-SA 4.0.
+
+---------------------------------------------------------------------------
+## 0. Scope, method, caveats
+---------------------------------------------------------------------------
+
+Files read completely (every line): README.md, CHANGELOG.md, VERSION, platform.env; skills/hoi4-investigate/SKILL.md; skills/hoi4-mod-design/{SKILL,DESIGN_DOC_TEMPLATE,CONCEPT_TEMPLATE}.md; skills/hoi4-submod/SKILL.md; skills/hoi4-wiring/SKILL.md; skills/hoi4-build-scripting/SKILL.md; skills/hoi4-build-api/SKILL.md; field-reference/{README,_validation-tools,_editing-existing-mods,_timeline-and-replace-path,_raw-script-fields,scripted-snippets,scripted-localisations,dynamic-modifiers,tokens,defines}.md.
+Also read, because my files cross-reference it and the CHANGELOG leans on it: guides/README.md and guides/dynamic-spirit-from-variables.en.md (400 lines). Grepped (not read) the other skills only for cross-references.
+
+Copyright handling: everything below is paraphrase. Quotes are a few words at most (mostly token names). The original text must not be copied into our projects; use the file:line references to re-inspect it. Ideas and facts are fair to learn from; sentences are not.
+
+Verification target: installed HOI4 "Operation Postern" 1.19.3.0 (launcher-settings.json). Hagane's own testing was on 1.19.2 (CHANGELOG:12-13, 23-41), so some drift is expected. Evidence used, all read-only:
+- documentation/*.md (effects, triggers, modifiers, dynamic variables, script concepts, loc formatters), common/on_actions/_documentation.md.
+- Vanilla script and data: common/, events/, history/, interface/*.gfx and *.gui, localisation/english, common/defines/00_defines.lua.
+- Strings embedded in hoi4.exe (grep -a) to confirm engine error messages. This is my own technique, not Hagane's.
+- Names and structure (not content) of the player-data folder on this machine: logs/, crashes/hoi4_<timestamp>/, dlc_load.json, mod/*.mod. I did not copy any of its content.
+Tags used below: [P] = depends on the Hagane platform/API, [G] = generic (usable without it), "inferred" = my deduction, not stated in the source.
+
+---------------------------------------------------------------------------
+## 1. What the repo is, and how its pieces fit
+---------------------------------------------------------------------------
+
+Layers (line counts from wc):
+- skills/ : 13 SKILL.md files. In my half: hoi4-investigate (100 lines), hoi4-mod-design (231 + 2 templates, 58 and 52), hoi4-submod (213), hoi4-wiring (145), hoi4-build-scripting (200), hoi4-build-api (184). The other half: 7 per-domain build cards (characters, decisions-ideas, events, focus, localisation, military, scenario).
+- field-reference/ : about 45 pages. Four underscore pages are cross-cutting (_validation-tools, _editing-existing-mods, _timeline-and-replace-path, _raw-script-fields), alongside README.md, tokens.md and one page per platform workbench.
+- guides/ : human walkthroughs that need no platform (one guide so far, zh + en).
+- README (8 languages), CHANGELOG, VERSION, platform.env (two env vars: platform URL and personal access token).
+
+Role split inside the skill set (my reading):
+- Investigator: hoi4-investigate. Process skill, mostly generic.
+- Orchestrator: hoi4-mod-design. Process skill, mostly generic; steps 8-9 call the platform.
+- Specialist for one project shape: hoi4-submod (additive submod on a big base mod).
+- Cross-entity glue: hoi4-wiring (six chains plus scope table).
+- Reference card for the transport and route table: hoi4-build-api.
+- Per-domain "build cards" (hoi4-build-scripting is one): a deliberately thin bridge from platform form to HOI4 output to player experience, which defers to field-reference for field tables (hoi4-build-scripting/SKILL.md:14-23; hoi4-build-api/SKILL.md:29-36).
+
+Two delivery routes (README.md:69-93): an MCP server (tools appear automatically) or copying the skill folders. The field-reference is vendored into the platform's backend to serve MCP resources (CHANGELOG:25-27, 61-65, 176-179), which created a recurring drift problem (section 3).
+
+Platform dependency is heavy. Almost every procedural step ends in a REST/MCP call. The generic value is in the principles, the HOI4 gotchas, the scope/wiring tables, the override and start-date guidance, and the process for design. My split by file:
+- hoi4-investigate: principles 1-6 generic; "fix path" (lines 87-96) platform.
+- hoi4-mod-design: steps 1-7 and almost all anti-patterns generic; steps 8-9 and the platform capability bullets platform.
+- hoi4-submod: sections 1, 4, 5 (iron rules), 7 (concept), 8 (verification mindset) generic; sections 2, 3, 6 platform.
+- hoi4-wiring: the six chains and scope table generic; auto-guard and tooltip-injection remarks platform.
+- hoi4-build-scripting: semantics of dynamic modifiers, BoP, defines, scripted blocks generic; routes, form fields, 409s platform.
+- hoi4-build-api: platform entirely, except idioms at lines 109-154 which are about half generic HOI4 knowledge.
+- field-reference: _timeline-and-replace-path, defines.md, dynamic-modifiers.md quirks, tokens.md generic; the rest platform.
+
+Size and context-efficiency observations (inferred, not stated by Hagane): each SKILL.md opens with the same four-line auto-update notice (for example hoi4-investigate/SKILL.md:6-9), repeated 13 times; descriptions are 300-700 characters of trigger nouns; skills end with cross-link footers; deep worked examples sit at the end of hoi4-mod-design (lines 202-225), which suits progressive disclosure.
+
+---------------------------------------------------------------------------
+## 2. Skill-by-skill analysis
+---------------------------------------------------------------------------
+
+### 2.1 hoi4-investigate (skills/hoi4-investigate/SKILL.md, 100 lines)
+
+1. Purpose and activation
+- Frontmatter (line 3): fire the moment a bug, regression or "why is X broken" appears, before writing any fix; confirm the mechanism against live platform state and the exported mod, verify the premise instead of trusting memory, a previous report or a green validate. It says to invoke it automatically on any bug report.
+- When-to-use (lines 18-22): any bug/regression/in-game crash/"it worked last time"; whenever an agent reports "done" or "validate is green"; before scoping work off a plan doc, backlog item or memory note; auto-invoke, do not start patching.
+- Receives control from: the cross-link footer of every build card ("error.log is the final gate -> hoi4-investigate", for example hoi4-build-api/SKILL.md:184, hoi4-build-scripting/SKILL.md:199-200), and from hoi4-mod-design step 11 (hoi4-mod-design/SKILL.md:143-144, 164).
+- Hands off to: hoi4-build-api for how to apply the fix (investigate:88-89, 99) and hoi4-mod-design for the end-to-end loop (investigate:100).
+
+2. Workflow (my words)
+(1) No edit until you can point at the exact broken field, entity or exported line. (2) Re-check any premise that came from memory, plans, backlog, prior audits or status reports against current live state; anything older than a few days is suspect. (3) Treat an accepted write or a green validator as "accepted", not "correct"; re-read the entity or re-export and confirm the change landed on the right id; verify against the fresh artifact plus the game's own error.log. (4) If an agent fixed something through a mechanism you did not expect, treat it as an alarm and trace the real path. (5) Quantify guessed counts from the real artifact before fixing a "drop". (6) State the root cause with concrete evidence first; if only part is proven, fix only that part and note the rest. (7) For a crash to desktop, read the player's log folder before analysing any mod content (details under techniques). (8) Fix through the API, then validate, lint, rebuild through the export job channel, load the fresh ZIP in the game, read error.log.
+
+3. Dependencies
+- [P] entity GET routes, export/validate, lint/tree-validation, the export-job channel, MCP export_project (lines 90-96).
+- [G] the player's own data folder (Documents\Paradox Interactive\Hearts of Iron IV\logs, crashes, dlc_load.json), counting entities, reading error.log.
+
+4. Verification routine and false-positive avoidance
+- A ladder of evidence is implied: request accepted (HTTP 200) < platform validator green < entity re-read < fresh re-export < game error.log. Only the last two count (lines 38-47, 84-85).
+- "I changed the field" is not evidence; re-read it (lines 41-44).
+- Surprise is a red flag: if an agent "fixed" something with an invented mechanism, assume the success report may be satisfying the letter of the ask (lines 45-47, 82).
+- Magnitudes get measured, not guessed (lines 49-52).
+- Never patch just to turn a validator green (lines 55-56).
+- Never call a reproducible in-game issue "just vanilla/environment" without reproducing it in a clean setup (line 85).
+
+5. Notable techniques (file:line)
+- T1. Iron Law: root cause first, applied to edits and API writes alike. 26-28.
+- T2. Premise red-flag phrases that force a re-check: "the plan says", "memory mentions", "a previous pass found", "should/probably/usually". 32-36. Staleness rule of thumb: more than a few days old is suspect. 30-32.
+- T3. Evidence ladder (see 4). 38-47.
+- T4. Magnitude measurement before a fix. 49-52.
+- T5. Output discipline: evidence-first root cause statement, partial fix allowed. 54-56.
+- T6. Crash protocol. Read, in order: logs/game.log (the last line carries the start date the game actually reached and the last subsystem loaded, which localizes the phase), crashes/hoi4_<timestamp>/exception.txt (an access violation means an engine null dereference, so error.log stays quiet), and dlc_load.json (active mods/DLC, to rule out conflicts). It explicitly authorizes reading these because they are the player's own game output. 58-69.
+- T7. Never assume the start date from what your mod intends. If game.log shows a start you did not design, your custom start did not load; re-export, reinstall, re-check log before anything else. A multi-day crash hunt is cited that assumed an early start while the game was executing history years later. 70-77.
+- T8. Six-item anti-pattern list ending with "do not dismiss without clean repro". 79-85.
+- T9. Fix path with retired-route warning (the old download route times out on big projects and enforces a retired gate). 87-96.
+
+6. Version-sensitive or doubtful claims
+- Log file names and structure: confirmed (V40). Outer .mod / dlc_load.json relationship: confirmed structurally (V41).
+- "Access violation means nothing useful in error.log": plausible, inferred; not tested.
+- Fix-path routes are platform-time-sensitive (they changed three times in the CHANGELOG, section 3).
+
+### 2.2 hoi4-mod-design (skills/hoi4-mod-design/SKILL.md, 231 lines; DESIGN_DOC_TEMPLATE.md 58; CONCEPT_TEMPLATE.md 52)
+
+1. Purpose and activation
+- Frontmatter (line 3): start of a new mod or large content project and drive it end to end: turn a creative brief, concept docs or a story idea into a playable mod through design (base-mod audit, feasibility root, decision-locked bible, author-facing doc, phased roadmap) and then the build, export, game-verify, fix loop. The author does only conversation and in-game verification.
+- When to use (lines 18-21): brief/story idea in hand; new mod or overhaul, especially a submod on a large base mod (TNO/KR/TFR named); it is explicitly the orchestrator that delegates mechanics.
+- Receives: author's filled CONCEPT_TEMPLATE (lines 49-51). Hands off: build mechanics to hoi4-submod/hoi4-build-api (127-131), in-game failures to hoi4-investigate (143-144), cross-entity wiring to hoi4-wiring (230).
+
+2. Workflow (13 steps in my words)
+Part 1, design: (1) take creative direction only from the author's own material and inventory every lore element, named entity, timeline beat, puppet and mechanic; (2) for overhauls, audit the base mod with parallel read-only passes (per playable nation plus cross-cutting); (3) find the single feasibility root of the dissonance; (4) write the bible; (5) gap-audit it against the step-1 inventory; (5b) run domain-expert self-critique passes; (6) write the author-facing design doc with tiered questions; (7) lock a phased roadmap with dependency boundaries and depth allocation.
+Part 2, per phase: (8) build all entities for the phase through the API; (9) export and self-verify before touching the author's time; (10) the author load-tests with a short specific checklist; (11) iterate through hoi4-investigate, re-export as v1/v2/..., keep the last accepted export as the demo snapshot.
+
+3. Dependencies
+- [P] authenticated API building, export/validate, lint/tree-validation, base-mod reference index, vanilla reference data / states picker.
+- [G] documents (bible, audit, roadmap), parallel read-only analysis, chat with the author, the author's game.
+
+4. Verification routine
+- Run the platform checks before the author's game test (step 9, lines 133-136) so the human's run is not wasted on what a validator would find.
+- But green validation does not mean it loads. The listed killers are invisible to validators: bad effect/modifier tokens, wrong recruit_character location, an undefined ideology, a country with no capital. The in-game error.log pass is mandatory and a few export-fix cycles (v1 to v3) are normal (lines 158-163).
+- Align versions first because a base-mod version mismatch is a crash that is not your content (140-141).
+- Phase is "accepted" only after the author's game report (143-146).
+- The meta-verification: verify prior audits before building on them (63-64) and verify feasibility by tracing the real setters, never assuming (78-79).
+
+5. Notable techniques (file:line)
+- T1. "Front-load the audit and design bible; never go step-by-step" because per-phase rediscovery of base-mod facts causes inconsistency. 23-25.
+- T2. Operating model: the human does only chat and in-game testing; the agent never tells them to click a workbench, and the text gives the catch-phrase to watch for. 27-34, 158.
+- T3. Recommend-then-decide: lead each fork with the agent's pick and reasoning, never a pile of open questions; work in coherent chunks and pause for the author to check the logic. 35-40.
+- T4. Author's source is the only creative authority; the base mod is mechanical baseline, never canon. 44-48, 165.
+- T5. Per-nation 5-point audit: start state, storyline, custom mechanics, dissonance surface (where base content contradicts the new vision, with severity), build-on (reframe vs gut). 55-60.
+- T6. "Audit what the bookmark actually loads, not raw entity counts": separate live from dead/cut/debug-gated arcs by following the active bookmark and focus-tree loading. 60-64.
+- T7. Feasibility root: trace where key global flags are set; a cascade hanging off one suppressible event can be made dormant by cutting that root; multi-rooted means scope balloon. 74-79, 167-168, 204-209.
+- T8. Bible requirements: "decide everything derivable, surface only genuine forks", provenance tags (locked / mine-derived / open-for-author) so derivations are never mislabeled as author decisions. 84-86, 169.
+- T9. Reusable alt-history engine: date-gated historical spine, divergence at a point where history could really have turned, endings derived from two real structural dilemmas as two orthogonal axes giving four endings; historicity tags per ending; lock tone as a first-class decision and treat tone feedback as a rewrite pass across all text. 87-103.
+- T10. Domain-expert self-critique before locking (historian pass, game-numbers pass sanity-checking against vanilla number ranges). 109-114, 218-222.
+- T11. Capability recon before promising a custom mechanic (hooks, workbenches, standalone support). 181-186.
+- T12. Meter-mechanic guardrail: unbounded accumulators overflow and get idle-farmed; recompute each period from sticky "earned" plus current "positional" components, clamp, and hide raw totals behind dimensions and tiers. 187-190.
+- T13. Multi-nation ownership rules: the leader nation owns faction creation, members only join; agree cross-line global flag names up front; never write one nation's history from another nation's build. 174-177.
+- T14. Never hand-guess vanilla data (state ids, portrait/flag names, ownership); pull from reference data; reuse a vanilla tag to pick its art. 191-194.
+- T15. Output set naming: index, baseline audit, story bible, locked roadmap, design doc, versioned exports; for heavy mods also per-faction backbone, node-level spec per nation per phase, mechanic system rules, world-year setup with real state ids, capability-recon note. 148-154.
+- T16. Mechanism hiding: keep platform detail out of the author-facing doc. 170.
+- T17. DESIGN_DOC_TEMPLATE: authoring rules block (strip mechanism, mark undecided beats, questions at the bottom in tiers, author's language, open by confirming it is drawn from their material) lines 5-10, 14; questions tiered A story gaps / B design calls with recommendation / C quick confirms with defaults, lines 42-54; closing line noting the first slice already proceeds in parallel, line 58.
+- T18. CONCEPT_TEMPLATE: 12-section input brief; blanks are acceptable and become the question list (lines 3-5, 51-52); calls out faction/alliance structure as easy to forget and decisive for day one (36-37); notes whole-state ownership granularity (49).
+
+6. Version-sensitive or doubtful claims
+- recruit_character "only at history setup" (named among the invisible killers, line 162; also hoi4-wiring:136): not supported by the documentation; see V10.
+- Hooks named for the custom meter (on_monthly, on_capitulation, line 212-213): both exist in 1.19.3 (V15).
+- "States are form-level" (lines 131, 193-194) is a platform limit, not a game limit.
+
+### 2.3 hoi4-submod (skills/hoi4-submod/SKILL.md, 213 lines)
+
+1. Purpose and activation
+- Frontmatter (line 3): building or extending a dependency-style submod (declares a base mod like TNO/KR/TFR and references its characters, tech, art, ideologies); covers additive architecture, base-mod reference index, base-mod-idiom toolkit, assets and the append-only limit. Invoke for "make or add content to a submod of <base mod>".
+- Lines 21-27: also use it to settle architecture before scoping any feature; defers routes to hoi4-build-api and orchestration to hoi4-mod-design.
+- Receives from hoi4-mod-design (build step), hands to hoi4-build-api, hoi4-build-characters (91), hoi4-wiring (196), and the full cross-link list (204-210).
+
+2. Workflow
+(1) Accept additive-on-canon as the only architecture; redesign any "suppress" idea as a reaction. (2) New empty project, declare the exact dependency names and align supported version. (3) Ingest the base mod's index (stage files, then index). (4) Build via API. (5) Use the base-mod idiom toolkit with real tokens from the index. (6) Handle states through the platform seed route or byte-exact copies. (7) Ship own assets via upload. (8) Understand super-event scheduling quirks. (9) Validate on the platform, then load in game and grep error.log for your own identifiers; retime long delays for tests.
+
+3. Dependencies
+- [P] import/stage-files, import/basemod-index, basemod-index/refs and ideology-registry, seed_states_from_vanilla/get_states/edit_state, upload endpoints, export/validate, lint, the PAT env vars (lines 47-77, 107-121, 151-157, 165-172).
+- [G] the toolkit effects (promote_character, set_character_name, kill_country_leader, create_country_leader, set_politics, load_focus_tree), the iron rules on states and tags, error.log grepping, retiming delayed events.
+
+4. Verification routine
+- Platform validate and tree-validation first, then the real game: read logs/error.log and grep for your own tokens (tag, focus/event ids, ideology, state ids); base-mod animation/entity noise is not yours; logs/text.log shows loc collisions (lines 165-172).
+- Headline distrust: "export succeeded" proves nothing; a typo'd cross-reference can be dropped silently and only surface in game (197-198).
+- Long-delay features: retime the trigger in a test build, then restore (174-177).
+- Index-backed lint turns on only after ingest; un-indexed submods fall back to trusting all references, so a quiet lint is not coverage (62-69).
+
+5. Notable techniques (file:line)
+- T1. Additive-on-canon rule and the honest list of what cannot be done: there is no disable_event, on_actions only append, scheduled events cannot be cancelled; trigger denial through an on_startup flag works only when the target event has a checkable trigger. 18-19, 29-39.
+- T2. Two-step base-mod index ingestion: stage the files, then index; index-only (content discarded), shared across submods of the same dependency; documented exception to the platform's route migration inline. 47-60.
+- T3. Dual benefit of the index: autocomplete for real base-mod ids and lint that flags undefined base-mod tags/states/ideologies/focuses/decisions; explicit trust-all fallback before ingest. 62-71, and hoi4-mod-design/SKILL.md:65-72.
+- T4. Idiom toolkit: promote_character with ideology to activate an existing latent leader role; add_country_leader_role is rejected on a character that already holds that role; rename by set_character_name; death by kill_country_leader; ruling_party takes the ideology group while ideology and promote_character take the subtype; swap a base nation's focus tree with load_focus_tree because an explicit load beats tree scoring. 83-98.
+- T5. Read the base mod's ideology registry before choosing tokens, because base mods may redefine the ideology space. 93-95.
+- T6. State handling: never write provinces from memory; rename a state only through a loc override and never change the name key inside the state file; check tag against the live vanilla roster; layouts drift between game versions; byte-for-byte copy including irregular original filenames if using local files. 107-143.
+- T7. A new custom tag that owns no state is dead at start (not listed in the bookmark, on_startup never fires) until a state is assigned. 145-147.
+- T8. Own-asset rule: referencing another mod's sprite name gets dropped and shows a placeholder; upload bytes. 151-157.
+- T9. Super-event scheduler switch semantics (a quirk a GET will not reveal). 159-163.
+- T10. Test retiming of long delays. 174-177.
+- T11. Hook sanity: some base mods comment out hooks, so confirm your intended hook actually fires; prefer your own on_monthly_<TAG>/on_weekly_<TAG>. 193-196.
+- T12. Idea attach control: a per-idea switch to prevent auto-attachment at game start when the idea should arrive later via focus/event. 190-192. [P]
+
+6. Version-sensitive or doubtful claims
+- add_country_leader_role rejection: confirmed with a nuance, it is per ideology (V02). set_character_name argument: misleading (V03). Ruling party group: confirmed (V04).
+- BRN since 1.18; state 333 and 1023 filenames; layout drift: confirmed (V32, V33).
+- "STATE_<id>:0 triggers a loc-key collision that vanilla wins": unverified (V36).
+- "No disable_event": confirmed from the docs (V35). But see the internal tension with _timeline-and-replace-path.md:35-36, 85-86, which allows shadowing a base file with a neutered copy.
+- "Base mods comment out on_ruling_party_change": the hook exists in vanilla (V16); the base-mod behaviour is unverifiable here.
+
+### 2.4 hoi4-wiring (skills/hoi4-wiring/SKILL.md, 145 lines)
+
+1. Purpose and activation
+- Frontmatter (line 3): use when connecting workbenches into live behavior: focus fires event, option sets flag read later, on_action hooks, leader succession, cosmetic-tag rename, scripted-snippet reuse, and scope passing. Invoke whenever a build step crosses two entities or asks "how do I make X trigger Y".
+- It is the cross-cutting card (lines 13-17); single-entity maps are in the build skills. Hands to all build cards and to hoi4-submod/hoi4-mod-design (139-145).
+
+2. Workflow
+Section 0: for every token placed into a raw field, check that it exists and that its scope is legal where it runs. Then pick one of six chains (focus fires event; choice sets flag or variable read later; automatic firing through on_actions; leader succession or allegiance flip; country rename plus dynamic modifier; reuse via scripted blocks and event targets), each given as a token sequence plus its footgun. Section 2 gives the scope table. Section 3 self-check: validators first, then game error.log, then a per-chain checklist (tokens present in output; setter and reader in same scope; one active leader per ideology; rename has display-name loc in both languages; snippets called with = yes).
+
+3. Dependencies
+- [P] Events workbench fields (on_action_attach, auto_fire_on_startup), export auto-guard, effect_tooltip_locs, scripted snippets workbench, validate/lint routes (lines 59-67, 55-57, 108-118).
+- [G] the chain token sequences and scope semantics.
+
+4. Verification routine
+- Same two-stage platform then game. In addition a per-chain assertion list (119-122) and the explicit caveat that lint can warn about submod base-mod refs but local dangling refs are silently dropped by the export gate with no lint warning (111-115). The way to see local dangling refs is the relations graph (field-reference/_validation-tools.md:6-15).
+
+5. Notable techniques (file:line)
+- T1. "Validate the token AND its scope." Two questions per token: does it exist, and is the scope legal. The number-one wiring bug is a country-scope effect run in a state or iterator scope, which silently does nothing. 26-34.
+- T2. On_action hook names are attach points, not effects or triggers, so a token validator must not flag them. 36-38, 128-129.
+- T3. Flag/variable handoff: the flag lives on the country that executed the setter; the reader must run in the same scope; setters have no auto-tooltip, so a reward made only of flag/variable changes needs a custom tooltip. 49-57, 125-126, 131.
+- T4. On_actions are global attach points; an unguarded effect would run for every country. A self-requeuing heartbeat event fires itself again. 59-67.
+- T5. One active country_leader per ideology; a second same-ideology leader with no promoting event is a dormant duplicate; succession is event driven (kill plus create), allegiance flip with the same person is a different effect. 68-74, 132.
+- T6. Cosmetic tag swaps the internal tag only; the visible name is separate localisation keyed by the cosmetic tag and a second form; both languages needed. 76-81, 133.
+- T7. add_dynamic_modifier declares a slot only; the stat definition must exist elsewhere. 81-84, 134.
+- T8. Reusable scripted blocks must be called with "= yes", and they inherit the caller's scope; event targets persist across events while PREV and FROM do not survive a fresh event fire. 85-93, 135.
+- T9. Scope-symbol table (THIS, ROOT, FROM, PREV, event_target:NAME) with "state iterators cannot run a country effect directly; address the owner". 95-106.
+- T10. recruit_character called out as history-only. 136-137.
+
+6. Version-sensitive or doubtful claims
+- Cosmetic tag loc "_DEF adjective form": contradicted (V06).
+- add_dynamic_modifier "days = -1" in chain 5 (line 77): unsupported (V07).
+- recruit_character history-only: unsupported by docs (V10).
+- Event-target persistence: unverified and conflates scoped and global targets (V47).
+- "Second same-ideology leader is dormant": consistent, but the docs say the kill effect promotes the next in line (V05).
+
+### 2.5 hoi4-build-scripting (skills/hoi4-build-scripting/SKILL.md, 200 lines)
+
+1. Purpose and activation
+- Frontmatter (line 3): filling scripted effects/triggers, scripted localisation (defined_text), dynamic modifiers, custom leader/commander/scientist traits, and the four domains that have no workbench (defines, balance of power, music/radio stations, peace-conference tuning). Carries the modifier-shape rule, call-by-name idioms and the template-then-edit flow.
+- Hands to hoi4-wiring for scope passing and who calls what (22-23, 142-159), to build-characters for the trait two-list trap (87, 158-159), build-decisions-ideas/build-events for callers, hoi4-investigate for failures (199-200).
+
+2. Workflow
+Section 0: read the matching field-reference page, and validate every token in every raw field. Section 1 per sub-workbench tables (platform field to HOI4 output to quirk). Section 2 cookbook "want X, fill Y". Section 3 wiring out (snippets run in caller scope; dynamic modifiers travel by effect; BoP is a three-part contract; scripted-loc calls live in loc text; traits close the loop through characters). Section 4 entity-level self-check by reading entities back. Section 5 trap list.
+
+3. Dependencies
+- [P] /scripted-snippets, /scripted-localisations, /dynamic-modifiers, /custom-traits, the raw-file template routes (list/create/edit), /scripted-symbols, validate/lint, binary upload route for music (lines 47-108, 161-168).
+- [G] meaning of kind=effect vs trigger, BoP tokens, defines, dynamic-modifier semantics, peace-conference semantics.
+
+4. Verification routine (lines 161-168)
+Read entities back and assert: every scripted name referenced from any raw field or loc value exists (a used-but-undefined name is a silent in-game no-op); dict-vs-raw modifier shapes match; every dynamic modifier has at least one add_dynamic_modifier caller; every BoP has a set_power_balance activator; the defines file has only changed keys and no date defines; each music entry's song matches an asset name and the audio is uploaded. Then validators, then the game. Idea: a checklist of "definition exists, but is it used/applied/activated/consistent" assertions.
+
+5. Notable techniques (file:line)
+- T1. Two shapes of "modifier" (dict vs raw flat string) as the number-one silent failure of the domain. 38-45, and field-reference/_raw-script-fields.md:54-58. [P]
+- T2. Scripted-symbols read-only index finds used-but-undefined names and collisions. 54-55, 161-165.
+- T3. Scripted localisation body re-includes its own name line; calls live inside loc values; a typo'd call renders as literal bracket text in game and must be proofread there. 57-64, 155-157, 181-182.
+- T4. Dynamic modifier: enable = when active, remove_trigger = when it self-removes; defined-but-never-applied is inert. 66-76, 121-124, 146-148, 175-176.
+- T5. Template-first for domains without a workbench (list templates, create from template, edit file). 91-108. [P]
+- T6. Defines: override per key only, one assignment per line, never copy a vanilla file, never hand-write the start/end dates, keys are checked by nobody so a misspelled key is silently ignored, defines are load-time (restart to test). 105, 131-133, 177-179. Confirmed in field-reference/defines.md:9-16, 58-64.
+- T7. Cookbook format: user intent in plain words mapped to fields and tokens (110-140), for example a creeping penalty that heals itself, a bespoke leader trait, a power-struggle bar, slower research via defines, a soundtrack, cheaper liberation in peace.
+- T8. BoP three-part contract: ship the file, activate with set_power_balance, then push and react with value/modifier effects and BoP triggers. 149-153.
+- T9. Snippets execute in the caller's scope, so write bodies for the narrowest scope you will call from; validate per call site because the same name can work from a focus and break from a state event. 143-145, 173-175.
+- T10. Peace-conference triggers see the pre-conference world mid-conference; use the pc_ trigger family; cost multipliers multiply, stay roughly 0.4-3.0. 184-185.
+- T11. Silent-failure list for audio: wrong station header or a renamed non-Vorbis file fails with no error. 183.
+- T12. On duplicate create (409), edit the existing entity instead of retrying create. 186-187. [P]
+
+6. Version-sensitive or doubtful claims
+- Defines namespaces and keys: confirmed; one default drifted (V18). Reserved vanilla files: confirmed plus a third one (V19).
+- BoP tokens: confirmed (V23). pc_ trigger family exists (V24).
+- Scripted loc semantics: confirmed (V26).
+- "Trailing comma in a defines override crashes at launch" (defines.md:23-25): unverified.
+- Later-loaded defines files win per key in filename order (defines.md:11): standard but not verified here.
+
+### 2.6 hoi4-build-api (skills/hoi4-build-api/SKILL.md, 184 lines)
+
+1. Purpose and activation
+- Frontmatter (line 3): about to drive the platform's workbenches through authenticated API; route table, payload shapes, export idioms; invoke when hoi4-submod or hoi4-mod-design reaches "build via API" or when a route/field shape is needed.
+- Hands to every per-entity cookbook (29-36), hoi4-submod/hoi4-mod-design (180-184), hoi4-investigate (184).
+
+2. Workflow
+(1) Learn a workbench's exact shape by GET, then POST the same shape (defaults fill omissions; PUT is partial). (2) Use PAT bearer auth and always set a User-Agent. (3) Consult the route table (about 35 resources). (4) Apply idioms a GET will not reveal. (5) Validate, lint, rebuild via the export job channel and read native warnings. (6) On a 422, GET an existing entity of that type and copy.
+
+3. Dependencies: entirely [P] (REST routes, PAT, CDN behaviour). The generic residue is in section 4 idioms.
+
+4. Verification routine: section 5 (lines 156-173): validate, lint, export job with status poll, read native_warnings from the status call (the place where the export reports what it dropped, line 169), then error.log in game.
+
+5. Notable techniques (file:line)
+- T1. "Protocol that never rots": self-describing API; GET to learn the shape, POST the same shape. 18-27. [P]
+- T2. Failure-signature note: a bare default HTTP client user-agent gets a CDN 403 with error code 1010 that looks like an auth failure; the doc keeps the snippet line and names the symptom. 46-49, and CHANGELOG:288-299. [P]
+- T3. Assert bytes, not terminal render, when checking non-ASCII round trips. 43-45. [G]
+- T4. Wrapped list responses (an object with a key instead of a bare array) make a naive length check read zero (false "empty"). 75, 90. [P], but the lesson of normalizing envelopes is generic.
+- T5. Raw-script wrapper idiom: store inner text, export supplies the block. 111-115, field-reference/_raw-script-fields.md:3-21. [P]
+- T6. Traps that pass lint but fail in game: research_bonus as a focus reward, and an add_tech_bonus category that is not a real tech category. 116-119. See V11, V12.
+- T7. Focus prerequisites as a list of lists (outer AND, inner OR group), mutually exclusive as a list of ids; double-POSTing nodes creates stacked suffixed duplicates (_1) that must be deleted. 120-123. [P] for the duplicates, [G] for the semantics (V29).
+- T8. Layout: focus tree layout is left-anchored and a left ornament panel overlaps low-x focuses, so shift x so the minimum is about 4. 124-125.
+- T9. Loc derived keys and both-language filling for focus and event; option keys are explicit; avoid a fourth option key that collides with the auto description key. 126-132.
+- T10. Decisions and categories are global by default; gating needs an allowed trigger on original_tag. 133-136. (V30)
+- T11. One commander-and-advisor person must be one character with two role blocks, or the person appears twice in game. 140-142.
+- T12. Custom tag must not collide with a vanilla tag (three-letter pinyin tags collide often). 143-145. (V32)
+- T13. Idea picture: missing picture gives a placeholder; picture value drops the GFX_idea_ prefix. 146-149. (V27)
+- T14. Flag/variable rewards have no auto-tooltip; fill effect tooltip locs. 150-152.
+- T15. Export gate drops dangling cross-refs silently (typo'd event id or focus ref). 153-154.
+- T16. Export channel: start job, poll, download; the /go segment is mandatory; do not fall back to the retired download route. 160-173.
+
+6. Version-sensitive or doubtful claims: V11, V12, V27, V29, V30, V32 (see ledger).
+
+### 2.7 field-reference pages in my half
+
+README.md (89 lines)
+- Purpose: map from HOI4 script vocabulary to platform API fields (1-6). The platform's validators are the authority and tokens.md is a filling aid, deliberately not an exhaustive dump (15-24). Channel table for exporting (26-43). Section on why /api/go is mandatory, including a measured table of what the legacy route misses (45-63).
+- Technique: README lists what is a file page versus cross-cutting underscore page (65-89), and marks DLC-gated and not-recommended workbenches inline (77-80).
+
+_validation-tools.md (39 lines)
+- Relations graph: edge list, per-entity incoming/outgoing, per-country slice; each edge has a resolved flag; unresolved means a dangling reference the export would drop (6-15).
+- Scripted-symbol index: definitions and every call site of scripted effects/triggers/localisation, plus used-but-undefined and collisions; fed by uploading the common/scripted_* source files (17-23).
+- Reminder of the two always-run endpoints and the legacy-route under-reporting (25-39).
+
+_editing-existing-mods.md (85 lines)
+- Loaded-existing mod vs submod: different project identities and export semantics (6-15). Entities have a source flag; imported becomes created when touched (18-21). Export by intent: patch/addon (created only), full re-emit, in-place update of the original archive (platform output wins on path conflicts, an overlap count in a response header), conflict-by-conflict dry-run plus resolve (22-33). Three-call export recipe and the rule to read warnings before shipping (38-68). "Notes that save a day": do not re-package base content into an addon; prefer same-name override over replace_path when changing vanilla content; 25 MiB binary cap, per-file hatch not bulk pipe (75-85).
+
+_timeline-and-replace-path.md (93 lines)
+- Two override mechanisms compared in a table (same-name file shadowing vs replace_path), granularity, scope, failure mode, use (7-18). Three replace_path details (20-36). Non-1936 start checklist with three dates that must agree and a recommendation to ship your own bookmark file (52-65). Why the far past is safer than the near past for dated blocks (67-78). Suppression toolbox (80-86). Red zone for changing a base mod's start date (88-93).
+
+_raw-script-fields.md (67 lines)
+- Master table of which field in which workbench takes effect tokens, trigger tokens or modifiers (22-42), the two modifier shapes (54-58), writing rules (60-67), and which workbenches are typed-only (44-49).
+
+scripted-snippets.md (19), scripted-localisations.md (21)
+- Field meaning and quirks already covered in 2.5; note the source_file rule that it must be a complete mod-relative path under the right common/ folder, not a bare filename (snippets:19, scripted-localisations:21).
+
+dynamic-modifiers.md (30)
+- Field table, quirks (dict not flat string; collision with a vanilla id warns and allows; country tag uppercased), and the "want the number to follow the situation" pointer to the guide with the platform gap stated (23-30).
+
+tokens.md (70)
+- Curated vocabulary: effects (14-44), triggers (46-50), modifiers (52-57), scopes (59-66). It states it is a starting vocabulary and the validator is the authority (68-70). Two entries are wrong or ambiguous in 1.19.3 (V45, V46).
+
+defines.md (67)
+- Lua assignments, not script; per-key overrides only; reserved vanilla filenames; start/end date red line; namespace table with defaults; template; quirks (9-66). Most defaults confirmed (V18, V19).
+
+### 2.8 README, CHANGELOG, VERSION, platform.env
+
+- README is positioning plus setup: "talk to your agent" flow (96-100), MCP command or skills files (69-93), measured claim that any model can drive the platform (47-58, verified with a DeepSeek run, caveat that skill files are Claude-flavoured and that taste is separate from correctness), self-update line (110-115), license (138-142). The honest pair of caveats at 55-58 is a good pattern for a product promise.
+- platform.env is two exported variables (platform URL, token).
+- VERSION is a single semver string mirrored as git tag; CHANGELOG starts with an "Unreleased" bucket and reads as an incident log (section 3).
+
+### 2.9 guides/dynamic-spirit-from-variables.en.md (cross-reference, 400 lines)
+
+Not in my assigned list but heavily referenced (CHANGELOG:8-21, dynamic-modifiers.md:23-30). It is the best single piece of generic HOI4 technique in the repo. It is organized as: a goal with observable results (7-13), prerequisites (19-23), object table (25-36), why an idea cannot hold a variable (38-44), a five-file minimal version (46-141), a second rule with nested loop (142-202), same-day refresh through the state-control hook (204-226), formatting table for variable text (228-242), an in-game checklist and a console test event (244-276), swapping in your own rule (278-336), showing the change in a focus or event via the tooltip argument (338-374), a common-mistakes list (376-384), alternatives (386-392) and a closing "how far this page was checked" section listing exactly what was and was not tested in game (394-400). I used it as source for several catalog entries and verified a large part of it (V15, V17, V20, V21, V22, V37).
+
+---------------------------------------------------------------------------
+## 3. CHANGELOG read as the evolution of the workflow
+---------------------------------------------------------------------------
+
+Line refs are to CHANGELOG.md. Pattern: nearly every rule exists because a silent failure or a documentation/behavior mismatch was measured.
+
+| Version (date) | What went wrong | Rule or structure that resulted | Lesson |
+|---|---|---|---|
+| v1.0.0 (2026-07-10, 311-316) | n/a | 9 skills + field reference | starting set |
+| v1.1.0 (07-16, 301-309) | users on stale copies | auto-update directive (git pull ff-only at session start), VERSION file, tags | stale instructions are a bug source; pins are the counterweight |
+| v1.1.1 (07-22, 288-299) | sample client got CDN 403 because of default client signature; error page never named the cause | always send a User-Agent; skill names the symptom | document failure signatures, not just the happy path |
+| v1.1.2 (07-22, 272-286) | "does it only work with Claude?" confusion | "Which models work?" section backed by a measured run | back product claims with a test and state caveats |
+| v1.1.3 / v1.2.2 / v1.2.4 / v1.2.5 (07-22 to 07-31, 259-270, 209-219, 191-200, 162-189) | quirk lines and fields added only to the platform's vendored copy; a one-way sync would erase them | backports; recurring "stranded edit" pattern; one fix verified against platform code | single authoring home, one-way sync, and a backport audit |
+| v1.2.0 (07-23, 231-257) | cookbooks covered 4 domains while the field reference covered about 30 | 4 new skills (scenario, military, scripting, localisation) | coverage parity between recipes and reference |
+| v1.2.1 (07-24, 221-229) | docs taught a constraint the platform no longer had | docs updated to match the pipeline | documented workarounds outlive the bug that required them |
+| v1.2.3 (07-24, 202-207) | beta/invite text stale | updated | trivial but shows doc drift cost |
+| v1.3.0 (08-07, 124-160) | custom techs do not render in game (0 of 718 sampled); special-project export can emit unparseable tokens; three domains had no docs; impassable states lacked their contract | techs and special projects flagged "not recommended" with measured evidence; three new pages verified against handler code | label unfinished features with measured evidence rather than teaching a confident recipe |
+| v1.3.1 (08-20, 106-122) | docs taught a synchronous download that times out and enforces a retired gate | job-channel recipe; mandatory /go segment | one route can be correct for months and still be the wrong channel |
+| v1.4.0 (08-26, 67-104) | legacy route family silently under-reports findings (283 vs 284 issues; 165 vs 173 event findings; about twenty vs all entity counts in summary) | all routes moved to /api/go; documented exception for the index ingest (500) inline; staging step added to submod; a states page contradiction fixed | "green on the old path" can hide errors; compare channels |
+| v1.4.1 (08-31, 43-65) | idea picture rule built from "sprites vanilla ideas happen to use" instead of "sprites that exist"; valid sprites dropped silently behind a 200 and a green export | whitelist rebuilt on declared sprite types; unknown names now produce an advisory finding with suggestions | the rule you enforce must match the engine's rule, not a convenient proxy |
+| v1.5.0 (08-31, 23-41) | field reference half of v1.4.1; states removal routes disagree about what they delete | both routes documented with their predicates; row id vs game id warning | when two similar routes differ, document the predicate |
+| Unreleased (6-21) | n/a | guides folder: human walkthroughs, explicit testing coverage | knowledge that needs no platform is kept separate |
+
+Observations about their process (inferred where marked):
+- Evidence is quantitative and dated in the changelog (counts, date of measurement, game version). This is exactly the pattern in our own CLAUDE.md for evidence.
+- Fixes alternate between "make the validator louder" (advisory findings, summary counts) and "teach the agent to distrust a quiet validator" (the investigate skill).
+- Release notes include a "what is live where" scope note (v1.4.1, 61-65), a good habit when the same source ships through two channels.
+- Their drift risk is structural: three copies of the same knowledge (public repo, platform's vendored copy, MCP resources). Our setup (CLAUDE.md as the single source with generated copies and a `--check`) already addresses the same class of problem.
+
+---------------------------------------------------------------------------
+## 4. Verification ledger against HOI4 1.19.3.0
+---------------------------------------------------------------------------
+
+Status words: CONFIRMED, CONFIRMED-WITH-NUANCE, CONTRADICTED, UNSUPPORTED (docs/vanilla do not back it, not proof it is false), UNVERIFIED (cannot be checked from the install). GAME = C:\Program Files (x86)\Steam\steamapps\common\Hearts of Iron IV. "doc" = GAME\documentation. Line numbers for doc files are the heading lines in those files.
+
+V01 CONFIRMED. promote_character with ideology activates a latent country-leader role; ideology is mandatory when the character has several roles. Hagane: hoi4-submod/SKILL.md:83-86. Evidence: doc/effects_documentation.md:5149-5175 (scopes COUNTRY and CHARACTER).
+
+V02 CONFIRMED-WITH-NUANCE. add_country_leader_role is rejected on a character who already has the role. Hagane: hoi4-submod/SKILL.md:83-86, 182-183. Evidence: hoi4.exe contains the strings for a character that already has a country leader role "for ideology" and "with this ideology", so the rejection is per ideology. Adding a role for a different ideology is the legitimate use, and the doc entry (effects_documentation.md:985-1005) shows promote_leader as a parameter. The blanket "never on a character who has one" is too strong.
+
+V03 CONTRADICTED (misleading). "Rename = set_character_name = <char_token>". Hagane: hoi4-submod/SKILL.md:87. Evidence: effects_documentation.md:6678-6692 says the argument is the new name, either a loc key or a literal name; in country scope the character must be named separately. It works with a token only when the token also happens to be a loc key (common for large base mods, inferred).
+
+V04 CONFIRMED. set_politics ruling_party takes an ideology group, not a subtype. Hagane: hoi4-submod/SKILL.md:92-95, 184-185. Evidence: doc 7526-7538; across vanilla common/events/history the literal values are neutrality (360 lines in my count), democratic (330), fascism (220), communism (195), plus a few tag/variable forms; the group names are the top-level entries of common/ideologies/00_ideologies.txt (democratic at line 3, communism at 73).
+
+V05 CONFIRMED-WITH-NUANCE. A second same-ideology leader is a dormant duplicate; succession is event driven with kill plus create. Hagane: hoi4-wiring/SKILL.md:68-74, 132. Evidence: effects_documentation.md:4707-4714 says kill_country_leader makes the next in line the new party and country leader, so a pre-existing same-ideology role can succeed without a create effect. The "event driven" part is right; "needs create_country_leader" is only true when no successor role exists.
+
+V06 CONTRADICTED. Cosmetic tag display needs loc for the tag and a "_DEF adjective form". Hagane: hoi4-wiring/SKILL.md:79-81. Evidence: vanilla localisation uses <TAG> for the name, <TAG>_DEF for the definite form ("the Dutch East Indies" for INS_HOL_DEF, "the British Raj" for RAJ_UK_democratic_DEF) and <TAG>_ADJ for the adjective ("German" for GER_ADJ). Cosmetic tags also appear with ideology and autonomy suffixes (RAJ_UK_democratic, INS_HOL_autonomy_dominion). The required loc set is name, _DEF and _ADJ, not name plus "_DEF adjective". The set_cosmetic_tag/drop_cosmetic_tag effects themselves exist (effects_documentation.md:6720, 3634).
+
+V07 UNSUPPORTED. add_dynamic_modifier with days = -1 "declares a slot" and is permanent. Hagane: hoi4-wiring/SKILL.md:77-78. Evidence: effects_documentation.md:1153-1172 describes days as optional and "temporary if specified". Of the 1576 add_dynamic_modifier usages in vanilla, none uses a negative days value. The Hagane guide itself (guides/dynamic-spirit-from-variables.en.md:124) says omit days for a permanent attach. The safest practice is to omit days.
+
+V08 CONFIRMED. add_dynamic_modifier accepts an optional scope argument and works in state, country, character and special-project scope; force_update_dynamic_modifier exists "if you don't want to wait for the daily update". Hagane: guides/dynamic-spirit-from-variables.en.md:204-226, 391. Evidence: effects_documentation.md:1153, 5978, 4372.
+
+V09 CONFIRMED. A dynamic modifier can take a variable name as value; has enable, remove_trigger, icon; custom_modifier_tooltip is real. Hagane: field-reference/dynamic-modifiers.md:6-30; guide 52-69. Evidence: the template comment at the top of common/dynamic_modifiers/0_dynamic_modifiers.txt (lines 1-20) shows icon, enable, remove_trigger, a variable-driven value and an attacker_modifier option; custom_modifier_tooltip appears 80 times in vanilla dynamic modifier files.
+
+V10 UNSUPPORTED. recruit_character is history-setup only and must never appear in events or on_actions. Hagane: hoi4-wiring/SKILL.md:136-137; hoi4-mod-design/SKILL.md:162. Evidence: effects_documentation.md:5696-5705 documents it as country scope with no timing restriction. Vanilla uses it in 257 history files, zero events, and only commented-out occurrences in focuses and a scripted effect (common/national_focus/soviet.txt:17055, common/scripted_effects/SOV_scripted_effects.txt:7914). Vanilla's choice is consistent with the rule but proves no engine restriction. Treat as house convention, test before relying on it.
+
+V11 CONFIRMED. research_bonus is not a focus completion effect. Hagane: hoi4-build-api/SKILL.md:116-118. Evidence: no research_bonus or add_research_bonus heading in the effects documentation; the token appears inside idea definitions (for example common/ideas/afghanistan.txt:1213, common/ideas/air_spirits.txt:25) and character files, not as a reward effect. The one-shot reward is add_tech_bonus (effects_documentation.md:2226).
+
+V12 CONFIRMED-WITH-NUANCE. For add_tech_bonus, "construction" and "infrastructure" are not categories, use industry. Hagane: hoi4-build-api/SKILL.md:118-119; field-reference/tokens.md:29-31. Evidence: the bare names are indeed not tech categories, but common/technology_tags/00_technology.txt lists both industry (line 22) and construction_tech (line 57), and vanilla focuses use construction_tech 19 times (for example common/national_focus/argentina.txt:6288). Advice to use industry loses the exact construction bonus.
+
+V13 CONFIRMED (structurally). Custom techs do not render because the tech tree UI draws only techs inside predeclared grid boxes; DLC-replaced folders fail without an error. Hagane: CHANGELOG:126-138; hoi4-build-api/SKILL.md:85. Evidence: interface/countrytechtreeview.gui has 124 gridboxtype entries; folder views for armour_folder (line 551), nsb_armour_folder (842), air_techs_folder (2266) and bba_air_techs_folder (2643); hoi4.exe contains the string "Found no grid box for tech %s". I did not test the in-game rendering of a custom tech myself.
+
+V14 CONFIRMED. The folder name uses the British spelling armour_folder. Hagane: hoi4-build-api/SKILL.md:85. Evidence: common/technology_tags/00_technology.txt:149 (armour_folder), 157 (nsb_armour_folder).
+
+V15 CONFIRMED. on_startup, on_daily_TAG, on_weekly_TAG, on_monthly_TAG exist as hook families; on_state_control_changed has ROOT = new controller, FROM = old controller, FROM.FROM = the state. Hagane: guide:94, 111-113, 224; hoi4-wiring/SKILL.md:59-67; hoi4-mod-design/SKILL.md:183-185. Evidence: common/on_actions/_documentation.md:8-14 (hook list, updated 2024-11), 23, 38, 69; the vanilla comment at common/on_actions/00_on_actions.txt:5075 states the scope mapping almost verbatim. Vanilla also uses per-tag hooks (00_on_actions.txt:5770 on_daily_GER, 5783 on_weekly_GER, 5920 on_monthly_GER, and many more).
+
+V16 CONFIRMED (hook), UNVERIFIED (base-mod behaviour). on_ruling_party_change exists in 1.19.3 (on_actions/_documentation.md:23). Whether a given base mod comments out hooks (hoi4-submod/SKILL.md:193-196) cannot be checked here.
+
+V17 CONTRADICTED (partly). The guide says attache, volunteers and lend-lease each have a hook named on_send_attache, on_send_volunteers, on_lend_lease, and that the base game does not use them. Hagane: guides/dynamic-spirit-from-variables.en.md:226, 400. Evidence: on_send_volunteers is in the 1.19.3 hook list (on_actions/_documentation.md:31) and used by four vanilla files (06_bftb_on_actions.txt:523, 07_nsb_on_actions.txt:2005, 10_toa_on_actions.txt:460, 12_wuw_on_actions.txt:1737). Neither on_send_attache nor on_lend_lease appears anywhere in common/ or documentation/ of the install. The guide admits these were not tested.
+
+V18 CONFIRMED except one default. Defines examples. Hagane: field-reference/defines.md:27-39, 46-49. Evidence from common/defines/00_defines.lua: EVENT_TIMEOUT_DEFAULT = 13 (line 19, in NGame); BASE_TRUCE_PERIOD = 180 (43, NDiplomacy); BASE_RESEARCH_SLOTS = 2 (302, NCountry); RESISTANCE_TARGET_BASE = 35.0 (517, NResistance); BASE_TECH_COST = 110 (710, NTechnology); BASE_POLITICAL_POWER_INCREASE = 2 (725, NPolitics); MAX_BUILDING_LEVELS = 15 (742, NBuildings); MAX_ARMY_EXPERIENCE = 500 (887, NMilitary). CONTRADICTED: BASE_FACTORY_SPEED is listed as 5 (defines.md:35) but is 4 at line 630 (NProduction) in 1.19.3, next to BASE_FACTORY_SPEED_MIL = 3.5 and _NAV = 2.0. START_DATE = "1936.1.1.12" at line 4, END_DATE = "1949.1.1.1" at line 5, so the date format claim holds.
+
+V19 CONFIRMED plus one more. Reserved vanilla defines files to never copy. Hagane: defines.md:14. Evidence: common/defines contains 00_defines.lua, 00_graphics.lua and also 01_career_profile.lua, which the page does not list.
+
+V20 CONFIRMED. set_state_controller is a country-scope effect taking the state; written the other way round it fails. Hagane: guide:274. Evidence: effects_documentation.md:7691-7699 (scope COUNTRY).
+
+V21 CONFIRMED. The tooltip argument on add_to_variable is used more than two thousand times. Hagane: guide:357. Evidence: 2236 single-line vanilla occurrences by my regex (plus multi-line forms). The effects documentation entry (effects_documentation.md:2343-2360) does not list the argument, so the vanilla scripts are the better source; script_concept_documentation.md:21-40 describes bindable-loc tooltips in general.
+
+V22 CONFIRMED. Built-in dynamic variables listed in the guide exist. Hagane: guide:284-293. Evidence: dynamic_variables_documentation.md headings for casualties_k (187), enemies_strength_ratio (293), num_core_states (544), num_faction_members (566), num_of_civilian_factories (604), num_of_controlled_states (619), num_of_military_factories (629), num_owned_states (670), num_subjects (683), stability (785), surrender_progress (791).
+
+V23 CONFIRMED. Balance-of-power tokens. Hagane: hoi4-build-scripting/SKILL.md:128-130, 149-153. Evidence: set_power_balance (effects 7571; also takes left_side, right_side, set_default, set_value, which the skill omits), add_power_balance_value (1893, includes tooltip_side), add_power_balance_modifier (1878); triggers has_power_balance (4556), is_power_balance_in_range (6115), is_power_balance_side_active (6130), power_balance_value (7271).
+
+V24 CONFIRMED (existence only). A pc_ trigger family exists. Hagane: hoi4-build-scripting/SKILL.md:184-185. Evidence: triggers_documentation.md:7010-7207, 18 triggers (pc_is_winner, pc_current_score, pc_turn, and so on). The statement that ordinary triggers read the pre-conference world mid-conference is UNVERIFIED.
+
+V25 CONFIRMED. Triggers named in the guide exist: has_attache_from (3250), is_core_of (5390), is_controlled_by (5381), has_volunteers_amount_from (5015), is_lend_leasing (5844) in triggers_documentation.md.
+
+V26 CONFIRMED. Scripted localisation shape and scope rule. Hagane: hoi4-build-scripting/SKILL.md:61-62, 117-120; scripted-localisations.md. Evidence: common/scripted_localisation/00_scripted_localisation.txt:1-14 (header comment says triggers must be valid for the scope the key is called in; a defined_text block contains its own name line and text entries each with trigger and localization_key); calls in loc look like [ROOT.GetX] (many hundreds of vanilla usages).
+
+V27 CONFIRMED. Idea picture drops the GFX_idea_ prefix; the legal rule is "a sprite of that name is declared", not "some vanilla idea uses it". Hagane: hoi4-build-api/SKILL.md:146-149; CHANGELOG:23-59. Evidence: of 6112 picture lines in common/ideas only 22 use the full prefix; GFX_idea_war_economy is declared at interface/ideas.gfx:1192 yet no vanilla idea uses a picture of that name (the clean example given). Count claim "4257 declared names in 1.19.2": my count in 1.19.3 over all .gfx files is 4131 unique lowercase names matching the declaration pattern, same order of magnitude; exact number UNVERIFIED (different method and version).
+
+V28 CONFIRMED. GFX_idea_unknown is a base-game placeholder. Hagane: guide:65. Evidence: interface/countrydiplomacyview.gfx:820 declares it; the dynamic-modifier template comment uses it as an example icon.
+
+V29 CONFIRMED. Focus prerequisites: separate prerequisite blocks are ANDed, entries inside one block are ORed. Hagane: hoi4-build-api/SKILL.md:120-122. Evidence: vanilla common/national_focus/generic.txt:443 (one block with two focus entries) and 277-279 (several single-focus blocks in a row). The OR/AND reading is the established engine semantics; I confirmed the file shape, not the runtime behaviour.
+
+V30 CONFIRMED-WITH-NUANCE. Decisions and categories are global unless gated; gate with original_tag. Hagane: hoi4-build-api/SKILL.md:133-136; CHANGELOG:193-200. Evidence: vanilla country categories gate with allowed = { original_tag = X } and leave visible empty (common/decisions/categories/AFG_decision_categories.txt:1-12). Hagane recommends visible for categories; both would hide, but allowed is the vanilla idiom (15 original_tag mentions in that one file).
+
+V31 CONFIRMED. In a targeted decision, ROOT is the taker and FROM the current target. Hagane: field-reference/tokens.md:61-63; hoi4-wiring/SKILL.md:101. Evidence: common/decisions/AFG.txt:479-488 (target_trigger with FROM = { ... is_claimed_by = ROOT }).
+
+V32 CONFIRMED. BRN (Brunei) is in the vanilla tag list; CHI, HUN, SHX are vanilla tags. Hagane: hoi4-submod/SKILL.md:138-140; hoi4-build-api/SKILL.md:143-145. Evidence: common/country_tags/00_countries.txt:354 (BRN) and the CHI/HUN/SHX lines; history/countries has "BRN - Brunei.txt". hoi4.exe also holds the string "Duplicate Country Tag" (V38). "Since 1.18" is UNVERIFIED.
+
+V33 CONFIRMED. Vanilla state files have irregular names. Hagane: hoi4-submod/SKILL.md:126-129. Evidence: history/states has "333-British Borneo.txt", "1023 - Brunei.txt" and "1022 - Interior Borneo.txt" (spacing differs between files). Both 333 and 1023 states exist in 1.19.3 (STATE_333 is shown as "Sarawak" in localisation).
+
+V34 CONFIRMED (count drifted). All impassable states also carry force_link_ownership_to. Hagane: CHANGELOG:147-152 (says 21). Evidence: 22 state files in history/states set impassable = yes, and the same 22 files contain force_link_ownership_to (none of the impassable files lacks it).
+
+V35 CONFIRMED. HOI4 has no way to disable or cancel an event. Hagane: hoi4-submod/SKILL.md:33-34, 180-181. Evidence: the effects documentation lists only country_event, news_event, state_event, unit_leader_event, operative_leader_event, event_target save/clear and event_option_tooltip as event-related effects (effects_documentation.md grep); no cancel/remove effect. Not tested: file-level shadowing, which the other Hagane page allows (section 6 tension).
+
+V36 UNVERIFIED. Writing STATE_<id>:0 for a rename triggers a collision that vanilla wins. Hagane: hoi4-submod/SKILL.md:119-121. Evidence: vanilla localisation uses the unversioned form (localisation/english shows "STATE_1: ..." and "STATE_1023: ..."), which is consistent with their advice but does not prove the failure mode. text.log does report duplicate keys (V39), so a test is easy.
+
+V37 PARTLY CONTRADICTED. Script .txt must not carry a BOM, localisation .yml must. Hagane: guides/dynamic-spirit-from-variables.en.md:23. Evidence: all 207 localisation/english/*.yml files start with a BOM (confirmed). But 1264 of the 4404 .txt files under common/, events/ and history/ also start with a BOM, so vanilla itself ships BOM-prefixed script. "Must not" is false as a hard rule; "may" is the accurate statement. The filename suffix rule _l_english.yml is consistent with vanilla file names.
+
+V38 CONFIRMED. Engine error strings that Hagane's rules rely on exist in hoi4.exe: "Duplicate Country Tag", "Invalid Scope" (and lowercase variants), "Duplicate localization found", "Found no grid box for tech %s", and the per-ideology country-leader messages (V02). The string "unterminated" does not appear in the executable (so that quote-related finding name in the changelog is the platform's own lint code, not an engine message).
+
+V39 CONFIRMED. text.log surfaces loc collisions. Hagane: hoi4-submod/SKILL.md:171-172. Evidence: the local logs/text.log contains "Duplicate localization found, key: ..., file: ..." lines (localize.cpp:658 prefix), including pairs from localisation/english and localisation/replace.
+
+V40 CONFIRMED. Player-data crash diagnostics. Hagane: hoi4-investigate/SKILL.md:58-69. Evidence: local logs/ holds game.log, error.log, text.log, system.log and others; a crashes/hoi4_<timestamp>/ folder holds exception.txt (shows a C0000005 EXCEPTION_ACCESS_VIOLATION header block), dlc_load.json, and more that the skill does not mention: mods_registry.json, meta.yml, a logs/ subfolder copy, settings files and a minidump. game.log carries a "Start-date:" line and every log line carries bracketed real time, in-game date and source file, so the date at the last line says what start was running. The extra crash-folder items (mods_registry.json, per-crash logs copy) are useful additions (inferred).
+
+V41 CONFIRMED (structurally). The launcher reads the outer .mod listed in dlc_load.json, not the inner descriptor. Hagane: field-reference/_timeline-and-replace-path.md:28-34. Evidence: local dlc_load.json lists enabled mods as "mod/<name>.mod" paths; each outer .mod holds name, path (pointing at the inner folder), supported_version and the replace_path lines; the inner-folder descriptor is a separate file. Which of the two the engine uses for replace_path is inferred from this layout, not tested.
+
+V42 CONFIRMED. Vanilla has two bookmarks and a bookmark-level effect block. Hagane: _timeline-and-replace-path.md:52-65; hoi4-build-api/SKILL.md:84. Evidence: common/bookmarks has the_gathering_storm.txt (date 1936.1.1.12, default) and blitzkrieg.txt (1939.8.14.12). Each ends with an effect block (the_gathering_storm.txt:1463-1466, blitzkrieg.txt:1142-1145) containing randomize_weather with a vanilla comment calling it obligatory in every bookmark (derived finding, not in Hagane).
+
+V43 DOUBTFUL WORDING. "A dated block only executes when the start date is on or after its date." Hagane: _timeline-and-replace-path.md:67-70. Evidence: vanilla history has later-dated blocks (history/countries/ENG - Britain.txt:333 and 1647 hold 1939.1.1 blocks) that exist precisely to run when the clock reaches that date in a 1936 start. The same page's next paragraph states the right consequence (a pre-1936 start runs into the scripted era years later). UNVERIFIED from files (runtime behaviour), but the sentence as written is ambiguous.
+
+V44 UNVERIFIED / DOUBTFUL. "replace_path only strips vanilla; other mods' files are untouched." Hagane: _timeline-and-replace-path.md:9-12, 35-36. No local documentation covers replace_path. I recall it also affecting earlier-loaded mods, but I have no evidence here; treat as unknown and test with a two-mod setup before relying on it.
+
+V45 CONTRADICTED. production_speed_factor appears as a common modifier. Hagane: field-reference/tokens.md:55. Evidence: modifiers_documentation.md has no such modifier; the production-speed family is production_speed_<building>_factor, production_speed_buildings_factor, license_*_production_speed_factor, production_factory_*_factor. Other modifiers in the same list are real (political_power_factor, stability_factor, war_support_factor, research_speed_factor, consumer_goods_factor, army_attack_factor, army_defence_factor, army_org_factor, justify_war_goal_time, conscription (line 2272), industrial_capacity_factory).
+
+V46 MISLEADING. set_state_owner = <TAG> in tokens.md:26. Evidence: effects_documentation.md says set_state_owner is a COUNTRY-scope effect ("set owner for state") that takes a state; the state-scope form is set_state_owner_to = TAG (vanilla: "268 = { set_state_owner_to = ETH }"). Vanilla never uses set_state_owner. The adjacent entries transfer_state, add_state_core are country-scope with a state id and match tokens.md.
+
+V47 UNVERIFIED. "event_target persists across events; PREV and FROM do not survive a fresh event fire." Hagane: hoi4-wiring/SKILL.md:91-93. Evidence: the docs only offer save_event_target_as and a separate save_global_event_target_as with clear_global_event_target(s) (effects_documentation.md:6496-6511, 2733-2750); has_event_target says "current scope or global scope" (triggers_documentation.md:3844). Hagane never distinguishes scoped from global targets, so lifetime rules are unclear.
+
+V48 CONFIRMED. Token existence batch from tokens.md: 38 effect names (add_political_power through news_event, including create_faction, set_rule, declare_war_on, white_peace, puppet, set_autonomy, set_technology, add_equipment_to_stockpile, unlock_decision_category_tooltip) and 13 triggers (has_country_flag, has_global_flag, check_variable, original_tag, tag, has_government, has_war, date, has_completed_focus, has_idea, has_dlc, is_ai, has_stability) all exist as headings in the 1.19.3 documentation.
+
+V49 CONFIRMED (forms). load_focus_tree accepts both the short form and the block form with tree, keep_completed, copy_completed_from. Hagane: hoi4-submod/SKILL.md:96-98; tokens.md:33. Evidence: effects_documentation.md:4771-4790; vanilla uses the short form 25 times and the block form 56 times. "An explicit load beats tree scoring" is UNVERIFIED but sensible.
+
+V50 UNVERIFIED. Variable scope-chain names such as PREV.PREV.var, and the [?var|Y0] format codes. Hagane: guide:193, 228-242. The guide reports in-game tests (guide:398), which I did not repeat; the documentation I have does not cover these two forms. Plausible.
+
+V51 UNVERIFIED. Several defines mechanics: "a trailing comma in an override crashes at launch"; later files win in ASCII filename order. Hagane: field-reference/defines.md:11, 23-25. No local evidence.
+
+V52 UNVERIFIED. Platform-fact claims (export gate drops dangling refs; super-event switch; idea auto-attach switch; route behaviours; counts like 0 of 718 techs). These describe Hagane's server and cannot be checked from the install.
+
+V53 UNVERIFIED. "TNO has no vanilla democratic/communism/neutrality groups" (hoi4-submod/SKILL.md:93-95). TNO is not installed here.
+
+Summary of the checks: 53 claim groups. 32 confirmed outright, 5 confirmed with nuance (V02, V05, V12, V18 with its one wrong default, V30), 6 contradicted or misleading (V03, V06, V17, V37, V45, V46), 4 unsupported or doubtful (V07, V10, V43, V44), 6 unverifiable from the install (V36, V47, V50, V51, V52, V53). The contradictions cluster in hand-curated vocabulary (tokens.md, the defines table, the cosmetic-tag loc advice) and in hooks the author marked as untested, which matches Hagane's own advice that the validator and the game, not the reference file, are authoritative. It also shows the value of generating such vocabulary lists from the game's documentation/ folder instead of curating by hand.
+
+Methodological note (derived, not Hagane): matching an error message to a cause is much faster when you can grep the game executable for the exact message text, as I did for V02, V13 and V38. Messages found this way tell you exactly what condition the engine checks (for example per-ideology rather than blanket).
+
+---------------------------------------------------------------------------
+## 5. Weaknesses, internal inconsistencies and things not to copy
+---------------------------------------------------------------------------
+
+1. Suppression is declared impossible in one place and offered in another. hoi4-submod/SKILL.md:29-39 and 180-181 say a base mod's events cannot be cancelled and the platform only appends, while field-reference/_timeline-and-replace-path.md:35-36 and 80-86 tell you to shadow a base or vanilla event file with a neutered same-name copy. Both are true for different tools (the structured workbench cannot, the raw-file route can), but the reader is not told. For a general kit the honest statement is: no script switch exists to disable an event (V35), file-level shadowing is the only suppression, and it freezes a copy of the original that goes stale.
+2. The wiring self-check says project-local dangling references are silently dropped with no lint warning (hoi4-wiring/SKILL.md:111-115), yet the relations graph reports exactly those as unresolved (field-reference/_validation-tools.md:6-15; hoi4-build-api/SKILL.md:101). The fix is to run the graph in the self-check; the skill does not say so.
+3. One permanent-attach recipe uses days = -1 (hoi4-wiring/SKILL.md:77) while their guide omits days (guides/dynamic-spirit-from-variables.en.md:124); vanilla never uses a negative value (V07).
+4. A copy-paste defect: the curl recipe in hoi4-build-api/SKILL.md:164 and 166 has a literal backslash-n where a line continuation should be, whereas the same recipe at field-reference/_editing-existing-mods.md:47-49 is correct. Cause (inferred): the recipe is duplicated across files and one copy rotted. Lesson: keep one canonical copy of a recipe and link to it.
+5. Hand-curated vocabulary drifted (V45, V46) even though the same page says it is only a filling aid.
+6. Release lag between the two delivery channels is a documented hazard (CHANGELOG:25-27, 61-65): an agent on MCP reads old field-reference while an agent with skill files reads new text.
+7. The auto-update directive (README.md:110-115 and the header block of every skill, for example hoi4-investigate/SKILL.md:6-9) makes every session pull and then trust moving instructions from a remote repository. That is convenient for a hobby product and an instruction-supply-chain risk for ours. They also offer pinning (README.md:115). See H-A100.
+8. Many rules are phrased as absolutes ("never") that the evidence supports only in a narrower form (V02, V10). A catalog entry should carry the scope in which the rule was observed.
+9. The platform vendors, validates and exports; most of the clever machinery (export gate, tag guard, tooltip injection) is not available to a generic kit. Anything that says "the export does X for you" is platform behavior to re-implement, not a technique to copy.
+
+Platform-specific mechanics to ignore for generic use: PAT auth and User-Agent handling, /api/go route family, workbench resources and field names (dm_id, effect_tooltip_locs, raw_extras, scope_kind, source flag semantics), 409/422 behaviours, export job API and native_warnings, seed_states_from_vanilla/get_states/edit_state, upload endpoints, auto_fire_* super-event switches, auto_attach_on_start, the 25 MiB binary cap, the template-based raw-file routes, UI panel beta, the translate API, and the translation quota.
+
+---------------------------------------------------------------------------
+## 6. IDEA CATALOG
+---------------------------------------------------------------------------
+
+Source abbreviations used in references:
+INV = skills/hoi4-investigate/SKILL.md; DES = skills/hoi4-mod-design/SKILL.md; DDT = skills/hoi4-mod-design/DESIGN_DOC_TEMPLATE.md; CBT = skills/hoi4-mod-design/CONCEPT_TEMPLATE.md; SUB = skills/hoi4-submod/SKILL.md; WIR = skills/hoi4-wiring/SKILL.md; SCR = skills/hoi4-build-scripting/SKILL.md; API = skills/hoi4-build-api/SKILL.md; FR = field-reference/; CHG = CHANGELOG.md; GUIDE = guides/dynamic-spirit-from-variables.en.md; RDM = README.md. V## = ledger entries in section 4.
+"Home" is a first guess: Chaos = Chaos Redux; Kit = Agentic HOI4 Modding Kit; Factory = HOI4 Factory; several = more than one.
+Class: generic = usable without Hagane's platform; Hagane-API = depends on it (a generic analogue is noted where there is one).
+
+========================================================================
+### A. Investigation and debugging
+========================================================================
+
+H-A01 Root cause before any edit
+- Idea: forbid every edit, API write or patch until the agent can name the exact broken field, entity or output line. If it catches itself proposing a change earlier, it goes back to finding the cause.
+- Src: INV:26-28, 54-56 (state evidence first, then fix; fix only what is proven; never patch just to turn a validator green).
+- Class: generic. Area: investigation and debugging.
+- Example: an event option calls country_event with an id that does not exist. The agent must first show the option, the missing id and the file it came from before touching anything, instead of adding a stub event that merely silences the warning.
+- Home: several (Kit rule plus Chaos Redux workflow; Factory agent-loop policy for "fix" requests).
+
+H-A02 Re-verify the premise against live state; use trigger phrases
+- Idea: facts that come from memory, plan docs, backlog items, earlier audits or status reports are point-in-time; before scoping, re-read the current files. A list of tell-tale phrases ("the plan says", "a previous pass found", "should", "probably") tells the agent when it is about to rely on a stale premise. Anything more than a few days old is suspect by default.
+- Src: INV:30-36; also DES:63-64 (re-verify a prior audit before locking on it).
+- Class: generic. Area: investigation and debugging / agent workflow design.
+- Example: a handoff note says focus CR_x_a was renamed to CR_x_alpha. Before editing a prerequisite, grep the current focus file for both names; the note may predate a later revert.
+- Home: several (Kit rule; Chaos handoffs; Factory stage handoff template already moves in this direction).
+
+H-A03 Evidence ladder: an accepted write or a green validator is not proof
+- Idea: define explicit rungs of evidence: request accepted, validator green, entity re-read, artifact rebuilt, game error.log clean, in-game observation. Only the higher rungs close a bug. Verify against the real artifact (fresh export plus the game's own log), never against an intermediate signal.
+- Src: INV:38-47, 84-85; SUB:197-198; DES:158-163.
+- Class: generic. Area: validation / avoiding false success reports.
+- Example: a static validator passes a mod whose event uses a token that only the game rejects at load; the error.log line is the only rung that sees it.
+- Home: several (Kit core rule; Factory acceptance rows already distinguish source parsing, rendering, game execution; Chaos validators).
+
+H-A04 A surprising fix mechanism is a red flag, not cleverness
+- Idea: when an agent reports success through a path nobody expected (for example it "fixed" a missing loc line by adding the key to a file the game never loads, or by relaxing a check), the reviewer treats the surprise as a trigger to retrace the real path.
+- Src: INV:45-47, 82.
+- Class: generic. Area: agent workflow design / validation.
+- Example: a sub-agent reports "focus tree now loads" after it moved the focus into a new file; the review checks whether the original file still defines the same focus id twice.
+- Home: several (reviewer step in the Factory agent loop; Kit review checklist).
+
+H-A05 Measure the magnitude before fixing a "drop"
+- Idea: quantify any guessed count from the real artifact (list the entities, count the validator findings) before spending effort; the real number is sometimes zero.
+- Src: INV:49-52.
+- Class: generic. Area: investigation.
+- Example: "we lose dozens of loc keys at load": count distinct duplicate-key lines in text.log first; if there are three, the fix is three renames, not a loc pipeline rewrite.
+- Home: Kit / Chaos.
+
+H-A06 Crash triage reads the player's own logs before analysing mod content
+- Idea: for a crash to desktop, read in order: the last lines of logs/game.log (the in-game date and subsystem reached), crashes/hoi4_<timestamp>/exception.txt (exception class; an access violation is an engine null dereference and will not appear in error.log), and the active mod list (dlc_load.json, plus mods_registry.json in the crash folder, inferred extra). Only then read content.
+- Src: INV:58-69. Verified file names and layout (V40).
+- Class: generic. Area: investigation and debugging.
+- Example: a CTD right after the loading bar: game.log ends at "Start-date" lines and the exception is C0000005, so inspect country history, state ownership and capital settings for the played tag rather than hunting event text.
+- Home: Kit (a crash-triage skill and a small log-summary script); Factory (a "paste or upload crash folder" tool, since the hosted app cannot read the player's disk); Chaos.
+
+H-A07 Confirm which start date and bookmark actually ran
+- Idea: never assume the start the mod "intends"; the last log line's in-game date is ground truth. If it differs from the design, the whole analysis is built on the wrong world, so first fix what the player selected (or what the mod offers as default).
+- Src: INV:70-77; FR/_timeline-and-replace-path.md:28-34 (the case of vanilla's 1936 bookmark resurfacing).
+- Class: generic. Area: investigation.
+- Example: a mod meant to start in 1748 crashes at a date-gated vanilla block; game.log shows the player started the 1936 bookmark.
+- Home: Kit / Chaos.
+
+H-A08 Outer launcher .mod versus inner descriptor drift check
+- Idea: the launcher uses the outer mod/<name>.mod file that dlc_load.json lists, and its replace_path lines must match the inner descriptor. After any manual reinstall or update, compare the two; a stale outer file silently resurrects vanilla directories.
+- Src: FR/_timeline-and-replace-path.md:28-34. Verified layout (V41).
+- Class: generic. Area: existing-mod safety / validation.
+- Example: replace_path = common/bookmarks exists in the inner descriptor only; the player sees vanilla bookmarks and starts a world the mod was never built for.
+- Home: Kit (validator comparing the two files); Chaos (our launcher .mod); Factory (export both files and diff them in the export check).
+
+H-A09 Reproduce in a clean setup before blaming vanilla or the environment
+- Idea: dismissing a reproducible in-game issue as "just vanilla" is an explicit anti-pattern; reproduce in a clean mod set first.
+- Src: INV:85.
+- Class: generic. Area: investigation.
+- Example: "events fire twice" is blamed on a base mod; a vanilla-plus-only-this-mod run shows the duplicate comes from two on_actions blocks in two of our own files.
+- Home: Kit.
+
+H-A10 Filter error.log by your own identifiers; keep text.log for loc collisions
+- Idea: base-mod animation and entity noise is not yours; grep the log for your tag, focus/event ids, ideology and state ids. Use text.log for duplicate-localization reports.
+- Src: SUB:169-172. Verified (V39).
+- Class: generic. Area: validation / debugging.
+- Example: after an event pack change, grep error.log for the event namespace and for each new scripted_effect name.
+- Home: several (Kit script; existing error-log tool in the agent tools; Chaos).
+
+H-A11 Failure-signature table (symptom to real cause)
+- Idea: document the odd failure and its true cause next to the happy path. Their example: every request returns a bot-block 403 with an obscure code regardless of valid credentials because a default client signature is blocked.
+- Src: API:46-49; CHG:288-299.
+- Class: Hagane-API in content, generic as a doc form. Area: investigation.
+- Example (HOI4): "Invalid Scope" in error.log after set_state_controller written as a state-scope block (GUIDE:274); a question-mark icon from an undeclared idea sprite (CHG:45-59); text of "[?var|Y0]" showing raw on screen (GUIDE:276). A table of 30 such rows per domain beats prose.
+- Home: Kit; Chaos; Factory (error explainer in the UI).
+
+H-A12 Engine-string lookup to understand an error message [derived, not Hagane]
+- Idea: grepping the game executable for the exact text of an error tells you what condition the engine checks (V02: the leader-role rejection is per ideology, not blanket).
+- Src: my verification work (V02, V13, V38).
+- Class: generic. Area: investigation and debugging.
+- Example: error.log says a character already has a country leader role; the executable's strings show the check is ideology-specific, so the legal fix is a different ideology's role, not removal.
+- Home: Kit (knowledge-gathering technique); Factory (error catalog generation).
+
+H-A13 After a fix, reinstall the fresh artifact and re-check the log before anything else
+- Idea: rebuild, reinstall the new copy (not the old one), reload, then read the log again; do not reason about content until the log confirms what was loaded.
+- Src: INV:73-75, 91-96.
+- Class: generic. Area: investigation.
+- Example: a fixed event still fires wrongly because the player is running the previous mod copy; the log's mod list and date prove it.
+- Home: Kit / Chaos.
+
+========================================================================
+### B. Validation and avoiding false success reports
+========================================================================
+
+H-A14 Re-read after write; assert bytes
+- Idea: after saving a field, read the entity back and confirm the change landed on the intended id. For non-ASCII, compare bytes rather than trust the terminal rendering.
+- Src: INV:41-44; API:43-45.
+- Class: generic. Area: validation.
+- Example: an agent edits localisation with accented text on Windows; the tool call succeeded, the file now has mojibake. A byte comparison catches it; so does a read-back.
+- Home: several (Factory agent loop: reconcile by reading state, as our CLAUDE.md already says for GitHub; Kit; Chaos).
+
+H-A15 Run the same check through two code paths and compare counts
+- Idea: they discovered the older route family returned fewer findings and a thinner summary than the current one for the same project and token. A clean result on the old path was not a clean mod. Lesson: when a second path exists (old validator, alternative parser, cached result), diff outputs before trusting either.
+- Src: CHG:76-86, 119-122; FR/README.md:45-63; FR/_validation-tools.md:34-39.
+- Class: generic principle (the endpoints are Hagane-API). Area: validation.
+- Example: our package validator, the in-game error.log and a separate script scan all report on the same mod; run all three once per release and diff the lists of unresolved ids.
+- Home: Factory (host has multiple validation paths, e.g. static parse vs headless run); Kit.
+
+H-A16 Validator output must enumerate what it scanned, including zeros
+- Idea: their old summary counted only about twenty entity kinds, so whole categories were absent while the tally looked complete. A validator should print a coverage manifest with every kind it knows, including "0 found" and "not scanned".
+- Src: CHG:81-82; FR/README.md:56-59; FR/_validation-tools.md:38-39.
+- Class: generic. Area: validation.
+- Example: a check passes "all scripted effects defined"; the manifest shows scripted_triggers were never scanned, which is why an undefined trigger slipped through.
+- Home: Kit validators; Factory; Chaos.
+
+H-A17 Export drop report: read what the export dropped or fell back on before shipping
+- Idea: the export job returns a list of warnings (missing assets, English-fallback loc keys, scripted names it could not model) and also writes the same details as log files into the archive. Any generator that silently drops or falls back should say so in a machine-readable report that the agent must read.
+- Src: FR/_editing-existing-mods.md:61-63; API:169.
+- Class: Hagane-API in form, generic design. Area: validation.
+- Example: an exporter omits a sprite reference it could not resolve; without the report the mod ships with a blank icon.
+- Home: Factory (export pipeline and Git commit summaries); Kit.
+
+H-A18 Reference graph with a resolved flag per edge
+- Idea: build a graph of "who references whom" (focus fires event, decision adds idea, character unlocked by focus) and mark each edge resolved or not. Unresolved edges are the dangling references the game ignores or silently drops.
+- Src: FR/_validation-tools.md:6-15; API:101, 153-154; WIR:111-115 (why you need it).
+- Class: generic. Area: validation / reference graphs.
+- Example: a focus completion_reward fires country_event = { id = cr_x.12 } and the event was renamed cr_x.12a; the edge is unresolved. A focus prerequisite pointing at a renamed focus is the same class.
+- Home: several (Factory feature; Kit script; Chaos check; the existing impact-inspection tools in our agent set cover part of it).
+
+H-A19 Tri-state resolution: resolved, unresolved, unknown (no index)
+- Idea: when the reference index for a dependency has not been ingested, the checker trusts all references and says so instead of flagging; indexing is "strictly an upgrade". Report unknown separately from resolved so that quiet means "clean" only where coverage exists.
+- Src: SUB:66-68; DES:70-72; WIR:111-115.
+- Class: generic. Area: validation / honesty of coverage.
+- Example: a submod refers to a base-mod character token that is misspelled; with no index the check says nothing, with one it flags it. The report should mark the character token class as "unknown" until the index exists.
+- Home: several (Factory, Kit validators).
+
+H-A20 Scripted-symbol index: used-but-undefined names and name collisions
+- Idea: resolve every scripted_effect, scripted_trigger and scripted_localisation symbol to its definition and every call site; flag names called but not defined and names defined twice.
+- Src: FR/_validation-tools.md:17-23; SCR:54-55, 161-165.
+- Class: generic. Area: validation / symbol indexes / duplicate detection.
+- Example: an event option calls CR_cleanup_effect = yes but the file defines CR_cleanup_effects; or two files define the same effect name and the later one silently wins.
+- Home: several (Kit script; Factory index; Chaos CI).
+
+H-A21 Orphan-definition audit
+- Idea: assert that every definition is used the way its type requires: each flag has a reader and a setter in compatible scope; each dynamic modifier is added somewhere; each balance-of-power definition is activated; each song entry matches an asset; each scripted name referenced exists.
+- Src: SCR:161-168, 174-176 (defined-but-never-applied is completely inert); WIR:119-122.
+- Class: generic. Area: validation / cross-entity dependencies.
+- Example: a dynamic modifier file exists but nothing calls add_dynamic_modifier, so the "penalty" the design describes never appears; a set_country_flag has no has_country_flag reader anywhere.
+- Home: several (Kit lint; Factory relations view; Chaos).
+
+H-A22 Validate a scripted block against every call site's scope
+- Idea: a reusable block has no scope of its own; its tokens must be legal in each caller's scope. A body that works from a focus can break from a state-scope caller.
+- Src: SCR:143-145, 173-175; WIR:89-92; WIR:26-34 (token plus scope check).
+- Class: generic. Area: validation / scopes.
+- Example: scripted effect adds stability but is called inside every_state in one event; per-call-site validation finds the one broken caller.
+- Home: Kit / Factory (needs scope inference over the call graph); Chaos.
+
+H-A23 Field-to-token-class table used as lint input
+- Idea: keep a table saying which field holds effects, which triggers, which modifiers (and which are typed-only). Lint then catches an effect token in a trigger field and the reverse.
+- Src: FR/_raw-script-fields.md:22-49, 60-67.
+- Class: generic (the field names are Hagane's; the concept maps to native blocks such as immediate, trigger, available, complete_effect). Area: validation / structural checks.
+- Example: add_stability inside a focus available block; an event trigger block containing a country_event effect.
+- Home: Kit; Factory editor (typed palette); Chaos.
+
+H-A24 Silent-typo classes need explicit existence checks
+- Idea: some assignments fail silently: a misspelled defines key, a sprite name no file declares, a scripted-localisation call typo (renders as literal bracket text), a nonexistent modifier. Check each name against the authoritative list (vanilla defines keys, declared sprite names, defined_text names, the modifier list from the game's documentation).
+- Src: FR/defines.md:58-60; SCR:155-157, 177-179; CHG:45-59; V45 (a nonexistent modifier sat in their own vocabulary page).
+- Class: generic. Area: validation / unresolved identifiers.
+- Example: NDefines.NGame.EVENT_TIMEOUT_DEFAULLT = 30 assigns happily and changes nothing; an idea uses a modifier name that only exists in a different scope.
+- Home: several (Kit validator parsing 00_defines.lua and modifiers_documentation.md).
+
+H-A25 Advisory finding with suggestions instead of a silent drop
+- Idea: when an unknown value is dropped, emit a non-blocking finding carrying the entity, the offending value and up to three "did you mean" candidates. Silence was the original bug.
+- Src: CHG:56-58.
+- Class: generic design. Area: validation UX.
+- Example: picture = war_econmy on an idea: "did you mean war_economy, wartime_economy".
+- Home: Factory (error UX); Kit.
+
+H-A26 Localisation checks as one bundle
+- Idea: localisation files need a BOM and an _l_<language> suffix; keys have a restricted character set (one illegal character drops the rest of the file, per the guide); duplicate keys collide across files; an event option key must not collide with the auto description key; every string must exist in each target language; scripted-loc bracket calls must resolve.
+- Src: GUIDE:23, 130, 384; API:126-132; SUB:171-172; SCR:155-157, 181-182. (V37, V39.)
+- Class: generic. Area: validation / localisation.
+- Example: a fourth event option keyed .d collides with the event description key .d; both appear in text.log duplicates.
+- Home: several (Kit validator; Chaos CI; Factory).
+
+H-A27 Asset and sprite references resolve against declarations; sniff file type, not extension
+- Idea: the legal test for a sprite reference is "a spriteType of that name is declared" in vanilla, DLC or the mod, not "some vanilla object uses it". Referencing another mod's sprite name shows a placeholder. For audio, a renamed non-Vorbis file named .ogg fails silently, so check content.
+- Src: CHG:23-59; API:146-149; SUB:151-157; SCR:183; FR/_editing-existing-mods.md:82-85. (V27, V28.)
+- Class: generic. Area: validation.
+- Example: idea picture value that no .gfx declares; an event picture path to a file with the wrong container format.
+- Home: several (Kit validator; Factory asset pipeline; Chaos).
+
+H-A28 Every knowledge entry carries its own test provenance
+- Idea: end each guide with a short section listing exactly what was tested (game version, start, what was loaded) and what was only derived from docs. Mark untested statements as such inline.
+- Src: GUIDE:3, 394-400; guides/README.md:7-8.
+- Class: generic. Area: agent workflow design / knowledge hygiene.
+- Example: the guide's three diplomacy hooks are flagged untested, and indeed two of them are absent from the whole 1.19.3 install (V17).
+- Home: several (Kit knowledge format; Factory docs; matches our evidence discipline).
+
+========================================================================
+### C. Scripting and authoring mechanics (HOI4 knowledge)
+========================================================================
+
+H-A29 Scope trap catalogue
+- Idea: collect and test scope traps. Hagane's list: a country effect inside a state iterator silently does nothing; a flag lives on the country that ran the setter, so the reader must be in the same scope; ROOT in on_state_control_changed is the new controller, not the country you want; switching into a country block does not change ROOT.
+- Src: WIR:49-55, 95-106, 124-126; GUIDE:94, 193, 224, 381. Hook scope confirmed (V15).
+- Class: generic. Area: scripting and authoring / scopes.
+- Example: a recount effect called from on_state_control_changed uses ROOT and counts another country's core states, so a spirit shows zero.
+- Home: several (Kit reference; Chaos conventions; Factory linter).
+
+H-A30 Put the scope chain into the variable name instead of a nested scope block
+- Idea: inside a nested loop, adding to a counter through a PREV.PREV scope block silently adds to the wrong (foreign) country; writing the chain into the variable name (PREV.PREV.counter) targets the right one. One extra PREV per extra loop level.
+- Src: GUIDE:193, 381. In-game tested by Hagane (GUIDE:398); not re-verified here (V50).
+- Class: generic. Area: scripting.
+- Example: counting how many foreign attaches a faction accepted in a nested every_other_country loop.
+- Home: Kit / Chaos.
+
+H-A31 Per-country tick hooks and self-requeuing heartbeat events
+- Idea: use on_daily_<TAG>, on_weekly_<TAG>, on_monthly_<TAG> instead of the global hook with a tag guard, because the global hook runs the body for every country; and a heartbeat event can requeue itself by firing itself again from its own immediate block.
+- Src: WIR:59-67; GUIDE:111-113; SUB:193-196. Hooks confirmed (V15).
+- Class: generic. Area: scripting / performance.
+- Example: a per-country maintenance effect in a large event mod runs from the global monthly hook with a tag limit, so the body is entered once per country every month; the per-tag hook is entered for the one country only.
+- Home: Chaos; Kit.
+
+H-A32 Variable-driven dynamic modifier: three pieces
+- Idea: an idea cannot hold a variable in its modifier. A dynamic modifier can. Pattern: the dynamic modifier binds a stat to a variable name; a scripted effect recounts and writes the variable; a per-country daily hook runs the recount; initialise before attaching; write per-rule explanation lines yourself in the custom tooltip because the engine shows only the total.
+- Src: GUIDE:38-141, 340-374; FR/dynamic-modifiers.md:23-30. Core facts confirmed (V08, V09, V21).
+- Class: generic. Area: scripting.
+- Example: a "pressure" national spirit that grows with each core state lost.
+- Home: Chaos; Kit (cookbook entry); Factory (template for dynamic spirits).
+
+H-A33 Recompute-from-components meters
+- Idea: a score that only accumulates overflows over a multi-year campaign and is idle-farmable. Recompute each period from a sticky "earned" part plus a current "positional" part, clamp, and show dimensions or tiers instead of the raw number.
+- Src: DES:187-190; GUIDE:90-92, 317-336 (fold step: count, then scale, then clamp; ratios and thresholds are last-line changes).
+- Class: generic. Area: design / scripting.
+- Example: a legitimacy or tension bar in an event mod.
+- Home: Chaos; Kit.
+
+H-A34 Same-day refresh
+- Idea: a daily hook means "tomorrow". To make a number move the day something happens, call the recount from the matching event hook and then call force_update_dynamic_modifier.
+- Src: GUIDE:204-226. Confirmed (V08, V15).
+- Class: generic. Area: scripting.
+- Example: refresh the spirit as soon as a state changes controller.
+- Home: Chaos; Kit.
+
+H-A35 Variable and flag rewards need tooltips
+- Idea: set_variable, add_to_variable and flag setters show nothing in a tooltip. Add a custom_effect_tooltip, or use the tooltip argument that vanilla uses thousands of times on the variable effects, with $RIGHT$/$LEFT$ tokens in the text.
+- Src: API:150-152; WIR:55-57, 131; GUIDE:338-374. Confirmed (V21).
+- Class: generic. Area: scripting / player experience.
+- Example: a focus whose only reward is add_to_variable looks like it does nothing; a lint can flag completion_reward blocks that contain only invisible effects.
+- Home: Kit lint; Chaos; Factory.
+
+H-A36 Console test events and temporary retiming
+- Idea: test a long-delayed outcome by temporarily shortening the delay (for example to a week) in a test build, then restore and re-check before shipping. Use a small test event with is_triggered_only and fire it from the console to cause a controlled world change.
+- Src: SUB:174-177; GUIDE:255-274.
+- Class: generic. Area: validation / testing.
+- Example: an event scheduled 365 days out; retime to 7, observe, restore. A guard step should scan for leftover test values.
+- Home: Kit / Chaos; Factory (test-plan generator).
+
+H-A37 Leader-token traps
+- Idea: promote an existing latent leader role instead of adding a second one for the same ideology; ruling_party takes the ideology group but the character effects take the subtype; rename by name argument (not by character token); read the base mod's ideology registry instead of assuming vanilla group names.
+- Src: SUB:83-95, 184-185. Verified with nuance (V01-V04).
+- Class: generic. Area: scripting.
+- Example: set_politics = { ruling_party = nazism } is wrong; fascism is the group.
+- Home: Kit; Chaos.
+
+H-A38 Succession is event driven; one active leader per ideology
+- Idea: a second leader of the same ideology is a dormant extra until something promotes it; an allegiance flip of the same person uses a different effect than a death.
+- Src: WIR:68-74, 132. (V05 nuance: kill_country_leader promotes the next in line.)
+- Class: generic. Area: scripting.
+- Example: succession chain in a monarchy mod.
+- Home: Chaos; Kit.
+
+H-A39 Cosmetic-tag localisation set
+- Idea: swapping a cosmetic tag changes the internal tag only; the visible name, definite form and adjective need localisation keyed by the cosmetic tag (and, in vanilla, often ideology or autonomy suffix variants).
+- Src: WIR:76-81, 133. Corrected in V06 (the second key is the definite form; the adjective is a third key).
+- Class: generic. Area: localisation / scripting.
+- Example: a country renamed after a focus shows the raw tag in diplomacy because _DEF or _ADJ was missed.
+- Home: Kit check (for each set_cosmetic_tag, require name, _DEF, _ADJ); Chaos; Factory.
+
+H-A40 Define a reusable effect once; call with the exact convention; watch the caller scope
+- Idea: put repeated blocks in one scripted effect/trigger and call as name = yes; edit once and all callers change. A call without the equals-yes form is a parse error; the body runs in the call site's scope.
+- Src: SCR:110-114, 143-145; WIR:85-93.
+- Class: generic. Area: scripting.
+- Example: five focuses doing the same purge; one scripted effect.
+- Home: Kit / Chaos.
+
+H-A41 Scripted localisation discipline
+- Idea: defined_text is a named dispatch block (the block repeats its own name line), its triggers are evaluated in the scope of the loc call, the strings live in ordinary loc keys, and a typo in the call renders as visible bracket text, so proofread in game.
+- Src: SCR:57-64, 117-120, 155-157, 181-182. Confirmed (V26).
+- Class: generic. Area: localisation / scripting.
+- Example: a title that changes with government: [ROOT.GetCRTitle].
+- Home: Kit; Chaos; Factory.
+
+H-A42 Balance of power is a three-part contract
+- Idea: the definition file alone is inert; activate it with set_power_balance, then push values or modifiers from focuses and events, and use the BoP triggers for reactions. Activation sets the bar visible.
+- Src: SCR:128-130, 149-153. Confirmed (V23).
+- Class: generic. Area: scripting.
+- Example: a BoP defined in common/bop with no set_power_balance anywhere (see H-A21).
+- Home: Kit; Chaos.
+
+H-A43 Defines hygiene
+- Idea: override per key only; one assignment per line; never copy a vanilla defines file (it freezes every constant at one patch); never hand-write the start and end dates when the mod timeline is set elsewhere; defines are read once at load, so restart to test.
+- Src: FR/defines.md:9-16, 58-64; SCR:105, 131-133, 177-179. Confirmed (V18, V19).
+- Class: generic. Area: scripting / validation.
+- Example: a copy of 00_defines.lua in the mod from an older patch would overwrite newer defaults; a validator could count how many assignments equal the vanilla value.
+- Home: several (Kit lint; Chaos; Factory).
+
+H-A44 Tech tree UI is a fixed set of grid boxes
+- Idea: custom technologies only render when placed in a folder the UI knows; folders replaced by DLC (armour/air variants) fail without any error. Do not teach a tech workflow before testing rendering.
+- Src: CHG:126-138. Confirmed structurally (V13, V14).
+- Class: generic. Area: scripting / feasibility.
+- Example: a mod adding a technology to armour_folder with the No Step Back variant active.
+- Home: Kit knowledge; Chaos (if techs are added); Factory (decide whether to expose techs).
+
+H-A45 Focus prerequisites: AND of OR groups; mutual exclusivity as list
+- Idea: separate prerequisite blocks are ANDed, entries within one block are ORed; mutually exclusive links must be listed on each branch entry.
+- Src: API:120-122. Confirmed (V29).
+- Class: generic. Area: scripting.
+- Example: a prerequisite that points at a renamed focus makes a focus unreachable; the reference graph (H-A18) finds it.
+- Home: Kit / Factory focus editor.
+
+H-A46 Reward-token traps that pass lint but fail in game
+- Idea: keep a list of effects that look legal but are not for that block, such as research_bonus as a reward, or add_tech_bonus with a category that is not a technology category (they say use industry; vanilla also has construction_tech).
+- Src: API:116-119. (V11, V12.)
+- Class: generic. Area: scripting / validation.
+- Example: a focus reward block with research_bonus = { ... } copied from an idea.
+- Home: Kit lint; Chaos.
+
+H-A47 Decisions and categories are global by default
+- Idea: a country-specific decision or category must be gated with an allowed trigger (original_tag); organisational fields alone do not restrict visibility.
+- Src: API:133-136; CHG:193-200. (V30.)
+- Class: generic. Area: scripting.
+- Example: a decision category added for TAG X appears to every country.
+- Home: Kit lint; Chaos.
+
+H-A48 Idea picture rule
+- Idea: the idea picture value omits the sprite prefix; an unknown name gives a question-mark icon; the legal test is that a sprite is declared.
+- Src: CHG:23-59; API:146-149. (V27.)
+- Class: generic. Area: scripting / assets.
+- Example: spirit slot with a placeholder.
+- Home: Kit lint; Factory.
+
+H-A49 DLC gate metadata per feature
+- Idea: record which features depend on which DLC (their pages flag military sub-workbenches, special projects, autonomy states) and make the checker warn when content uses a DLC-gated feature without a has_dlc guard.
+- Src: CHG:257; API:96-97; FR/tokens.md:49-50. has_dlc exists (V48).
+- Class: generic. Area: validation.
+- Example: a mod uses an MIO or a power-balance mechanic that silently does nothing for a player without that DLC.
+- Home: several (Kit; Factory; Chaos).
+
+H-A50 Check that the hook you build on actually fires
+- Idea: some base mods disable hooks; before building on a hook, check that the final loaded on_actions still contains and uses it, or choose your own per-country hook.
+- Src: SUB:193-196; WIR:36-38 (hook names are attach points, not tokens). (V15, V16.)
+- Class: generic. Area: existing-mod safety.
+- Example: relying on on_ruling_party_change in a submod where the base mod's overriding on_actions file removed it.
+- Home: Kit; Factory.
+
+H-A51 Use the matching trigger family for transient engine states
+- Idea: during a peace conference the world is still the pre-conference world for ordinary triggers; use the pc_ family for conference decisions.
+- Src: SCR:184-185. Existence confirmed (V24).
+- Class: generic. Area: scripting.
+- Example: a peace-conference cost modifier that tries to read ownership after taking states.
+- Home: Chaos (if peace conference content is added); Kit knowledge.
+
+========================================================================
+### D. Existing-mod safety, overrides and load order
+========================================================================
+
+H-A52 Override mechanism decision table
+- Idea: choose between same-name file shadowing (one file, overrides vanilla and earlier mods, failure = double define on a misspelled filename) and replace_path (whole directory, vanilla; failure = empty category). Default to shadowing.
+- Src: FR/_timeline-and-replace-path.md:7-18, 35-36; FR/_editing-existing-mods.md:79-81.
+- Class: generic. Area: existing-mod safety.
+- Example: overriding one vanilla event file versus wiping common/bookmarks.
+- Home: several (Kit rule; Factory export logic; Chaos).
+
+H-A53 Emptied-directory guard
+- Idea: only add a replace_path when the complete replacement set is generated together; declaring the path without full contents boots with an empty category (a crash). If the full file cannot be produced, add no replace_path.
+- Src: FR/_timeline-and-replace-path.md:22-27, 38-50.
+- Class: generic. Area: existing-mod safety / validation.
+- Example: replace_path = common/ideologies with only a partial ideology file.
+- Home: several (Kit validator; Factory exporter; Chaos).
+
+H-A54 Shadow files with the exact original filename
+- Idea: copy vanilla irregular filenames verbatim (spacing and hyphens differ even among neighbours); a name off by one character yields two definitions.
+- Src: SUB:126-129; FR/_timeline-and-replace-path.md:14. Confirmed (V33).
+- Class: generic. Area: existing-mod safety.
+- Example: 333-British Borneo.txt versus 1023 - Brunei.txt.
+- Home: Kit validator (compare override names against the game's file list); Factory; Chaos.
+
+H-A55 Wholesale-overwrite detector and effective-definition resolver [derived from H-A52/H-A62]
+- Idea: given the load order, compute which file wins for each path or id and, for any shadowing file, diff it against the original it replaces; report entities present in the original and missing in the copy (content lost), added, and changed.
+- Src: inferred extension of FR/_timeline-and-replace-path.md:7-18 and FR/_editing-existing-mods.md:76-81. Not stated by Hagane.
+- Class: generic. Area: existing-mod safety.
+- Example: a submod copies a base event file to change one option and drops thirty unrelated events when the base mod updates.
+- Home: Kit; Factory; Chaos.
+
+H-A56 Never write game data from memory; versions drift
+- Idea: state compositions, tag rosters and other vanilla data change between versions (examples they give: a state split in 1.16, a region redrawn in 1.19, a new tag in 1.18); pull from the installed game or a version snapshot.
+- Src: SUB:131-143; DES:191-194. Partly confirmed (V32, V33).
+- Class: generic. Area: existing-mod safety.
+- Example: a hand-written state file double-defines provinces after a patch.
+- Home: several (existing reference tools for Factory/Kit; Chaos).
+
+H-A57 Impassable states need ownership linking
+- Idea: impassable blocks entry and construction; in vanilla every impassable state also carries force_link_ownership_to, otherwise it becomes an ownerless wasteland.
+- Src: CHG:147-152. Confirmed (V34).
+- Class: generic. Area: scripting / validation.
+- Example: a custom wasteland state that leaves ownership to chance.
+- Home: Kit lint; Chaos; Factory.
+
+H-A58 Country tag hygiene: collisions with the vanilla roster, and dead tags
+- Idea: a new tag must not equal an existing tag (the vanilla roster grows with patches; short pinyin tags collide); a tag that owns no state is dead at start (not selectable, on_startup never fires); a country without a capital is a crash risk.
+- Src: SUB:138-140, 145-147, 201-202; API:143-145; DES:161-163. Confirmed (V32, V38).
+- Class: generic. Area: validation.
+- Example: adding SHX when vanilla already defines Shanxi.
+- Home: several (Kit validator; Factory tag generator; Chaos).
+
+H-A59 Additive-on-canon rule for submods, with an honest list of limits
+- Idea: design submods as reactions to what the base mod emits; do not try to disable base content. Trigger denial through a flag works only when the target event has a checkable trigger. State what cannot be done.
+- Src: SUB:18-19, 29-39, 180-181. Confirmed (V35). Tension with FR/_timeline-and-replace-path.md:85-86 (section 5, item 1).
+- Class: generic. Area: existing-mod safety / design.
+- Example: a submod that needs a base event not to fire; check the event's trigger first.
+- Home: Kit; Chaos (if it has base-mod relations); Factory.
+
+H-A60 Base-mod reference index: index-only, shared per dependency
+- Idea: ingest the declared dependency's entity ids (characters, focuses, ideologies, states, tags, decisions) into an index, discard the content, share it between submods of the same base. Use it both for autocompletion and for checking references; fall back to trust-all before ingest.
+- Src: SUB:41-71; DES:65-72.
+- Class: generic concept (the endpoints are Hagane-API). Area: existing-mod safety / symbol indexes.
+- Example: a submod references GER_albert_speer; the index shows the base mod spells it differently.
+- Home: Factory (import flow); Kit (script building an index from a mod folder); Chaos.
+
+H-A61 Two project identities: loaded-existing mod versus submod; provenance flag per entity
+- Idea: a project that holds an entire imported mod behaves differently from a submod that holds only your content. Mark each entity imported or created; touching an imported entity flips it to created. Exports depend on that flag.
+- Src: FR/_editing-existing-mods.md:6-21.
+- Class: generic concept. Area: existing-mod safety.
+- Example: repair an existing mod and only ship changed files as a patch.
+- Home: Factory (Git diff can supply the same signal); Kit.
+
+H-A62 Export modes by intent; never repackage base content into an addon
+- Idea: offer distinct outputs: changes-only patch, full re-emit, in-place update of the original; warn that including untouched imported content in an addon duplicates the entire original (huge archive, double definitions).
+- Src: FR/_editing-existing-mods.md:22-33, 76-78.
+- Class: generic concept. Area: existing-mod safety.
+- Example: a patch export that should contain eight changed files but contains 4000.
+- Home: Factory; Kit.
+
+H-A63 Merge preview with conflict count and per-path resolution
+- Idea: before merging platform output onto an original archive, produce a dry-run conflict report; the merge returns the overlap count in a response header; resolution can be chosen per path; platform-wins is the default.
+- Src: FR/_editing-existing-mods.md:28-29.
+- Class: Hagane-API in form, generic concept. Area: existing-mod safety / conflict resolution.
+- Example: applying generated events onto a hand-edited mod.
+- Home: Factory (Git merge preview); Kit.
+
+H-A64 Non-1936 start: three dates must agree
+- Idea: the bookmark date, the defines start date and the history content must all describe the same date, plus ship your own complete bookmark file so vanilla's scenarios cannot be picked. The mismatch produces crashes that look like content bugs. Vanilla also ends every bookmark with an effect block containing randomize_weather, marked obligatory (derived finding, V42).
+- Src: FR/_timeline-and-replace-path.md:52-65; API:84.
+- Class: generic. Area: existing-mod safety / validation.
+- Example: a mod set in 1748 whose defines still say 1936.
+- Home: several (Kit validator; Chaos; Factory project settings).
+
+H-A65 Far past is safer than near past; suppression toolbox
+- Idea: vanilla dated history blocks later than the start run when the clock gets there; a start far in the past never reaches them in play, a start close to 1936 does. Tools to quiet vanilla: dormant dated blocks, is_triggered_only events, same-name neutered copies for residual MTTH events, and an explicit load_focus_tree for a vanilla country.
+- Src: FR/_timeline-and-replace-path.md:67-86. Wording caveat V43.
+- Class: generic. Area: design / existing-mod safety.
+- Example: a total conversion starting in 1924 hitting vanilla 1936 scripts in game year 12.
+- Home: Kit; Chaos.
+
+H-A66 Changing a base mod's start date is a mini total conversion
+- Idea: a large base mod's world lives in its event and focus layer; the engine does not simulate the gap, so shifting the start requires hand-writing each country's state at the new date. Follow official bookmarks or accept the workload.
+- Src: FR/_timeline-and-replace-path.md:88-93.
+- Class: generic. Area: design / feasibility.
+- Example: a submod request "start it ten years later".
+- Home: Kit.
+
+H-A67 State rename via localisation only
+- Idea: rename a state through a loc override and leave the name key in the state file unchanged; do not mix versioned and unversioned forms (claimed to collide).
+- Src: SUB:115-121. (V36 unverified.)
+- Class: generic. Area: localisation / existing-mod safety.
+- Example: renaming a state in a submod without redefining the state.
+- Home: Kit; Chaos.
+
+H-A68 Version alignment before any test
+- Idea: a base-mod version that does not match the supported version causes crashes that are not your content; check versions first, and align the project's declared supported version.
+- Src: DES:140-141; SUB:45-46.
+- Class: generic. Area: existing-mod safety.
+- Example: a submod tested against an older base mod.
+- Home: Kit; Chaos.
+
+========================================================================
+### E. Design and planning
+========================================================================
+
+H-A69 Front-load the audit and a decision-locked bible; do not build step by step
+- Idea: rediscovering base-mod facts per phase produces inconsistency and rework. Lock the facts and decisions once; then building is fill-in.
+- Src: DES:23-25, 166.
+- Class: generic. Area: design and planning.
+- Example: a content batch needing the leader's ideology subtype at three different points; decide once.
+- Home: several (Kit; Chaos; Factory design stage).
+
+H-A70 The author's material is the only creative authority
+- Idea: when overhauling, the base mod provides mechanics, never canon. Read every author source and inventory every named element (lore, entities, timeline beats, puppets, mechanics).
+- Src: DES:44-48, 165.
+- Class: generic. Area: design.
+- Example: stopping a submod from importing a base mod's canon.
+- Home: Kit; Chaos.
+
+H-A71 Concept brief where blanks become the question list
+- Idea: hand the author a 12-section brief; "TBD" is a valid answer; each blank becomes a question; the brief calls out easy-to-forget items such as who leads which bloc at game start and the ownership granularity of the map.
+- Src: CBT:3-5, 36-37, 49, 51-52; DES:49-51.
+- Class: generic. Area: design / converting rough ideas to specs.
+- Example: a mod idea in two paragraphs becomes a structured intake.
+- Home: Factory (intake form); Kit.
+
+H-A72 Audit what the active bookmark loads; per-nation five-point map; parallel read-only passes
+- Idea: raw entity counts mislead (dead, cut and debug-gated content). Follow the bookmark and focus-tree loading to separate live from dead. For each nation record start state, storyline, custom mechanics, dissonance surface, build-on options. Run one read-only pass per nation in parallel plus a cross-cutting pass.
+- Src: DES:53-64, 204-209.
+- Class: generic. Area: existing-mod safety / design / delegation.
+- Example: counting 4000 focuses in a base mod when only 600 are reachable.
+- Home: Kit (audit skill); Factory (import analysis); Chaos.
+
+H-A73 Feasibility root: trace who sets the key flags
+- Idea: apparent world-wide dissonance may hang from a single event; trace the real setters, never assume; cutting one root can leave the reactive content dormant. Multi-rooted means a scope balloon.
+- Src: DES:74-79, 167-168, 204-209.
+- Class: generic. Area: design / reference graphs.
+- Example: a flag set by one succession event; suppressing that event keeps everything downstream quiet.
+- Home: several (flag-setter/reader graph in Factory; Kit script; Chaos).
+
+H-A74 Provenance tags on design decisions
+- Idea: mark every item locked (author decided), mine-derived (agent inferred), open-for-author. "Decide everything derivable; surface only genuine forks."
+- Src: DES:84-86, 169.
+- Class: generic. Area: design / consistency.
+- Example: an AI-derived naming decision silently treated as the author's.
+- Home: several (Factory spec fields; Kit design template; Chaos bible).
+
+H-A75 Gap audit of the bible against the source inventory
+- Idea: after drafting, compare against the step-1 inventory to catch omissions and decision holes.
+- Src: DES:105-107.
+- Class: generic. Area: design.
+- Example: cosmetic names, puppets, faction structure not covered.
+- Home: Kit; Chaos.
+
+H-A76 Domain-expert self-critique passes
+- Idea: review your own design as a historian (is the history right, which endings are counterfactual) and as a game-numbers reviewer (does the mechanic scale across a campaign, are values in vanilla ranges), reporting honestly where your design is wrong.
+- Src: DES:109-114, 218-222.
+- Class: generic. Area: agent workflow design.
+- Example: a balance mechanic that overflows by year five.
+- Home: Kit; Chaos; Factory (reviewer agent).
+
+H-A77 Author-facing design document rules; tiered question list
+- Idea: strip internal mechanism; mark undecided beats; open by confirming it is drawn from the author's material; write in the author's language; put questions at the end in tiers: story gaps, design calls with a recommendation, quick confirms with defaults; do not re-ask settled items.
+- Src: DDT:5-10, 14, 42-54; DES:116-120, 170, 173.
+- Class: generic. Area: design / handoffs.
+- Example: a clarifying round before a large event pack.
+- Home: several (Factory agent conversation; Kit template; Chaos).
+
+H-A78 Phased roadmap with dependency boundaries and depth allocation
+- Idea: sequence the work, mark what is additive now versus gated on a missing capability, and decide which parts get deep versus thin treatment.
+- Src: DES:122-123.
+- Class: generic. Area: design and planning / phasing.
+- Example: a mod of 40 countries where five get deep trees.
+- Home: several.
+
+H-A79 History spine, real dilemmas, two axes, four endings; historicity tags; tone lock
+- Idea: lay a date-gated historical spine, place the divergence where history could have gone otherwise, derive endings from two real structural dilemmas as two axes, tag each ending as history / near-history / counterfactual / heavy counterfactual, lock tone early and treat tone feedback as a rewrite pass.
+- Src: DES:87-103, 213-217.
+- Class: generic. Area: design (content).
+- Example: designing a fictional state's branches in a history-flavoured mod.
+- Home: Chaos (if applicable); Kit as optional guidance.
+
+H-A80 Capability recon before promising a mechanic; branch on project shape
+- Idea: before committing a bespoke mechanic, confirm hooks, scopes and tools exist; standalone projects skip the base-mod audit and use a capability recon instead.
+- Src: DES:178-186, 211-216.
+- Class: generic. Area: planning.
+- Example: promising a "monthly legitimacy" mechanic; confirm on_monthly_<TAG> exists (it does, V15).
+- Home: Kit; Factory.
+
+H-A81 Multi-nation ownership rules
+- Idea: only the leader nation creates the faction (members join); agree global flag names up front; never write one nation's history or events from another nation's build.
+- Src: DES:174-177.
+- Class: generic. Area: design / cross-entity dependencies.
+- Example: two authors each invent a different global flag for the same fact.
+- Home: Chaos; Kit (flag registry).
+
+H-A82 Pull reference data, do not guess it
+- Idea: state ids, portrait and flag names, and ownership come from reference data; reuse a vanilla tag to take its art.
+- Src: DES:191-194.
+- Class: generic. Area: design / validation.
+- Example: strict-history setups.
+- Home: several.
+
+H-A83 Design-to-build traceability
+- Idea: the bible's build mapping column links each item to the mechanism and roadmap phase that implements it.
+- Src: DES:81-84.
+- Class: generic. Area: design.
+- Example: an unbuilt promise is visible because its row has no phase.
+- Home: Kit; Factory.
+
+H-A84 Versioned exports and an accepted snapshot
+- Idea: label successive exports v1, v2, and keep the last accepted as the demo snapshot.
+- Src: DES:145-146.
+- Class: generic. Area: handoffs.
+- Home: Factory (Git tags); Kit.
+
+H-A85 Hand the human tester a short, specific checklist
+- Idea: give a few concrete in-game steps and expected observations (start, country, leader, date to skip to, icons) rather than "please test"; they report in words.
+- Src: DES:138-141.
+- Class: generic. Area: validation / handoffs.
+- Example: "load the 1936 start, pick TAG, confirm leader is X, skip past date D, confirm no civil war".
+- Home: several (Factory handoff template; Kit; Chaos).
+
+H-A86 Standard output document set
+- Idea: index, baseline audit, bible, locked roadmap, design doc, per-phase specs, per-mechanic system rules, start-state setup, capability note.
+- Src: DES:148-154.
+- Class: generic. Area: design.
+- Home: Kit.
+
+========================================================================
+### F. Agent workflow design
+========================================================================
+
+H-A87 Two-channel operating model; the agent never asks the human to click
+- Idea: the human does only conversation and game verification; the agent performs all building. A catch-phrase test ("if I am about to say go open the workbench...") interrupts a violation.
+- Src: DES:27-34, 158.
+- Class: generic. Area: agent workflow design.
+- Home: Factory (product UX); Kit.
+
+H-A88 Recommend-then-decide; coherent chunks, then pause
+- Idea: lead every fork with a recommendation and its reason; work in chunks and pause for the author's review.
+- Src: DES:35-40.
+- Class: generic. Area: agent workflow design.
+- Home: several (consistent with the "batch foreseeable questions" rule in our CLAUDE.md).
+
+H-A89 Tripwire phrases in the agent's own output
+- Idea: name the exact phrases that signal a rule violation (premise red flags in INV:32-36; "go open the workbench" in DES:32-33).
+- Src: INV:32-36; DES:31-33.
+- Class: generic. Area: agent workflow design.
+- Home: Kit; Factory prompt design.
+
+H-A90 Skill description as activation contract
+- Idea: the frontmatter opens with "use when", lists the concrete trigger situations and entity nouns, and states how it is invoked (automatic for bugs; start of a project; whenever a step crosses two entities). Process skills are automatic; build cards are noun-triggered.
+- Src: description lines (line 3) of each skill; INV:22; DES:3; WIR:3; API:3.
+- Class: generic. Area: skill activation.
+- Home: Kit; Chaos.
+
+H-A91 Orchestrator plus thin specialist cards plus cross-link footers
+- Idea: one orchestrator, specialist skills for project shapes, per-domain cards that bridge form to output to player experience and defer to a shared reference for field tables, each ending with cross-links. Keeps each loaded body small.
+- Src: SCR:14-23; API:29-36; DES:227-231; footers throughout.
+- Class: generic. Area: context efficiency / handoffs.
+- Home: Kit; Chaos; Factory (skill packaging).
+
+H-A92 Intent-to-recipe cookbook
+- Idea: write recipes as "the author wants experience X, fill these fields with these tokens", one per plain-language intention.
+- Src: SCR:110-140.
+- Class: generic. Area: agent workflow design.
+- Example: "a creeping penalty that heals itself".
+- Home: Kit; Factory.
+
+H-A93 Distilled trap lists with a flag marker at the end of each skill
+- Idea: short end-of-file lists of the highest-cost silent failures, marked visibly.
+- Src: INV:79-85; WIR:124-137; SCR:170-187; SUB:179-202.
+- Class: generic. Area: preventing repeated mistakes.
+- Home: Kit; Chaos.
+
+H-A94 Reference page as filling aid; the validator is authority; generate vocabulary from the game
+- Idea: a curated vocabulary is incomplete by design; the checker decides legality. Their own list contained two bad entries (V45, V46), so generate token lists from the game's documentation folder.
+- Src: FR/README.md:15-24; FR/tokens.md:1-8, 68-70.
+- Class: generic. Area: validation / knowledge hygiene.
+- Home: Kit (generator script); Factory.
+
+H-A95 Maturity labels backed by measured evidence
+- Idea: label unfinished features "not recommended" or "beta" in the docs with the measurement behind it (for techs: 0 of 718 sampled rendered); keep field tables for maintenance but do not teach a confident recipe.
+- Src: CHG:126-138; FR/README.md:77-80; API:85, 96, 98.
+- Class: generic. Area: agent workflow design / honesty.
+- Home: Factory (feature gating); Kit.
+
+H-A96 Changelog as incident log; rules paired with the measured incident
+- Idea: every rule in the skills traces to a dated incident with numbers; claims in release notes are verified before release (all eight locale routes checked live).
+- Src: CHG (section 3 above); CHG:183-189.
+- Class: generic. Area: preventing repeated mistakes.
+- Home: Kit; Chaos; Factory (knowledge changelog is already similar).
+
+H-A97 One authoring home, one-way sync, backport audit
+- Idea: three repeated incidents of edits landing only in the vendored copy; the fix is a single source and a periodic check of downstream copies for edits missing upstream.
+- Src: CHG:176-179, 209-219, 162-189, 61-65.
+- Class: generic. Area: preventing repeated mistakes.
+- Example: any generated copy of instructions or skills.
+- Home: several (our sync_skills.py check already covers the CLAUDE.md/AGENTS.md pair; extend to the skill copies and to any vendored kit content).
+
+H-A98 Put the known exception where the reader will use it
+- Idea: when one route behaves differently from the rest of the document, say so inline at the step and again in the top-level README.
+- Src: SUB:57-60; FR/README.md:62-63.
+- Class: generic. Area: documentation design.
+- Home: Kit.
+
+H-A99 A measured model-agnostic claim with honest caveats
+- Idea: claim that any tool-calling model can drive the product only after a real run with a weaker model; state the two caveats (skills-file discovery is client-specific; correctness is separate from taste). Safety comes from server-side validation.
+- Src: RDM:47-58; CHG:272-286.
+- Class: generic. Area: agent workflow design / product.
+- Home: Factory (evaluation of the agent loop across models); Kit.
+
+H-A100 Auto-update versus pin
+- Idea: a git pull at session start keeps instructions fresh but makes behavior depend on remote state; they also tag releases and say how to pin. For us the safer pattern is pin plus an explicit "newer version available, review" step.
+- Src: RDM:110-115; INV:6-9; CHG:301-309.
+- Class: generic. Area: agent workflow design / risk.
+- Home: Kit (anti-pattern note).
+
+H-A101 State explicitly which user-local paths the agent may read
+- Idea: the crash protocol says logs in the player's own data folder are legitimate to read, removing hesitation.
+- Src: INV:59-61.
+- Class: generic. Area: agent workflow design.
+- Home: Kit; Chaos.
+
+H-A102 Typed forms with raw-script escape hatches
+- Idea: structured fields for the common cases plus a free-text raw field for anything not modelled (they use raw_extras and advanced_raw_script), and a field-by-field table of which are effect, trigger or modifier text.
+- Src: FR/_raw-script-fields.md:3-21, 37, 42, 47; FR/dynamic-modifiers.md:27-28.
+- Class: Hagane-API in naming; generic design. Area: authoring tool design.
+- Home: Factory.
+
+H-A103 Idempotent create: re-runs must not stack duplicates; on conflict update
+- Idea: re-posting focus nodes created suffixed duplicates; duplicate named scripted blocks return a conflict and the instruction is to edit the existing one. Tools should be idempotent or detect existing ids.
+- Src: API:122-123; SCR:186-187.
+- Class: generic (HTTP specifics are Hagane-API). Area: agent workflow design / duplicate detection.
+- Example: a re-run building a focus tree leaves cr_focus_1 duplicates.
+- Home: Factory (agent loop request keys); Kit (duplicate-suffix detection).
+
+H-A104 Creation order dependencies
+- Idea: create the parent before the child (focus tree before focus, event namespace before event); verified with a weaker model that ordered them on its own.
+- Src: RDM:53-55; WIR:42-48.
+- Class: generic. Area: agent workflow design.
+- Home: Factory tools.
+
+H-A105 Normalize response envelopes
+- Idea: list endpoints that return a wrapped object make a naive length check read zero (a false "empty"). Agent tools should normalize envelopes.
+- Src: API:75, 90.
+- Class: Hagane-API, with a generic lesson. Area: agent workflow design.
+- Home: Factory tool wrappers.
+
+H-A106 Self-describing shapes
+- Idea: to learn a payload shape, read an existing entity and send the same shape; on a validation error, do the same.
+- Src: API:18-27, 175-178.
+- Class: Hagane-API, generic design principle. Area: agent workflow design.
+- Home: Factory.
+
+H-A107 One canonical copy of each recipe
+- Idea: recipes duplicated across files diverge; their curl snippet has a defect in one copy and not another (section 5, item 4). Keep one copy and link.
+- Src: API:164-166 vs FR/_editing-existing-mods.md:47-49.
+- Class: generic. Area: documentation design / preventing repeated mistakes.
+- Home: Kit; Factory docs.
+
+---------------------------------------------------------------------------
+## 7. Short list of the ten most valuable ideas for us
+---------------------------------------------------------------------------
+
+1. H-A03 / H-A01 / H-A02: evidence ladder, root cause first, premise re-verification (the investigate skill is the cleanest piece of the repo).
+2. H-A18, H-A19, H-A20, H-A21: reference graph with resolved flags, tri-state coverage, symbol index and orphan audit.
+3. H-A15 and H-A16: dual-path diff and a coverage manifest in validator output.
+4. H-A52, H-A53, H-A54, H-A55: override decision table, empty-directory guard, verbatim filenames, wholesale-overwrite detector.
+5. H-A06, H-A07, H-A08: crash triage from the player's logs, check which start ran, outer-versus-inner .mod drift.
+6. H-A29, H-A30, H-A22: scope trap catalogue, scope chain in variable name, per-call-site scope validation.
+7. H-A32, H-A33, H-A34, H-A35: variable-driven modifiers with recompute meters, same-day refresh and tooltips.
+8. H-A60 / H-A61 / H-A62: base-mod reference index and imported-versus-created provenance with export modes.
+9. H-A64: non-1936 triple-date agreement.
+10. H-A28 / H-A94 / H-A97: test provenance on knowledge, generate vocabularies from the game, single-source with downstream audit.
+
+End of report.

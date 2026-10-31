@@ -1,0 +1,511 @@
+# 11 - Hagane Studio: engineering assessment for direct reuse by HOI4 Factory
+
+Scope: read-only engineering assessment of the shallow clone of github.com/hagane-works/hagane-studio
+(commit 1e831623ed162e1a64763c242c55b249376ba20c, v0.1.2, GPL-3.0-only). Nothing was built, run or
+downloaded; no model calls. Numbers come from `git ls-files` plus `wc -l`/`grep` on the clone.
+
+Paths: `H/...` means <projects>\hoi4-factory\.work\ext\hagane-studio\...
+`AT/...` means <projects>\hoi4-factory\.work\ext\agent-tools\src\hoi4_agent_tools\...
+Evidence tags: [V] verified by reading or measuring; [I] inference; [U] could not verify.
+Effort scale (agent-assisted engineer-days, my estimate, excludes the ADR-025 design-lab loop and
+maintainer approvals): Small <= 3, Medium 4-10, Large > 10.
+
+New fact taken as given: the maintainer reports that the Hagane Works author agreed that the maintainer
+takes over development and may use the project in any way. Section 7 lists what should still be put in
+writing before code moves.
+
+---------------------------------------------------------------------
+
+## 0. Findings in brief
+
+1. [V] The valuable part is small and mostly knowledge, not code. The Go backend is 234,477 non-test lines
+   (19,731 of them two generated unicode tables) and the React frontend is 195,134 non-test lines (724 files)
+   plus 38,765 test lines. Only about 5.8k Go lines (about 2.5 percent) and a few thousand TS lines are worth
+   carrying over (section 6.1). The earlier overview's "about 106k TS/TSX lines" does not reproduce: I measure
+   195,134 non-test + 38,765 test lines. The Go figures (123.5k internal/hoi4, 81.5k domains, 16.5k toolapi) match.
+2. [V] The data model is the blocker for direct reuse. Every editor, store and tool works on JSON table rows
+   (`project.json` + `data/<table>.json`, 54 tables in H/internal/schema/tables.json) and regenerates mod files on
+   export. HOI4 Factory edits native files in place. The editors cannot be re-pointed at native files by changing
+   a base URL. They need an adapter (native parse -> view model, edits -> source-bound proposals), and only the
+   graph-shaped ones are cheap to adapt.
+3. [V] The Go Clausewitz parser is lossy (comments-only trivia, no byte offsets, canonical tab-indented
+   re-emission). It is not a basis for source-preserving edits. The maintainer's own TS lexer
+   (AT/core/source/lexer.ts, start/end offsets and whitespace tokens) is already better. Do not reuse it.
+4. [V] Largest overlap with existing assets: focus layout and geometry (agent-tools focus/layout.ts 2,879 lines,
+   geometry.ts 382 lines use the game's 176x116 px grid; Hagane's editor grid is 130x180), map tooling (agent-tools
+   map/ 47,776 lines vs Hagane mapgen 6,645 + worldmap 8,091), GUI rendering (agent-tools gui/ 18,826 lines vs Hagane
+   guirender 23,000), tech and event tooling. Porting the Go versions would create duplicates.
+5. [V] Best code to take: the focus-graph React/xyflow interaction shell (about 3.4k lines after dropping layout),
+   the event/decision "in-game preview" cards (274 + 164 lines), the save-diagnostics delta model, the sha256-guarded
+   span repair plan (clausewitz/crossref.go), the draw.io importer (398 lines), the DLC/dead-flag/perf lint rules as
+   specs, gamedir/install/log-parsing for the local companion.
+6. [V] Frontend is Tailwind-class styled (8,151 className sites), use-intl i18n, zustand + SWR state, 494 inline
+   `style={}` sites. Factory uses plain CSS custom properties, i18next, no state library, a no-`style=` source rule
+   and an i18n literal-text lint. Visual components therefore need a restyle, a message-format conversion and a
+   lint pass whatever else is decided. Logic modules transfer, JSX does not.
+7. [V] The Go backend builds without cgo and has non-Windows stubs, so a Linux build is plausible, but it listens
+   on 127.0.0.1 only, mints a session cookie for any visitor, keeps process-global singletons and needs the user's
+   game files mounted. It is a single-user local server, not a hosted service. Hosting it behind our Rust server as
+   a worker is possible but is a poor trade.
+8. [V] Recommendation: Option C, phased. Phase 1 is Option A (harvest selected editors, rules and ideas), phase 2
+   builds the local companion from the few local-integration modules, and Hagane Studio goes to maintenance-only
+   with a stated sunset trigger. Reject Option B. Section 6.
+
+---------------------------------------------------------------------
+
+## 1. Architecture map
+
+### 1.1 Process model [V]
+
+- One Go process, `H/cmd/haganeworks/main.go` (188 lines). Serves the embedded SPA (`H/web/embed.go:8`
+  `//go:embed all:dist`) and the JSON API on 127.0.0.1 only (`main.go:153-165`, `listen`). Flags: `--port`,
+  `--no-window` (`main.go:28`), `--version`, `--config`. A second launch finds the running copy through
+  `GET /api/app/ping` (`main.go:167-176`).
+- Window: WebView2 via go-webview2 in `cmd/haganeworks/window_windows.go` (442 lines). On other systems
+  `window_other.go:5-7` returns `errNoWindow` and the program opens the default browser (`window.go:19-28`).
+- CLI: `H/cmd/hw/main.go` (621 lines) is a thin client for the tool API; it starts the program with `--no-window`
+  if it is not running (`docs/cli.md`).
+- Project storage: `H/internal/project/project.go` (`Row = map[string]any`, whole project in memory, JSON files,
+  temp-and-rename saves). Not typed structs, not native files.
+
+### 1.2 Go packages (non-test lines / files / test lines) [V]
+
+| Package | Lines | Files | Test lines | Role |
+|---|---:|---:|---:|---|
+| internal/hoi4/emit | 42,337 | 78 | 3,853 | JSON rows -> script/localisation emitters; includes two generated unicode tables (8,217 + 11,514 lines) and Python-compat helpers |
+| internal/hoi4/guirender | 23,000 | 83 | 12,516 | reconstructs game screens from game files + mod rows |
+| internal/hoi4/exportengine | 14,489 | 55 | 13,844 | export plus most lints (native.go 3,803; cross_ref_lint 776; reference_integrity 538; registry_validation 503; dlc_conditional_lint 389; loc_fallback_lint 381) |
+| internal/hoi4/importsvc | 12,058 | 45 | 613 | native text -> rows (trees, events, ideas, world, military, ...) |
+| internal/hoi4/importjob | 7,281 | 25 | 3,677 | import orchestration |
+| internal/hoi4/mapgen / mapsketch | 6,645 / 1,720 | 25 / 7 | 3,493 / 463 | world-from-picture, terrain, rivers |
+| internal/hoi4/exportmerge | 2,634 | 9 | 1,374 | append-to-existing and diff merge |
+| internal/hoi4/clausewitz | 1,238 | 3 | 428 | span analysis, cross-ref repair plans, position lint |
+| internal/hoi4/paradox | 762 | 5 | 1,749 | tokenizer + parser with comment trivia |
+| internal/hoi4/drawio | 398 | 1 | 112 | draw.io sketch -> focus nodes |
+| internal/domains/* | 81,506 | 256 | 23,954 | per-domain REST handlers (tools 23,080; worldmap 8,091; focus 6,930; gameview 6,289; military 5,666; content 4,852; states 4,844; countries 4,639; technology 4,074; gamesave 4,023; characters 2,660; decisions 2,297; events 2,112; ideas 1,936) |
+| internal/toolapi | 16,485 | 58 | 13,818 | tool API, middleware, tool wrappers |
+| internal/gameindex | 4,468 | 16 | 897 | datasets built from the user's game files (cached in the user cache dir) |
+| internal/api | 2,177 | 8 | 1,351 | app/projects/import/export routes |
+| internal/workbench, project, knowledge, schema, reftables, settings, gamedir, gamefiles, cwtools, export, server, apiutil | 1,774 / 840 / 379 / 95 / 195 / 164 / 186 / 346 / 236 / 249 / 150 / 106 | | | support |
+| Total Go (git ls-files, incl. cmd) | 234,477 | | 88,327 (527 test files, 2,266 Test funcs) | |
+
+Dependencies are tiny: go.mod lists x/image, x/sync, x/sys, x/text, go-webview2, go-winloader. No router or
+framework; routing uses the Go 1.22 `net/http` pattern mux. `go 1.25.0` is required.
+
+### 1.3 HTTP surfaces [V]
+
+(a) Web API, cookie session. About 263 `HandleFunc("METHOD ...")` registrations (more via helper loops).
+Prefixes: `/api/go/projects/{id}/...` (49 literal routes), `/api/app/*` (status, settings, folders, game-index, quit,
+install), `/api/go/vanilla/*` (18), `/api/go/lint/*` (7), `/api/go/import/*` (6), `/api/go/export/*`, `/api/go/image-batch/*`,
+`/api/go/basemod/*`. Registered in `H/internal/api/app.go:67-92` and `api/domains.go:18-40`. The `/go/` segment and the
+26 `*.goRouting.test.ts` files are a legacy of porting a hosted Python backend to Go: the frontend contract is the
+hosted platform's REST contract.
+
+(b) Tool API, bearer token: `GET /api/tools`, `GET /api/tools/{name}`, `POST /api/tools/{name}`, `GET /api/tools/fields[/{doc}]`
+(`H/internal/toolapi/api.go:16-22`). Tools are wrappers that call (a) in-process through a fake transport
+(`rest_proxy.go:26-60`, `handlerTransport`), so every tool inherits the JSON-table semantics. Input schemas are
+generated by reflection from Go structs; field guidance lives in `jsonschema:"..."` tags (for example
+`tools_focus_proxy.go:15-19`). No MCP protocol is spoken; the code mimics MCP SDK type names only (grep for
+jsonrpc/modelcontextprotocol is empty). 144 direct `AddTool(s,` call sites in the code vs "149 tools" in docs/cli.md
+(helper loops register more; not run, so not reconciled [U]).
+
+(c) Middleware chain in `toolapi/server.go:6-12`: editRevisions, mutationReceipt, idReassignment, authoringDefaults,
+fieldReferenceHint.
+
+### 1.4 Web app structure [V]
+
+- Vite 6.4.5 + React 19.2.6 + react-router 7 `BrowserRouter` (`H/web/src/desktop/App.tsx:52-88`), routes
+  `/:locale/project/:id/<page>` with 36 lazy pages (`desktop/routes.ts`), plus `/:locale/game-view`.
+- Heritage: a Next.js App Router layout (`src/app/[locale]/...`) with 404 files carrying `"use client"` and shims for
+  next/dynamic, image, link, navigation (`src/platform/*`, 282 lines).
+- State: 16 zustand stores (`lib/store`, 4,580 lines), SWR in 138 files, 9 `createContext` uses.
+- API client: `lib/api/_client.ts` (250 lines; `API_BASE = "/api"`, cookie credentials, retry, 401 reload) + 14 domain
+  modules (`lib/api/*.ts`, 7,978 lines including tests).
+- i18n: use-intl. `web/messages/{en,zh,ru,de,es,fr,ja,ko}/` each 136 namespace JSON files, about 7,876 entries per
+  locale (en 560,651 bytes), `import.meta.glob` plus English fallback merge (`src/i18n/messages.ts:1-40`); 58
+  plural/select messages, 1,211 interpolated messages, 46 `t.rich(` sites. 308 files call `useTranslations`.
+- UI kit: `components/ui` 2,157 lines on @base-ui/react 1.4.0, Tailwind 4 utility classes (8,151 `className=` sites),
+  shadcn-derived `app/globals.css` (804 lines) with `--color-ingame-*` tokens for the game-like preview skin.
+- Size by area (non-test lines): `components/workbench` 69,714; `app/[locale]/game-view` 62,993 (7,304-line page.tsx);
+  project pages 18,401; `lib` 22,832; gui-renderer about 6.6k.
+- Other deps: Monaco 0.57 (local copy via `scripts/copy-monaco.mjs`), recharts, html-to-image, react-image-crop,
+  driver.js (tours), sonner, cmdk, lucide-react.
+
+### 1.5 Coupling of the frontend to Go API shapes [V]
+
+- 231 non-test files import `@/lib/api`; 509 `/go/...` path literals in `lib/api`; row types mirror database rows
+  (`types/*.ts`, 2,369 lines: `project_id`, `*_en`/`*_zh`, `raw_extras`, `source`).
+- The edit-concurrency protocol is baked in: `X-Edit-Revisions` header (`domains/focus/revision.go:58,135`) and
+  `components/workbench/save-diagnostics/*` (582 non-test lines).
+- Page level coupling is high (store + API + routing). Component level is mixed: `FocusTreeGraph` is a controlled
+  component (`nodes: FocusNode[]` plus 12 callbacks, `focus-graph/FocusTreeGraph.tsx:79-120`) but still imports
+  `focusTreeStore`, `contentLocaleStore`, `useBaseModDepKeys`, `toast`, `useConfirm`. The editors (EventEditor,
+  IdeaEditor, CharacterEditor ...) each import 30-37 modules including stores and API clients and are not extractable
+  without a rewrite.
+- Conclusion: reuse at module level (pure TS and presentational pieces with injected data), never at page or store level.
+
+### 1.6 Loopback security (also feeds section 5) [V]
+
+`H/internal/server/server.go`: strict Host equality with the listener address (:48), Origin must equal
+`http://<host>` (:52), `Sec-Fetch-Site` must be `same-origin` or `none` (:56), `X-Content-Type-Options`, `Referrer-Policy`,
+CORP set. Web routes need a per-process random 32-byte session cookie (HttpOnly, SameSite=Strict, Path=/api/;
+:77, :118-119), compared in constant time. The tool API needs a bearer token from `tools-token` next to settings.json
+(created 0600 by `settings/settings.go:112-135`), constant-time compare (:90).
+Gaps: the cookie is minted for any request that reaches `GET /` with the right Host (`serveWeb`, :93-120), so any local
+process of the same user gets full control, including `GET /api/app/folders` (arbitrary directory listing,
+`api/app.go:275-309`), `POST /api/app/quit` and install-into-mod-folder. That is an acceptable desktop trade-off and
+an unacceptable network one. There is no Content-Security-Policy header (grep empty) and `web/index.html:8-10` has an
+inline `<script>`. A companion that a hosted site talks to from a browser origin needs the opposite design (explicit
+allowed origin, pairing token); Hagane's refuse-all-cross-origin model does not transfer.
+
+---------------------------------------------------------------------
+
+## 2. Frontend editors, one by one
+
+Cross-cutting facts first (they apply to every row below).
+
+- Styling: Tailwind utility classes everywhere. Inline `style={}`: 494 sites in non-test TSX, 11 in focus-graph
+  (`FocusContextMenu.tsx:35`, `FocusGraphNode.tsx:77`, `FocusGraphRuler.tsx:62,72,86,100`, `FocusTreeGraph.tsx:939,950,1009`,
+  edge `style` at `FocusMutexEdge.tsx:60`, `FocusPrereqEdge.tsx:77`). Factory's rule (`web/README.md:30`, CSP in
+  `crates/server/src/hardening.rs`) is no `style=` attributes and no inline scripts/styles.
+- xyflow and CSP [I]: React applies `style` props through the CSSOM (`element.style`), which CSP `style-src` does not
+  block; xyflow 12.10.2 positions nodes and the viewport with such props and ships a separate stylesheet
+  (`import "@xyflow/react/dist/style.css"`, FocusTreeGraph.tsx:23). So the library should run under `default-src 'self'`.
+  Our own code must still follow the source rule, which means dynamic positions (ruler ticks, context menu at pointer
+  coordinates, minimap offset) are set with `ref.style.setProperty` in an effect or with SVG attributes, never a
+  `style=` attribute. Needs a one-hour spike with the real header; node_modules was not available to confirm xyflow
+  injects no `<style>` tag [U]. `html-to-image` (PNG export) needs `img-src data: blob:`, which the CSP already allows.
+  Monaco injects `<style>` elements at runtime and is the likely real CSP problem [I]; the Factory CSP also blocks
+  CDN loading, but Hagane copies Monaco locally.
+- New dependencies for Factory (all need maintainer approval, GOAL-UI rule): @xyflow/react 12.10.2 (MIT; brings
+  @xyflow/system, classcat, zustand 4, d3 packages), html-to-image 1.11.13 (optional; agent-tools `hoi4_focus_render`
+  could replace it), react-image-crop (characters), a code editor for script boxes.
+- Accessibility: 916 `aria-` and 192 `role=` uses across the app, but no jsx-a11y in `eslint.config.js`. Literal English
+  strings in `aria-label` (50), `title` (14) and `placeholder` (140) would fail Factory's `i18n.test.ts` literal-text
+  rule. Graph canvases rely on xyflow defaults for keyboard access (no `ariaLabelConfig`, `nodesFocusable` etc. set)
+  and creation is pointer-only (double-click pane, drag handle) with xyflow's `deleteKeyCode` for nodes
+  (`FocusTreeGraph.tsx:925`) and a window `keydown` for selected edges (`:870-885`). The side forms (FocusNodeEditor with reference dropdowns) give a keyboard path.
+- i18n: 8 locales, but the English strings are what transfers (ADR-021 is English-only). Conversion work: use-intl ICU
+  to i18next (58 plural/select, 1,211 interpolations, 46 rich-text sites). Some strings never reached message files:
+  69 inline `zh:`/`en:` dictionaries in TS (for example `shared/editors/cwtoolValidate.ts:21-60`,
+  `types/event.ts` labels like "Country Event / 国家事件").
+- Tests: 317 test files, 1,815 `it(`/`test(` calls; 106 test files read source text with `readFileSync` and assert
+  substrings (brittle contract tests). Pure-logic tests (focusTidyLayout, focusEdgeDisplay, exportTreeGeometry,
+  controlledNodeSelection) are portable.
+
+| Editor | Files and size (non-test lines) | Deps and data shape | Extractable? Adapter | Effort |
+|---|---|---|---|---|
+| Focus graph (canvas) | `components/workbench/focus-graph/` 2,866 (14 files: FocusTreeGraph 1,028; IconLibraryDialog 520; Node 244; Toolbar 226; Sidebar 190; PrereqEdge 128; Ruler 110; MutexEdge 97; Legend 64; ContextMenu 58; controlledNodeSelection 47) + `lib/focusTreeGraph.ts` 1,329 + `focusEdgeDisplay.ts` 94 + `exportTreePng.ts` 135 + `focusIdSuggest.ts` 31 = 4,455. Tests 314 + 159 + 129 + 72 lines. | xyflow, html-to-image, use-intl, sonner, lucide, zustand store, Tailwind. Data: `FocusNode` row (`types/focus.ts:56-110`): focus_id, x, y, relative_position_id, prerequisites string[][] (outer AND, inner OR), mutually_exclusive string[], icon, cost, raw_extras, allow_branch_ast, name_en/zh. | Yes, as a controlled shell. Adapter: native parse (agent-tools focus model with sourceLocation, `AT/focus/model.ts:1-80`) -> `FocusNode`-like view model; each callback (`onUpdatePosition`, `onAddPrerequisite(nodeId, prereqFocusId)`, `onRemovePrerequisite(..., groupIndex)`, `onAddMutualExclusion`, `onCreateNode`, `onDeleteNode`) becomes a proposal op bound to a source range; replace numeric DB ids with focus_id strings; icon URLs (`gfxUrl`) come from a Go endpoint serving converted game sprites and need a policy decision of our own. Drop `focusTreeStore` (1,856 lines, optimistic-write tracker bound to REST) and the layout code (agent-tools layout.ts/geometry.ts already do it and use game-accurate grid). | Medium (6-10): restyle about 1k JSX lines to plain CSS, i18next conversion, a11y and CSP pass, port tests, spike xyflow under CSP. Building the canvas without xyflow would be Large. |
+| Focus node form | `FocusNodeEditor.tsx` 1,415 + `focus-tree/page.tsx` 1,854 | Monaco ScriptEditor, reference dropdowns, store | Field inventory only | Large; treat as reference |
+| Event editor + live preview card | `EventEditor.tsx` 1,075; `events/page.tsx` 1,143; `EventInGamePreview.tsx` 274; `EventPreviewBoundary.tsx` 98; `eventStore.ts` 239 | `GameEvent` row (`types/event.ts`), picture URL from Go (`eventsApi.pictureUrl`). The preview is a CSS mock (ingame-* tokens), not a game render; click-to-edit is `activeTarget` + `onSelectTarget` over four targets (picture, title, description, options) (`EventInGamePreview.tsx:14-22`). | Preview: yes, small and presentational. Adapter: parsed event block -> {title, description, picture sprite, options[]} plus a map region -> source span. Editor: no. | Preview Small (2-3, rewrite in plain CSS and bind to spans); editor Large |
+| Decision editor | `DecisionEditor.tsx` 1,075; `DecisionInGamePreview.tsx` 164; `decisions/page.tsx` 887; `decisionStore.ts` 266; category editors | `decision` row (about 45 fields incl. targeted_modifier, state_target) | Preview card yes; editor no | Preview Small, editor Large |
+| Character editor | `CharacterEditor.tsx` 1,816; `CharacterInGamePreview.tsx` 340; `characters/page.tsx` 965; `CustomTraitsPanel.tsx` 1,470; `characterStore.ts` 121 | react-image-crop, type-specific field reveal (leader/commander/advisor/operative/scientist), known-trait list from game index | Field-reveal rules as spec only | Large |
+| Idea editor | `IdeaEditor.tsx` 1,356; `IdeaInGamePreview.tsx` 219; `ideas/page.tsx` 685; `VanillaIdeasTab` (needs vanilla index built from game files) | modifiers as typed rows plus raw JSON, 26 idea types | No | Large |
+| Technology canvas | `tech-graph/` 2,327 (TechFlowGraph 1,214; GraphNode 521; LedgerTabs 159) + `lib/techGraph.ts` 1,670 + `TechEditor.tsx` 1,541 + `TechSurfacePanel.tsx` 977 + `technologyStore.ts` 512 | xyflow; `Technology` row (`types/technology.ts`, folder_placements, xor, dependencies); layout from Go `tech-canvas/layout` (`domains/gameview/gameview.go:19`) and game-grid geometry | Not without the Go layout service; agent-tools technology tools (7,639 lines) already inspect/render | Large; skip |
+| Map and states views | `states-map/` 1,593, `world-map/` 3,708, `game-view/map-studio/` (MapEditor 2,401, NewWorldStudio 1,112, studioSketch 725, ModMapImport 912) | HTML canvas over province rasters generated by Go from the game's map files | No | Large and game-file dependent; ignore (agent-tools map is far larger) |
+| GUI overlay editor | `app/[locale]/gui-renderer/` (GuiCanvas 1,871; tooltipText 589; BitmapText 371; GameTooltip 409) + `lib/guiRenderApi.ts` 998 + game-view layers; Go side guirender 23,000 + `exportengine/gui_overlay.go` 845 + `toolapi/tools_gui_overlay.go` 1,677 | needs Go GUI index built from the user's game install | No | Large; ignore (agent-tools gui/ 18,826 lines + hoi4_gui_* tools exist) |
+| Script editor (Monaco) | `shared/editors/` ScriptEditor 367, cwtoolValidate 415, hoi4Monarch 57 (highlight grammar), useEditorWiring 307 | Monaco, CWTools rule JSON | Highlight grammar and marker model only | Small for grammar; the editor choice is ours |
+
+Notes on the focus graph interaction model (what S04 should copy) [V]:
+- Bottom handle creates/targets prerequisite edges; left/right side handles create mutual-exclusion edges
+  (`FocusGraphNode.tsx` Handle blocks; `FocusTreeGraph.tsx` `isValidConnection`, `onConnect`). Click-vs-drag on a handle
+  (under 200 ms and 5 px) adds a child (`FocusGraphNode.tsx:34-62`).
+- AND groups get one colour each from a 4-entry palette when a node is selected (`lib/focusEdgeDisplay.ts:7-12,62`).
+- Selection is controlled and bulk-drag positions are batched (`controlledNodeSelection.ts`, `onBulkUpdatePositions`).
+- Undo/redo, duplicate, tidy and compact layout, ruler, legend, minimap, icon library with upload and favourites, PNG
+  export through html-to-image over `.react-flow__viewport` (`exportTreePng.ts:60-110`, max 12,000 px side, 40M px area).
+- `lib/focusTidyLayout.test.ts` tests `bfsLayoutFocusNodes` in `lib/focusTreeGraph.ts:1084`; there is no `focusTidyLayout.ts`.
+- Not reusable as-is: grid 130x180 / node 110x120 (`focusTreeGraph.ts:8-15`) is not the game grid (agent-tools uses 176x116 and
+  144x76, `AT/focus/geometry.ts:6-9`); big-tree performance is untuned (no `onlyRenderVisibleElements`, grep empty).
+
+---------------------------------------------------------------------
+
+## 3. Backend capabilities and verdicts
+
+Verdict key: REUSE (take code), PORT (rewrite in Rust or TS, keep the idea and tests), REPLACE (we already have it),
+PATTERN (copy the design only), IGNORE.
+
+| Capability | What it is (evidence) | Verdict and reason |
+|---|---|---|
+| Clausewitz parser with trivia | `paradox/parser.go` (345), `token.go` (183), `trivia.go` (104). `Entry` holds key/op/value/block, `Line`, `Quoted`, comment `Trivia` only (parser.go:41-50); the tokenizer drops whitespace (`token.go:73-81`); there is no byte offset in the AST. Emission is `importsvc/toscript.go:147-225`, tab-indented canonical text, blank lines not kept. | IGNORE. Lossy by design, so it cannot give "untouched bytes stay identical". Round-trip tests: none for text. The only "round-trip" hit is a number-value check (`token_test.go:94`); the vanilla corpus sweep only counts parse failures and recoveries (`vanilla_corpus_test.go:277-410`, skipped without a game folder). Our TS lexer and Rust side are better. Mine the tests: recovery cases stray `}` / empty value / unclosed block (`parser_test.go:261-415`), truncated-real-file prefixes never panic (`malformed_test.go:112`), depth limit 1000 (`parser.go:71`). |
+| Offset layer | `clausewitz/analysis.go` (584) re-aligns tokens to the source to produce rune-offset `SourceSpan` (`analysis.go:20-27`, `locateTokens` :259); `crossref.go` (390) plans and applies a repair (`PlanCrossRefRepair` :308, `ApplyCrossRefRepair` :373): sha256 of the source, span text must still match, deletion refused when boolean ancestry could change semantics (:344-358). `position.go` (264) lints script positions. | PATTERN, then PORT (Small, 2-4 days): the guarded plan is exactly our "source-bound proposal revalidated on the server". Offsets are runes, not bytes; reimplement on our lossless spans. |
+| Byte-offset focus patcher | `exportmerge/focus_blocks.go` (478): `focusTokens` :381, `focusEntries` :457, `Render` :188, `focusPatchNode` :273; patches individual fields inside a focus block in the original file. Only used by append-to-existing export. | PATTERN. Shows the heuristics (newline style, appending new keys before the closing brace) worth turning into test cases for `hoi4_focus_rewrite`. |
+| Parser fragmentation | Besides `paradox`: `exportmerge.focusTokens`, `clausewitz.locateTokens`, `gameindex/build/states.go:27 tokenize`, `exportplan/history scanTokens` (history.go:451), `worldout.scriptTokens` (state_start_transfer.go:209), regex lints (`focus/lint.go:15-18`, `lint/perf.go`). | IGNORE all; evidence for the "three implementations" risk in section 6. |
+| Import of existing mods | `importjob` 7,281 + `importsvc` 12,058 + `importassets` 993; browser scans a folder and posts files to a staging route (`api/imports.go:45-51`, 1 GiB request cap :25). Output is rows; unmodelled content lands in raw-file or "unrecognized" buckets. Encodings: strips a leading BOM (`parser.go:335`); `decodeModText` tries UTF-8, then Windows-1252, then GB18030 (`exportmerge/target.go:258-270`). | REPLACE (Setup scan and native workspace). Take facts only: [I] Go's charmap Windows-1252 decoder maps every byte, so the GB18030 branch is probably unreachable; test our non-UTF-8 uploads directly. |
+| Archive safety | `exportmerge/target.go:43-48`: 512 MiB compressed, 20,000 entries, 256 MiB per entry, 1 GiB uncompressed, ratio 200; refuses symlinks (:139-140), `..`, absolute paths (:182). | PATTERN. Compare numbers with our upload caps; behaviour is standard. |
+| Export engine | `exportengine` 14,489 + `emit` 22,606 (excluding generated tables) + `exportplan` 1,457. Rebuilds files from rows (native.go 3,803). | IGNORE. This is the regenerate-on-export model Factory rejects. Several emitters are ports of Python (15 `pycompat`/`pyrepr`/`pyfloat` files). |
+| Fidelity ledger | `web/src/generated/exportCoverage.ts`: 40 path rows (earlier note said 41), statuses modeled_roundtrip 22, not_routed 6, preserved_verbatim 5, parsed_partial 4, imported_not_exported 2, metadata_only 1 (types also define consumed_then_discarded, scanner_blind). Used by `ExportSettingsDialog.tsx:24` to warn about lossy paths. | PATTERN. Adopt a ledger in Setup scan output (per path pattern: edited-by-span, preserved byte-exact, parsed-not-edited, not understood). Our design should show byte-exact for everything it does not touch. |
+| Validation: Clausewitz syntax | codes `clausewitz.` unterminated_quote, unclosed_block, stray_closing_brace, missing_assignment_value, parse_error, parse_failed, analysis_token_alignment, analysis_ast_mismatch (`clausewitz/analysis.go`) | REPLACE (`hoi4_script_validate`); diff the code lists for gaps. |
+| Validation: localisation | 11 `localisation.*` keys: content_before_language_header, invalid_entry, invalid_key, missing_language_header, missing_open_quote, missing_utf8_bom, multiple_language_headers, parser_diagnostic, trailing_junk, unknown_language_header, unterminated_value; parser `hoi4/loc` 384 lines | PORT only if `AT/core/source/localisation.ts` (178 lines) lacks one; Small. |
+| Validation: references | `exportengine/cross_ref_lint.go` (776), `reference_integrity.go` (538), `registry_validation.go` (503); message families `refs.focus_missing`, `refs.focus_case`, `refs.completed_case`, `refs.template_missing`; `has_completed_focus_case` catches case mismatches | REPLACE (`hoi4_mod_index`, `hoi4_impact_inspect`); keep the case-mismatch and typo-suggestion (Levenshtein, `crossref.go:187-250`) behaviours as test cases. |
+| Validation: politics/ideology | 19 `politics_*` and 11 `ideology_source_*` codes | IGNORE; tied to Hagane's ideology-registry custody model. |
+| Validation: focus | 31 `focus_*` codes (scope, registry, shared pool, layout: same_cell, relative_cycle, missing_anchor, adjacent_same_row, replacement_global_shift) in `domains/focus/custody.go`, `filepolicy.go`, `treevalidation.go` (700) | PORT the layout and prerequisite rules as specs into the S04 lint if `AT/focus/lint.ts` lacks them. Note `treevalidation.go:205,459,498,675` have Chinese-only messages. |
+| Validation: DLC lint | `exportengine/dlc_conditional_lint.go` (389): scans `has_dlc` guards, reports by DLC and folder, with typo suggestion; plus DLC selection per project | PORT as a rule (Small, 2 days) together with a per-project DLC setting. |
+| Validation: perf lint | `domains/tools/lint/perf.go` (218) + `perf_profile.go` (339): regex heuristics, thresholds focus nodes per tree 200 (`perf.go:45`), events per namespace 300, decisions per category 120, trigger fanout 6, total focus 1,500; codes perf.heavy_trigger_fanout, hot_scope_loop, nested_scope_loop, mtth_no_floor, expensive_available_recheck, oversized_* | PATTERN. Thresholds are folklore [U]; port only with our own measurement. |
+| Validation: token lint | `gameindex/build/cwtool_rules.json` (10,641 bytes, version 4: 3 anti-patterns, enum tables, Chinese messages); CWTools config submodule only supplies the modifier catalog (`cwtools/cwtools.go`, 236 lines) | IGNORE; use the CWTools config directly if we want rules. |
+| Validation: flag set-but-never-read | `domains/focus/lint.go` (261): two regexes over row text (`:15-18`), dynamic `@`/`$` suffixes skipped | PORT as an index query on `hoi4_mod_index` (Medium-small, 3 days, better than regex). High user value. |
+| Validation: playtest/log | `lint/errorlog.go` (502), `playtest.go` (674): error.log signature bucketing, start-date detection, runtime inventory | REPLACE (`hoi4_error_log`); the regexes are facts for the companion (`playtest.go:12-15`). |
+| Relations graph | `domains/countries/relations.go` (717): edges {source_kind, source_id, effect_name, target_type, target_id, field_name, resolved}; `refEdge` at :39-51 | REPLACE with mod_index/impact; keep `resolved:false` edges as an API shape idea. A scripted-symbol endpoint under that name does not exist in this repo [U]; nearest is `rawfiles/crossref.go` (485) and `exportengine/scripted_ref.go` (222). |
+| Mutation receipts | `toolapi/mutation_receipt.go` (513): write_status committed/partially_committed/no_change; verification_status not_run/issues_found/references_passed/diagnostics_found/verification_unavailable/verified; every result carries a plain-language `reporting_rule` telling the agent what it may claim (`:290-372`). "Verified" means indexed references and returned proofs passed, not game behaviour. | PATTERN, take it. Put a receipt in the broker's tool-result envelope. Keep the rule text style; write our own wording. |
+| `edit_revision` tokens | `toolapi/edit_revisions.go`: client sends `edit_revisions` {"focus_tree:<id>": "<int>"}; middleware accepts only `bookmark` and `focus_tree` scopes (`:30`); server compares and answers 409 `save_conflict` (`domains/focus/revision.go:14-34`, header `X-Edit-Revisions` :58,135). | PATTERN. Ours should be a per-file content hash on every write, which covers every entity, not two. |
+| `id_reassigned` | `toolapi/id_selfcheck.go:10-76`: compares requested business ids with returned ones, adds a loud notice when the platform silently renamed on collision. | PATTERN as a negative requirement: Factory refuses on collision instead of renaming; keep a test that asks for id X and never gets Y. |
+| Preview then apply | `preview_delete_entity`/`delete_entity` (`tools_delete_entity.go`, 205), `preview_gui_overlay`/`apply_gui_overlay_edits`, `preview_delete_ideology`/`apply_delete_ideology`, `diff-preview`/`diff-resolve` | PATTERN; already in Factory's proposal model. |
+| Diff-preview / diff-resolve merge | `exportmerge/diff.go` (389), `append.go` (421): field-level three-way (source_snapshot = base, project row = mine, mod on disk = theirs) over 5 entity kinds; `ConflictReport`, `FieldConflict`, `ResolutionRequest` (`diff.go:60-80`). UI: `DiffMergeExportDialog.tsx`. | PATTERN for our semantic-diff UI. Git three-way at block level replaces the mechanism. |
+| Save diagnostics delta | `hoi4/savediagnostics` (263) + `web/.../save-diagnostics` (582): every write returns the findings with change = introduced/unchanged/improved/worsened/changed/resolved, key, code, severity, entity_ref, evidence, repair_route, affected | PORT (Small, 2 days). Best small idea for "what did this edit do to the findings". |
+| Local tool API (149 tools) | `docs/cli.md` (149 lines), `toolapi` 16,485 lines. Conventions: knowledge first, ids vs keys, field references, write results, edit revisions, authoring defaults. Field guidance in schema: struct tags -> JSON-schema descriptions, and a middleware appends a pointer to a per-area field table (`tools_fieldref_hint.go:9-60`, 42 markdown files, 128,245 bytes in `toolapi/fieldsdata`). | PATTERN. The tools wrap JSON-table REST so none of the code transfers. The convention "put what each field expects next to its input schema, and keep it in a file the tool can serve" fits our broker; write our own text. |
+| Knowledge articles | `internal/knowledge/articlesdata`: 34 guides + 14 reference entries, each en + zh (68 + 28 files; English total 363,863 bytes). Front matter has verification (source-checked), gameVersion 1.19.2.0, sources (HOI4 wiki URLs). Search is 379 lines of Go. README.md says original articles are GPL-3.0-only and cited sources are not relicensed. Authored by the Hagane team; some reference entries follow the Paradox wiki's structure [I]. | Data reuse possible after (a) written grant, (b) a fact check against our game version, (c) wiki licence check [U]. Treat as a checklist of traps first. The 1,909-entry command wiki from the hosted site is not here. |
+| Map tools | `check_world_map`, `repair_world_map`, `list_world_map_records`, `undo_world_map_change`, `restore_world_map`, world-from-picture tools (`tools_world_*.go`); codes already_water, land_covers_sea, river_faults, disconnected_province, mod_state_gap, no_province, kind_land_water | IGNORE/REPLACE (`hoi4_map_inspect`/`hoi4_map_rewrite`; AT/map 47,776 lines with partition, watershed, relief, border-quality). |
+| GUI renderer | `guirender` 23,000 lines. Needs the user's game files at runtime: `api/app.go:85-90` returns `os.DirFS(GameDir)`; `gameindex` builds datasets from it into the user cache dir; `/api/go/gui-vanilla/{path...}` converts game DDS/TGA to PNG on request and serves it to the browser (`domains/gameview/sprite.go:89-112`, `imgcodec` 512 lines). | IGNORE. Also a policy problem for a hosted app: serving converted game sprites to browsers is redistribution of Paradox assets (see section 4.5). |
+| Mod install and game discovery | `gamedir/gamedir.go` (186): Steam roots and `libraryfolders.vdf` for windows/darwin/linux (:90-111), HOI4 user-data candidates incl. OneDrive Documents (:152-190); `export.Install` (`export/export.go:179`) extracts a ZIP into the mod folder with a folder-taken guard (:171,203). Browser path: File System Access API writes (`SaveToModFolderButton.tsx:44-45,72`). | PORT to the companion (Small, 2-3 days for discovery + safe install). |
+| Draw.io importer | `hoi4/drawio/drawio.go` (398): XML -> nodes {focus_id, name, x, y} and edges, 8 MiB cap, 100 px per grid unit | PORT (Small, 2 days in TS or Rust) with its 112 lines of tests. |
+
+---------------------------------------------------------------------
+
+## 4. Build and run feasibility (by reading only)
+
+### 4.1 Linux and macOS build [V/I]
+- No cgo (`import "C"` absent). Windows code is isolated by filename: `window_windows.go`, `fatal_windows.go`,
+  `start_windows.go`, with stubs `window_other.go` (returns `errNoWindow`), `fatal_other.go`, `start_other.go` (Setsid).
+  go-webview2 and go-winloader are imported only from `cmd/haganeworks/window_windows.go`. `internal/gamedir` already
+  handles darwin and linux. So `go build ./cmd/haganeworks` should work on both; `--no-window` is the headless mode.
+- The Go build needs `web/dist` first (`//go:embed all:dist`; the clone has no `web/dist`, so a Go build fails until
+  `npm --prefix web run build` has run). CI works around it with a build artifact.
+- Never tested off Windows: CI is `windows-latest` only (`.github/workflows/ci.yml:14,41`); only the dependency-submission
+  job runs on ubuntu. README and CONTRIBUTING say Windows 10/11 is required to build. Tests with backslash paths exist
+  (`paradox/vanilla_corpus_test.go:13` hard-codes `G:\Steam\steamapps\common\Hearts of Iron IV`, skipped when absent).
+
+### 4.2 Headless in Docker as a service [I]
+Possible only as an internal worker, not as the product. Blockers measured: bind address is hard-coded to
+127.0.0.1 (`main.go:154,164`); Host and Origin checks are string-equal to that address (`server.go:48,52`), so a published
+container port fails them; the session cookie is issued to any visitor; settings, game index (`gameindex.SetDefault`),
+reference tables and CWTools dir are process-global (`api/app.go:47-49,64`), so one process serves one user; a project is
+loaded whole into memory; game files must be mounted read-only. Patching bind address and allowed host is a few lines,
+but the missing multi-tenancy is not. Our Rust server owns accounts, RLS and workspaces; a Go worker behind it would be
+a second brain for the same project.
+
+### 4.3 Test suite [V]
+- Go: 527 test files, 2,266 `Test` functions, 9 Fuzz/Benchmark, 88,327 test lines (37.7 percent of non-test lines);
+  58 `t.Skip` in 49 files, mostly "set HOI4_GAME_DIR / HOI4_GAME_ROOT" real-game gates (25 files). The default suite uses
+  a synthetic mini game (`internal/gameindex/gameindextest/game`, files labelled "Synthetic test fixture written for
+  Hagane Works' tests (not game data)", about 30 KB by a partial sum) and runs without the game.
+- Coverage by area (test lines): exportengine 13,844, toolapi 13,818, guirender 12,516, domains/tools 8,067, worldmap 3,109,
+  importjob 3,677, mapgen 3,493; paradox 1,749; importsvc only 613 (thin for 12k lines).
+- TS: 317 test files, 38,765 lines, 1,815 `it(`/`test(`; 106 files assert on source text.
+- Parity tests against the former Python backend exist (`gameindex/build/parity_test.go` 547 lines, `floatparity_test.go`,
+  "bug-compatible" cases): these pin behaviour that no longer has a reference [I].
+- Pass/fail status of any of it: [U], not run.
+
+### 4.4 CI [V]
+`ci.yml`: frontend job (npm ci, `npm audit --audit-level=low`, typecheck, eslint, design-token lint, set-state-in-effect
+ratchet at max 0, vitest, build), then Go job (`go test ./...`, submodules recursive), then dependency submission.
+`release.yml` builds x86/x64/arm64 Windows archives from tag `v*` (`tools/release-windows.ps1`, 186 lines). CONTRIBUTING
+and README tell contributors to run `go test -vet=off ./...` while CI runs plain `go test ./...`; one of them is stale [I].
+No coverage gate, no Linux job, no race detector.
+
+### 4.5 Third-party licences and assets that must not travel [V unless noted]
+- `THIRD_PARTY_NOTICES.md` (177,821 bytes): Go stdlib/x BSD-3, go-webview2 MIT, go-winloader ISC, WebView2Loader BSD-3,
+  shadcn utilities MIT (`globals.css` portions), and about 76 npm packages in the shipped UI: 60 MIT, 10 ISC, 2 OFL-1.1
+  (Geist fonts), 2 BSD-3, 1 Apache-2.0, 1 0BSD. No GPL/AGPL/LGPL/MPL dependency. CWTools config (MIT) is an unfetched
+  submodule (`.gitmodules`), not bundled. Compatible with an AGPL host; the Hagane code itself is GPL-3.0-only, which
+  GPLv3 section 13 allows to be combined with AGPL (earlier note), but cannot flow into the Apache-2.0 agent-tools.
+- Files with no per-file licence header or SPDX line; copyright holder appears only as the commit author
+  "Hagane Works <opensource@hagane.works>" and the single commit "Initial open-source release" (2026-10-30).
+- Paradox-related: nothing from the game is shipped (README, THIRD_PARTY_NOTICES lines 3004-3015). Test fixtures are
+  synthetic. `internal/reftables/defaults/*.json` (ideologies, alerts, text colours; 9,337 bytes total) are facts about the
+  base game. Do not redistribute: `docs/screenshots/map-studio.png` and `photo-map-studio.png` (583,700 and 580,036
+  bytes) show the game's world map and country colours (viewed), and any game-view screenshot; the runtime path that
+  converts and serves game sprites; the CWTools-config submodule content (own licence).
+- Brand and art: "Hagane Works" name and `web/public/brand/hagane-icon-*.png`; `web/public/avatars/pets/*.png` (8 files,
+  about 1.1 MB, provenance unknown [U]). The new agreement should say whether the name and icon are included.
+- Fonts: Geist (OFL-1.1) is fine. No CJK font is bundled.
+
+---------------------------------------------------------------------
+
+## 5. Code quality signals
+
+Positive [V]
+- Structured: packages by domain, tiny dependency set, standard-library HTTP, explicit error types (`apiutil`), atomic
+  saves, TypeScript `strict`, 14 `eslint-disable`, 11 `any` in non-test TS, one TODO-type marker in TS and 14 in Go.
+- Honest limits: export never blocks, coverage ledger, documented lossy paths, `SECURITY.md`, synthetic fixtures.
+- Real-game gates exist and are skippable; a malformed-input never-panics test exists (`paradox/malformed_test.go:31`).
+
+Negative or risky [V unless marked]
+- No architecture docs: `docs/` holds only `cli.md`, two start-here files and screenshots. CONTRIBUTING says implementation
+  code should be "self-explanatory" and keep only licence/generated comments; measured result: 19 comment lines in all
+  Go non-test code and 14 in TS non-test code. Intent has to be recovered from tests. That is the largest take-over cost.
+- Python heritage: 15 `pycompat/pyrepr/pyfloat/pyunicode/pydict` files (14,346 lines including the generated tables),
+  Python float repr reproduction, `TestTokenizeEscapedNewlineSkipsLineCount_QuirkBugCompatible` (`token_test.go:207`).
+- Hosted heritage: Next.js shims, hosted-DB column names in a "blacklist" (`structural_fields_product.json`: is_admin,
+  deleted_at, expires_at), `schemagen` generating `tables.json` from a SQL schema, `/go/` route prefix [I: dead surface].
+- Parser fragmentation: at least 7 separate tokenizers or scanners (section 3).
+- Chinese-only text in code: 75 Go non-test files (475 lines) and 54 TS non-test files (432 lines) contain CJK, including
+  user-facing validation messages (`domains/focus/treevalidation.go:205,459,498,675`, `worldmap/world.go:176`,
+  `gamesave/undo.go:21`, `exportcheck/export_locref_scan.go:42`, `gameindex/build/cwtool_rules.json` messages) and bilingual
+  in-code dictionaries. No CJK identifiers found. Test files with CJK: 140 Go, 75 TS.
+- Hard-coded Windows paths: only in tests and Steam discovery (`gamedir.go:100`, `vanilla_corpus_test.go:13`).
+- Hard-coded English in JSX: `placeholder="..."` 140, `aria-label="..."` 50, `title="..."` 14 sites.
+- i18n gaps: 69 inline bilingual dictionaries; by my line count `ko` has 7,874 message entries vs 7,876 in the other seven locales (two keys possibly missing, not checked).
+- Dead or vestigial code: not measured; the hosted-origin items above are candidates [I].
+- Generated code: `emit/preview/unicode_tables_gen.go` (8,217), `emit/locout/pyunicode_tables_gen.go` (11,514),
+  `web/src/generated/exportCoverage.ts` (482), the generator for the last is not in the repo [U].
+- Architecture smells: maps instead of types for rows; global singletons; tools proxy REST in-process; the largest store
+  (focusTreeStore, 1,856 lines) holds optimistic-write tracking; god files (`game-view/page.tsx` 7,304 lines,
+  `MapEditor.tsx` 2,401, `UnifiedModImport.tsx` 2,177, `native.go` 3,803).
+- Security of loopback API: see 1.6. Strengths: Host/Origin/Fetch-Metadata checks, SameSite=Strict HttpOnly cookie,
+  constant-time compares, 0600 token file, body size caps. Weaknesses: cookie minted to any local visitor, no CSP,
+  inline script in index.html, directory-listing and quit endpoints behind the same cookie, tool API takes absolute
+  file paths (`export_project save_to`, `create_world_image file_path`) for anyone holding the token.
+
+---------------------------------------------------------------------
+
+## 6. Strategic options
+
+### 6.1 What is actually worth carrying over (sizes)
+- Go ideas to port, about 5.8k lines of Go: clausewitz span/repair plan 1,238; drawio 398; dlc lint 389; dead-flag lint 261;
+  perf lint 557; gamedir 186; export.Install 249; errorlog + playtest 1,176; savediagnostics 263; loc parser 384; receipt,
+  id self-check, revisions about 730 (patterns).
+- TS to port or rewrite: focus graph shell about 3.4k lines (after dropping layout); event and decision preview cards 438;
+  save-diagnostics and revision-conflict UX 582; edge-display and selection helpers 141 + tests.
+- Data to review before use: 34 + 14 knowledge articles, 42 field-reference tables, the 40-row coverage ledger, the finding-code
+  catalog (158 `Code:` literals), en message files for the ported components.
+- Not worth anything to us: row-based stores, REST client modules, export engine, importers, emitters, GUI renderer,
+  map generators, game-view layers (63k lines), Windows shell.
+
+### 6.2 Option A: harvest selected editors and ideas, freeze or archive Hagane Studio
+Pros
+- Cheapest. Keeps Factory's single source of truth (native files + Git) and one implementation of parser, validator,
+  renderer. Fits the design-lab rule: each ported component is restyled anyway.
+- Small and reversible: each harvested module arrives with attribution (`PROVENANCE.md`, path, commit 1e83162, GPL-3.0-only).
+Cons
+- Existing Hagane users lose their local app (the hosted site closes 2026-11-11 per the earlier note) unless a migration
+  path exists. Their export ZIPs are native mod files, so Setup can import them, but with the consolidation losses in the
+  ledger.
+- Throws away the maintainer's newly granted ownership as a user-facing asset. Reputation risk if "taken over" means
+  "abandoned".
+Effort: Small-to-Medium in total, spread over stages: rules and data 5-8 days; pure TS modules 6-10 days; focus graph shell
+6-10 days; previews 4-6 days. About 25-35 engineer-days for everything listed in 6.1.
+Risks: provenance and licence paperwork (section 7); partial copies drifting from upstream, which is acceptable because
+upstream is frozen.
+
+### 6.3 Option B: Hagane Studio becomes the local/desktop edition, shares React editors with Factory via a common package
+Pros
+- Keeps the Windows desktop product alive and gives a local-first story without building a companion first.
+- One React editor family in principle.
+Cons (all measured above)
+- Two data models cannot share editors: JSON rows with regenerate-on-export versus native files with source-bound proposals.
+  The shared package would need a neutral document model plus two adapters, which is the adapter work of Option A plus a
+  permanent compatibility layer.
+- Two design systems and toolchains: Tailwind/base-ui/use-intl/zustand/SWR vs plain CSS/i18next/no state library, different
+  CSP rules, different lint (jsx-a11y absent in Hagane). A common package must pick one; either side pays a rewrite.
+- Two backends for the same responsibilities: Go parser/validator/renderer/map code (about 100k+ lines) next to Rust and
+  agent-tools. This is the "two competing implementations" outcome, with three languages.
+- Maintenance: 234k Go + 195k TS lines to own, no architecture docs, comments stripped, Windows-only CI, Python-parity tests.
+- GPL-3.0-only on the shared package would force the package, and everything linking it in the hosted app, under GPL terms
+  (fine for AGPL Factory) but never into the Apache-2.0 agent-tools without a relicense grant.
+Effort: Large. Initial extraction 8-12 weeks [I], then about double the maintenance for every editor change.
+Risks: maintainer bandwidth (hobby project), divergence on first change, local edition blocks Git-native workflows.
+
+### 6.4 Option C: converge; port the valuable Go logic; one client serves hosted and local
+Pros
+- One implementation per responsibility (table in 6.6). Local use is served by the Factory client plus a small companion,
+  matching the planned "local companion" in CLAUDE.md and the CSP `connect-src 'self'` constraint.
+- The portable Go value is about 5.8k lines, so "port" is cheap compared with the size of the backend.
+Cons
+- The largest piece of work after A, and it must wait for the companion design (new ADR for CSP, pairing, threat model).
+- Existing Hagane Studio users need a stated path and time frame.
+Effort: A (25-35 days) plus companion modules 6-10 days plus importer/migration notes 3-5 days plus rule ports 8-12 days:
+about 45-60 engineer-days over several stages [I]; no single large rewrite.
+Risks: scope creep into porting game-view or map code (do not); relicensing of ports into agent-tools (needs the grant);
+companion language choice (Rust keeps one toolchain; Go would make the companion a third language).
+
+### 6.5 Recommendation: Option C, executed as "harvest first (A), converge second", reject B
+Why C and not A alone: the companion needs gamedir/install/log-parsing and a decision about local-folder sync (Hagane already
+solved discovery and safe install, and demonstrated a browser-only fallback with the File System Access API in Chromium).
+A without a plan leaves those users and those modules orphaned. Why not B: sections 6.3 and 1.5; the shared package would
+be the permanent cost of the data-model mismatch.
+
+Sequence
+1. Paperwork (section 7); decide the maintenance posture of the Hagane repo.
+2. Phase 1 (with S04): port the pure items and the focus graph shell; port the save-diagnostics delta; feed the finding-code
+   catalog and traps into test fixtures; add the dead-flag query and DLC rule to mod_index-based lint.
+3. Phase 2 (with the companion ADR): port gamedir, safe install, log-parsing facts into the companion; define pairing and
+   origin rules from scratch.
+4. Hagane Studio: tag a final release, README banner pointing to Factory, security and data-loss fixes only, no features.
+   Sunset trigger (to record as a maintainer decision): when Factory can import a Hagane export ZIP with a fidelity ledger,
+   the companion handles local mod-folder sync, and focus/event/decision/character editors exist; then archive.
+
+### 6.6 How it avoids two implementations of the same responsibility
+
+| Responsibility | Single owner after C | Hagane disposition |
+|---|---|---|
+| Lossless lex/parse with spans | agent-tools `core/source` (TS) for tools; Rust workspace/Setup for the host | Go `paradox`/`clausewitz` frozen, never extended |
+| Source-preserving edit | Rust host: proposals bound to file hash + span; agent-tools `source-update`/`rewrite` | idea of sha-guarded span plans ported once |
+| Validation | agent-tools `script_validate`, `mod_index`, `impact`; one rule catalog | 158 finding codes become spec + test fixtures, each ported at most once |
+| Rendering (focus, event, GUI, tech, map) | agent-tools render tools | Go guirender/mapgen frozen |
+| Editors | Factory client (plain CSS, i18next) | Hagane React copied module by module, restyled; originals frozen |
+| Project format | native mod files + Git | JSON-table projects are legacy; migration = Hagane "Export mod (ZIP)" -> Setup import |
+| Local integration | companion | gamedir, install, log facts ported once |
+| Tool/agent conventions | broker with grants | receipts, id and revision conventions as patterns |
+
+How it fits native files + Git: Hagane's rows are never imported as truth. Editors receive a view model derived from
+parsed native files (with source ranges), and every edit leaves as a proposal revalidated on the server. Hagane's
+`edit_revision` and `source_snapshot` ideas map to file hashes and Git three-way merges; its "export never blocks" and
+fidelity ledger become Setup scan honesty; the lossy consolidation it performs on export is the exact failure our design
+exists to avoid.
+
+---------------------------------------------------------------------
+
+## 7. Provenance and licensing steps before code moves [I, not legal advice]
+
+1. Get the grant in writing from the copyright holder (the commit author is the entity "Hagane Works", no person named, no
+   copyright lines in files): a short statement in a GitHub issue or commit in the repo, naming the maintainer, scope ("any
+   use, including relicensing"), and whether the name and icon are included. Transfer or fork the repository under the
+   maintainer's control.
+2. Decide the target licence per destination: into AGPL Factory the GPL-3.0-only code is allowed as is (GPLv3 section 13);
+   into Apache-2.0 hoi4-agent-tools it needs an explicit relicense grant, otherwise write from the rule specs only.
+3. Put adapted files under a provenance note and headers (path, commit, licence) because the originals carry none.
+4. Do not move: screenshots showing game data, game-derived runtime paths, brand assets, pet avatars (unknown provenance).
+5. Record the decision in `docs/02-architecture/maintainer-decisions-2026-10-24.md`.
+6. Knowledge text: use only after (1) and a game-version fact check; the wiki licence of the sources needs a look [U].
+
+---------------------------------------------------------------------
+
+## 8. Questions for the maintainer (batched)
+
+1. Is the grant (section 7.1) in writing, from whom, and does it cover relicensing, the name and the icon?
+2. Do you want Hagane Studio kept as a product (maintenance-only with sunset trigger, my recommendation), or archived now?
+3. Approve @xyflow/react 12.10.2 (MIT, adds zustand 4 transitively) for the S04 focus editor, or should S04 build its own canvas?
+4. Is the "no `style=` attribute" rule a source rule only (CSSOM updates via `style.setProperty` allowed), or must a lint ban any
+   `.style.` use? This decides how ruler ticks and context menus are built.
+5. Which language for the local companion: Rust (one toolchain, recommended) or Go (reuse of gamedir/install, third language)?
+6. Should the focus editor show game sprites at all in the hosted app? The existing plan (agent-tools render) avoids serving
+   converted game files to browsers; Hagane's editor assumes it.
+7. May the seven non-English locale sets be kept as a future asset (provenance and quality unknown), or dropped for now?
+8. Should the finding-code catalog become a public test corpus (fixtures) under our licence?
+
+---------------------------------------------------------------------
+
+## 9. Unverified items and limits
+
+- Nothing was built or run; all pass/fail, performance and Linux-build statements are inference [I].
+- node_modules was not present, so xyflow and Monaco CSP behaviour, and whether xyflow injects `<style>`, are unconfirmed [U].
+- Tool count: docs say 149, code shows 144 direct registration sites; helper registration not traced [U].
+- `scripted-symbols` endpoint named in the skills docs was not found in this repo under that name [U].
+- Wiki and knowledge-article licensing, pet avatar provenance, quality of the non-English translations, and the generator of
+  `exportCoverage.ts` were not determined [U].
+- Effort numbers are my estimates on the stated scale, not measurements.
+- The clone was not modified; this file is the only artifact written.
+
+---------------------------------------------------------------------
+
+## Appendix: measurement sources
+
+- Go lines: `git ls-files '*.go'` split on `_test.go`, `xargs cat | wc -l`; per-package loops over `internal/*/`.
+- TS lines: `git ls-files 'web/src/*.ts' 'web/src/*.tsx'` split on `.test.`; 724 non-test files (414 tsx), 317 test files.
+- Counts of `style={`, `className=`, `aria-`, `role=`, literal `placeholder|aria-label|title`: grep over non-test TSX.
+- CJK counts: `LC_ALL=C.UTF-8 grep -P '[\x{4e00}-\x{9fff}]'` over `git ls-files`.
+- Finding codes: `grep -oE 'Code: +"..."'` over `internal` (158 distinct) plus message-key families.
+- Comparison assets: `AT/core/source/lexer.ts` (324), `AT/focus/{layout 2,879; geometry 382; model 422; source-update 519; render 830}`,
+  `AT/map` 47,776, `AT/gui` 18,826, `AT/technology` 7,639, `AT/event` 10,665, whole `src` 151,098 lines.
+- Factory client facts: `web/package.json` (React 19.3.1, i18next 26.5.10, react-router 8.5.0, vite 8.3.5, eslint-plugin-jsx-a11y),
+  `web/README.md:30` (CSP and no `style=`), `.work/research/07-factory-current-state.txt` section 1.5.

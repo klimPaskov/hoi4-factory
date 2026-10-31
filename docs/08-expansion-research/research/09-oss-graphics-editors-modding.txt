@@ -1,0 +1,339 @@
+# 09 - Open-source graphics editors, canvas libraries, image pipeline and HOI4 tooling
+
+Research report for HOI4 Factory (AGPL-3.0). Date accessed: 2026-10-31. Read-only research.
+Method: GitHub contents API (`gh api`), WebFetch and WebSearch only. Nothing was cloned, built, installed, downloaded or executed, no accounts were created, no paid model calls were made. Disk was not used beyond tiny temp files (one copy of Pillow's `DdsImagePlugin.py` is left in `/tmp/dds_plugin.py`; the rest is in the session scratchpad). `.work/ext` is untouched.
+
+How to read the evidence labels used below:
+- VERIFIED = I read the cited file or page in this session.
+- UNVERIFIED = stated from general knowledge, search snippets or inference. Do not rely on it without a check.
+- PROPOSAL = my design suggestion, not a fact about any project.
+- License labels: L = LICENSE text read, M = manifest field (Cargo.toml/package.json) read, A = GitHub API license detection only.
+- "Not legal advice": AGPL-3.0 compatibility notes below are the usual reading (permissive MIT/Apache-2.0/BSD-3 and GPL-3.0 code can be included in an AGPL-3.0 work; LGPL via linking; MPL-2.0 lists AGPL as a secondary license; custom/non-commercial/no-license code cannot). Network use of a separate GPL program over HTTP is not inclusion.
+
+Several repos move fast (Graphite, CWTools MD Edition, ComfyUI). SHAs below are the default-branch heads at access time; Graphite's head advanced twice while I was reading, so file contents there span SHAs 210aef5..f04bbe1.
+
+Project context read first (local repo): `web/package.json` pins React 19.3.1, Vite 8, TypeScript 6, no graph/canvas library yet; SPEC-010 (assets) already requires versioned "technical profiles", original-retained transforms with receipts, DDS conversion as a deterministic post-step, and ComfyUI-style endpoints behind a capability adapter; the roadmap puts the focus editor in S04 and assets/localization in S06, maps in S07; the earlier audit (docs/00-research/02-existing-assets-audit.md) already pinned cwtools, cwtools-hoi4-config, hoi4-modmaker, HOIIVUtils and Nova.
+
+---------------------------------------------------------------------------------------------------
+
+## 0. Short answer (details and caveats follow; the consolidated recommendation is in section 8)
+
+1. Graphite: reject as a dependency now. It is a real, active, dual MIT/Apache-2.0 node-graph editor, but it is alpha, its document format is mid-migration, its crates are unpublished (`publish = false`, version 0.0.0, Rust 1.98), its CLI renders through wgpu, and it has no DDS output. Adapt three ideas (recipe as a node DAG, content-addressed resources, versioned migrations). Revisit after its stable-format and batch-tools milestones.
+2. OpenDesign: a TypeScript/Node daemon + Next.js UI that orchestrates third-party coding agents to make HTML prototypes, decks and videos. Not a graphics engine. Reject as a dependency; borrow the DESIGN.md style-spec and lint-before-accept ideas.
+3. Canvas: React Flow (`@xyflow/react`, MIT) is the best fit for a grid-based focus tree and for event chains. tldraw is licensed out (no production use without a key). Excalidraw/LiteGraph/Rete are poor or riskier fits. Konva/Pixi/Fabric are for pixel-level editors (maps, GUI) later. dagre (MIT) for event-chain layout; elkjs only if ports/orthogonal routing are needed (it is `EPL-2.0 OR GPL-3.0-or-later`).
+4. Pipeline: do DDS in-process in Rust with `image` + `image_dds` (which wraps `intel_tex_2` and `ddsfile`), but write the DDS header with `ddsfile` yourself because `image_dds` emits DX10-extension headers for BC1/BC3/BC7, whose acceptance by HOI4 is UNVERIFIED. Write TGA flags with a tiny own writer because `image`'s TGA encoder is RLE + top-left origin by default while the HOI4 wiki says uncompressed 32-bit, bottom-left origin. texconv is Windows-only as a tool; Compressonator CLI ships Linux x86_64 only; ImageMagick/Pillow are usable as test oracles.
+5. New find with high value: "CWTools MD Edition" (MillenniumDawn/cwtools-vscode, MIT) contains a Rust rewrite of CWTools, HOI4-first, with a CLI (`cwtools validate`, JSON/SARIF) and LSP. It could replace the F# CWTools worker. It is extremely active (pre-release numbering at v4.1.299, four tags published within about an hour on 2026-10-31), so pin by SHA and evaluate in a bounded spike. Also noted: RHoiScribe (AGPL-3.0 Rust MCP server for HOI4 agents) and hoi4skill (GPL-3.0 Rust CLI) overlap with hoi4-agent-tools.
+6. AI art: keep ComfyUI as an external HTTP service (GPL-3.0, separate process, no linking). The maintainer's portrait repo ships API-format workflows and a DDS saver; its model (FLUX.2 Klein 9B) is gated and non-commercial, so support "bring your own endpoint" before hosting weights.
+
+---------------------------------------------------------------------------------------------------
+
+## 1. Graphite (GraphiteEditor/Graphite)
+
+Identity: first inspected at 210aef541b1e202889853a5f989cedba23abce16 (2026-10-31 11:50Z); head later f04bbe1c5a26efcde0848757cef5ca456a656a04. Rust (workspace) + Svelte/TypeScript frontend. GitHub size 61 MB. 184 contributors (list paging count). At least 100 commits between 2026-10-01 and 2026-10-31 (the API page cap). One rolling "latest-stable" prerelease tag from 2022; no versioned releases.
+
+License (VERIFIED, L+M): LICENSE-APACHE and LICENSE-MIT both present; workspace `license = "MIT OR Apache-2.0"`; the website license page says dual-licensed at your choice. GitHub API reports Apache-2.0. Either choice is AGPL-3.0 compatible (inbound).
+
+What it is (from code and docs):
+- A node-based, non-destructive vector/raster editor. Document = node network; the "Graphene" engine (`node-graph/` crates: graph-craft, interpreted-executor, graphene-std, nodes for raster, vector, blending, brush, text, transform, path-bool, vectorize) compiles and runs the network.
+- Frontend is Svelte; the Rust editor compiles to WebAssembly via `frontend/wrapper` (crate type cdylib+rlib) built by the repo's own `cargo run` tooling. Its frontend README says the backend is the source of truth for state and the frontend is presentation only.
+- Documents: legacy `.graphite` (serialized runtime structs) and a new `.gdd` archive format. A design RFC (node-graph/rfcs/document-format.md) describes a flat node registry, content-addressable resources (images, fonts, declarations) and a CRDT-style delta tree that also drives history, migrations and incremental compilation. The newest commits on the day I read it add the `.gdd` migration core and CLI, so the format is in flux. The features page (WebFetch) says a stable document format is planned for "Alpha 5" and "automation/batch processing tools" for "Beta 2"; raster compositing is described as still experimental.
+
+Is it embeddable in a web app? No supported path (VERIFIED by absence): all crates have `publish = false` and version 0.0.0; the WASM wrapper is built only through the repo's tooling and exposes the editor's message protocol to its own Svelte UI; there is no documented embedding API or npm package. Embedding means hosting a fork of the whole editor (an iframe) with no hook into our auth, Git or proposal model. `tools/web-editor-driver` drives the editor with real input plus screenshots via Playwright (for QA/agents); it is a driver, not an integration API.
+
+Is Graphene usable server-side for batch pipelines? Partly, with heavy caveats:
+- `node-graph/graphene-cli` has `compile`, `export`, `list-node-identifiers`, `extract-legacy-doc`. `export` reads a `.graphite` or `.gdd` and writes svg, png, jpg, webp, tiff, bmp, tga, ico or gif with scale/size/transparent/frame options.
+- It defaults to the `wgpu` feature and enumerates GPU adapters (`Backends::all()`); a comment in the editor runtime says raster falls back to the SVG pipeline when there is no GPU, as in headless tests. Raster export in a GPU-less container is therefore UNVERIFIED (would need software Vulkan).
+- Build cost: 39 workspace entries (two are globs over `node-graph/libraries` and `node-graph/nodes`, so dozens more crates), `rust-version = 1.98`, edition 2024, and git-pinned forks of `vello_gpu/vello_common/vello_gpu_shaders` (Keavon/vello, a specific rev). That would fight a pinned `rust-toolchain.toml` and bloat the image.
+- DDS: none. Workspace `image` features are png, jpeg, bmp, gif, webp, tiff, ico, tga, hdr, exr, serde; code search found 0 hits for `DXT1` and `image_dds`; `BC7` appears only in a blog post and lockfiles. DDS would have to be produced by our own encoder after a PNG export.
+
+Maintenance: very active, large community, but alpha. Churn is a risk for a pinned dependency: node names, document schema and even the GPU path changed within hours (a commit retiring the "Rust GPU" path and "Upload Texture" node landed the same day).
+
+Overlap with hoi4-agent-tools renderers: none (Graphite renders arbitrary vector/raster art, not HOI4 UI). It could in principle author source art, not game files.
+
+Verdict: REJECT as a dependency now. ADAPT IDEAS:
+1. A recipe is a small DAG of pure, typed, versioned operations on content-addressed inputs (our "transform recipe" with source hash, profile id, parameters, output hash and receipt).
+2. Content-addressed resource store keyed by hash for source images, fonts and generated outputs (maps to SPEC-010 "original retained, receipt recorded").
+3. Schema-versioned documents with explicit migrations from day one (apply to our recipe and technical-profile files).
+Revisit trigger: stable `.gdd` + batch tooling + a documented CPU raster path + a DDS output node. Even then, run it as an optional sandboxed worker, not an in-process crate. Maintainer approval: not applicable now (no adoption).
+
+---------------------------------------------------------------------------------------------------
+
+## 2. OpenDesign (nexu-io/open-design)
+
+Identity: SHA 12d970eacc8971150e3c76470d2a9afe16dc2ed1 (2026-10-30). TypeScript. Created 2026-04-28. ~105k stars, ~444 contributors, release open-design-v0.26.1 (2026-10-22). GitHub size 3.6 GB (history and media). License: Apache-2.0 (A; LICENSE file present, 11 KB, text not read; README badge agrees). AGPL-3.0 inbound compatible.
+
+What it actually is (VERIFIED from repo layout and docs/architecture.md): a pnpm monorepo for a "design agent workspace":
+- `apps/daemon`: a local Express daemon plus the `od` CLI. It owns the HTTP/SSE API, a SQLite store, skills/design-systems/artifacts registries, and it spawns coding-agent CLIs or ACP processes (the README matrix lists Claude Code, Codex, Cursor, OpenCode, Kiro and others).
+- `apps/web`: Next.js 16 + React 18 UI; `apps/desktop`: Electron shell; `packages/*`: contracts, sidecar protocol, plugin runtime, etc.
+- Content: `skills/` (171 entries), `design-templates/` (116), `design-systems/` (154 brand DESIGN.md files), `craft/` (brand-agnostic rule sheets such as accessibility, typography, "anti-ai-slop"), `plugins/` (8).
+- Media: the daemon has `media/` and `media-adapters/` (image-generation retry policy, stock search, a HyperFrames video runtime). The image skills I opened are catalogue entries pointing to an upstream skills bundle; I found no raster processing, texture or sprite code. docs/external-media-orchestration.md says it should not become a generic provider router; the host owns budgets, credentials and provider policy.
+- Telemetry: PRIVACY.md says product analytics are on by default with an opt-out, plus an always-on reliability channel in builds that have a destination.
+- Runtime: Node 24, pnpm, better-sqlite3 (native build on Windows per its AGENTS.md).
+
+Relevance: it produces HTML/slides/video design artifacts with coding agents. It is not an asset pipeline, has no DDS/TGA/GFX concepts (not an exhaustive grep), and would add a second runtime and a second agent loop next to our Rust one.
+
+Overlap with hoi4-agent-tools: none on rendering. Overlap with our own agent loop and UI design track (ADR-025): conceptual only.
+
+Verdict: REJECT as a dependency. ADAPT IDEAS:
+1. DESIGN.md: a per-brand, agent-readable style spec. PROPOSAL: a per-mod "art style guide" file (palette, framing, text-free rule, size profile) that the agent reads before generating portraits or icons.
+2. `craft/` rule sheets as short checklists injected into prompts and reused as review criteria.
+3. A deliverable lint step before accepting output (`lint-artifact`), matching our validate-before-apply rule.
+4. Run-scoped media policy where the host, not the agent, owns provider budgets (already SPEC-010).
+
+---------------------------------------------------------------------------------------------------
+
+## 3. Visual editor building blocks (React)
+
+Facts gathered (versions from manifests on the default branch at the SHAs in the sources table):
+
+| Library | Version / last commit | License (evidence) | Render model | Notes that matter here |
+|---|---|---|---|---|
+| @xyflow/react (React Flow) | 12.12.0; head 2026-10-29; ~144 contributors | MIT (L, webkid GmbH) | DOM nodes + SVG edges | Deps: zustand ^4.4, classcat, plus d3-drag/selection/zoom/interpolate via @xyflow/system. Peer React >= 17. |
+| tldraw | head 2026-10-30 | Custom tldraw license (L): production use not permitted without a license key, trial or commercial agreement; key enforcement and optional usage-data transmission | Canvas/DOM whiteboard SDK | Incompatible with a free AGPL service. REJECT. |
+| Excalidraw | 0.18.1 release 2026-04-21; head 2026-10-31 | MIT (L) | Canvas whiteboard component | Freeform scene model, not a node graph. |
+| Rete.js | core 2.0.6 (last commit 2025-06-30); react-plugin 2.1.2 (2026-07-10) | MIT (L; plugin A) | Plugin framework, React/Vue/Angular renderers | Dataflow engine we do not need; smaller ecosystem. |
+| LiteGraph | jagenjo/litegraph.js last commit 2024-01-08; Comfy-Org fork README says archived and merged into ComfyUI frontend | MIT (original and fork LICENSE read); ComfyUI_frontend itself is GPL-3.0 (A) | Canvas 2D | Stale or absorbed into a GPL app. REJECT. |
+| elkjs | release 0.12.1 (2026-10-28); master manifest 0.13.0 | LICENSE.md is EPL-2.0 text with a Secondary-License exhibit; master package.json says `EPL-2.0 OR GPL-3.0-or-later` (M). Published-tarball field UNVERIFIED | Layout only (GWT-compiled Java) | Layered layout with ports and edge routing; async/worker friendly. Choose the GPL-3.0-or-later option for AGPL inclusion. |
+| dagre (@dagrejs/dagre) | master 3.1.4-pre (2026-10-24); latest GH release v2.0.0 (2025-11-23) | MIT (L+M) | Layout only | README says only the @dagrejs package is updated. React Flow's own Layouting example uses (an older) dagre. |
+| Konva / react-konva | 10.9.0 / 19.3.2 (react-konva peer is React ^19.3.0; our client is 19.3.1) | MIT (L both; Konva carries a KineticJS header which makes the API show NOASSERTION) | Canvas 2D | Pixel-level canvases; no DOM a11y. |
+| PixiJS | 8.22.0; head 2026-10-30 | MIT (L) | WebGL/WebGPU | Best for huge bitmaps (province maps) later. |
+| Fabric.js | 7.4.0; head 2026-10-30 | MIT (L) | Canvas 2D object model | Image/SVG object editing; no a11y. |
+
+React Flow Pro (VERIFIED via reactflow.dev pages and source): Pro is a paid subscription (pro examples/templates, priority issues, support, team seats) and the way to remove the "React Flow" attribution link. The source exposes `proOptions.hideAttribution` and shows a console/data message asking you to hide it only when subscribed. The core stays MIT ("MIT forever" on their page). A free open-source project can leave the small attribution link visible; nothing in Pro is needed technically.
+
+Verified React Flow capabilities relevant to HOI4 (component props read in `packages/react/src/types/component-props.ts`): `snapToGrid` + `snapGrid`, `onlyRenderVisibleElements`, `nodesFocusable`, `edgesFocusable`, `disableKeyboardA11y`, `ariaLabelConfig`, `selectionOnDrag`, `onReconnect`, `isValidConnection`, `nodeDragThreshold`, `autoPanOnNodeDrag`, custom node and edge types, `parentId` sub-flows (child positions relative to a parent). Examples in the repo include A11y, Stress, Subflow, EdgeTypes, EdgeRouting, Layouting.
+
+Fit analysis (PROPOSAL, based on the facts above plus HOI4 focus semantics from the project's own specs; not tested):
+- Focus tree (x/y on a grid, `relative_position_id`, prerequisites with AND groups of OR sets, `mutually_exclusive`): positions are author-defined, so no auto-layout is needed. The Rust adapter should resolve relative chains to absolute cells and own the write-back (moving a node rewrites `x`/`y` relative to its `relative_position_id` reference, or re-parents). The canvas only needs fixed-grid snapping, custom node UI (server-rendered icon, label, status), orthogonal prerequisite edges with an OR/AND visual, a distinct mutual-exclusion edge, selection, keyboard operation and viewport culling. React Flow covers all of these with DOM nodes (text, i18n, focus rings, CSS custom properties) and keeps the "plain CSS" rule. Whether `parentId` can represent `relative_position_id` chains (children move with the reference node) is UNVERIFIED and must be proven in an S04 spike; the safer design is to keep one flat node list with absolute positions and let the host recompute relative offsets.
+- Event chains and decision graphs: variable-size nodes and auto-layout wanted. Use React Flow + dagre first; add elkjs (GPL option) only if port-based or orthogonal routing becomes necessary. Prior art: the CWTools MD Edition extension renders its focus/tech/event tree view with Cytoscape.js + cytoscape-elk (package.json read).
+- Canvas/WebGL libraries (Konva, Pixi, Fabric) lack node/edge semantics and DOM accessibility; they fit S07 (province map, large bitmaps: Pixi) or a future GUI sprite editor (Konva). Decide then.
+- Community prior art that skipped a graph library: the browser focus designer LesMiserablesMod/hoi4-focus-tree-designer (Next.js, custom canvas, no license file so ideas only) and 1725381449-cell/hoi4-focus-viewer (MIT, zero dependencies, positions taken from the author's x/y). A zero-dependency DOM+SVG renderer is therefore a real fallback if the maintainer declines a new runtime dependency; the cost is re-implementing pan/zoom, marquee selection, minimap and keyboard/a11y.
+
+Overlap with hoi4-agent-tools: its focus/event/tech renderers produce game-accurate images from source (they are server-side evidence). The browser canvas should be an editing surface fed by the same normalized model, with the server-rendered image kept as verification evidence, not replaced by the canvas.
+
+Verdicts:
+- @xyflow/react: INTEGRATE (client dependency; needs maintainer approval; S04 spike first).
+- @dagrejs/dagre: INTEGRATE later, for events/decisions (needs approval; not needed in S04).
+- elkjs: ADAPT IDEA (keep as the escalation path; GPL option only).
+- tldraw: REJECT (license). Excalidraw: REJECT (wrong model). LiteGraph: REJECT (stale/archived/GPL host). Rete.js: REJECT as primary; acceptable fallback.
+- Konva/Pixi/Fabric: DEFER to S07/GUI.
+
+---------------------------------------------------------------------------------------------------
+
+## 4. Image processing and DDS for an asset pipeline
+
+### 4.1 What HOI4 requires (documented vs claimed)
+- Flags (VERIFIED, HOI4 wiki "Country creation"): TGA, uncompressed 32-bit ARGB; bottom-left origin (top-left flips the image); 82x52 (about 16.6 or 17.1 KiB), 41x26, 10x7; files go under `gfx/flags` with each size in its own subfolder (exact subfolder names not captured; check the page); 24-bit loads with a performance warning.
+- Sprites (VERIFIED, wiki "Graphical asset modding"): `.gfx` spriteType/frameAnimatedSpriteType/corneredTileSpriteType entries; texture paths relative to the game folder; sprite DDS files should stay under about 16 MB; the page is marked outdated and does not state DXT/mip rules.
+- Portraits: the wiki says usually 156x210 and gives no format rules. The maintainer's own repo states in its DDS saver docstring that vanilla leader portraits are 156x210 uncompressed A8R8G8B8 with no mipmaps, and offers DXT5 as an option. That is a repo claim, not independently verified here.
+- Event pictures: the wiki event page gives only the sprite pattern (`GFX_*` in an interface `.gfx`, DDS path) and no pixel sizes; 210x176 / news sizes come from the task brief and are UNVERIFIED here.
+- Focus/idea/decision icons: DXT choice and mip policy are not stated by any page I fetched. UNVERIFIED. A search snippet suggests vanilla interface textures usually have no mipmaps (non-HOI4 sources); treat as a hint only.
+- What the maintainer's own decoder accepts (VERIFIED, `src/hoi4_agent_tools/gui/dds.ts`): legacy FourCC DXT1/DXT3/DXT5, uncompressed RGB16/24/32, and two DX10 formats (RGBA8 sRGB, BGRA8 sRGB); RXGB is intentionally not decoded. This is decode-only; there is no DDS encoder anywhere in that repo. Its raster stack is `sharp` (libvips) + custom DXT decode.
+- PROPOSAL: derive technical profiles from data, not memory (SPEC-010 already requires this): a one-off scan of the installed game's `.dds` headers (format, mip count, size histogram per folder) run on the server-side reference copy, stored as versioned profile files; only the derived numbers enter the repo.
+
+### 4.2 Candidates and verdicts
+
+| Tool | Version / head | License (evidence) | DDS capability (VERIFIED unless noted) | Linux container fit | Verdict |
+|---|---|---|---|---|---|
+| `image` crate | head 2026-09-15 (tag v0.25.10) | Apache-2.0 detected (A; dual MIT OR Apache-2.0 statement not read) | Decode/encode PNG, JPEG, WebP, TIFF, TGA, BMP, etc. No DDS in its feature list (image_dds can register a decoding hook). TGA encoder: RLE on by default (`disable_rle()` exists) and always sets the upper-left origin bit (read in `header.rs`). | Pure Rust, amd64+arm64 | INTEGRATE (decode, resize, PNG). Do not rely on its TGA writer for flags. |
+| `image_dds` 0.7.2 (crate), head 2026-10-22 | MIT (L) | Encodes via intel_tex_2 (BC1, BC2, BC3, BC4, BC5, BC6H, BC7) with mip options (`Mipmaps::{Disabled,FromSurface,GeneratedExact,GeneratedAutomatic}`) and `Quality`; decodes BCn via a safe-Rust bcdec port; also uncompressed formats. `Surface::to_dds` picks a DXGI (DX10-extension) header for most formats, including BC1/BC3/BC7 and Bgra8; it uses legacy D3D headers only when DXGI has no mapping. Last crates.io release 2025-03-13 though main continues. | Builds on Windows/Linux/macOS per README, with a caveat that some targets lack precompiled ISPC kernels | INTEGRATE for block compression, wrapped by our own header writer. Needs approval (precompiled native kernels). |
+| `intel_tex_2` 0.5.0 (Traverse Research fork of Intel ISPC Texture Compressor bindings) | head 2026-07-01 | MIT/Apache-2.0 in Cargo.toml (M); LICENSE-APACHE and LICENSE-MIT present | BC1, BC3, BC4, BC5, BC6H, BC7, ETC1; ASTC pending. Precompiled ISPC kernels are checked in for x86/x86_64 (SSE2..AVX512) and arm/aarch64 (Neon) and used unless the `ispc` feature regenerates them (build.rs read) | Source indicates amd64 and arm64 both covered; not built here | Transitive via image_dds; do not depend directly. |
+| `ddsfile` 0.6.0 (cwfitzgerald fork, trunk) | head 2026-09-21; SiegeEngine/PistonDevelopers originals stale since 2023 | MIT (L+M) | Reads/writes DDS containers: `Dds::new_d3d` (legacy FourCC/bitmask incl. DXT1/DXT5/A8R8G8B8) and `Dds::new_dxgi` (DX10). No pixel encode/decode. | Pure Rust | INTEGRATE (transitively via image_dds; use directly for the header). |
+| `texpresso` 2.0.2 | head 2025-10-27 | Cargo.toml says MIT (M); repo root has no LICENSE file (flag it) | Pure Rust BC1/BC2/BC3/BC4/BC5; BC6H/BC7 not implemented per its roadmap | Pure Rust, any arch | Fallback if precompiled kernels are unacceptable (no BC7). Fix license-file question first. |
+| `fast_image_resize` 6.1.0 | head 2026-08-20 | MIT OR Apache-2.0 (M) | Resize only (Nearest, Box, Bilinear, Bicubic, Lanczos3...); SSE4.1/AVX2/Neon/wasm SIMD | amd64+arm64 | Not needed for 156x210-class assets; `image::imageops` is enough. Add only if profiling demands. |
+| `resvg` 0.49.0 / `tiny-skia` | head 2026-10-30 / 2026-08-20 | Apache-2.0 OR MIT (M) / BSD-3-Clause (A) | SVG to PNG; default features include text and system fonts, so fonts must be supplied in the image | Pure Rust | INTEGRATE only when SVG sources are accepted (S06+), pinned fonts. |
+| DirectXTex (texconv) | head 2026-10-21; release may2026 | MIT (A) | Full-featured, including software BC6H/BC7 (OpenMP optional). README: Windows toolchains, plus "WSL with GCC 11+" for the library. CMake gates the command-line tools behind `WIN32` (CMakeLists read), so texconv is Windows-only as a tool. | Library possible, tool not | Use only on the maintainer's Windows machine as a test oracle, not as a server dependency. |
+| Compressonator CLI 4.6.0 | head 2026-10-19; release 2026-10-20 | AMD MIT-style text in `license/license.txt` (L); GitHub shows no license; bundles third-party dirs (astc, directxtex, etcpack, imgui, json, opencv, openexr) with their own terms | BC1-BC7, ETC, ASTC; `CompressonatorCLI -fd BC7 in out.dds`. Linux assets are x86_64 only (.deb/.tar.gz); no arm64 asset | amd64 only unless built from source | Test oracle / optional high-quality BC7 worker; not a core dependency (fails the arm64 requirement). |
+| ImageMagick 7 | head 2026-10-31; 7.1.2-34 | ImageMagick License (L; permissive custom text) | `coders/dds.c` has DXT1/DXT3/DXT5 write paths with mipmap options (`dds:skip-mipmaps` read, `dds:fast-mipmaps` and mip generation in writer), legacy FourCC; reader recognizes BC5/BC7 DX10 formats. BC7 write UNVERIFIED. | apt-installable; a process with a CVE history, ships a `policy-secure.xml` | Test oracle or emergency fallback only. |
+| Pillow 13.0.0 | head 2026-10-31 | MIT-CMU (L) | DDS save: DXT1/DXT3/DXT5 with legacy FourCC; BC2/BC3/BC5 via DX10; uncompressed RGB(A)/L(A); `_save` writes a single level (no mip generation found). Used by the maintainer's ComfyUI node to write A8R8G8B8. | Needs Python | Test oracle (decode our DDS to PNG). Not a server dependency. |
+| libvips 8.18.7 | head 2026-10-29 | LGPL-2.1 (A) | No loader/saver named dds found by filename search (UNVERIFIED; ImageMagick delegate may cover it) | Fine, but hoi4-agent-tools already uses `sharp` | Skip for DDS. |
+| Compressonator/DirectXTex/ImageMagick/Pillow as decoders | | | Useful as independent decoders for round-trip tests | | Dev/CI oracles |
+
+Game-correctness note (PROPOSAL, grounded in the reads above): "valid DDS" and "loads in HOI4" are different evidence kinds. `image_dds` output defaults to DX10-extension headers for BC1/BC3/BC7; whether HOI4 accepts those, and whether it needs mip chains for icons, is UNVERIFIED. Safe default until an in-game test: legacy FourCC DXT5 for alpha icons, DXT1 for opaque art, uncompressed A8R8G8B8 for portraits (matching the maintainer's tool) and TGA 32-bit uncompressed bottom-left for flags. Make BC7 and DX10 headers opt-in profile entries that stay "unverified" until the maintainer observes them in the game. Wrap `Surface.data` (raw blocks) with `ddsfile::Dds::new_d3d` to force legacy headers.
+
+TGA detail (VERIFIED in `image` source): the flags profile cannot use `TgaEncoder` as-is. Write the 18-byte header and BGRA rows yourself (roughly 40 lines, no dependency), bottom-left origin, no RLE, and add a golden test against a vanilla flag's header and a byte-compare of a re-decode.
+
+### 4.3 Browser-side and desktop editors (for non-destructive authoring by humans)
+- Photopea: closed source web app (UNVERIFIED beyond that). Not embeddable or auditable here. REJECT.
+- miniPaint 4.14.3 (viliusle/miniPaint, MIT): layered raster editor in plain JS, last commit 2026-04-19. Its non-destructive claims are UNVERIFIED. Not a pipeline component. REJECT as dependency; fine as a user tool.
+- Penpot 2.18.5 (MPL-2.0; MPL lists AGPL as a secondary license): vector UI design and prototyping, large self-hosted service stack (not inspected). Wrong tool for raster/DDS art. REJECT.
+- Krita (GPL-3.0, desktop, active) and GIMP (GPL with a stated exemption text, desktop): the real editors modders will use for layered work; interoperate through an open layered format rather than embed. ADAPT (interchange only).
+
+### 4.4 Layered/non-destructive source formats
+- OpenRaster (VERIFIED, openraster.org spec 0.0.6): a zip with `mimetype` (first, stored), `stack.xml`, `data/` PNG layers, a required thumbnail and `mergedimage.png`. Layers carry `src`, `name`, `x`, `y`, `opacity`, `visibility`, `composite-op` (default `svg:src-over`, plus multiply, screen, overlay, etc.). The site lists Krita, GIMP, MyPaint and Scribus as supporting apps. No license stated on the site (copyright notice only).
+- PSD: Rust `psd` crate (Apache-2.0, 284 stars, last commit 2025-01-30, release 0.3.4 from 2022) parses PSD for reading/flattening, not authoring (UNVERIFIED for writing). PSD is proprietary; do not make it a source of truth. REJECT as source format.
+- Graphite documents: unstable (see section 1). REJECT for now.
+- A small Rust ORA reader exists (AnAverageGitUser/ora-reader, MIT, 0 stars, last commit 2025-08-08): too young to depend on. REJECT.
+- PROPOSAL: the Git-native layered source is "master PNG(s) + masks + a recipe JSON + provenance receipt", exactly the shape the maintainer's portrait workflow already emits (1024x1365 master PNG, game-size PNG, DDS). Where a human wants layers, store the OpenRaster layout (`stack.xml` + `data/*.png`) unzipped in Git so diffs are per layer, and zip it on download for Krita/GIMP. No new dependency is needed for the MVP if the host only emits and reads its own recipe and treats `.ora` as interchange.
+
+---------------------------------------------------------------------------------------------------
+
+## 5. HOI4 and Paradox modding tools
+
+Several of these were already audited in docs/00-research/02-existing-assets-audit.md at the same SHAs; I re-checked the heads and they have not moved (cwtools b377453, cwtools-hoi4-config 297dd69, HOIIVUtils 0fe0645, hoi4-modmaker a5c138f, Nova 5e44bc4). hoi4-agent-tools itself has moved to fbc5144 (2026-10-25) since the audited pin 25f5641.
+
+| Project | What it does (from code/docs) | License / AGPL fit | Maintenance | Recommendation |
+|---|---|---|---|---|
+| cwtools/cwtools (F#) | Parser/validator library with a HOI4 `IGame` service (prior audit). Head b377453 (2025-12-08). | MIT (A) | Alpha line; no commits since the pin | Keep as planned fallback validation worker (prior audit's decision). |
+| cwtools/cwtools-hoi4-config | Versioned `.cwt` rules for HOI4. Head 297dd69 (2026-09-18), tag 1.15.2. | MIT (A) | Active | INTEGRATE as rules input (also required by the Rust engine below). |
+| cwtools/cwtools-vscode | VS Code extension on the F# library. | MIT (L) | Last commit 2025-12-08 | Reject (superseded by the Rust edition for our use). |
+| MillenniumDawn/cwtools-vscode ("CWTools MD Edition") | NEW. One repo with a VS Code extension and a Rust engine (`engine/`, 17 crates: parser, rules, index, validation, game, localization, info, cache, driver, lsp, cli ...). Standalone binaries: `cwtools-server` (LSP) and `cwtools` (CLI: `validate`, `loc`, `fix`, `cache-vanilla`, `parse`, `explain`, text/CSV/JSON/SARIF output, `--since <git-ref>`). README: HOI4 is the complete/tested game; Stellaris partly; others only parse. Rules are not bundled (use cwtools-hoi4-config). Parser AST keeps comments and line/col ranges but stores numbers as parsed f64/i64, so it is not a byte-lossless tree (VERIFIED in `ast.rs`); good for validation/indexing, not as the canonical write path (same conclusion as the earlier audit for F# CWTools). Rust edition 2024, MSRV 1.88, workspace version 3.4.0. | MIT (L, copyright Thomas Boby and Millennium Dawn Team) | Head 937a06e (2026-10-31); at least 100 commits in October; 11 contributors; pre-release numbering at v4.1.299-pre.1 with several tags published within the same hour on 2026-10-31 (latest non-pre v4.0.6). Very high churn, small team. | INTEGRATE as an optional subprocess validator after a bounded spike: pin by SHA, build amd64+arm64 from source in the image, compare diagnostics with F# CWTools and `hoi4_script_validate` on fixtures, measure startup/memory. Not a library dependency. Needs maintainer approval (replaces an accepted plan item). |
+| MillenniumDawn/cwtools | Predecessor repo, archived; README says it migrated to cwtools-vscode. Head fd9e326 (2026-08-20), v2.6.1. | MIT | Archived | Reject (use the migrated repo). |
+| rakaly/jomini | Low-level, fast parser for Paradox text and binary formats (EU4, HOI4, CK3, ...) with serde-like derive, zero dependencies, WASM-capable; separate `hoi4save` crate. Text tape treats comments as skippable (tests with comment lines; no trivia nodes observed - UNVERIFIED in depth), so not lossless. | MIT (M+L) | Head 2026-10-26, tag v0.37.2 | ADAPT/DEFER: candidate for fast read-only indexing of very large vanilla files or HOI4 saves later; not for the write path. |
+| pdx-tools/pdx-tools | EU4-centric save analyzer and map tooling on jomini; HOI4 appears only as extended support. | AGPL-3.0 (A) | Head 2026-10-27 | Reject as dependency (scope mismatch); its Clausewitz syntax write-up is useful background. |
+| amtep/tiger | Validator for CK3, Vic3, Imperator mods. README: HOI4 support (`hoi4-tiger`) is unfinished and produces thousands of false positives. | GPL-3.0 (A) | Head 2026-06-06, v1.19.0 | Reject for HOI4 now; revisit if hoi4-tiger matures. |
+| czxieddan/RHoiScribe | Rust local MCP server + skill for HOI4 agents: bundled reference layer, red/yellow/green project validation (duplicate IDs, brace balance, missing GUI/GFX/localization links, replace_path risks), encoding/format checks, safe edits, debug-launch prep, a tool-call audit log, and experimental `generate_gui_gfx_asset` (procedural PNG + `.gfx` registration + optional `.gui`, with an approval flag). Depends on the MD-edition Rust cwtools crates by git rev. | AGPL-3.0 (A), same as us | v0.4.1 (2026-07-13), head 2026-10-10, 27 stars | ADAPT IDEAS (approval-gated asset generation with dry run, tri-state validation report, tool-call audit log). Overlaps hoi4-agent-tools; do not integrate. |
+| zhangxiaoyu66666/hoi4skill | Chinese-first Rust CLI + skill: plans mods from documents, strict reference indexing so invented effects/sprites/tags become errors, event-chain checks (dead events, loops, branch merges, route blocking per README), flag import (jpg/png/webp/tga to the three flag sizes), sprite/`interface/*.gfx` registration with `gfx-audit`, release gates. Deps include `image` (jpeg, webp) and `png`. | GPL-3.0 (A) | v0.30.7 (2026-08-20), 37 stars | ADAPT IDEAS (strict-reference rule, `gfx-audit`, flag three-size import, event-chain lint). One-way GPL-to-AGPL reuse is licence-possible but the codebase is a monolith; prefer re-implementing the checks. |
+| battleskorpion/HOIIVUtils | Scala/JavaFX desktop toolkit; parser, domain classes, province generator (prior audit). Head 0fe0645. | Apache-2.0 (A) | v16.0.2 (2026-02-28) | Comparison only (prior decision). |
+| Floxizdia/hoi4-modmaker | Python/Tkinter desktop with focus canvas, map and content workflows (prior audit). Head a5c138f. | MIT (A) | v1.4.1 (2026-08-08), 1 star | ADAPT interactions and fixtures (prior decision). |
+| Ultra-XT/HOI4-Modding-Suite ("Nova") | Binary-only visual hub; no source to inspect (prior audit). | CC BY-NC-ND 4.0 with extra restrictions | v1.0.6 (2026-08-28) | Comparison only; cannot be used. |
+| LesMiserablesMod/hoi4-focus-tree-designer | Browser focus tree editor (Next.js): drag canvas with grid snap, absolute and relative coordinates, AND/OR prerequisites, complete mutual-exclusion groups, cycle/deadlock validation, preserves unmanaged per-focus fields on round trip, UTF-8 BOM localisation export. | No license file (all rights reserved) | Head 2026-10-05, 0 stars | ADAPT IDEAS only (preserve unknown fields; deadlock/cycle checks). Cannot reuse code. |
+| 1725381449-cell/hoi4-focus-viewer | Local, dependency-free viewer: lays out the tree from the author's x/y, explains why a focus is locked, translates `available` conditions to plain language, traces which event sets a flag, collapses branches after mutual exclusion. | MIT (A) | Head 2026-10-26, 0 stars | ADAPT IDEAS (explain-why-locked panel; flag-setter tracing; exclusion preview). Quality unverified. |
+| malashin/hoi4treesnap | Go tool for focus-tree screenshots. | GPL-3.0 (A) | Last commit 2022-08-31 | Reject (stale; duplicates hoi4_focus_render). |
+| jordsta95/hoi4-national-focus-maker, jackc606/focus-forge (PySide6), XueRongHua123/xuerong-editor, MrCoasterBrain/hoi4-focus-editor, The-CFG/HOI4Editor, TheCascadian/HOI4FocusGUI | Assorted desktop/web focus or mod editors. Only focus-forge (MIT) and the 2018 maker (GPL-3.0) have clear licenses; several have none or NOASSERTION. Not inspected beyond search metadata. | Mostly unclear | Mostly tiny/new | Reject (no integration path); UNVERIFIED capabilities. |
+| Yalu64/Hoi4-Focus-Icon-and-Shine-creator | Prebuilt script that creates `goals.gfx` and `goals_shine.gfx` entries for a folder of icons. Binaries only in releases; I did not run it. | MIT (A) | Last commit 2023-10-30 | ADAPT IDEA: every focus icon needs a normal and a shine sprite registration; make registration part of the asset package. |
+| ScottyThePilot/hoi4_province_editor (HOI4PE) | Rust desktop editor for `provinces.bmp` + `definition.csv`; README says no longer maintained, points to AdriianCOE/HOI4-Map-Editor (no license, preview releases). | MIT (A), archived | Archived 2026-09-05 | ADAPT IDEAS for S07 (keep bitmap and definition table consistent). Do not integrate. |
+| raederhans/scenario-forge | Browser political-map/scenario editor (MIT, 3.2 GB repo). Relevance to HOI4 maps not assessed. | MIT (A) | Active | UNVERIFIED; skip unless S07 needs a web map reference. |
+| khoeos/paradox-translation-toolkit | Desktop tool that generates missing localisation files per language for Stellaris, EU4, EU5, HoI4, CK3, with key-by-key comparison, optional machine translation (Ollama/OpenAI-compatible), resume and markup checks. | GPL-3.0 (A) | v3.2.1 (2026-10-27) | ADAPT IDEAS (key-by-key coverage, markup-preserving translation checks) for S06; do not embed. |
+| Event-chain visualisers | Searches for dedicated HOI4 event-chain visualisers found none. The nearest are the CWTools MD Edition graph view (Cytoscape + ELK), hoi4skill's chain lint and hoi4-focus-viewer's flag tracing. | | | Build on React Flow + dagre; reuse hoi4skill's lint ideas. |
+| Map generators ("MapGen") | The HOI4PE README mentions an external MapGen program; I did not find an open-source repo for it. | | | UNVERIFIED; out of scope until S07. |
+
+Overlap summary: hoi4-agent-tools already provides inspect, render, rewrite and validation tools for focus, events, decisions, GUI, tech and maps. RHoiScribe and hoi4skill are parallel agent-oriented toolchains; neither should be a dependency.
+
+---------------------------------------------------------------------------------------------------
+
+## 6. AI image generation workflow tools
+
+### 6.1 klimPaskov/comfyui-hoi4-portraits (maintainer's own)
+Head dce200950147f234309d29d41f38eef03bc6f6b2 (2026-08-31) on a non-standard default branch named `codex/portrait-pipeline`; release v1.0.2; MIT (A + README). GitHub size 268 MB (mostly docs assets). VERIFIED from README, docs/output-layout.md, THIRD_PARTY_LICENSES.md, workflows/manifest.json and `custom_nodes/hoi4_portraits/__init__.py`:
+- Four ComfyUI workflows with API-format twins (`*.api.json`): source photo to three styled candidates, text-to-image, batch, and processing-only. Pipeline: RealESRGAN upscale, Adonis Base + Post restoration, a HOI4 style LoRA (MIT, on Hugging Face) on FLUX.2 Klein 9B, optional BiRefNet background replacement, face detectors, then exports.
+- Outputs per portrait: a 1024x1365 master PNG, a 156x210 PNG (center crop, Lanczos, no stretching) and a 156x210 DDS. The DDS saver node (`Hoi4SaveDDS`) writes uncompressed A8R8G8B8 with no mipmaps via Pillow by default, with a DXT5 option. It validates 156x210 and flattens alpha to opaque.
+- Custom nodes include crop, identity mask, background replace, batch I/O, restoration cache and PNG/DDS savers; Python deps: opencv-contrib-python 4.10.0.84, scipy, Pillow.
+- Installers: Windows wizard, RunPod script, manual scripts; also runs in Comfy Cloud.
+- Model terms: the full and FP8 FLUX.2 Klein files are gated; the README states the model is non-commercial and that the MIT workflow/LoRA does not lift that. Other third-party components (RES4LYF, ComfyUI-GGUF, Adonis LoKrs, BiRefNet, RealESRGAN) keep their own terms (listed in THIRD_PARTY_LICENSES.md).
+Use for HOI4 Factory: the `.api.json` workflows are the submission payloads for a ComfyUI HTTP adapter; the saved master PNG plus recipe is the "layered source" in section 4.4; the DDS saver defines the portrait technical profile. Open question for the maintainer: whether a public free service hosting these weights counts as commercial use under the model terms (UNVERIFIED legal reading) - the safe design is a bring-your-own-endpoint adapter (user's own ComfyUI machine, RunPod or Comfy Cloud), not factory-hosted weights.
+
+### 6.2 ComfyUI (comfyanonymous/ComfyUI)
+Head 7c4390a6f70cd8eb41014d6af52969397a752fc4 (2026-10-31), v0.43.0 (2026-10-27), GPL-3.0 (L), ~144k stars, 5.4k open issues. HTTP routes in `server.py` (VERIFIED): `POST /prompt` (submit an API-format graph), `GET /history/{prompt_id}`, `GET /queue`, `GET /ws`, `GET /view`, `POST /upload/image`, `GET /object_info`, `POST /interrupt`, `GET /api/jobs`, `POST /api/jobs/{job_id}/cancel`, `GET /system_stats`. I did not see per-user authentication in the route list, so treat it as a private-network service behind our server (UNVERIFIED beyond routes).
+AGPL fit: calling it over HTTP/WebSocket from an AGPL server is use of a separate program, not inclusion; do not link, vendor or modify ComfyUI inside our image without GPL compliance. A Docker image that merely ships ComfyUI alongside our server is aggregation, but keep it a separate container/process. Custom node packs carry their own licenses. SPEC-010's reconcile-after-disconnect rule maps to `GET /history/{prompt_id}` plus `/queue`.
+
+### 6.3 InvokeAI (invoke-ai/InvokeAI)
+Head 50f02b221b668bfff9cd90270ed3338149b85483 (2026-10-31), v6.14.2 (2026-09-27), Apache-2.0 (A), Python. Provides a locally hosted web server with a React UI, canvas, node workflows, boards/gallery, and FastAPI routers (images, boards, session_queue, workflows, model_manager, auth, ...). Fully AGPL-compatible licence-wise. It overlaps with ComfyUI as a generation backend, but nothing in the maintainer's assets targets it. DEFER: a second capability adapter only if users ask; model licenses (not the engine) are the binding constraint either way.
+
+Overlap with hoi4-agent-tools: none (it does not generate art).
+
+---------------------------------------------------------------------------------------------------
+
+## 7. Risks and unknowns worth carrying forward
+
+1. HOI4 acceptance of DX10-header DDS, BC7 and mip chains is unverified; only game observation can settle it. Needs a maintainer test on his Windows machine with a small fixture set (DXT1, DXT5, A8R8G8B8, BC7/DX10, with and without mips) before BC7 is advertised.
+2. Event picture and icon sizes in the task brief are not on the wiki pages I fetched; derive them from a vanilla header scan.
+3. `image_dds`/`intel_tex_2` ship precompiled ISPC machine code; amd64+arm64 availability is inferred from source, not built. If unacceptable, `texpresso` is the pure-Rust fallback (no BC7, license file missing in repo).
+4. CWTools MD Edition churn: decide pin policy (by SHA, vendor binary hash) before any adoption. Its crates are consumed by git rev elsewhere (RHoiScribe), not from crates.io.
+5. React Flow `parentId` vs `relative_position_id` mapping, 300+ node performance and a11y behavior are unverified.
+6. FLUX.2 Klein non-commercial terms versus a hosted public service.
+7. Graphite and others change daily; any future adoption review must re-read at that time.
+8. GitHub code search is token-based and fuzzy; "0 hits" results (for example DDS terms in Graphite and libvips) are indicative, not exhaustive.
+
+---------------------------------------------------------------------------------------------------
+
+## 8. Consolidated recommendation
+
+Naming at most one dependency per responsibility. "Approval" means the maintainer must approve per CLAUDE.md (new runtime dependency or changed accepted plan).
+
+(a) Focus / event / decision editor canvas stack
+- Canvas, selection, pan/zoom, grid snap, custom nodes/edges: `@xyflow/react` (React Flow 12, MIT; brings zustand, classcat and d3-zoom/drag/selection/interpolate). Approval required. Keep the small "React Flow" attribution visible (Pro is only for removing it).
+- Auto-layout for event/decision chains only (not for focus trees, which use author coordinates): `@dagrejs/dagre` (MIT) when the events stage starts. Approval required then. Escalation path if ports/orthogonal routing are needed: `elkjs` under its GPL-3.0-or-later option.
+- Architecture: the Rust adapter owns the normalized model (absolute cells, relative_position_id write-back, prerequisite groups, exclusion sets, unknown-field preservation); the canvas is a projection; hoi4-agent-tools' server-rendered images remain the verification evidence.
+- Gate: an S04 spike that proves (1) relative-position write-back, (2) a 300-400 focus tree stays responsive with `onlyRenderVisibleElements`, (3) keyboard and screen-reader operation under the existing jsx-a11y lint, (4) AND/OR prerequisite and mutual-exclusion visuals. If it fails or the maintainer declines the dependency, fall back to a DOM+SVG renderer with no library (precedent: two community focus tools).
+- Not chosen: tldraw (license), Excalidraw, LiteGraph, Rete, Konva/Pixi/Fabric (revisit Pixi at S07 for province bitmaps).
+
+(b) Server-side asset pipeline including DDS
+- Raster decode/resize/PNG: `image` (Rust). Use `imageops` for Lanczos resizing; no separate resize crate.
+- BC compression and DDS handling: `image_dds` (pulls `ddsfile` and `intel_tex_2`). Approval required (precompiled native kernels). Fallback: `texpresso` (pure Rust, no BC7).
+- Own code, no dependency: a TGA flag writer (uncompressed 32-bit, bottom-left origin) and a DDS header step that forces legacy FourCC (DXT1/DXT5) or A8R8G8B8 through `ddsfile::Dds::new_d3d`; profile-driven (`dds_profile` data derived from a vanilla header scan, versioned) with BC7/DX10 disabled until game-verified.
+- SVG sources (only if wanted, S06+): `resvg` with bundled fonts. Approval required then.
+- Generation: ComfyUI as an external HTTP service reached through the capability adapter, using the maintainer's `.api.json` workflows; BYO endpoint first. No new library dependency (HTTP client already exists).
+- Test oracles (not dependencies): hoi4-agent-tools' DDS decoder, Pillow or ImageMagick on a dev machine for independent decode, Compressonator/texconv on Windows for cross-encoding, and a recorded in-game observation as the separate evidence kind.
+- Related validator decision (separate approval): evaluate MillenniumDawn CWTools Rust engine as the optional validation subprocess in place of the F# worker.
+
+(c) Non-destructive layered asset sources
+- One format decision: store a Git-native source bundle per asset: master PNG(s) and masks, a versioned `recipe.json` (crop, filter, mask/background step, target profile id, DDS format, mip count) and a provenance/transform receipt (source hash, recipe hash, output hash, generator version, seed). Re-export DDS/TGA deterministically from the recipe; originals stay untouched (matches SPEC-010).
+- For human layered editing use OpenRaster (`.ora`, open spec 0.0.6, supported by Krita and GIMP), kept as an unzipped layout in Git or zipped for download. Zero new dependencies in the MVP (the host only reads its own recipe and treats ORA as interchange); add a small XML/zip crate later only if reading foreign ORA files becomes a requirement.
+- Not chosen: Graphite documents (unstable, GPU render path, no DDS; revisit after its stable-format and batch milestones), PSD (proprietary, read-only crate), Photopea (closed), Penpot (wrong domain), miniPaint (not a pipeline component).
+
+Dependencies needing maintainer approval, in order of need: `@xyflow/react` (S04), `image` + `image_dds` (S06; `image` may already be planned), `@dagrejs/dagre` (events stage), `resvg` (only if SVG sources are accepted), and the decision to trial the Rust CWTools engine. Items needing an explicit maintainer answer: ComfyUI/FLUX hosting stance, permission to run an in-game DDS acceptance test, and whether to keep the React Flow attribution link.
+
+---------------------------------------------------------------------------------------------------
+
+## 9. Sources (date accessed 2026-10-31)
+
+SHAs are default-branch heads at access time. License evidence labels as defined at the top.
+
+| URL | SHA | License (evidence) | Last commit / release |
+|---|---|---|---|
+| https://github.com/GraphiteEditor/Graphite | 210aef541b1e202889853a5f989cedba23abce16 first read; f04bbe1c5a26efcde0848757cef5ca456a656a04 final | MIT OR Apache-2.0 (L+M; website page) | 2026-10-31; rolling tag only |
+| https://github.com/nexu-io/open-design | 12d970eacc8971150e3c76470d2a9afe16dc2ed1 | Apache-2.0 (A; file present, text not read) | 2026-10-30; v0.26.1 2026-10-22 |
+| https://github.com/xyflow/xyflow | d4bc936edad07aba995dbdb8e2c63af8cdd631c9 | MIT (L) | 2026-10-29; @xyflow/system 0.0.83 2026-09-24 |
+| https://reactflow.dev/pro and https://reactflow.dev/learn/troubleshooting/remove-attribution | n/a | n/a | page content as fetched |
+| https://github.com/tldraw/tldraw | 9e700c63f66c040f172dbd7fef936a888ac4b8cc | Custom tldraw license, production use needs a key (L) | 2026-10-30 |
+| https://github.com/excalidraw/excalidraw | 2610ebae0cbd26d8148e70f6144cacbb81e8b156 | MIT (L) | 2026-10-31; v0.18.1 |
+| https://github.com/retejs/rete | 2aae19950180dc12725306f06c0440f64473bd21 | MIT (L) | 2025-06-30; 2.0.6 |
+| https://github.com/retejs/react-plugin | 7f2244a105 (short; full not recorded) | MIT (A) | 2026-07-10; v2.1.2 |
+| https://github.com/jagenjo/litegraph.js | 0555a2f2a3df5d4657593c6d45eb192359888195 | MIT (A) | 2024-01-08 |
+| https://github.com/Comfy-Org/litegraph.js | ea0e1a85c612454540152aa56b0d1e104738e6dc | MIT (L) | 2025-08-06 (archive notice in README) |
+| https://github.com/Comfy-Org/ComfyUI_frontend | aa4e48c08d364dcd36071131455a7aec40b852ac | GPL-3.0 (A) | 2026-10-31; v1.60.0 |
+| https://github.com/kieler/elkjs | bddee3a807b5ff6324a1f1af79d1f95105637458 | EPL-2.0 text (L); package.json EPL-2.0 OR GPL-3.0-or-later (M) | 2026-10-28; 0.12.1 |
+| https://github.com/dagrejs/dagre | 877ead2bb0d5822daeb44ccb4396be1ebccbc9e4 | MIT (L+M) | 2026-10-24; v2.0.0 2025-11-23 |
+| https://github.com/konvajs/konva | 57be2e3ab299cdb006e1723abe1703b855e26c22 | MIT (L+M) | 2026-10-23; 10.9.0 |
+| https://github.com/konvajs/react-konva | be9feb46cacfdff6c4c3bb0277b222448c7c94f7 | MIT (L+M) | 2026-10-15; 19.3.2 |
+| https://github.com/pixijs/pixijs | 4fabfa6409c35cc114cb4fbfbb812c9cd8abdced | MIT (L) | 2026-10-30; 8.22.0 |
+| https://github.com/fabricjs/fabric.js | eac083c13e4772cb872ea5d636aceb5b8b58cb8a | MIT (L) | 2026-10-30; 7.4.0 |
+| https://github.com/image-rs/image | 075e65d618a323e5cb48c1d8710a2eca25d690c6 | Apache-2.0 detected (A) | 2026-09-15; v0.25.10 |
+| https://github.com/ScanMountGoat/image_dds | 87456b770913824698e0e1cf97d1692bf911f0ab | MIT (L+M) | 2026-10-22; crate 0.7.2 (2025-03-13) |
+| https://github.com/Traverse-Research/intel-tex-rs-2 | eb8d01d0dfd01b7d19348365004591988636fe2f | MIT/Apache-2.0 (M; both files present) | 2026-07-01; tag 0.5.0 |
+| https://github.com/cwfitzgerald/ddsfile | 86f84fc29d37aa5fd9cdb411aad5c675bec04d9f | MIT (L+M) | 2026-09-21; v0.6.0 |
+| https://github.com/jansol/texpresso | 5010d1f99febc779cc32641fe6227d7c530390c2 | MIT in Cargo.toml (M); no LICENSE file at repo root | 2025-10-27; v2.0.2 |
+| https://github.com/Cykooz/fast_image_resize | ce36aeb20ed4a33805baa3c0ff4caff7cf163e19 | MIT OR Apache-2.0 (M) | 2026-08-20; v6.1.0 |
+| https://github.com/linebender/resvg | 4ba2462da4ecf1f93731e957fc65d4ccb7c51bed | Apache-2.0 OR MIT (M) | 2026-10-30; v0.49.0 |
+| https://github.com/linebender/tiny-skia | 5d4754777746eef0828be166896eaf482c49f8f2 | BSD-3-Clause (A) | 2026-08-20 |
+| https://github.com/microsoft/DirectXTex | ec66b78b37389e8373a8e14ccc3cd29be94146b3 | MIT (A) | 2026-10-21; may2026 |
+| https://github.com/GPUOpen-Tools/compressonator | 095a143ad8cfbf9ed5afa4ea63c735bfd0fd04dd | MIT-style AMD text in license/license.txt (L) | 2026-10-19; V4.6.0 2026-10-20 |
+| https://github.com/libvips/libvips | b04300c241934a895d826054e906f3e238e23924 | LGPL-2.1 (A) | 2026-10-29; v8.18.7 |
+| https://github.com/ImageMagick/ImageMagick | 998773fa3d60f5c8a7964a73850904edf441b9fc | ImageMagick License (L) | 2026-10-31; 7.1.2-34 |
+| https://github.com/python-pillow/Pillow | a11bd1d9d96345d38920979cfd0ca80ffdec7b43 | MIT-CMU (L) | 2026-10-31; 13.0.0 |
+| https://github.com/penpot/penpot | 723267cfdd8a8f3f436be8f4acbab0c4fb8b16db | MPL-2.0 (A) | 2026-10-30; 2.18.5 |
+| https://github.com/viliusle/miniPaint | a79733eb803fc97084ef0ee4faa96b031e69e1c0 | MIT (M) | 2026-04-19; v4.14.3 |
+| https://github.com/KDE/krita | 5d3e30dd259439076351628c642a08568c2f2844 | GPL-3.0 (A, COPYING) | 2026-10-31 |
+| https://github.com/GNOME/gimp | e4b07e674a (short; full not recorded) | GPL with exemption text (L) | 2026-10-30 |
+| https://github.com/chinedufn/psd | 28357a29414f940b6272b71831b3273f57f267bd | Apache-2.0 (A) | 2025-01-30; 0.3.4 |
+| https://github.com/AnAverageGitUser/ora-reader | de7ce096745bc35d23b96d461aa6e1572a01475f | MIT (A) | 2025-08-08 |
+| https://www.openraster.org/ , /baseline/file-layout-spec.html , /baseline/layer-stack-spec.html | n/a | no license stated on site | spec 0.0.6 |
+| https://hoi4.paradoxwikis.com/Country_creation , /Graphical_asset_modding , /Portrait_modding , /Event_modding , /Interface_modding | n/a | wiki content (summarized, not quoted) | Graphical asset page marked outdated, last edit 2024-10-21 |
+| https://github.com/klimPaskov/comfyui-hoi4-portraits | dce200950147f234309d29d41f38eef03bc6f6b2 (branch codex/portrait-pipeline) | MIT (A) | 2026-08-31; v1.0.2 |
+| https://github.com/klimPaskov/hoi4-agent-tools | fbc514407155e572fe95fa1e263b7e1552d4d6fc | Apache-2.0 (A) | 2026-10-25 (audited pin was 25f5641bbc07c65a822ef576ac6e92bd12666880) |
+| https://github.com/comfyanonymous/ComfyUI | 7c4390a6f70cd8eb41014d6af52969397a752fc4 | GPL-3.0 (L) | 2026-10-31; v0.43.0 |
+| https://github.com/invoke-ai/InvokeAI | 50f02b221b668bfff9cd90270ed3338149b85483 | Apache-2.0 (A) | 2026-10-31; v6.14.2 |
+| https://github.com/cwtools/cwtools | b377453dee803f9258be92cfc49896d09039702d | MIT (A) | 2025-12-08 |
+| https://github.com/cwtools/cwtools-hoi4-config | 297dd69c42aabe10078a8b7ab7f2d07ee631d4ef | MIT (A) | 2026-09-18; tag 1.15.2 |
+| https://github.com/cwtools/cwtools-vscode | 364beae5e3c1edfd6fe2f7e5701e8df93c9e45c5 | MIT (L) | 2025-12-08; 0.10.31 |
+| https://github.com/MillenniumDawn/cwtools-vscode | 937a06ef905ea400d9a970a97c73959020db92bc | MIT (L) | 2026-10-31; v4.0.6 stable, v4.1.299-pre.1 |
+| https://github.com/MillenniumDawn/cwtools | fd9e326cbc2feeac120164020351a5a815e147c2 | MIT (A) | 2026-08-20; archived |
+| https://github.com/rakaly/jomini | 8fbd6861f453c719da59daac6970babd9ddc19ac | MIT (M+L) | 2026-10-26; v0.37.2 |
+| https://github.com/pdx-tools/pdx-tools | 9aae7bbdf5f9320efe3872b6b4a6d1dca7f5020f | AGPL-3.0 (A) | 2026-10-27 |
+| https://github.com/amtep/tiger | 9e3d3b25c7524cdcc86d5f4190f3f8cffbc4d630 | GPL-3.0 (A) | 2026-06-06; v1.19.0 |
+| https://github.com/czxieddan/RHoiScribe | f81682aba26d07d6bae608580803ed15f372863a | AGPL-3.0 (A) | 2026-10-10; v0.4.1 |
+| https://github.com/zhangxiaoyu66666/hoi4skill | d90e4ab5e2ddefeb2668ea25222dd6d3398f68c1 | GPL-3.0 (A) | 2026-08-20; v0.30.7 |
+| https://github.com/ScottyThePilot/hoi4_province_editor | 4dcd9f8e88d11dba94ef7261422935aa2d2bace7 | MIT (A) | 2026-09-05; archived |
+| https://github.com/AdriianCOE/HOI4-Map-Editor | 8531064bde12bd84425e714804916f36bf1ff669 | none | 2026-09-05; v0.1.0-preview.5 |
+| https://github.com/battleskorpion/HOIIVUtils | 0fe06450bf17c506485caf90fb5d52cf8a2e1b33 | Apache-2.0 (A) | 2026-04-18; 16.0.2 |
+| https://github.com/Floxizdia/hoi4-modmaker | a5c138ffacf4ed471769558f864cbe55ec5163fa | MIT (A) | 2026-08-08; v1.4.1 |
+| https://github.com/Ultra-XT/HOI4-Modding-Suite | 5e44bc4f483e504310a0d4bad6e5ecc3c1cd08a6 | CC BY-NC-ND 4.0 with restrictions (prior audit) | 2026-08-28; v1.0.6 |
+| https://github.com/malashin/hoi4treesnap | 05a367b00eeecf0f57d62f1e749884e4f2d864d7 | GPL-3.0 (A) | 2022-08-31 |
+| https://github.com/khoeos/paradox-translation-toolkit | ec78f3ef248f397492dbdc3e9be2dcb199b421fc | GPL-3.0 (A) | 2026-10-27; v3.2.1 |
+| https://github.com/1725381449-cell/hoi4-focus-viewer | e7a4f1d647f49c934bd117937766ccd910ae4571 | MIT (A) | 2026-10-26 |
+| https://github.com/LesMiserablesMod/hoi4-focus-tree-designer | e3f00d25a9d29af74e3e6f832d082734f130c96f | none (no license file) | 2026-10-05 |
+| https://github.com/jackc606/focus-forge | ab3f5a7aa0600031a8ff492eeac5094b5f07c541 | MIT (A) | 2026-10-11; v0.2.2 |
+| https://github.com/Yalu64/Hoi4-Focus-Icon-and-Shine-creator | f1db3a3355677e66fe3fcf41fed87bd07d874262 | MIT (A) | 2023-10-30 |
+| https://github.com/raederhans/scenario-forge | 7bce7622e37ceeb24e37670aaeffe469e3adff79 | MIT (A) | 2026-10-31 |
+| https://graphite.art/features/ | n/a | n/a | page content as fetched |

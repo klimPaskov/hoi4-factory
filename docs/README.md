@@ -30,6 +30,7 @@ Implementation is deferred by the maintainer. The next implementation action, wh
 | docs/05-verification | Fixtures, test catalog, three-profile evaluation, requirement/gate mappings, risks and executable package QA |
 | docs/06-agent-handoffs | One-stage implementation goal, Claude-first start prompt, portable start prompt, workflow guide and handoff template |
 | docs/07-developer-workflow | Exhaustive 196-field config migration, learning policy, skill source and deterministic synchronization |
+| [docs/08-expansion-research](08-expansion-research/README.md) | Expansion research and plan of 2026-10-31: ecosystem audit, open-source and Hagane Works research, decision record, autonomy, features, ecosystem requirements, architecture, UX, roadmap, testing and risks. Awaiting approval |
 | Hidden starter directories | Four real skills each under .claude, .codex and currently supported .agents discovery paths, plus safe native configs |
 
 [MANIFEST](MANIFEST.md) maps the requested content contract to actual filenames. The numbered spec prefixes differ from the suggested names only for readability. Every required content area is present. Hidden starter directories are included in the ZIP even if a file manager initially hides them.
