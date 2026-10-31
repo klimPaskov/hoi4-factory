@@ -255,7 +255,7 @@ Existing requirement IDs are kept. Wording changed for REQ-002, REQ-003, REQ-006
 
 ### ADR-026: outcomes of the expansion research consultation
 
-**Status.** Maintainer decisions made in an interactive planning session on 2026-10-31. They set direction for the expansion plan in [the expansion research package](../08-expansion-research/README.md). The full question-by-question record is the [expansion decision record](../08-expansion-research/00-decision-record.md). No stage is authorized by this record, and implementation waits for explicit approval of the plan.
+**Status.** Maintainer decisions made in an interactive planning session on 2026-10-31. They set direction for the expansion plan in [the expansion research package](../08-expansion-research/README.md). The full question-by-question record is the [expansion decision record](../08-expansion-research/00-decision-record.md). No HOI4 Factory stage is authorized by this record. The maintainer approved the plan on 2026-10-31, which authorizes its first phase (D-13) and nothing beyond it.
 
 | Topic | Decision | Effect on earlier decisions |
 |---|---|---|

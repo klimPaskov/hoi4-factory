@@ -1,6 +1,6 @@
 # Implementation roadmap
 
-Status: **Proposed for approval**. Nothing here starts until the maintainer explicitly approves the plan (Phase D). Following D-13, the first implementation covers research and workflow updates only: the kit, hoi4-agent-tools, the new `hoi4-imagegen-mcp`, HOI4 Mod Setup touch points and Chaos Redux workflow files. HOI4 Factory product features stay designs until their stage is authorized, and the mapping at the end shows where each one lands.
+Status: **Approved by the maintainer on 2026-10-31** (Phase D). Following D-13, the first implementation covers research and workflow updates only: the kit, hoi4-agent-tools, the new `hoi4-imagegen-mcp`, HOI4 Mod Setup touch points and Chaos Redux workflow files. HOI4 Factory product features stay designs until their stage is authorized, and the mapping at the end shows where each one lands.
 
 ## Order and dependencies
 

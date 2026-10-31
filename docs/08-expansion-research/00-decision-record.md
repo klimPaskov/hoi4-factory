@@ -1,6 +1,6 @@
 # Expansion research decision record
 
-Status: **Phase B complete, plan awaiting approval**. Started 2026-10-31. Every maintainer decision in the expansion research session is recorded here when it is made, with the date and the question it answers. Decisions that change product scope are also copied into the [maintainer decision record](../02-architecture/maintainer-decisions-2026-10-24.md). Nothing in this record authorizes implementation. Phase D starts only after the maintainer approves the consolidated plan.
+Status: **Plan approved on 2026-10-31, Phase D under way**. Started 2026-10-31. Every maintainer decision in the expansion research session is recorded here when it is made, with the date and the question it answers. Decisions that change product scope are also copied into the [maintainer decision record](../02-architecture/maintainer-decisions-2026-10-24.md). Nothing in this record authorizes implementation. Phase D starts only after the maintainer approves the consolidated plan.
 
 Choices offered for each proposal: **Adopt** (take the recommended approach), **Adapt** (keep the idea, change it for our workflow), **Defer** (save for later), **Reject** (do not take it).
 
@@ -125,3 +125,9 @@ Ideas not put to a vote because existing practice already covers them or Chaos R
 | D2 | Strictness of the focus layout verdict | `blocked` and `revise` block the commit at every level with a recorded override, `review` is advisory | **`blocked` and `revise` gate, `review` advisory** |
 | D3 | Agents calling a ComfyUI endpoint the maintainer configured (local GPU or a RunPod URL) | Allowed except portraits of real historical people | **Allowed for everything**, including portraits of real people. This changes the kit's rule that agents never operate RunPod. Chaos Redux keeps its own asset policy (historical leaders are never generated) as a project overlay unless the maintainer changes it separately |
 | D4 | Vanilla Paradox art sent to image providers as reference images | Opt-in for local kit use only, never in hosted HOI4 Factory | **Opt-in everywhere**, per project, off by default. In hosted HOI4 Factory this amends ADR-015, which keeps raw game files on the server, for opt-in reference images only. It stays behind the game-rights review that already gates public exposure |
+
+## Plan approval (2026-10-31)
+
+| ID | Question | Decision |
+|---|---|---|
+| E1 | Approve the implementation plan (Phase D) as written, starting with W1 kit sync automation | **Approved** ("Approve plan"). Work follows the roadmap order. W1 runs in the planning session directly in the kit checkout. W3 and W4 were offered to the maintainer as separate sessions because they live in hoi4-agent-tools and depend on nothing in W1 |

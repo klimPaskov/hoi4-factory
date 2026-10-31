@@ -1,6 +1,6 @@
 # Expansion research and planning package
 
-Status: **Plan awaiting maintainer approval**, prepared 2026-10-31. This package researches and plans the expansion of HOI4 Factory into the central environment of the maintainer's HOI4 ecosystem, together with improvements to the Agentic HOI4 Modding Kit, Chaos Redux, hoi4-agent-tools and a new `hoi4-imagegen-mcp`. No repository has been changed by it apart from this folder and the decision records. Implementation (Phase D) starts only after explicit approval.
+Status: **Plan approved by the maintainer on 2026-10-31**, prepared the same day. This package researches and plans the expansion of HOI4 Factory into the central environment of the maintainer's HOI4 ecosystem, together with improvements to the Agentic HOI4 Modding Kit, Chaos Redux, hoi4-agent-tools and a new `hoi4-imagegen-mcp`. No repository has been changed by it apart from this folder and the decision records. Implementation (Phase D) began after that approval, in the order of the [roadmap](09-implementation-roadmap.md).
 
 ## How the work was done
 
