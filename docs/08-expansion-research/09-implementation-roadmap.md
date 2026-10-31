@@ -2,6 +2,31 @@
 
 Status: **Approved by the maintainer on 2026-10-31** (Phase D). Following D-13, the first implementation covers research and workflow updates only: the kit, hoi4-agent-tools, the new `hoi4-imagegen-mcp`, HOI4 Mod Setup touch points and Chaos Redux workflow files. HOI4 Factory product features stay designs until their stage is authorized, and the mapping at the end shows where each one lands.
 
+## Progress
+
+| Package | State | Evidence |
+|---|---|---|
+| W0 | Merged into the kit's local `main` (`56f917f`), not pushed | `verify_wiki_snapshot.py`: 63 pages, no problems |
+| W1 | Committed on the kit's local `main` (`35fcffa`), not pushed. HOI4 Mod Setup pull request [#137](https://github.com/klimPaskov/HOI4-Mod-Setup/pull/137) open, CI pending | See [W1 evidence](#w1-evidence) |
+| W3, W4 | Offered to the maintainer as separate sessions | None yet |
+| W2, W5 to W8 | Not started | None |
+
+### W1 evidence
+
+Each criterion is demonstrated by `.tools/tests/test_sync.py` in the kit (31 tests on fixture mods built from the shipped tools). They passed on Windows 11 with Python 3.13.5 and on a fresh Linux clone in `python:3.13-slim` (Python 3.13.18). The live hook command was also run on the kit itself.
+
+| # | Criterion | Observed |
+|---|---|---|
+| 1 | Instruction edit updates or flags `AGENTS.md` | The hook command regenerated `AGENTS_template.md` after the template edit in 0.40 s and named it for the commit. `--check` reports `DRIFT`. A hand edit of `AGENTS.md` is refused with exit 2 and kept |
+| 2 | Skill edit updates or flags its copies | Only the edited skill's copies change. A mod with `.codex/` fails the check without `.agents/skills`. A source-package mirror round-trips and detects a mutated file |
+| 3 | Agent add, modify, remove | Codex TOML, `config.toml` row and maps are written, updated, flagged `STALE` and removed. The agent count comes from the folder. A malformed agent fails with exit 2 |
+| 4 | No unnecessary work | Hook on mod content exits 0 with no output (0.27 s on Windows). A sentinel generator never starts for unrelated paths or for skill edits |
+| 5 | CI detects stale projections | Every mutation fails `generators.py --check` and `check.py`'s generators check. CI now runs it unfiltered on pull requests, plus a Linux, macOS and Windows job. CI itself has not run yet because nothing is pushed |
+| 6 | Setup and runtimes compatible | Registry outputs are inside Setup's rewritable allowlist (tests on both sides, Setup side in #137). `check.py setup` repairs a stale fixture mod and changes only allowed paths. On the fresh Linux clone it left the generators in sync. A real HOI4 Mod Setup install and update round trip was not run: it needs the desktop app pointed at the local kit commit (`HOI4_MOD_SETUP_SOURCE_REPOSITORY`) |
+| 7 | Failures visible | Missing script, broken or missing registry, crashing generator, needs cycle and an empty folder each exit 2. `check.py setup` returns non-zero. The optional pre-commit hook blocked a stale commit on Linux |
+
+Not yet verified: macOS, until the kit branch is pushed and CI runs. Maintainer actions: a ruleset that requires the Validate job on the kit's `main`.
+
 ## Order and dependencies
 
 ```mermaid

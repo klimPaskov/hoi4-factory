@@ -52,6 +52,7 @@ On Windows only:
 - Shell heredocs passed into Python can alter backslash escapes, and a Python heredoc that edits files containing backslashes or `'''` can fail silently or abort the command. Make such edits with the Edit tool, and check that an edit applied.
 - Git Bash corrupts non-ASCII text passed on a command line, for example `curl -d` with accents or emoji. Write such payloads to a UTF-8 file and send them with `--data-binary @file`.
 - Scripts that pass host paths to `docker run` convert them with `cygpath -m` when it exists and set `MSYS_NO_PATHCONV=1`, as `scripts/linux-tests.sh` does. Both are no-ops on macOS.
+- The session scratchpad path is long, so cloning a deep repository there (the Agentic kit's skill assets) fails with "Filename too long". Mount the checkout read-only into a Linux container and clone it inside, which also gives a fresh-checkout Linux run.
 
 On macOS only:
 

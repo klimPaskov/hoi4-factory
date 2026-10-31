@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.5, 2026-10-31, deep clones on Windows
+
+- CLAUDE.md notes that cloning a deep repository into the long session scratchpad path fails on Windows with "Filename too long", and that cloning inside a Linux container with the checkout mounted read-only works and doubles as a fresh-checkout Linux run.
+
+Evidence: the W1 kit synchronization work of 2026-10-31. A `git clone` of the Agentic kit into the scratchpad failed on the skill asset paths, and the same clone inside `python:3.13-slim` ran the 31 synchronization tests. Rollback: revert this commit and regenerate.
+
 ## 0.2.4, 2026-10-25, Windows and macOS development
 
 - CLAUDE.md's working environment now covers both development machines, Windows 11 and macOS on Apple Silicon, with shared rules first and per-platform quirks after them. The Python, Compose and disk-check commands are the same on both.
