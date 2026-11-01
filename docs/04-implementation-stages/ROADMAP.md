@@ -99,7 +99,21 @@ Every editor is the MCP read and render tools shown to people, with the same wri
 | GUI | S07 | `hoi4.gui_inspect`, `hoi4.gui_render` | `hoi4.gui_rewrite` | Parity tests only |
 | Map | S07 | `hoi4.map_inspect` | `hoi4.map_rewrite` | The bounded operation S07-W3 selects |
 
-**Game preview (D-16).** Every visual editor, from the focus editor in S04 onwards, includes an in-app game preview: a fast, faithful rendering of how the mod content looks in the game, built on the hoi4-agent-tools renderers (`hoi4.focus_render` in S04, then `hoi4.event_render`, `hoi4.tech_render`, `hoi4.gui_render` and the map renders in the stages of their editors). It must be far faster and more reliable than Hagane Works' preview, measured on the same content as part of Q-1. It complements in-game checks and never replaces them: real in-game testing is done through the HOI4 Live Tools MCP where it is set up, otherwise by a human, for example on the web version (D-15). The preview's targets stay open until the hands-on Hagane Works v0.1.3 review reports.
+**Game preview (D-16).** Every visual editor, from the focus editor in S04 onwards, includes an in-app game preview: a fast, faithful rendering of how the mod content looks in the game, built on the hoi4-agent-tools renderers (`hoi4.focus_render` in S04, then `hoi4.event_render`, `hoi4.tech_render`, `hoi4.gui_render` and the map renders in the stages of their editors). It must be far faster and more reliable than Hagane Works' preview, measured on the same content as part of Q-1. It complements in-game checks and never replaces them: real in-game testing is done through the HOI4 Live Tools MCP where it is set up, otherwise by a human, for example on the web version (D-15). The hands-on review of Hagane Works v0.1.3 proposed nine preview targets, which the maintainer decides:
+
+1. A warm preview update after an edit within 1 s, and never slower than Hagane's 2 to 3 s on a loaded machine.
+2. A cold first preview faster than Hagane's base layer (90 CPU-s, about 5 min in the review), with no idle eviction that forces a full rebuild.
+3. A 1,000-focus tree that stays interactive, with zoom and hover.
+4. Every localisation key the game resolves is resolved (Hagane missed 527 of 550 event titles in Ireland Total Overhaul).
+5. Art the mod defines is drawn: event pictures, idea pictures and scripted GUI art.
+6. Visibility is evaluated, so a screen shows only what the player would see, for example decisions.
+7. Every DDS format the base game uses is decoded, including DX10-header files (hoi4-agent-tools #76).
+8. Missing text shows as the raw key, like the game, and every missing or undecodable asset is reported.
+9. Saving or exporting never changes files the user did not edit.
+
+Today the agent-tools renders take 20 to 155 s per call (#74), and `focus_render` is a schematic rather than game-like (#75).
+
+**Hagane failures as test cases.** The Q-1 and D-16 fixtures include the failures the review found, so our tools prove they beat them: raw keys shown for 527 of 550 event titles and descriptions although the mod defines them, silent empty renders for undefined sprites, missing textures and DX10 or BC7 textures, and an export whose merge loses 59 percent of comment lines and all 113 idea `picture =` lines. Each is a regression test that must pass on our side.
 
 Every editor also calls the shared checks: `hoi4.script_validate` with the closure option, `hoi4.package_check` and the engine's finding delta. `hoi4.error_log` reads logs the user uploads. New tool names are proposals until their agent-tools pull request fixes them. The client screens for each editor go through the ADR-025 design track. None of Hagane Studio's visual design is reused.
 
@@ -111,13 +125,18 @@ Only hard capabilities are taken, each adapted to this architecture, and each mu
 |---|---|---|---|---|
 | Hash-guarded span repair plan | Engine `repair.rs` | Landed in W4 | S04 | A plan becomes a C-02 proposal. A changed source hash or a deletion under boolean logic is refused |
 | Per-edit finding delta | Engine `delta.rs` | Landed in W4 | S04 | The review card shows introduced, worsened, changed, improved, unchanged and resolved findings for every proposal |
-| Dead-flag and DLC lints | Engine `lints.rs` | Landed in W4 | S04 | Valid and invalid fixtures per rule, zero false alarms on vanilla, DLC names from the project's game reference |
-| Finding-code catalog as fixtures | Engine tests | Landed in W4 | S04 entry (benchmark fixtures) | Each mapped code has an engine fixture, and the Q-1 validation surface runs them against Hagane Studio |
-| draw.io sketch importer | Engine `hoi4-drawio` | Landed in W4 | S06 | A sketch imports into a new focus branch as a proposal, and the Hagane parity fixture passes unchanged |
+| Dead-flag and DLC lints | Engine `lints.rs` | Landed in W4, rewritten per A1-3 | S04 | Each rule checks the whole mod (achievements, scripted effects and triggers, mod `.gfx`), never changes output and stays within a time budget. Valid and invalid fixtures per rule, zero false alarms on vanilla, DLC names from the project's game reference |
+| Finding-code catalog as fixtures | Engine tests | Landed in W4 | S04 entry (benchmark fixtures) | The code names seed our catalog only. Each mapped code has an engine fixture, and the Q-1 validation surface runs them against Hagane Studio |
+| draw.io sketch importer | Engine `hoi4-drawio` | Landed in W4, fixes needed (A1-3) | S06 | Deflate-compressed diagrams, OR groups and mutual exclusion are supported. A sketch imports into a new focus branch as a proposal, and the Hagane parity fixture passes |
 | Focus graph wiring on xyflow | Hagane Studio client | Not taken | S04 decision | Taken only if the S04 design shows it saves real effort. The decision and its reason are recorded in S04 evidence |
 | Hagane export ZIP import | HOI4 Factory import flow | Not started | S06 | A Hagane export imports with a preservation report that recognizes Hagane conventions without adopting them. Test exports are generated by running Hagane Studio locally from its GPL source in `hagane-works/hagane-studio`, which holds the exporter, and no sample exports are requested |
-| Game discovery, safe mod install, log parsing | Local companion, rewritten in Rust | Not started | Companion stage proposal after S06 | Its own security review, tests on Windows and macOS |
+| Game discovery | Local companion, rewritten in Rust | Not started | Companion stage proposal after S06 | Validity is checked with `launcher-settings.json` or the game executable, not only four folders. Tests on Windows and macOS |
+| Safe mod install | Local companion, rewritten in Rust | Not started | Companion stage proposal after S06 | The ownership marker and the refusal of folders owned by another mod are kept, with no forced acknowledgement of blockers. Its own security review |
+| Log parsing | Local companion, rewritten in Rust | Not started | Companion stage proposal after S06 | Its own test before harvest |
 | Event and decision preview cards | None | Dropped | None | Our render tools cover them |
+| Mutation receipts, edit revisions, duplicate-ID refusal | HOI4 Factory operations, agent-tools rewrite tools | Pattern adopted (A1-3) | S04 | Every write returns a receipt and refuses a duplicate ID, and a test shows a write changes only the fields it names |
+| Game preview renderer | None, ideas only | Code not ported (A1-3) | S04 onward (D-16) | Our renderers gain a resident cached base layer, bitmap-font glyphs, window navigation and whole-screen context (hoi4-agent-tools #74, #75, #76) |
+| Export, Loaded-mode merge, session model | None | Not harvested (A1-3) | None | Our Git-native model keeps unedited bytes, and every local route needs a secret |
 
 **Archiving Hagane Studio (W8).** The studio is archived when HOI4 Factory imports a Hagane export with a preservation report (S06), the companion syncs local mod folders (the companion stage) and the focus (S04), event, decision and character editors (S06) exist. W8 is blocked until the maintainer controls the repository.
 

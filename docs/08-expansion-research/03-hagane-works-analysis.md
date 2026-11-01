@@ -111,15 +111,21 @@ These come from the hosted platform and Hagane Studio. They are carried into the
 
 Measured size: about 195,000 lines of non-test TypeScript and 234,000 lines of non-test Go, with almost no comments or architecture documents. Every editor works on JSON table rows and regenerates files on export. The Go parser keeps comments but not byte offsets and re-emits canonical text, so it cannot provide byte-preserving edits. Its focus grid differs from the game grid our tools use.
 
-The maintainer chose **harvest, then archive** (A1) and narrowed it to hard capabilities on 2026-11-01 (A1-1). HOI4 Factory builds its own interface through its own design track (ADR-025), and none of Hagane Studio's visual design is reused. Only capabilities that would be costly to rebuild from scratch are taken, each adapted to our architecture and design, and UI pieces our own tools already cover are dropped. Under Q-1 every harvested part must end up better than the original. About 2.5 percent of the Go code is worth taking, and at most one piece of TypeScript:
+The maintainer chose **harvest, then archive** (A1) and narrowed it to hard capabilities on 2026-11-01 (A1-1). HOI4 Factory builds its own interface through its own design track (ADR-025), and none of Hagane Studio's visual design is reused. Only capabilities that would be costly to rebuild from scratch are taken, each adapted to our architecture and design, and UI pieces our own tools already cover are dropped. Under Q-1 every harvested part must end up better than the original. A hands-on review of Hagane Works v0.1.3 on 2026-11-01 set the verdicts below (A1-3). About 2.5 percent of the Go code is worth taking, and at most one piece of TypeScript:
 
-| Harvest item | Size | Destination |
+| Harvest item | Verdict after the hands-on review (A1-3) | Destination |
 |---|---|---|
-| Focus graph shell on xyflow: the wiring only, no layout code or styling | About 3,400 lines | HOI4 Factory client, only if it saves real effort when S04 is designed |
-| Hash-guarded span repair plan, per-edit finding delta, dead-flag lint, DLC lint rule | Small | Shared Rust engine |
-| draw.io sketch importer | 398 Go lines | Shared Rust engine |
-| 158 finding codes | Catalog | Test fixtures for the Rust engine |
-| Game discovery, safe mod install, log parsing | Small | Local companion, rewritten in Rust |
+| Game preview renderer | Do not port the code: one DOM element per glyph, silent empty renders, no visibility evaluation, missing mod art, a 5-minute cold build with idle eviction. Take the ideas only: a resident base layer cached on disk, bitmap-font glyph drawing from `.fnt`, click navigation between windows, whole-screen context | hoi4-agent-tools renderers (D-16) |
+| Lints (flags, scripted references, export advisories) | Ideas only. Rewrite each against the whole mod (achievements, scripted effects and triggers, mod `.gfx`), never let a lint change output, and add a time budget test. 3 of 5 sampled flag findings were false, and the idea-picture advisory deleted valid lines | Shared Rust engine |
+| Finding-code catalog | A seed for our catalog only, not complete coverage. Hagane's own validation missed every probe failure | Test fixtures for the Rust engine |
+| draw.io sketch importer | Take it with fixes: deflate-compressed diagrams, OR groups and mutual exclusion before shipping | Shared Rust engine |
+| Game discovery | Take it with a stronger validity check, such as `launcher-settings.json` or the game executable, not just four folders | Local companion, rewritten in Rust |
+| Safe mod install | Take the folder-ownership marker and the refusal of folders owned by another mod. Drop the forced acknowledgement of blockers | Local companion, rewritten in Rust |
+| Tool API patterns | Take mutation receipts, edit revisions and duplicate-ID refusal, with one added rule: a write touches only the fields it names. One Hagane write silently changed the project end date | HOI4 Factory operations and agent-tools rewrite tools |
+| Span repair plans, per-edit finding changes, log parsing | Earlier source-study verdict stands. Each needs its own test before harvest | Shared Rust engine, local companion |
+| Focus graph wiring on xyflow | Only if it saves real effort when S04 is designed | HOI4 Factory client |
+| Export and Loaded-mode merge | Do not harvest. It is lossy and changes untouched content, while our Git-native model keeps unedited bytes | None |
+| Session security model | Do not copy. Every local route needs a secret | None |
 
 Hagane Studio gets a final tagged release, a banner pointing to HOI4 Factory and maintenance-only fixes. It is archived once HOI4 Factory imports a Hagane export ZIP with a preservation report, the companion syncs local mod folders, and the focus, event, decision and character editors exist. Porting effort was estimated at 45 to 60 engineer-days for the phased path.
 
