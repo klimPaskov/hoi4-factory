@@ -99,6 +99,8 @@ Every editor is the MCP read and render tools shown to people, with the same wri
 | GUI | S07 | `hoi4.gui_inspect`, `hoi4.gui_render` | `hoi4.gui_rewrite` | Parity tests only |
 | Map | S07 | `hoi4.map_inspect` | `hoi4.map_rewrite` | The bounded operation S07-W3 selects |
 
+**Game preview (D-16).** Every visual editor, from the focus editor in S04 onwards, includes an in-app game preview: a fast, faithful rendering of how the mod content looks in the game, built on the hoi4-agent-tools renderers (`hoi4.focus_render` in S04, then `hoi4.event_render`, `hoi4.tech_render`, `hoi4.gui_render` and the map renders in the stages of their editors). It must be far faster and more reliable than Hagane Works' preview, measured on the same content as part of Q-1. It complements in-game checks and never replaces them: real in-game testing is done through the HOI4 Live Tools MCP where it is set up, otherwise by a human, for example on the web version (D-15). The preview's targets stay open until the hands-on Hagane Works v0.1.3 review reports.
+
 Every editor also calls the shared checks: `hoi4.script_validate` with the closure option, `hoi4.package_check` and the engine's finding delta. `hoi4.error_log` reads logs the user uploads. New tool names are proposals until their agent-tools pull request fixes them. The client screens for each editor go through the ADR-025 design track. None of Hagane Studio's visual design is reused.
 
 ### Hagane harvest (A1, A1-1)
@@ -196,7 +198,7 @@ After S05, S06 and S07 may progress in parallel when they have separate modules 
 
 ## Gate semantics
 
-A stage is complete only when every mandatory exit gate has a result against its final revision. A known source-loss, cross-account or unauthorized-write failure blocks the affected capability. Missing credentials, hardware, a GitHub test repository or a user-operated game produce an explicit unavailable result. They do not count as a pass.
+A stage is complete only when every mandatory exit gate has a result against its final revision. A known source-loss, cross-account or unauthorized-write failure blocks the affected capability. Missing credentials, hardware, a GitHub test repository or an in-game check (done through the HOI4 Live Tools MCP where it is set up, otherwise by a human, D-15) produce an explicit unavailable result. They do not count as a pass.
 
 The [acceptance matrix](../05-verification/REQUIREMENTS-ACCEPTANCE-MATRIX.md) maps all 50 requirements and all 59 stage gates to planned checks. Twelve gates were added on 2026-11-01 for the engine, the editors, imports and Q-1. The [evaluation matrix](../05-verification/EVALUATION-MATRIX.md) defines model tasks and measurement. Stage evidence uses the six-file handoff convention in [the handoff template](../06-agent-handoffs/STAGE-HANDOFF-TEMPLATE.md).
 

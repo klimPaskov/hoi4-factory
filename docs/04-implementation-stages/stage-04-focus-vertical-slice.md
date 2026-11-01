@@ -35,6 +35,7 @@ The cross-stage plan is in [engine, editors and tools across stages](ROADMAP.md#
 | MCP tools exposed | The S03 read tools plus `hoi4.focus_rewrite`. No other rewrite tool |
 | Hagane harvest | Span repair plans as C-02 proposals, the per-edit finding delta on the review card, the dead-flag and DLC lints in the commit check. Decide whether the xyflow focus-graph wiring saves real effort and record the decision. Build the canvas on `@xyflow/react` either way |
 | Import | Preservation report and findings baseline in the Setup import flow for uploads and GitHub imports (P4) |
+| Game preview (D-16) | The focus editor shows an in-app game preview: a fast, faithful rendering of the focus tree as it looks in the game, built on `hoi4.focus_render`. It complements in-game checks and never counts as one. Speed and fidelity targets stay open until the hands-on Hagane Works review reports |
 | Q-1 | No regression on T-BENCH-01, plus the editor round trip measured against Hagane Studio on the same focus tree |
 | Coding-agent integration | T-EDIT-01 runs the coding-client path on a clone with the same tool profile |
 
@@ -70,7 +71,7 @@ Use F-FOCUS-SMALL and F-FOCUS-FIDELITY. Include missing icon, localization gap, 
 
 Run T-EDIT-01 for each supported gesture: the same intent as a gesture, a native agent call and a coding-client MCP call on a clone must produce identical bytes, projection and finding delta. Include a person moving a node while the agent's proposal on that node is pending, and an agent rewrite sent after a person's edit with stale hashes. Run T-ENG-01 with a proposal that adds an unknown scripted trigger and confirm the commit is blocked, and one that touches a file with baseline findings and confirm only new findings block. Run T-IMPORT-01 on a GitHub import and a ZIP upload. Run T-BENCH-01 and compare with the baseline of gate 12.
 
-Each of M-API-A, M-API-B and M-LOCAL-C attempts the same bounded focus task. Record unsupported capability of the self-hosted endpoint rather than silently replacing it with another provider. Simulate a lost push reply and a lost pull request reply on a disposable GitHub repository. Repeat one successful task after process death at each critical mutation boundary. Actual game observation is a separate user-operated test where available. The server does not run the game.
+Each of M-API-A, M-API-B and M-LOCAL-C attempts the same bounded focus task. Record unsupported capability of the self-hosted endpoint rather than silently replacing it with another provider. Simulate a lost push reply and a lost pull request reply on a disposable GitHub repository. Repeat one successful task after process death at each critical mutation boundary. Actual game observation is a separate in-game check, done through the HOI4 Live Tools MCP where it is set up, otherwise by a human (D-15). The server does not run the game.
 
 Use the [test strategy](../05-verification/TEST-STRATEGY.md) and [evaluation matrix](../05-verification/EVALUATION-MATRIX.md). Exercise production code for the behavior under test. Record exact revision, fixture hash, environment, command or action, result, evidence kind and limitation. A declared upstream test or successful source inspection does not replace running the required stage test.
 

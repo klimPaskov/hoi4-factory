@@ -64,7 +64,7 @@ A contract-only dependency permits parallel implementation after that interface 
 
 Run the acceptance matrix and scenario matrix against the deployed staging images, not only development servers. Include unsupported mod target version, unreachable custom endpoint, API refusal and rate limit, server restart during a task, agent worker crash, full disk on the Git volume, GitHub outage, revoked GitHub installation and corrupted or missing artifact recovery.
 
-Run T-ENG-01 and T-EDIT-01 against the staging images for every advertised editor. Repeat critical source-loss, cross-account and authorization fixtures after image upgrade and restore. Restore a backup into a fresh deployment and confirm source, canon and task state agree. Actual game observations remain user-operated scenarios. A missing environment is a support limitation, not a passing test.
+Run T-ENG-01 and T-EDIT-01 against the staging images for every advertised editor. Repeat critical source-loss, cross-account and authorization fixtures after image upgrade and restore. Restore a backup into a fresh deployment and confirm source, canon and task state agree. Actual game observations remain in-game checks, done through the HOI4 Live Tools MCP where it is set up, otherwise by a human (D-15). A missing environment is a support limitation, not a passing test.
 
 Use the [test strategy](../05-verification/TEST-STRATEGY.md) and [evaluation matrix](../05-verification/EVALUATION-MATRIX.md). Exercise production code for the behavior under test. Record exact revision, fixture hash, environment, command or action, result, evidence kind and limitation. A declared upstream test or successful source inspection does not replace running the required stage test.
 

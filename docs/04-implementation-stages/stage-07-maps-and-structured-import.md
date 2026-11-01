@@ -78,7 +78,7 @@ Use the [test strategy](../05-verification/TEST-STRATEGY.md) and [evaluation mat
 3. The supported bounded edit preserves unrelated source and passes named topology checks.
 4. Reference image upload never creates an unsupported game-ready claim.
 5. Known unavailable geography synthesis remains disabled or is separately implemented and validated, with evidence of what changed.
-6. Map recovery and performance results are recorded. Actual game evidence is scenario-specific and missing game evidence remains explicit.
+6. Map recovery and performance results are recorded. Actual game evidence is scenario-specific, comes from in-game checks done through the HOI4 Live Tools MCP where it is set up, otherwise by a human (D-15), and missing game evidence remains explicit.
 7. The map, technology and GUI editors pass parity across the gesture, native agent and coding-client paths on their supported operations, and agent edits appear in an open editor without reload.
 8. T-BENCH-01 shows no regression from the stored baseline.
 
