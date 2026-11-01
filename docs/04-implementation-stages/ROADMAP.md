@@ -144,9 +144,9 @@ The rules-lookup measurement under way in a separate session feeds this benchmar
 | Event and decision tools are read-only | Writers on the engine's span edits | S06 (S06-W4) |
 | Technology tools are read-only | A writer | S07 (S07-W3) |
 | No GFX asset validation | Sprite and `.gfx` registration checks in the engine, DDS header and profile checks through `hoi4-imagegen-mcp` | S06 (S06-W3) |
-| No tools for on_actions, MIOs, balance of power, special projects, operations and raids | Inspect tools, then render and rewrite where they help (M-9, third group) | agent-tools after S06's localisation, idea and character tools; HOI4 Factory editors stay in the [backlog](BACKLOG-AND-DEFERRED-SCOPE.md) |
-| No sound validation | Sound validation with GFX validation (M-9, fourth group). S06 tracks audio as assets with provenance | agent-tools after the third group; editors in the backlog |
-| No units, division templates, OOB or equipment tools | Inspect tools first (M-9, fourth group) | agent-tools after the third group; editors in the backlog |
+| No tools for on_actions, MIOs, balance of power, special projects, operations and raids | Inspect tools, then render and rewrite where they help (M-9, third group) | agent-tools after S06's localisation, idea and character tools. HOI4 Factory editors stay in the [backlog](BACKLOG-AND-DEFERRED-SCOPE.md) |
+| No sound validation | Sound validation with GFX validation (M-9, fourth group). S06 tracks audio as assets with provenance | agent-tools after the third group. Editors are in the backlog |
+| No units, division templates, OOB or equipment tools | Inspect tools first (M-9, fourth group) | agent-tools after the third group. Editors are in the backlog |
 | No CI on real vanilla | A vanilla job on a runner with a licensed game copy | S03, before the Q-1 baseline |
 | No macOS Node CI job | A macOS arm64 job in agent-tools Node CI (M-13) | S03, before per-platform binaries are trusted |
 
