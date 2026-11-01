@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.12, 2026-11-01, autocrlf covers the checkout too
+
+- CLAUDE.md now says `-c core.autocrlf=false` must cover worktree creation and sparse-checkout changes, not only the commit. It also says never to use `commit -a` in another repository, and to check `git diff --ignore-cr-at-eol --stat` before committing. It notes two Git Bash quirks: `grep` hides CR bytes, and `rev:path` arguments get rewritten.
+
+Evidence: Chaos Redux #4 (ce260deb1c) stored 119 files as CRLF blobs. They were checked out CRLF by `git sparse-checkout add` under the system `core.autocrlf=true`, then staged by `git -c core.autocrlf=false commit -a`. Chaos Redux #5 (082247083b) restored the LF blobs and changed line endings only. Rollback: revert this commit and regenerate.
+
 ## 0.2.11, 2026-11-01, agents never start the game
 
 - CLAUDE.md now says agents never start Hearts of Iron IV on the maintainer's machines. In-game checks go to the HOI4 Live Tools MCP or the maintainer, with an exact list of what to check.
