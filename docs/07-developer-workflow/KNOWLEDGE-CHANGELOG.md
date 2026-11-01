@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.13, 2026-11-01, routine steps need no approval
+
+- CLAUDE.md now lets agents merge pull requests for authorized work once every required check is green and push the commits that finish authorized work, without waiting for the maintainer. Only true blockers wait: a sign-in or credential, money, access only the maintainer holds, the Mac and in-game checks. The rules against skipping failing checks, force pushes, lost work, new spending, starting the game and touching Docker Desktop are unchanged.
+
+Evidence: maintainer decision D-18 of 2026-11-01, relayed by the coordinating session. Rollback: revert this commit and regenerate.
+
 ## 0.2.12, 2026-11-01, autocrlf covers the checkout too
 
 - CLAUDE.md now says `-c core.autocrlf=false` must cover worktree creation and sparse-checkout changes, not only the commit. It also says never to use `commit -a` in another repository, and to check `git diff --ignore-cr-at-eol --stat` before committing. It notes two Git Bash quirks: `grep` hides CR bytes, and `rev:path` arguments get rewritten.
