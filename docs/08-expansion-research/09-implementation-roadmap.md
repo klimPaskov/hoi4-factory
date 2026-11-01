@@ -151,7 +151,7 @@ Repository: Chaos Redux, instruction, skill and tool files only. Starts after th
 
 W3's verdict and inline renders and W7's layout results are also the data the S04 focus editor shows people (FR-5): a node a person drags is saved through the same rewrite operation, and the agent reads it back through inspect.
 
-Repository: hoi4-agent-tools. Solver layout per branch lane with `relative_position_id` anchors (D1), corridor insertion of new branches with untouched coordinates kept, shared geometry for renders and metrics, vanilla `offset` blocks. Acceptance: determinism across Windows, macOS and Linux, idempotent second call, untouched-focus hash unchanged, runtime far below today's 21 to 70 seconds.
+Repository: hoi4-agent-tools. Solver layout per branch lane with `relative_position_id` anchors (D1), corridor insertion of new branches with untouched coordinates kept, shared geometry for renders and metrics, vanilla `offset` blocks. Acceptance: determinism across Windows, macOS and Linux, idempotent second call, untouched-focus hash unchanged, runtime far below today's 21 to 70 seconds. Q-1 applies: speed and quality are shown by measured comparisons, not claimed.
 
 ### W8 Hagane Studio wind-down (A1)
 
