@@ -1,0 +1,92 @@
+{
+  "anthropic_version": "2026-10-21",
+  "cancel_at_ms": 702.5996,
+  "captured_utc": "2026-10-24T11:22:52Z",
+  "chunk_sizes": [
+    836,
+    139,
+    805
+  ],
+  "endpoint": "https://api.anthropic.com/v1/messages",
+  "events_at_cancel": 9,
+  "evidence_kind": "live",
+  "model_reported": "claude-haiku-5-5",
+  "model_requested": "claude-haiku-5-5",
+  "name": "anthropic-cancelled-turn",
+  "outcome": {
+    "auto_retry_allowed": false,
+    "class": "cancelled_after_acceptance",
+    "error": {
+      "class": "Cancelled",
+      "partial": {
+        "bytes": 1780,
+        "done_marker": false,
+        "events": 9,
+        "finish_reason": null,
+        "response_id": "msg_011CgLyZUgieQ25g4Dt7mKvn",
+        "text": "1. Start with a clear identity for your nation and let every",
+        "tool_calls": [],
+        "usage": {
+          "cached_input_tokens": 0,
+          "input_tokens": 37,
+          "output_tokens": 4,
+          "reasoning_tokens": 0
+        }
+      }
+    },
+    "ok": false
+  },
+  "provider": "anthropic-messages",
+  "redaction": "x-api-key is never recorded. Response headers other than status and content-type are dropped, including request-id and anthropic-organization-id. The body is byte-for-byte. Message IDs (msg_...) inside the body are kept because altering them would break byte fidelity, and they are not credentials.",
+  "request_body": {
+    "max_tokens": 600,
+    "messages": [
+      {
+        "content": "List 40 numbered one-line tips for writing Hearts of Iron IV national focus trees.",
+        "role": "user"
+      }
+    ],
+    "model": "claude-haiku-5-5",
+    "stream": true,
+    "thinking": {
+      "type": "disabled"
+    }
+  },
+  "response": {
+    "content_type": "text/event-stream; charset=utf-8",
+    "status": 200
+  },
+  "spend": {
+    "basis": "cancelled: usage incomplete, output counted at the full max_tokens allowance as an upper bound",
+    "call": "anthropic-cancelled-turn",
+    "estimate": {
+      "kind": "estimated",
+      "price": {
+        "cached_input_per_mtok": 0.01,
+        "input_per_mtok": 0.1,
+        "model_prefix": "claude-haiku-5-5",
+        "output_per_mtok": 0.5,
+        "retrieved": "2026-10-24",
+        "source": "https://platform.claude.com/docs/en/about-claude/pricing (Claude Haiku 5.5, prompts up to 100,000 tokens)"
+      },
+      "usage": {
+        "cached_input_tokens": 0,
+        "input_tokens": 37,
+        "output_tokens": 600,
+        "reasoning_tokens": 0
+      },
+      "usd": 0.0003037
+    },
+    "model": "claude-haiku-5-5",
+    "reported_partial_usage": {
+      "cached_input_tokens": 0,
+      "input_tokens": 37,
+      "output_tokens": 4,
+      "reasoning_tokens": 0
+    }
+  },
+  "sse_bytes": 1780,
+  "sse_sha256": "0d0c6feb4e292ddcb14482810ef07199e5c0cb6f384e5cbe36ccb800b4f201c3",
+  "total_ms": 702.6079,
+  "ttfb_ms": 548.8583
+}

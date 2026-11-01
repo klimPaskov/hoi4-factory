@@ -81,8 +81,6 @@ Gate numbering is the ordered “Measurable exit gates” list in each stage pac
 | S03-G4 | [S03, exit gate 4](../04-implementation-stages/stage-03-native-agent-and-durability.md#measurable-exit-gates) | T-RUN-03 |
 | S03-G5 | [S03, exit gate 5](../04-implementation-stages/stage-03-native-agent-and-durability.md#measurable-exit-gates) | T-RUN-06, T-RUN-04, T-ACCT-02 |
 | S03-G6 | [S03, exit gate 6](../04-implementation-stages/stage-03-native-agent-and-durability.md#measurable-exit-gates) | T-RUN-05, T-SEC-01 |
-| S03-G7 | [S03, exit gate 7](../04-implementation-stages/stage-03-native-agent-and-durability.md#measurable-exit-gates) | T-ENG-01, T-SEC-02 |
-| S03-G8 | [S03, exit gate 8](../04-implementation-stages/stage-03-native-agent-and-durability.md#measurable-exit-gates) | T-BENCH-01 |
 | S04-G1 | [S04, exit gate 1](../04-implementation-stages/stage-04-focus-vertical-slice.md#measurable-exit-gates) | T-SETUP-01, T-SETUP-02, T-VIS-02, T-GH-01 |
 | S04-G2 | [S04, exit gate 2](../04-implementation-stages/stage-04-focus-vertical-slice.md#measurable-exit-gates) | T-VIS-02 |
 | S04-G3 | [S04, exit gate 3](../04-implementation-stages/stage-04-focus-vertical-slice.md#measurable-exit-gates) | T-VIS-01, T-VIS-03 |
@@ -93,6 +91,8 @@ Gate numbering is the ordered “Measurable exit gates” list in each stage pac
 | S04-G8 | [S04, exit gate 8](../04-implementation-stages/stage-04-focus-vertical-slice.md#measurable-exit-gates) | T-ENG-01, T-IMPORT-01, T-HOI-01 |
 | S04-G9 | [S04, exit gate 9](../04-implementation-stages/stage-04-focus-vertical-slice.md#measurable-exit-gates) | T-EDIT-01, T-VIS-03 |
 | S04-G10 | [S04, exit gate 10](../04-implementation-stages/stage-04-focus-vertical-slice.md#measurable-exit-gates) | T-BENCH-01, T-PERF-01 |
+| S04-G11 | [S04, exit gate 11](../04-implementation-stages/stage-04-focus-vertical-slice.md#measurable-exit-gates) | T-ENG-01, T-SEC-02 |
+| S04-G12 | [S04, exit gate 12](../04-implementation-stages/stage-04-focus-vertical-slice.md#measurable-exit-gates) | T-BENCH-01 |
 | S05-G1 | [S05, exit gate 1](../04-implementation-stages/stage-05-context-and-recovery-hardening.md#measurable-exit-gates) | T-CTX-01, T-DEV-04, T-MEM-01, T-MEM-03 |
 | S05-G2 | [S05, exit gate 2](../04-implementation-stages/stage-05-context-and-recovery-hardening.md#measurable-exit-gates) | T-CTX-02, T-MEM-04 |
 | S05-G3 | [S05, exit gate 3](../04-implementation-stages/stage-05-context-and-recovery-hardening.md#measurable-exit-gates) | T-CTX-03 |

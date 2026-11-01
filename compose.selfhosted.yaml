@@ -1,0 +1,20 @@
+# Self-hosted model endpoint for the S03 provider profile check (M-LOCAL-C). Development only.
+#
+# Adds an Ollama server on the Compose network with no model pulled. By the maintainer's decision
+# the self-hosted profile is verified by connection, model listing and the outbound destination
+# policy only, so nothing here runs inference. Its port is not published to the host.
+#
+#   scripts/compose.sh -f compose.yaml -f compose.selfhosted.yaml up -d --wait
+#
+# From the server, the endpoint is http://ollama:11434/v1. That name resolves to a private
+# address, so the destination policy refuses it until the operator lists the network's range in
+# FACTORY_OUTBOUND_ALLOW_CIDRS (the check script does both, in that order).
+services:
+  ollama:
+    image: ollama/ollama:0.40.0@sha256:1bef639749741b375e9a1eb2c1346fb57ce52f5432de1f74846e44ccc18e1687
+    environment:
+      OLLAMA_HOST: "0.0.0.0:11434"
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 3s
+      retries: 30

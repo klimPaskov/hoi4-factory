@@ -50,3 +50,13 @@ export function formatBytes(bytes: number): string {
     maximumFractionDigits: unit === 0 ? 0 : 1,
   }).format(value);
 }
+
+/** Integer micro-dollars as dollars, with 2 to 4 decimals. */
+export function formatMicros(micros: number): string {
+  return new Intl.NumberFormat(locale(), {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 4,
+  }).format(micros / 1_000_000);
+}

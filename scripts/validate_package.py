@@ -59,6 +59,7 @@ SKILLS = {
     "production-readiness-review",
     "delegate-parallel-work",
     "ui-design-iteration",
+    "track-issues",
 }
 STAGE_SECTIONS = [
     "Objective and non-goals", "Entry conditions", "Read-first sequence and reuse",

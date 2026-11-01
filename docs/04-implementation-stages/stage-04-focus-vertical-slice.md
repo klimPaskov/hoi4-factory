@@ -14,7 +14,7 @@ Support a deliberately bounded focus syntax subset. Do not build general visual 
 
 ## Entry conditions
 
-S03 accepted, including native provider path, scoped mutation, durable recovery, truthful capability profiles, the shared tool profile and the Q-1 baseline. The UI design track (ADR-025) has produced the design system the focus screens use.
+S03 accepted, including native provider path, scoped mutation, durable recovery and truthful capability profiles. S03 completed before the cross-stage plan, so the shared tool profile and the first Q-1 baseline are done at the start of S04 (gates 11 and 12): the native loop reaches hoi4-agent-tools through one pinned tool profile, the same one Setup installs for a local Claude Code or Codex session, the engine binary ships in the image, and a missing engine is reported as unavailable, never replaced silently by the TypeScript path. The UI design track (ADR-025) has produced the design system the focus screens use.
 
 Upstream prerequisites, each merged and released in hoi4-agent-tools: W3 (layout verdict, in-game connector model, inline renders), `hoi4.mod_index` and the closure option of `hoi4.script_validate` on the engine. W7 (the Rust layout solver) is expected. If it has not landed, snapping uses the plain grid through `hoi4.focus_rewrite`, solver snapping is recorded as unavailable and the gate wording is narrowed.
 
@@ -68,7 +68,7 @@ A contract-only dependency permits parallel implementation after that interface 
 
 Use F-FOCUS-SMALL and F-FOCUS-FIDELITY. Include missing icon, localization gap, duplicate focus ID, unknown effect, cycle, unsupported relative edit, external source edit after preview and collision between a drag and agent change. Verify no-op bytes independently from the parser's own serialized output.
 
-Run T-EDIT-01 for each supported gesture: the same intent as a gesture, a native agent call and a coding-client MCP call on a clone must produce identical bytes, projection and finding delta. Include a person moving a node while the agent's proposal on that node is pending, and an agent rewrite sent after a person's edit with stale hashes. Run T-ENG-01 with a proposal that adds an unknown scripted trigger and confirm the commit is blocked, and one that touches a file with baseline findings and confirm only new findings block. Run T-IMPORT-01 on a GitHub import and a ZIP upload. Run T-BENCH-01 and compare with the S03 baseline.
+Run T-EDIT-01 for each supported gesture: the same intent as a gesture, a native agent call and a coding-client MCP call on a clone must produce identical bytes, projection and finding delta. Include a person moving a node while the agent's proposal on that node is pending, and an agent rewrite sent after a person's edit with stale hashes. Run T-ENG-01 with a proposal that adds an unknown scripted trigger and confirm the commit is blocked, and one that touches a file with baseline findings and confirm only new findings block. Run T-IMPORT-01 on a GitHub import and a ZIP upload. Run T-BENCH-01 and compare with the baseline of gate 12.
 
 Each of M-API-A, M-API-B and M-LOCAL-C attempts the same bounded focus task. Record unsupported capability of the self-hosted endpoint rather than silently replacing it with another provider. Simulate a lost push reply and a lost pull request reply on a disposable GitHub repository. Repeat one successful task after process death at each critical mutation boundary. Actual game observation is a separate user-operated test where available. The server does not run the game.
 
@@ -85,7 +85,9 @@ Use the [test strategy](../05-verification/TEST-STRATEGY.md) and [evaluation mat
 7. Measured preview and interaction results are recorded against proposed budgets, with any revised target justified.
 8. The server links the engine, and every agent commit passed closure, lints, override audit and the findings baseline. Unknown references are counted and never reported as a pass. Every import has a preservation report and a recorded baseline.
 9. Every supported focus gesture and the agent's matching edit go through the same operation, with parity across the gesture, native agent and coding-client paths. An agent's applied edit appears in an open editor without reload, and a person's edit is visible to the agent's next inspect.
-10. T-BENCH-01 shows no regression from the S03 baseline, and the focus editor round trip is measured against Hagane Studio on the same tree.
+10. T-BENCH-01 shows no regression from the baseline of gate 12, and the focus editor round trip is measured against Hagane Studio on the same tree.
+11. The native loop and the coding-client profile name the same hoi4-agent-tools release, engine revision and read tools. A missing or broken engine yields an explicit unavailable result, never a silent fallback. T-ENG-01 removes the engine binary from a test image and confirms the affected tool answers unavailable.
+12. A Q-1 baseline from T-BENCH-01 is stored with fixture hashes, comparator pins and hardware, recorded before the focus work is measured, and each surface that could not run, such as vanilla without a licensed copy, is named with its reason.
 
 All gates are evaluated against the final stage revision. Changed inputs invalidate affected evidence. A known defect in the selected critical path requires a fix or an explicit narrower scope decision. Optional unavailable checks remain named limitations.
 

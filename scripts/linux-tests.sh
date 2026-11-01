@@ -41,7 +41,7 @@ mkdir -p "$HERE/crates/server/tests/fixtures/recorded"
 REC_ARGS="-v $HERE/crates/server/tests/fixtures/recorded:/src/crates/server/tests/fixtures/recorded"
 if [ -n "${FACTORY_RECORD_REPLIES:-}" ]; then REC_ARGS="$REC_ARGS -e FACTORY_RECORD_REPLIES"; fi
 # shellcheck disable=SC2086
-MSYS_NO_PATHCONV=1 exec docker run --rm --network "$NET" $KEY_ARGS $REC_ARGS \
+MSYS_NO_PATHCONV=1 exec docker run --rm --init --network "$NET" $KEY_ARGS $REC_ARGS \
   -v "$HERE:/src:ro" -v hf-finish-target:/target -v hf-finish-cargo:/cargo \
   -v hf-finish-setupcache:/setupcache \
   -e CARGO_HOME=/cargo -e CARGO_TARGET_DIR=/target -e CARGO_INCREMENTAL=0 \

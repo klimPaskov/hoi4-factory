@@ -7,7 +7,7 @@
 
 use std::str::FromStr;
 
-use factory_accounts::{ApiError, Permission, Principal, Project, ProjectId};
+use factory_accounts::{ApiError, Permission, Principal, Project, ProjectId, RateLimitConfig, RateLimiter, Rule};
 
 use crate::state::ServerState;
 
@@ -16,6 +16,40 @@ use crate::state::ServerState;
 /// roles that may change the project's settings, may bring in a mod. Change this one constant
 /// when the matrix gains it.
 pub const IMPORT_PERMISSION: Permission = Permission::RenameProject;
+
+/// Per-account request limits of the routes that cost disk, network or model work (PR-098).
+/// Generous for a person working through the flow, tight enough to stop a script.
+pub const LIMIT_UPLOAD: &str = "route_upload";
+pub const LIMIT_GITHUB_IMPORT: &str = "route_github_import";
+pub const LIMIT_SETUP_SCAN: &str = "route_setup_scan";
+pub const LIMIT_SETUP_ANALYZE: &str = "route_setup_analyze";
+pub const LIMIT_SETUP_PLAN: &str = "route_setup_plan";
+pub const LIMIT_SETUP_APPLY: &str = "route_setup_apply";
+
+pub fn route_limits() -> RateLimitConfig {
+    let rule = |capacity, secs| Rule { capacity, refill_every: std::time::Duration::from_secs(secs) };
+    RateLimitConfig {
+        rules: [
+            (LIMIT_UPLOAD, rule(20, 180)),
+            (LIMIT_GITHUB_IMPORT, rule(10, 300)),
+            (LIMIT_SETUP_SCAN, rule(20, 120)),
+            (LIMIT_SETUP_ANALYZE, rule(10, 300)),
+            (LIMIT_SETUP_PLAN, rule(20, 120)),
+            (LIMIT_SETUP_APPLY, rule(10, 120)),
+        ]
+        .into_iter()
+        .map(|(k, v)| (k.to_owned(), v))
+        .collect(),
+    }
+}
+
+/// Counts one request of `rule` for the signed-in account, or refuses it with `429 rate_limited`.
+pub fn limit(state: &ServerState, rule: &str, principal: &Principal) -> Result<(), ApiError> {
+    state
+        .route_limits
+        .check(rule, &principal.account_id().to_string())
+        .map_err(ApiError::rate_limited)
+}
 
 /// What reading the workspace requires.
 pub const READ_PERMISSION: Permission = Permission::ReadProject;

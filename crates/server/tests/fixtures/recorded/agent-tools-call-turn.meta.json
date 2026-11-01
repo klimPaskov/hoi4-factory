@@ -1,0 +1,49 @@
+{
+  "anthropic_version": "2026-10-21",
+  "captured_utc": "2026-10-25T14:07:21Z",
+  "endpoint": "https://api.anthropic.com/v1/messages",
+  "evidence_kind": "live",
+  "model_reported": "claude-haiku-5-5",
+  "model_requested": "claude-haiku-5-5",
+  "name": "agent-tools-call-turn",
+  "outcome": {
+    "finish_reason": "tool_use",
+    "response_id": "msg_011CgP5tu1BLN3Q8p6qR3n5U",
+    "tool_calls": [
+      {
+        "arguments": {
+          "mode": "overview"
+        },
+        "id": "toolu_01Q2orWE8X7eYnGp1G9utHVA",
+        "index": 0,
+        "name": "agent_tools_mod_index",
+        "raw_arguments": "{\"mode\": \"overview\"}"
+      }
+    ],
+    "usage": {
+      "cached_input_tokens": 0,
+      "input_tokens": 4779,
+      "output_tokens": 56,
+      "reasoning_tokens": 0
+    }
+  },
+  "redaction": "x-api-key is never recorded; only the response body bytes are kept.",
+  "request_summary": {
+    "messages": 1,
+    "system": "factory_server::agent::runner::SYSTEM_PROMPT",
+    "tools": [
+      "list_files",
+      "read_file",
+      "finish",
+      "agent_tools_source_lookup",
+      "agent_tools_mod_index",
+      "agent_tools_script_validate",
+      "agent_tools_reference_search",
+      "agent_tools_reference_read",
+      "agent_tools_reference_context",
+      "agent_tools_focus_inspect",
+      "agent_tools_event_inspect",
+      "agent_tools_decision_inspect"
+    ]
+  }
+}

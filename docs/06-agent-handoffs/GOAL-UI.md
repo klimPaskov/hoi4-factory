@@ -1,6 +1,6 @@
 # Goal: redesign the HOI4 Factory browser client
 
-For the maintainer: run this session after S03 is finished and pushed. Open Claude Code at the root of an up-to-date clone of https://github.com/klimPaskov/hoi4-factory and give it everything below this line as its goal. This track is authorized by ADR-025 and needs no `/start-implementation-stage`. It is interactive, so stay available to choose between previews.
+For the maintainer: run this session after S03 is finished and pushed (S03 finished on 2026-10-25, see `evidence/S03/handoff.md`). Open Claude Code at the root of an up-to-date clone of https://github.com/klimPaskov/hoi4-factory and give it everything below this line as its goal. This track is authorized by ADR-025 and needs no `/start-implementation-stage`. It is interactive, so stay available to choose between previews.
 
 ---
 
@@ -9,8 +9,19 @@ You are redesigning the browser client of HOI4 Factory, a free, open-source host
 ## Before any design work
 
 1. Read CLAUDE.md fully, then `docs/02-architecture/maintainer-decisions-2026-10-24.md` (ADR-021 on translatable strings and ADR-025 on this track), the latest stage handoff under `evidence/`, and `docs/07-developer-workflow/DEVELOPER-SETUP.md`.
-2. Make sure the stack runs (`docker compose up -d --build --wait`) and the client checks pass (`web/scripts/docker-npm.sh run check`). Start the client dev server with `web/scripts/docker-npm.sh run dev`, which serves http://127.0.0.1:5173 and proxies `/api` to the server.
-3. Inventory every screen and state in `web/src`: sign up, sign in, email verification, password reset, project list, project creation, upload and GitHub import, the Setup wizard steps and recovery, account settings, and the task and API key screens S03 added. Include empty, loading, error and unavailable states. Take a screenshot of each current screen with the built-in browser, so the maintainer can compare before and after.
+2. Make sure the stack runs (`scripts/compose.sh up -d --build --wait`) and the client checks pass (`web/scripts/docker-npm.sh run check`). Start the client dev server with `web/scripts/docker-npm.sh run dev`, which serves http://127.0.0.1:5173 and proxies `/api` to the server.
+3. Inventory every screen and state in `web/src`. Include empty, loading, error and unavailable states. Take a screenshot of each current screen with the built-in browser, so the maintainer can compare before and after. The screens are:
+   - Sign up, sign in, email verification and password reset.
+   - The project list, project creation, and the project page.
+   - Upload and GitHub import.
+   - The Setup wizard steps and recovery.
+   - Account settings.
+   - The S03 screens, built with the existing components and no design effort:
+     - The project page's "Tasks" card.
+     - The task list with its create form (`web/src/pages/Tasks.tsx`): objective, read-only or edit mode, allowed paths, budget, model and who pays.
+     - The task page (`web/src/pages/Task.tsx`): attempts with their states, grant, outcome and pending effects, the Start, Pause, Resume, Interrupt and Revoke actions, and the live event log (`web/src/components/TaskEvents.tsx`), which streams and falls back to polling.
+     - On the account page, the model API keys section (`web/src/components/ApiKeys.tsx`: list, add with a password field, delete with a confirmation, and the "keys cannot be saved on this server" state) and the monthly allowance and usage summary (`web/src/components/UsageSummary.tsx`).
+   - Task states the design must handle: running, paused with the attempt suspended, interrupt requested (not yet stopped), cancelled, failed with an error code, unknown effect with pending effects, and in review with changed files. Seed realistic examples through the API or fixtures.
 
 ## How the work goes
 

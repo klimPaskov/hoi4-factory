@@ -1,0 +1,8 @@
+# cargo-audit configuration (PR-032). Every ignore names why it does not apply.
+[advisories]
+ignore = [
+    # rsa 0.9 Marvin timing side channel. rsa is only a dev-dependency (factory-intake and
+    # factory-server tests generate a throwaway GitHub App key for the fake GitHub); it is not in
+    # any shipped binary. No fixed release exists. Recheck when rsa 0.10 is released.
+    "RUSTSEC-2023-0071",
+]

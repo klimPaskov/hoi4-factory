@@ -12,16 +12,34 @@ publish.workspace = true
 # the host (S01: probes/runtime).
 
 [features]
-default = ["openai", "anthropic", "protocol"]
+default = ["openai", "anthropic", "protocol", "worker"]
 openai = ["http"]
 anthropic = ["http"]
-http = ["dep:reqwest"]
+http = ["dep:reqwest", "tokio/net", "tokio/rt", "tokio/macros"]
 protocol = ["tokio/io-util"]
+# Worker binary, worker loop and host-side supervisor.
+worker = ["protocol", "anthropic", "openai", "tokio/process", "tokio/io-std", "dep:libc"]
+# Replay HTTP server for tests. Tests enable it through the self dev-dependency below.
+testing = ["http", "tokio/io-util"]
 
 [dependencies]
 bytes = "1"
+ipnet = { version = "2", features = ["serde"] }
 serde.workspace = true
 serde_json.workspace = true
 thiserror = "2"
 tokio = { workspace = true, features = ["sync", "time"] }
+url = "2"
 reqwest = { version = "0.13.5", default-features = false, features = ["rustls"], optional = true }
+
+[target.'cfg(unix)'.dependencies]
+libc = { version = "0.2", optional = true }
+
+[[bin]]
+name = "factory-agent-worker"
+path = "src/bin/factory-agent-worker.rs"
+required-features = ["worker"]
+
+[dev-dependencies]
+factory-agent = { path = ".", features = ["testing", "worker"] }
+tempfile.workspace = true

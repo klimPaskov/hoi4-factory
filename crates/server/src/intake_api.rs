@@ -320,6 +320,7 @@ async fn upload(
     multipart: Multipart,
 ) -> Result<Response, Fail> {
     let project = active_project_for(&state, &principal, &id, IMPORT_PERMISSION).await?;
+    crate::access::limit(&state, crate::access::LIMIT_UPLOAD, &principal)?;
     let received = receive(&state.intake, multipart).await?;
 
     let options = UploadOptions {
@@ -575,6 +576,7 @@ async fn import(
     ApiJson(body): ApiJson<ImportBody>,
 ) -> Result<Response, Fail> {
     let project = active_project_for(&state, &principal, &id, IMPORT_PERMISSION).await?;
+    crate::access::limit(&state, crate::access::LIMIT_GITHUB_IMPORT, &principal)?;
     let repository = body.repository.trim().to_owned();
     if parse_full_name(&repository).is_none() {
         return Err(invalid("repository must be owner/name."));

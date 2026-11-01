@@ -1151,25 +1151,6 @@
       "status": "Planned, not executed"
     },
     {
-      "id": "S03-G7",
-      "stage": "S03",
-      "ordinal": 7,
-      "tests": [
-        "T-ENG-01",
-        "T-SEC-02"
-      ],
-      "status": "Planned, not executed"
-    },
-    {
-      "id": "S03-G8",
-      "stage": "S03",
-      "ordinal": 8,
-      "tests": [
-        "T-BENCH-01"
-      ],
-      "status": "Planned, not executed"
-    },
-    {
       "id": "S04-G1",
       "stage": "S04",
       "ordinal": 1,
@@ -1269,6 +1250,25 @@
       "tests": [
         "T-BENCH-01",
         "T-PERF-01"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S04-G11",
+      "stage": "S04",
+      "ordinal": 11,
+      "tests": [
+        "T-ENG-01",
+        "T-SEC-02"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S04-G12",
+      "stage": "S04",
+      "ordinal": 12,
+      "tests": [
+        "T-BENCH-01"
       ],
       "status": "Planned, not executed"
     },

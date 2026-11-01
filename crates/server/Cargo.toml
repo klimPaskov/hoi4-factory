@@ -21,11 +21,16 @@ factory-workspace = { path = "../workspace" }
 factory-game-ref = { path = "../game-ref" }
 factory-intake = { path = "../intake" }
 factory-setup-adapter = { path = "../setup-adapter" }
-factory-agent = { path = "../agent", default-features = false, features = ["anthropic"] }
+factory-agent = { path = "../agent", default-features = false, features = ["anthropic", "openai", "protocol", "worker"] }
+factory-tasks = { path = "../tasks" }
+factory-broker = { path = "../broker" }
+factory-hoi4-tools = { path = "../hoi4-tools" }
+futures-util = { version = "0.3", default-features = false, features = ["std"] }
 axum = { workspace = true, features = ["multipart"] }
 async-trait.workspace = true
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
-tokio = { workspace = true, features = ["net", "time", "sync", "fs", "io-util"] }
+tokio = { workspace = true, features = ["net", "time", "sync", "fs", "io-util", "process", "io-std", "rt"] }
+sha2.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 sqlx.workspace = true
@@ -40,6 +45,7 @@ tracing-subscriber = { version = "0.3", default-features = false, features = ["s
 url = "2"
 
 [dev-dependencies]
+factory-agent = { path = "../agent", features = ["testing", "worker"] }
 # The gate tests drive Setup's transaction engine and plan builder directly (fault injection, a
 # child process that applies), next to the HTTP flow.
 hoi4-mod-setup.workspace = true
@@ -52,4 +58,3 @@ flate2 = "1"
 jsonwebtoken = "9"
 rand = "0.8"
 rsa = { version = "0.9", features = ["pem"] }
-sha2.workspace = true

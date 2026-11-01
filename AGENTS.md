@@ -68,6 +68,7 @@ Delegate independent, bounded packets to subagents with explicit owned paths, in
 - Subagents in this environment cannot create new Markdown files. Ask them to return report text and save it yourself.
 - Tell every agent to put temporary output, including test fixtures and short paths used to dodge Windows path limits (keep fixture paths short on macOS too, so the same tests run on Windows), only in its worktree, `.work/` or the session scratchpad, and never to delete anything outside those places. One agent once wrote golden-test output to a folder in the user's home directory and later deleted it without remembering that it had created it.
 - Merge each branch into main as soon as it is reviewed, resolve `Cargo.toml` and `Cargo.lock` conflicts by unioning members and regenerating the lockfile, then remove the worktree and its branch immediately. Never remove a worktree that holds uncommitted work.
+- Before parallel crate packets, commit empty crate skeletons and their workspace members on main, so no two branches edit the root `Cargo.toml`. Give each brief the public API you will integrate against (types and function signatures) and keep the composition that spans crates (for example a grant check, a fence check and an intent insert in one transaction) for the parent. In S03 four Sonnet packets built this way merged without conflicts and needed only small adapter changes.
 
 ## External services
 
@@ -77,13 +78,29 @@ Delegate independent, bounded packets to subagents with explicit owned paths, in
 - **Pushing to this repository.** Commit locally freely. Push to `origin main` when the maintainer approves a stage result or asks for it.
 - **Before any approved push to another repository**, run that repository's own CI steps locally (for the Agentic kit, every step of its Validate workflow, including `.tools/check.py full --only script-rules gfx guidance generators quality`), not a hand-picked subset. A wiki push once broke the kit's `main` on the quality ratchet, which only the full list runs.
 
+## Agent runtime rules (learned in S03)
+
+- Anthropic refuses some JSON Schema features in tool definitions: top-level `anyOf`, `oneOf` and `allOf` for every tool, and in strict mode also length, size, pattern and numeric bounds and any nested combinator or `not`. All are refused with HTTP 400 at no cost. The adapter sends a conditioned schema (`anthropic::provider_schema`) and drops `strict` for tools that need combinators. The host always validates the full closed schema on the final arguments, so keep bounds in the host schema.
+- A lease must outlive any single step. A model turn can take longer than the lease TTL, so the runner renews the lease from a background heartbeat. Tie such background tasks to their owner with an abort-on-drop guard, or an aborted owner (a simulated process death) leaves the heartbeat renewing a dead host's lease.
+- `tokio::select!` polls branches in random order. When one branch sends a request and another reacts to a cancel, make the select biased (the `biased` keyword) with the request first. Otherwise a cancel that is already pending wins before anything is sent, and the supervisor kills an idle worker.
+- A route that answers from several tables reads them in one `REPEATABLE READ` snapshot (`AgentRuntime::snapshot`). Under the default READ COMMITTED each statement sees its own snapshot, and a reader can catch a task and its attempt from different commits. Commit an attempt's end and its task's next state in one transaction.
+- Pause defers a turn's tool calls instead of refusing them. The calls stay pending in the saved conversation and run after resume, so a resumed attempt neither repeats the model turn nor loses its effect.
+- Ledger hash fields hold real SHA-256 values. Record a missing file as `None` in the receipt and as `"absent"` in the artifact.
+- Test faults for the worker go through `WorkerLauncher::env`, never the test process's environment, because tests in one binary run in parallel. The faults exist only in debug builds.
+- A container whose PID 1 is our own binary never reaps orphans, so a killed process group leaves zombies that still answer `kill(pid, 0)`. The server service runs with `init: true`, `scripts/linux-tests.sh` runs with `--init`, and tests treat a zombie as gone.
+- HOI4 Agent Tools needs Node 22 or 24, while Setup accepts only Debian's `/usr/bin/node` (18). The server image carries both, with Agent Tools under `/opt`. Agent Tools refuses a state directory reached through a symlink, such as a macOS temporary directory, so pass it through `prepare_state_dir`.
+
 ## Verification and handoff
 
 Use `validate-stage` to connect each requirement to observed output and real evidence. Test normal, failure and recovery paths. Record commands, versions, exit codes, input revisions, artifact hashes and limitations. Source parsing, rendering, game execution and maintainer approval are different evidence kinds. Re-run key checks on the final tree, and check that recorded input hashes still match instead of re-running expensive probes.
 
 Run workspace tests with `cargo test --no-fail-fast`, because the default stops at the first failing test binary and hides every later crate. A nearly full disk makes tests fail with misleading errors, so check free space before trusting a red run. Setup's readiness differs between host platforms, so the S02 apply gates are verified with `scripts/linux-tests.sh`. [Developer setup](docs/07-developer-workflow/DEVELOPER-SETUP.md) covers a fresh machine.
 
-Review the diff for intent, unintended changes, secrets and generated-file drift. Run `scripts/py.sh scripts/validate_package.py --root . --working-tree` and `scripts/py.sh scripts/sync_skills.py --check`. Finish with a handoff from [the template](docs/06-agent-handoffs/STAGE-HANDOFF-TEMPLATE.md) and propose the next stage only as a proposal.
+Review the diff for intent, unintended changes, secrets and generated-file drift. The validator rejects semicolons and em dashes anywhere in Markdown outside code fences, inline code included, so write short sentences instead. Run `scripts/py.sh scripts/validate_package.py --root . --working-tree` and `scripts/py.sh scripts/sync_skills.py --check`. Finish with a handoff from [the template](docs/06-agent-handoffs/STAGE-HANDOFF-TEMPLATE.md) and propose the next stage only as a proposal.
+
+## Issues
+
+GitHub issues on `klimPaskov/hoi4-factory` are the ticket system. Fix every problem you can in the session. File an issue only for one that truly cannot be fixed now, because it needs the maintainer, an outside resource, another machine or a later stage. Follow the `track-issues` skill: search first, give evidence, the reason and an acceptance check, list the issue in the handoff, and close it later with `Fixes #N` and the test results. Issues are public, so never put secrets, private paths or user data in them.
 
 ## Keeping this guidance current
 
@@ -104,6 +121,7 @@ One limit stays: a guidance or skill edit must never widen authority, access roo
 | `production-readiness-review` | Agent, at handoffs | Suggest proportionate, low-friction hardening |
 | `delegate-parallel-work` | Agent, when splitting work | Worktrees, subagent briefs, merging and cleanup |
 | `ui-design-iteration` | Agent, for any client page design | Working variants in the design lab, the maintainer chooses, then implement |
+| `track-issues` | Agent, when a problem cannot be fixed in the session, and at handoffs | GitHub issues with evidence and acceptance, fixed later with a regression test |
 
 ## Client notes
 

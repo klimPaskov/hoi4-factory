@@ -1,0 +1,27 @@
+[package]
+name = "factory-hoi4-tools"
+description = "HOI4 Factory tool adapters: configured profiles over MCP stdio (HOI4 Agent Tools)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "fake-mcp-server"
+path = "src/bin/fake-mcp-server.rs"
+
+[dependencies]
+chrono.workspace = true
+jsonschema = { version = "=0.60.1", default-features = false }
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
+tokio = { workspace = true, features = ["process", "io-util", "time", "sync", "rt", "macros"] }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+[dev-dependencies]
+tempfile.workspace = true

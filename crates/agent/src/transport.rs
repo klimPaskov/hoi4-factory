@@ -8,7 +8,7 @@ use bytes::Bytes;
 use std::io::Write;
 use std::time::Instant;
 
-#[derive(Debug, Clone, PartialEq, Eq, thiserror::Error, serde::Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, thiserror::Error, serde::Serialize, serde::Deserialize)]
 pub enum TransportError {
     /// The connection failed before the request could have been accepted.
     #[error("connect failed before request was sent: {0}")]
@@ -21,7 +21,14 @@ pub enum TransportError {
     BodyBroken(String),
     #[error("recording sink failed: {0}")]
     Recording(String),
+    /// The response body passed the configured size cap. The connection is
+    /// closed; the provider may already have charged for the request.
+    #[error("response body exceeded the {0} byte cap")]
+    ResponseTooLarge(u64),
 }
+
+/// Default cap on a provider response body (RT-11).
+pub const DEFAULT_MAX_RESPONSE_BYTES: u64 = 8 * 1024 * 1024;
 
 /// Records chunk boundaries and timing so replay can reproduce them.
 #[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
@@ -143,6 +150,9 @@ pub enum ByteSource {
     Live {
         resp: reqwest::Response,
         tee: Option<Tee>,
+        /// Body bytes read so far and the cap they may not pass.
+        seen: u64,
+        limit: u64,
     },
     Replay(Replay),
 }
@@ -151,8 +161,17 @@ impl ByteSource {
     pub async fn next_chunk(&mut self) -> Option<Result<Bytes, TransportError>> {
         match self {
             #[cfg(feature = "http")]
-            ByteSource::Live { resp, tee } => match resp.chunk().await {
+            ByteSource::Live {
+                resp,
+                tee,
+                seen,
+                limit,
+            } => match resp.chunk().await {
                 Ok(Some(b)) => {
+                    *seen += b.len() as u64;
+                    if *seen > *limit {
+                        return Some(Err(TransportError::ResponseTooLarge(*limit)));
+                    }
                     if let Some(t) = tee.as_mut()
                         && let Err(e) = t.record(&b)
                     {
@@ -167,6 +186,17 @@ impl ByteSource {
         }
     }
 
+    /// A live source for an accepted response. `limit` caps the body size.
+    #[cfg(feature = "http")]
+    pub fn live(resp: reqwest::Response, tee: Option<Tee>, limit: u64) -> Self {
+        ByteSource::Live {
+            resp,
+            tee,
+            seen: 0,
+            limit,
+        }
+    }
+
     /// Take the chunk log out of a live teed source.
     pub fn take_chunk_log(&mut self) -> Option<ChunkLog> {
         match self {
@@ -175,4 +205,69 @@ impl ByteSource {
             _ => None,
         }
     }
+}
+
+/// Read a whole (non-streaming) response body, refusing past `limit` bytes.
+#[cfg(feature = "http")]
+pub(crate) async fn read_capped(
+    mut resp: reqwest::Response,
+    limit: u64,
+) -> Result<Vec<u8>, TransportError> {
+    let mut out = Vec::new();
+    loop {
+        match resp.chunk().await {
+            Ok(Some(b)) => {
+                if (out.len() + b.len()) as u64 > limit {
+                    return Err(TransportError::ResponseTooLarge(limit));
+                }
+                out.extend_from_slice(&b);
+            }
+            Ok(None) => return Ok(out),
+            Err(e) => {
+                return Err(TransportError::BodyBroken(crate::types::redact(
+                    &e.to_string(),
+                )));
+            }
+        }
+    }
+}
+
+/// Map a failed `send()` to a turn error. A destination-policy refusal raised
+/// by the connect-time resolver is found in the error's source chain.
+#[cfg(feature = "http")]
+pub(crate) fn map_send_error(e: reqwest::Error) -> crate::types::TurnError {
+    use crate::types::{Acceptance, Partial, TurnError};
+    let mut cur: Option<&(dyn std::error::Error + 'static)> = Some(&e);
+    while let Some(err) = cur {
+        if let Some(r) = err.downcast_ref::<crate::destination::DestinationRefusal>() {
+            return TurnError::Destination(r.clone());
+        }
+        cur = err.source();
+    }
+    let text = crate::types::redact(&e.to_string());
+    let (error, acceptance) = if e.is_connect() {
+        (TransportError::ConnectFailed(text), Acceptance::NotAccepted)
+    } else {
+        (TransportError::AfterSend(text), Acceptance::Uncertain)
+    };
+    TurnError::Transport {
+        error,
+        acceptance,
+        partial: Partial::default(),
+    }
+}
+
+/// A 3xx answer is never followed: a redirect could move the request to an
+/// address the policy has not checked.
+#[cfg(feature = "http")]
+pub(crate) fn redirect_check(status: u16) -> Result<(), crate::types::TurnError> {
+    if (300..400).contains(&status) {
+        return Err(crate::types::TurnError::Destination(
+            crate::destination::DestinationRefusal::new(
+                "redirect_refused",
+                format!("provider answered HTTP {status}; redirects are not followed"),
+            ),
+        ));
+    }
+    Ok(())
 }

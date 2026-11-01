@@ -73,6 +73,11 @@ function ProjectBody({ project, onChanged }: { project: Project; onChanged: (pro
       ) : (
         <>
           <WorkspacePanel key={workspaceVersion} projectId={project.id} />
+          <section className="card" aria-labelledby="project-tasks-title">
+            <h2 id="project-tasks-title">{t('project.tasksTitle')}</h2>
+            <p>{t('project.tasksBody')}</p>
+            <Link to={`/projects/${encodeURIComponent(project.id)}/tasks`}>{t('project.tasksLink')}</Link>
+          </section>
           {canWork ? (
             <>
               <BringInMod

@@ -1,7 +1,8 @@
 //! The one place that lists every crate's migrations.
 //!
 //! All crates share the `migrations/` directory and the `_sqlx_migrations` table, each owning a
-//! version range (0100 accounts, 0200 workspace, 0300 intake, 0400 setup, 0500 game-ref). A
+//! version range (0100 accounts, 0200 workspace, 0300 intake, 0400 setup, 0500 game-ref, 0600 tasks, 0700
+//! broker). A
 //! crate that adds tables exposes a `migrator()` limited to its range, with `ignore_missing`
 //! set (see `factory_accounts::migrator`), and is added to [`components`] in range order.
 
@@ -54,6 +55,16 @@ pub fn components() -> Vec<Component> {
             name: "setup-adapter",
             migrator: factory_setup_adapter::migrator(),
             probe_table: "setup_sessions",
+        },
+        Component {
+            name: "tasks",
+            migrator: factory_tasks::migrator(),
+            probe_table: "agent_tasks",
+        },
+        Component {
+            name: "broker",
+            migrator: factory_broker::migrator(),
+            probe_table: "agent_grants",
         },
     ]
 }

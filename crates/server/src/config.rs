@@ -24,6 +24,12 @@
 //! | `FACTORY_SETUP_CACHE` | Cache of verified Setup workflow package files. Must be outside every workspace; created when missing | `<FACTORY_DATA_ROOT>/setup-cache` |
 //! | `FACTORY_NODE_EXECUTABLE` | The Node runtime Setup registers in generated coding-client configuration. Verified by Setup (on Linux it must be the Debian `nodejs` package). Without it, plans that need Node are refused | none |
 //! | `FACTORY_NODE_PREFIX` | npm prefix named in that configuration. Not created or read | `<FACTORY_DATA_ROOT>/node-prefix` |
+//! | `FACTORY_SECRET_KEY_FILE` | File holding the base64 32-byte key that encrypts users' saved model API keys. Without it saving keys is unavailable and only the operator allowance works | none |
+//! | `FACTORY_OUTBOUND_ALLOW_CIDRS` | Comma-separated address ranges custom model endpoints may use although they are private (self-hosting operators only). Empty: private, loopback, link-local and metadata addresses are refused | empty |
+//! | `FACTORY_ALLOWANCE_MICROS` | Operator-funded model usage per verified account per calendar month, in micro-dollars | `1000000` ($1) |
+//! | `FACTORY_OPENAI_API_KEY`, `FACTORY_OPENAI_BASE_URL` | Operator key for OpenAI models on the allowance, and the API base. Without the key OpenAI is available with a user's own key only. Never logged | none, `https://api.openai.com/v1` |
+//! | `FACTORY_AGENT_TOOLS_NODE`, `FACTORY_AGENT_TOOLS_ENTRY` | Node 22 runtime and `dist/bin/stdio.js` of HOI4 Agent Tools. Without them the Agent Tools profile reports unavailable | none (set in the image) |
+//! | `FACTORY_AGENT_MAX_RUNNING` | Attempts running at once on this server | `4` |
 //! | `RUST_LOG` | Log filter | `info,sqlx=warn` |
 //!
 //! Pool limits (`FACTORY_DB_*`) are read by [`factory_accounts::PoolSettings`].
@@ -51,6 +57,21 @@ pub struct ServerConfig {
     /// `None` when `FACTORY_ANTHROPIC_API_KEY` is absent: analysis is then unavailable.
     pub anthropic: Option<AnthropicSettings>,
     pub setup: SetupSettings,
+    pub agent: AgentSettings,
+}
+
+/// The native agent (S03): key encryption, outbound policy, allowance and tool installs.
+#[derive(Debug, Clone)]
+pub struct AgentSettings {
+    pub secret_key_file: Option<PathBuf>,
+    /// Raw ranges; parsed by the destination policy at startup.
+    pub outbound_allow_cidrs: Vec<String>,
+    pub allowance_micros: u64,
+    pub openai_api_key: Option<Redacted<String>>,
+    pub openai_base_url: Option<String>,
+    pub agent_tools_node: Option<PathBuf>,
+    pub agent_tools_entry: Option<PathBuf>,
+    pub max_running: usize,
 }
 
 /// Where Setup keeps its package cache and which Node runtime it may register.
@@ -141,7 +162,34 @@ impl ServerConfig {
                 .map(PathBuf::from)
                 .unwrap_or_else(|| data_root.join("node-prefix")),
         };
+        let agent = AgentSettings {
+            secret_key_file: non_empty("FACTORY_SECRET_KEY_FILE").map(PathBuf::from),
+            outbound_allow_cidrs: non_empty("FACTORY_OUTBOUND_ALLOW_CIDRS")
+                .map(|v| {
+                    v.split(',')
+                        .map(|s| s.trim().to_owned())
+                        .filter(|s| !s.is_empty())
+                        .collect()
+                })
+                .unwrap_or_default(),
+            allowance_micros: match non_empty("FACTORY_ALLOWANCE_MICROS") {
+                None => 1_000_000,
+                Some(raw) => raw.trim().parse::<u64>().map_err(|_| {
+                    ConfigError::Invalid("FACTORY_ALLOWANCE_MICROS", "expected a number".into())
+                })?,
+            },
+            openai_api_key: non_empty("FACTORY_OPENAI_API_KEY").map(|k| Redacted(k.trim().to_owned())),
+            openai_base_url: non_empty("FACTORY_OPENAI_BASE_URL").map(|v| v.trim().trim_end_matches('/').to_owned()),
+            agent_tools_node: non_empty("FACTORY_AGENT_TOOLS_NODE").map(PathBuf::from),
+            agent_tools_entry: non_empty("FACTORY_AGENT_TOOLS_ENTRY").map(PathBuf::from),
+            max_running: match non_empty("FACTORY_AGENT_MAX_RUNNING") {
+                None => 4,
+                Some(raw) => usize::try_from(positive("FACTORY_AGENT_MAX_RUNNING", &raw)?)
+                    .map_err(|_| ConfigError::Invalid("FACTORY_AGENT_MAX_RUNNING", "too large".into()))?,
+            },
+        };
         Ok(Self {
+            agent,
             listen: non_empty("FACTORY_LISTEN").unwrap_or_else(|| "0.0.0.0:8080".to_owned()),
             database_url: Redacted(database_url),
             migration_database_url: non_empty("DATABASE_MIGRATION_URL").map(Redacted),

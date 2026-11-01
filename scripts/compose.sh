@@ -59,4 +59,11 @@ else
   echo "scripts/compose.sh: no Hearts of Iron IV install found in HOI4_GAME_DIR or the Steam" \
     "libraries. Set HOI4_GAME_DIR to the game folder (the one with launcher-settings.json)." >&2
 fi
+# The key that encrypts users' saved model API keys (S03). Compose mounts it read-only. A
+# development stack gets its own random key on first use; nothing else reads this file.
+if [ -z "${FACTORY_SECRET_KEY_SOURCE:-}" ] && [ ! -s .work/secrets/factory-secret.key ]; then
+  mkdir -p .work/secrets
+  (umask 077 && head -c 32 /dev/urandom | base64 | tr -d '\n' >.work/secrets/factory-secret.key)
+  echo "scripts/compose.sh: created .work/secrets/factory-secret.key (development key encryption)" >&2
+fi
 exec docker compose "$@"

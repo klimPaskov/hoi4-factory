@@ -1470,7 +1470,7 @@ async fn the_setup_migrations_run_in_order_after_intake() {
         .iter()
         .map(|c| c.name)
         .collect();
-    assert_eq!(names, ["accounts", "intake", "setup-adapter"]);
+    assert_eq!(names, ["accounts", "intake", "setup-adapter", "tasks", "broker"]);
     let latest: Vec<i64> = h
         .state
         .migrations
@@ -1631,4 +1631,29 @@ async fn setup_call(
     } else {
         client.get(&path).await
     }
+}
+
+#[tokio::test]
+async fn uploads_are_rate_limited_per_account() {
+    let h = Harness::start(Options::default()).await;
+    let alice = h.verified_user("alice@example.org").await;
+    let project = h.project(&alice, "Synthetic").await;
+    let zip = build_zip(&mod_entries());
+    let parts = [
+        Part::text("kind", "zip"),
+        Part::text("git_init_consent", "true"),
+        Part::file("synthetic.zip", zip),
+    ];
+    // The first upload creates the workspace; later ones are conflicts, but every request counts.
+    for n in 0..20 {
+        let r = alice.client.upload(&project, &parts).await;
+        assert_ne!(r.status, 429, "request {n} was limited too early: {}", r.text);
+    }
+    let limited = alice.client.upload(&project, &parts).await;
+    assert_eq!(limited.status, 429, "{}", limited.text);
+    assert_eq!(limited.error_code(), "rate_limited");
+    // Another account keeps its own allowance.
+    let bob = h.verified_user("bob@example.org").await;
+    let bob_project = h.project(&bob, "Bob").await;
+    assert_eq!(bob.client.upload(&bob_project, &parts).await.status, 201);
 }

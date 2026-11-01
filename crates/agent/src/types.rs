@@ -1,11 +1,11 @@
 //! Provider-neutral turn results and failure classes.
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::transport::TransportError;
 
-#[derive(Debug, Clone, Serialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct ToolCall {
     pub index: usize,
     pub id: String,
@@ -16,7 +16,7 @@ pub struct ToolCall {
     pub arguments: Value,
 }
 
-#[derive(Debug, Clone, Default, Serialize, serde::Deserialize, PartialEq)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct Usage {
     pub input_tokens: u64,
     pub cached_input_tokens: u64,
@@ -25,7 +25,7 @@ pub struct Usage {
 }
 
 /// Partial state captured when a turn fails. Nothing in it is executable.
-#[derive(Debug, Clone, Default, Serialize, PartialEq)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct Partial {
     pub text: String,
     pub tool_calls: Vec<PartialToolCall>,
@@ -37,7 +37,7 @@ pub struct Partial {
     pub usage: Option<Usage>,
 }
 
-#[derive(Debug, Clone, Default, Serialize, PartialEq)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct PartialToolCall {
     pub index: usize,
     pub id: Option<String>,
@@ -58,8 +58,50 @@ pub struct Turn {
     pub events: usize,
 }
 
+/// Deserialization shape of [`Turn`]: the provider name is owned on the wire
+/// and mapped back to the known static constant.
+#[derive(Deserialize)]
+struct TurnWire {
+    provider: String,
+    model: Option<String>,
+    response_id: Option<String>,
+    text: String,
+    tool_calls: Vec<ToolCall>,
+    finish_reason: String,
+    usage: Option<Usage>,
+    bytes: usize,
+    events: usize,
+}
+
+impl<'de> Deserialize<'de> for Turn {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        TurnWire::deserialize(d).map(Turn::from)
+    }
+}
+
+impl From<TurnWire> for Turn {
+    fn from(w: TurnWire) -> Self {
+        let provider = match w.provider.as_str() {
+            "anthropic-messages" => "anthropic-messages",
+            "openai-chat-completions" => "openai-chat-completions",
+            _ => "unknown-provider",
+        };
+        Turn {
+            provider,
+            model: w.model,
+            response_id: w.response_id,
+            text: w.text,
+            tool_calls: w.tool_calls,
+            finish_reason: w.finish_reason,
+            usage: w.usage,
+            bytes: w.bytes,
+            events: w.events,
+        }
+    }
+}
+
 /// Why a turn did not produce an executable result.
-#[derive(Debug, Clone, Serialize, PartialEq, thiserror::Error)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, thiserror::Error)]
 #[serde(tag = "class")]
 pub enum TurnError {
     /// Stream ended without its completion marker or finish reason.
@@ -92,6 +134,10 @@ pub enum TurnError {
     Cancelled { partial: Partial },
     #[error("provider refused request: {0}")]
     Http(HttpRefusal),
+    /// The outbound destination policy refused the request before any byte
+    /// was sent to a provider (RT-11, EXT-14).
+    #[error("destination refused: {0}")]
+    Destination(crate::destination::DestinationRefusal),
 }
 
 impl TurnError {
@@ -104,24 +150,25 @@ impl TurnError {
             TurnError::ProviderStreamError { .. } => "provider_stream_error",
             TurnError::Cancelled { .. } => "cancelled_after_acceptance",
             TurnError::Http(_) => "http_refusal",
+            TurnError::Destination(_) => "destination_refused",
         }
     }
 
     /// Whether an automatic retry of the same provider request is allowed.
-    /// Only a request known not to have been accepted may be retried.
+    /// Only a request known not to have been accepted, or one the provider
+    /// refused with a transient status, may be retried. This is exactly the
+    /// `safe_same_inputs` retry class of [`TurnError::normalized`].
     pub fn auto_retry_allowed(&self) -> bool {
-        match self {
-            TurnError::Transport {
-                acceptance: Acceptance::NotAccepted,
-                ..
-            } => true,
-            TurnError::Http(h) => matches!(h.class, HttpClass::RateLimited | HttpClass::Overloaded),
-            _ => false,
-        }
+        self.normalized().retry_class == crate::errors::RetryClass::SafeSameInputs
+    }
+
+    /// The contract-envelope view of this failure (retry class, cost certainty).
+    pub fn normalized(&self) -> crate::errors::NormalizedError {
+        crate::errors::normalize(self)
     }
 }
 
-#[derive(Debug, Clone, Copy, Serialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum Acceptance {
     /// Connection failed before the request was written.
@@ -132,7 +179,7 @@ pub enum Acceptance {
     Uncertain,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum HttpClass {
     Auth,
@@ -146,7 +193,7 @@ pub enum HttpClass {
     Other,
 }
 
-#[derive(Debug, Clone, Serialize, PartialEq, thiserror::Error)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, thiserror::Error)]
 #[error("HTTP {status} {class:?} {provider_code:?}")]
 pub struct HttpRefusal {
     pub status: u16,
@@ -164,7 +211,10 @@ pub fn redact(s: &str) -> String {
         let trimmed = word.trim_end_matches(|c: char| c.is_whitespace() || c == '"' || c == '\'');
         let looks_secret = trimmed.starts_with("sk-")
             || trimmed.starts_with("sk_")
-            || (trimmed.len() > 32 && trimmed.chars().all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_'));
+            || (trimmed.len() > 32
+                && trimmed
+                    .chars()
+                    .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_'));
         if looks_secret {
             out.push_str("[REDACTED]");
             out.push_str(&word[trimmed.len()..]);

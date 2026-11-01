@@ -2,23 +2,47 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
-## 0.2.7, 2026-11-01, decisions as statements of intent
+## 0.2.9, 2026-11-01, decisions as statements of intent
 
 - CLAUDE.md now says to write each maintainer decision as a clear, complete statement of intent in our own words, not a verbatim quote. The maintainer asked for it after A1-1, FR-5 and Q-1 were first recorded as quotes, and those entries were rewritten in the same change.
 
 Evidence: maintainer request relayed by the parent session on 2026-11-01. Rollback: revert this commit and regenerate.
 
-## 0.2.6, 2026-10-31, run the target repository's CI list before pushing
+## 0.2.8, 2026-10-31, run the target repository's CI list before pushing
 
 - CLAUDE.md now says to run another repository's own CI steps locally before an approved push to it. The kit's wiki follow-ups were pushed after seven hand-picked checks passed, and the kit's Validate workflow then failed on the quality complexity ratchet, which only `check.py full --only ... quality` runs. The fix (`aa09a0c` in the kit) moved three checks into helpers without touching the baseline.
 
 Evidence: kit Validate run 41229595759 failed on `4261df9` because `verify` had a complexity of 55 against a recorded baseline of 50, and the same check passed locally after the fix. Rollback: revert this commit and regenerate.
 
-## 0.2.5, 2026-10-31, deep clones on Windows
+## 0.2.7, 2026-10-31, deep clones on Windows
 
 - CLAUDE.md notes that cloning a deep repository into the long session scratchpad path fails on Windows with "Filename too long", and that cloning inside a Linux container with the checkout mounted read-only works and doubles as a fresh-checkout Linux run.
 
 Evidence: the W1 kit synchronization work of 2026-10-31. A `git clone` of the Agentic kit into the scratchpad failed on the skill asset paths, and the same clone inside `python:3.13-slim` ran the 31 synchronization tests. Rollback: revert this commit and regenerate.
+
+## 0.2.6, 2026-10-25, issue tracking
+
+- New skill `track-issues`. Problems that cannot be fixed in the current session become GitHub issues on `klimPaskov/hoi4-factory`, each with evidence, the reason and an acceptance check, and are later closed with `Fixes #N` and test results. Everything else is fixed in the session. CLAUDE.md has an "Issues" section, the generator and validator list the skill, and the repository has the labels `blocked`, `verification`, `backlog` and `stage:SNN`.
+- New `scripts/audit-deps.sh` for the dependency scan, with ignores and their reasons in `.cargo/audit.toml`.
+
+Evidence: issues #2 to #11 and the S03 handoff's follow-up section. Rollback: revert this commit and regenerate.
+
+## 0.2.5, 2026-10-25, S03 agent runtime
+
+- CLAUDE.md has a new section, "Agent runtime rules (learned in S03)". It covers:
+  - Anthropic tool-schema conditioning: top-level combinators, and strict-mode keywords and combinators.
+  - The lease heartbeat, tied to its owner with an abort-on-drop guard.
+  - Biased selects, so a request goes out before a cancel is acted on.
+  - REPEATABLE READ snapshots for answers that combine several tables, and one transaction for an attempt's end and its task's next state.
+  - Tool calls deferred on pause.
+  - Real SHA-256 values in ledger hash fields.
+  - Worker test faults passed through the launcher environment.
+  - An init process for containers whose PID 1 is our own binary.
+  - The two Node runtimes in the server image.
+- CLAUDE.md's delegation section and the `delegate-parallel-work` skill say how to run crate packets in parallel. The parent commits empty crate skeletons first, writes the integration API into each brief (saved as a file the agent reads), and keeps the composition that spans crates.
+- `scripts/linux-tests.sh` runs its container with `--init`, and the server service in `compose.yaml` sets `init: true`.
+
+Evidence: [S03 learning review](../../evidence/S03/learning-review.md) (S03-L01 to S03-L11) with the tests named there. Rollback: revert this commit and regenerate.
 
 ## 0.2.4, 2026-10-25, Windows and macOS development
 

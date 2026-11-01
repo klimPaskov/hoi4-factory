@@ -4,11 +4,12 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use axum::extract::FromRef;
-use factory_accounts::{AccountsState, Database};
+use factory_accounts::{AccountsState, Database, InMemoryRateLimiter};
 use factory_intake::{IntakeLimits, IntakeService};
 use factory_setup_adapter::SetupAdapter;
 use factory_workspace::StorageRoot;
 
+use crate::agent::AgentRuntime;
 use crate::game_reference::GameReferenceHandle;
 use crate::github::GithubRuntime;
 use crate::migrations::MigrationReport;
@@ -60,6 +61,11 @@ pub struct ServerState {
     pub migrations: Arc<MigrationReport>,
     pub settings: Arc<RuntimeSettings>,
     pub web: Option<StaticSite>,
+    /// The native agent host. `None` only when it could not start; the task routes then
+    /// answer `agent_unavailable`.
+    pub agent: Option<AgentRuntime>,
+    /// Per-account limits of the expensive intake and Setup routes (see [`crate::access::limit`]).
+    pub route_limits: Arc<InMemoryRateLimiter>,
 }
 
 impl FromRef<ServerState> for AccountsState {
