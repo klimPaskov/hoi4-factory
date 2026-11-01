@@ -62,13 +62,15 @@ The engine (W4) is a Cargo workspace inside hoi4-agent-tools under Apache-2.0: `
 | Per-platform binaries: Windows x64, macOS arm64, Linux x64 and arm64 as optional npm packages with checksums. Docker images build the engine from pinned source | agent-tools release workflow | S03 (pinned in the server image and in the coding-client profile) | A release carries all four binaries and the server image digest names the engine revision |
 | Core engine client: JSON request, schema-checked response, the engine reported as unavailable instead of a silent fallback to TypeScript | agent-tools `core` | S03 | A missing or broken binary makes the tool return an explicit unavailable result |
 | `hoi4.mod_index` on the engine (definition counts, `next_id`) | agent-tools | S04 entry | The existing route tests pass unchanged against the engine |
+| `hoi4.source_lookup` on the engine's symbol index (M-8) | agent-tools | S04 entry | The existing route tests pass unchanged against the engine |
 | Whole-mod closure as an option of `hoi4.script_validate` | agent-tools | S04 entry | Resolved, unresolved and unknown counts per kind, verdict `incomplete` whenever anything is unknown |
 | Engine linked into the server as a library | HOI4 Factory S04 | S04 | Closure, lints, override audit and findings baseline (P1 to P4) run in the server before every agent commit |
+| Map hot paths, then the remaining analyzers (M-8) | agent-tools | S05 to S07 | Each moved route keeps its tests and is faster on the M-6 benchmark mods |
 | Focus routes on the engine after W3 and W7 settle | agent-tools | S04 if ready, otherwise S05 | Focus tool tests pass unchanged, and the server and the MCP read one layout model |
 | Event, decision, character and idea routes on the engine | agent-tools | S06 | Each new writer is built on the engine's span edits, not on the TypeScript index |
 | TypeScript index retired | agent-tools | Target S06 exit, checked in S08 | No route reads the TypeScript index, or S08 lists the remaining route as an accepted limitation |
 
-The two indexes must not disagree while both exist. ADR 0074 records one known difference: the TypeScript scanner treats `replace_path` as covering subfolders and the engine does not. Until a route moves, a server check that relies on load order uses the engine and labels the MCP answer it differs from.
+The move order follows M-8: binaries, the symbol index (`mod_index`, then `source_lookup`), the whole-mod reference report in `script_validate`, the map hot paths, the remaining analyzers, then retiring the TypeScript index. The ZIN MCP worker owns that sequence in agent-tools. The two indexes must not disagree while both exist. ADR 0074 records one known difference: the TypeScript scanner treats `replace_path` as covering subfolders and the engine does not. Until a route moves, a server check that relies on load order uses the engine and labels the MCP answer it differs from.
 
 **Reference closure before every agent commit (S04 onward).** The server runs the linked engine on the proposal's worktree before an agent commit. A new finding at or above the project threshold blocks the commit and returns the finding to the agent. Existing findings recorded in the baseline do not block. Unknown references never count as a pass, and the review card shows their count. Repair plans from the engine become ordinary C-02 proposals, refused when the source hash changed.
 
@@ -117,13 +119,14 @@ Only hard capabilities are taken, each adapted to this architecture, and each mu
 
 ### Tool quality bar (Q-1)
 
-HOI4 Factory and hoi4-agent-tools must be measurably ahead of `cpntodd/HOI4-MCP` and Hagane Studio. The proof is a head-to-head benchmark (T-BENCH-01) on shared mod files and questions that runs in CI. Comparators run as separate programs pinned by commit, and none of their code is copied. Their licenses are checked before they enter CI.
+HOI4 Factory and hoi4-agent-tools must be measurably ahead of `cpntodd/HOI4-MCP` and Hagane Studio. The proof is a head-to-head benchmark (T-BENCH-01) on shared mod files and questions. Under M-7, `cpntodd/HOI4-MCP` is measured once, in an isolated container with a pinned commit, read-only mod copies and no network, and none of its code is copied. After that, CI benchmarks measure against our own stored baselines. The benchmark mods are the M-6 set.
 
 | Surface | Tools | Measure | Proposed target |
 |---|---|---|---|
 | Rules and reference lookup | `hoi4.reference_search`, `hoi4.reference_read`, `hoi4.reference_context`, `hoi4.source_lookup` | Share of benchmark questions whose top three results contain the source in a human answer key | At least 90 percent, and ahead of each comparator on the same questions |
 | Validation | `hoi4.script_validate`, engine check, `hoi4.package_check` | False positives on vanilla and on hand-labelled findings in public mods, seeded defects caught | Zero on vanilla, at most 5 percent of reported findings on labelled mods, every seeded defect class caught |
 | Honest unknowns | Engine closure, inspect tools | Share of unresolvable references reported as unknown | All of them, never a pass |
+| Recurring errors (M-3) | `hoi4.error_log` | Repeated errors across launches grouped into signatures and linked to documentation or an approved rule | Every signature in the fixture logs grouped and linked |
 | Latency | Inspect, lookup, validate and rewrite tools | p95 wall time on declared hardware for fixed fixtures | No slower than the fastest comparator |
 | Editor round trip | HOI4 Factory editors | Gesture to saved file and agent-visible state, agent edit to redraw | 1 s p95, with Hagane Studio measured on the same tree |
 
@@ -141,11 +144,33 @@ The rules-lookup measurement under way in a separate session feeds this benchmar
 | Event and decision tools are read-only | Writers on the engine's span edits | S06 (S06-W4) |
 | Technology tools are read-only | A writer | S07 (S07-W3) |
 | No GFX asset validation | Sprite and `.gfx` registration checks in the engine, DDS header and profile checks through `hoi4-imagegen-mcp` | S06 (S06-W3) |
-| No tools for MIOs, balance of power, special projects, operations and raids | Inspect tools first, writers on demand | [Backlog](BACKLOG-AND-DEFERRED-SCOPE.md) |
-| No sound and music tools | S06 tracks audio as assets with provenance only | Backlog |
-| No units, division templates or OOB tools | Inspect tools first | Backlog |
+| No tools for on_actions, MIOs, balance of power, special projects, operations and raids | Inspect tools, then render and rewrite where they help (M-9, third group) | agent-tools after S06's localisation, idea and character tools; HOI4 Factory editors stay in the [backlog](BACKLOG-AND-DEFERRED-SCOPE.md) |
+| No sound validation | Sound validation with GFX validation (M-9, fourth group). S06 tracks audio as assets with provenance | agent-tools after the third group; editors in the backlog |
+| No units, division templates, OOB or equipment tools | Inspect tools first (M-9, fourth group) | agent-tools after the third group; editors in the backlog |
 | No CI on real vanilla | A vanilla job on a runner with a licensed game copy | S03, before the Q-1 baseline |
-| No macOS Node CI job | Add the job to agent-tools CI | S03, before per-platform binaries are trusted |
+| No macOS Node CI job | A macOS arm64 job in agent-tools Node CI (M-13) | S03, before per-platform binaries are trusted |
+
+### MCP improvement decisions (M-1 to M-15)
+
+The maintainer's MCP decisions of 2026-11-01 are recorded in the [expansion decision record](../08-expansion-research/00-decision-record.md). They are hoi4-agent-tools work unless the table says otherwise.
+
+| Decision | Lands in | HOI4 Factory stage that relies on it | Done when |
+|---|---|---|---|
+| M-1 skills served by the MCP | `hoi4.skill` tool and MCP resources | S03 (one tool profile), S05 (the native loop reads the same pinned skills) | The served text matches the pinned kit version and hash, and a drift check fails otherwise |
+| M-2 approved rules at kit and mod level | Kit and mod repositories, served by the MCP | S05 (rules in the context bundle), S06 (mod rules per project) | A proposed rule takes effect only after approval and carries reason, evidence and a regression test. `LESSONS.md` is converted |
+| M-3 recurring error signatures | `hoi4.error_log` | S06 (log upload review), the companion stage | Fixture logs from several launches group into counted signatures linked to documentation and rules |
+| M-4 no redundant guards, drift guards kept | All rewrite tools | S04 onward (FR-5 concurrency) | No edit-size guard or similar is added. The stale-base refusal and expected hashes stay and are covered by T-EDIT-01 |
+| M-5 generated tool documentation | agent-tools docs and CI | S03 (pinned tool profile) | Docs are generated from the definitions, and CI fails on drift, duplicates or an undocumented tool |
+| M-6 benchmark mods | T-BENCH-01 fixture set | S03 baseline, every later exit gate | Vanilla, Chaos Redux, ZIN, Ireland Total Overhaul and two or three large Workshop mods pinned at fixed versions, run locally |
+| M-7 HOI4-MCP measured once | Isolated container run | S03 baseline | One recorded head-to-head result. Later runs compare with our own baselines |
+| M-8 Rust move order | Engine route moves | S03 to S08, see the engine table above | The TypeScript index is retired |
+| M-9 coverage order | New inspect, render and rewrite tools | S06 (localisation, ideas, characters), S07 and the backlog (the later groups) | Each area has inspect, and render or rewrite where they help, with tests on the M-6 mods |
+| M-10 lookup vocabulary | Reference lookup tools | S05 (retrieval baseline EXP-05) | Vocabulary built from game localisation plus a short hand-checked list, with no embedding model |
+| M-11 writers with their editors | Event, decision and technology rewrite tools | S06 (event, decision), S07 (technology) | Each writer ships with its editor and passes T-EDIT-01 |
+| M-12 nightly real-game benchmark | A maintainer machine with the game | Every exit gate from S03 | Nightly results are stored locally with hashes, and a regression is flagged |
+| M-13 macOS arm64 CI | agent-tools Node CI | S03 | The job runs on every pull request |
+| M-14 Chaos Redux tools in a private plugin | agent-tools plugin loading | S03 (public tool profile) | The public package has no `chaosx.*` tools, and the server loads the plugin only when it is present |
+| M-15 HOI4-MCP licensing | None | None | No action |
 
 ### Coding-agent integration
 
@@ -153,7 +178,7 @@ The native Rust loop, Claude Code and Codex use the same tools and operations, s
 
 - **One tool profile.** The server pins one hoi4-agent-tools release with its engine, and `hoi4-imagegen-mcp` from S06. The native loop calls them through the broker. HOI4 Mod Setup installs the same pinned versions and the kit for a local Claude Code or Codex session on a clone. Tool names, arguments and results are the same in both places.
 - **Local coding clients.** A person or a coding agent working on a clone pushes to GitHub. The server detects the external change (S04-G6), re-validates it with its own pinned tools and records the client's tool version in the evidence. S05 makes that change visible to the next native agent session.
-- **Same knowledge.** The native loop loads the kit's skills and lessons as versioned product knowledge (A4), the same text a local coding client reads.
+- **Same knowledge.** The native loop loads the kit's skills and approved rules as versioned product knowledge (A4), served by `hoi4.skill` and the MCP resources (M-1, M-2), the same text a local coding client reads.
 - **Hosted access for external agents.** A product MCP endpoint that lets an external coding agent work on the hosted workspace through the same proposals and grants stays in the [backlog](BACKLOG-AND-DEFERRED-SCOPE.md), read-only first.
 - **Parity.** T-EDIT-01 includes the coding-client path, so a gesture, a native agent call and a local MCP call produce the same bytes.
 
