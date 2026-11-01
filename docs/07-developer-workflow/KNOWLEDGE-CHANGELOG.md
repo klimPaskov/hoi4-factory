@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.10, 2026-11-01, issues in every repository
+
+- The `track-issues` skill now files each problem in the repository it belongs to (hoi4-factory, hoi4-agent-tools, the kit, HOI4 Mod Setup or hoi4-imagegen-mcp), with an owner and a "Done when" check, and closes it only with proof. It no longer forbids issues on the upstream repositories. The rule against secrets and private paths is unchanged.
+
+Evidence: maintainer decision of 2026-11-01, relayed by the planning session. The 15 live-test problems are klimPaskov/hoi4-agent-tools#57 to #71. Rollback: revert this commit and regenerate.
+
 ## 0.2.9, 2026-11-01, decisions as statements of intent
 
 - CLAUDE.md now says to write each maintainer decision as a clear, complete statement of intent in our own words, not a verbatim quote. The maintainer asked for it after A1-1, FR-5 and Q-1 were first recorded as quotes, and those entries were rewritten in the same change.

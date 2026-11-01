@@ -51,23 +51,25 @@ HOI4-MCP is a 19-tool Python server built on a July 2026 copy of our kit. 654 of
 
 **What is wrong:**
 
-| # | Problem | Evidence |
-| --- | --- | --- |
-| 1 | `event_inspect` reports scripted effects that exist as missing. Helper expansion is deferred on large workspaces, so traces lose their helpers | `chaosx.nr9.1`: 6 helpers in `009_white_peace_effects.txt` marked `EVENT_HELPER_UNRESOLVED`. 10,224 nodes affected. `expandHelpers: true` changes nothing |
-| 2 | Upstream callers come back empty, so "callerless" counts are inflated. A modder could delete live events | `chaosx.nr10.20` shows 0 callers, while `source_lookup` finds the caller. 5,895 "callerless" events |
-| 3 | Selectors, ids and subjects are ignored, and unknown ids return `ok` with no results | Event `scan` file selector, `state_flow` subject, decision category id. Missing event, state, decision, window or symbol. A missing GUI window returns a 116 MB artifact |
-| 4 | False "probable defect" on event targets | `has_event_target` presence checks and `meta_effect` names marked `EVENT_TARGET_READ_BEFORE_SAVE`, confirmed |
-| 5 | Map reference false errors | `prioritize = { … }` provinces treated as states. The `NOT = { state = 0 }` sentinel flagged as an error |
-| 6 | GUI false errors and warnings | Sprite names returned through `defined_text` flagged as missing loc keys, about 5,500 times, burying real errors. Intended overlaps and empty-meter clipping flagged |
-| 7 | `probability_analyze` ignores the requested adapter and step count | Asked for `decision_ai_will_do`, got `mission_ai_will_do`, and 1 sweep point instead of 5 |
-| 8 | Plain-English lookup misses often | About 5 of 12 live questions hit. The held-out baseline is 7 of 24 first. Misses include `add_timed_idea`, `has_war_with`, `owner =` and `mean_time_to_happen` |
-| 9 | Misleading results | `error_log` says "no errors in this mod" for a 5-day-old log from a launch that never loaded the mod. `script_validate` reports `PARTIAL` with 0 unresolved. The `source_lookup` example in the tool description fails |
-| 10 | Answers hidden in artifacts | Most tools return counts inline and the answer in a 5 KB to 116 MB artifact. Every reply carries 12 unrelated `filesScanned` entries. Large-workspace deferrals make almost every result `PARTIAL` |
-| 11 | False error on `owner = GER` in state scope | `SCRIPT_DYNAMIC_VARIABLE_AS_TRIGGER`. Vanilla uses it, for example `common/decisions/AFG.txt:824` |
-| 12 | Parameters are never checked | `parametersChecked: false`. A wrong idea id inside `add_timed_idea` passes |
-| 13 | Slow cold paths | First `source_lookup` takes 58.9 s. `mod_index` on Chaos Redux takes 13 to 15 s, a decision inventory 33 to 42 s, an event-consumer lookup up to 145 s |
-| 14 | Stale game data | The native-effects list and the probability adapters are pinned to 1.19.2. The installed game is 1.19.3 |
-| 15 | Coverage gaps | No localisation tool, and only English is indexed. No tools for ideas, characters, MIOs, balance of power, special projects, raids, units, templates or OOB, GFX assets, or sound. Event, decision and technology tools are read-only |
+| # | Problem | Evidence | Issue |
+| --- | --- | --- | --- |
+| 1 | `event_inspect` reports scripted effects that exist as missing. Helper expansion is deferred on large workspaces, so traces lose their helpers | `chaosx.nr9.1`: 6 helpers in `009_white_peace_effects.txt` marked `EVENT_HELPER_UNRESOLVED`. 10,224 nodes affected. `expandHelpers: true` changes nothing | [#57](https://github.com/klimPaskov/hoi4-agent-tools/issues/57) |
+| 2 | Upstream callers come back empty, so "callerless" counts are inflated. A modder could delete live events | `chaosx.nr10.20` shows 0 callers, while `source_lookup` finds the caller. 5,895 "callerless" events | [#58](https://github.com/klimPaskov/hoi4-agent-tools/issues/58) |
+| 3 | Selectors, ids and subjects are ignored, and unknown ids return `ok` with no results | Event `scan` file selector, `state_flow` subject, decision category id. Missing event, state, decision, window or symbol. A missing GUI window returns a 116 MB artifact | [#59](https://github.com/klimPaskov/hoi4-agent-tools/issues/59) |
+| 4 | False "probable defect" on event targets | `has_event_target` presence checks and `meta_effect` names marked `EVENT_TARGET_READ_BEFORE_SAVE`, confirmed | [#60](https://github.com/klimPaskov/hoi4-agent-tools/issues/60) |
+| 5 | Map reference false errors | `prioritize = { … }` provinces treated as states. The `NOT = { state = 0 }` sentinel flagged as an error | [#61](https://github.com/klimPaskov/hoi4-agent-tools/issues/61) |
+| 6 | GUI false errors and warnings | Sprite names returned through `defined_text` flagged as missing loc keys, about 5,500 times, burying real errors. Intended overlaps and empty-meter clipping flagged | [#62](https://github.com/klimPaskov/hoi4-agent-tools/issues/62) |
+| 7 | `probability_analyze` ignores the requested adapter and step count | Asked for `decision_ai_will_do`, got `mission_ai_will_do`, and 1 sweep point instead of 5 | [#63](https://github.com/klimPaskov/hoi4-agent-tools/issues/63) |
+| 8 | Plain-English lookup misses often | About 5 of 12 live questions hit. The held-out baseline is 7 of 24 first. Misses include `add_timed_idea`, `has_war_with`, `owner =` and `mean_time_to_happen` | [#64](https://github.com/klimPaskov/hoi4-agent-tools/issues/64) |
+| 9 | Misleading results | `error_log` says "no errors in this mod" for a 5-day-old log from a launch that never loaded the mod. `script_validate` reports `PARTIAL` with 0 unresolved. The `source_lookup` example in the tool description fails | [#65](https://github.com/klimPaskov/hoi4-agent-tools/issues/65) |
+| 10 | Answers hidden in artifacts | Most tools return counts inline and the answer in a 5 KB to 116 MB artifact. Every reply carries 12 unrelated `filesScanned` entries. Large-workspace deferrals make almost every result `PARTIAL` | [#66](https://github.com/klimPaskov/hoi4-agent-tools/issues/66) |
+| 11 | False error on `owner = GER` in state scope | `SCRIPT_DYNAMIC_VARIABLE_AS_TRIGGER`. Vanilla uses it, for example `common/decisions/AFG.txt:824` | [#67](https://github.com/klimPaskov/hoi4-agent-tools/issues/67) |
+| 12 | Parameters are never checked | `parametersChecked: false`. A wrong idea id inside `add_timed_idea` passes | [#68](https://github.com/klimPaskov/hoi4-agent-tools/issues/68) |
+| 13 | Slow cold paths | First `source_lookup` takes 58.9 s. `mod_index` on Chaos Redux takes 13 to 15 s, a decision inventory 33 to 42 s, an event-consumer lookup up to 145 s | [#69](https://github.com/klimPaskov/hoi4-agent-tools/issues/69) |
+| 14 | Stale game data | The native-effects list and the probability adapters are pinned to 1.19.2. The installed game is 1.19.3 | [#70](https://github.com/klimPaskov/hoi4-agent-tools/issues/70) |
+| 15 | Coverage gaps | No localisation tool, and only English is indexed. No tools for ideas, characters, MIOs, balance of power, special projects, raids, units, templates or OOB, GFX assets, or sound. Event, decision and technology tools are read-only | [#71](https://github.com/klimPaskov/hoi4-agent-tools/issues/71) |
+
+Each problem is tracked as a GitHub issue in hoi4-agent-tools with its evidence, owner and "Done when" check, and closes only with proof. [#71](https://github.com/klimPaskov/hoi4-agent-tools/issues/71) also tracks the coverage work.
 
 ## Targets
 

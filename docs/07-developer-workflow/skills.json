@@ -32,7 +32,7 @@
     },
     {
       "name": "track-issues",
-      "description": "Use when a problem found in a session cannot be fixed in that session, at every stage handoff, and when picking up a tracked issue. File it as a GitHub issue on klimPaskov/hoi4-factory with evidence, the reason it is not fixed now and an acceptance check, then fix tracked issues later with a regression test and close them with evidence. Fix everything you can in the session instead of filing it."
+      "description": "Use when a problem found in a session cannot be fixed in that session, at every stage handoff, and when picking up a tracked issue. File it as a GitHub issue in the repository it belongs to (hoi4-factory, hoi4-agent-tools, the kit, HOI4 Mod Setup or hoi4-imagegen-mcp) with evidence, an owner, the reason it is not fixed now and an acceptance check, then fix tracked issues later with a regression test and close them with evidence. Fix everything you can in the session instead of filing it."
     }
   ]
 }
