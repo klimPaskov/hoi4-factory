@@ -102,7 +102,7 @@ These come from the hosted platform and Hagane Studio. They are carried into the
 | Hash-guarded span repair plans | Studio `clausewitz/crossref.go` | Source-bound proposals revalidated on the server |
 | Findings introduced, improved and resolved by an edit | Studio save diagnostics | Per-job finding delta shown on the review card |
 | Fidelity ledger with honest statuses | Studio `exportCoverage.ts` | Import preservation report (P4) |
-| One operation layer for the editor and the agent, with parity tests | The hosted editor and MCP shared one Go service, and a second route family drifted and under-reported | Editors and agents call the same server operations, with tests that compare them |
+| One operation layer for the editor and the agent, with parity tests | The hosted editor and MCP shared one Go service, and a second route family drifted and under-reported | Editors and agents call the same server operations, with tests that compare them. Required for every visual editor by FR-5 |
 | Click on a preview region to jump to its source field | Event preview card | Render regions mapped to source spans |
 | Per-project DLC selection that changes checks and previews | Hosted platform | Project setting used by validation and previews |
 | Field guidance inside tool schemas | Studio `hw describe` and `hw fields` | Tool descriptions carry per-field guidance |
@@ -111,12 +111,11 @@ These come from the hosted platform and Hagane Studio. They are carried into the
 
 Measured size: about 195,000 lines of non-test TypeScript and 234,000 lines of non-test Go, with almost no comments or architecture documents. Every editor works on JSON table rows and regenerates files on export. The Go parser keeps comments but not byte offsets and re-emits canonical text, so it cannot provide byte-preserving edits. Its focus grid differs from the game grid our tools use.
 
-The maintainer chose **harvest, then archive** (A1). About 2.5 percent of the Go code and some TypeScript is worth taking:
+The maintainer chose **harvest, then archive** (A1) and narrowed it on 2026-11-01 (A1-1): nothing of Hagane's look is reused, because HOI4 Factory's UI comes from its own design track (ADR-025), and only what would take a lot of work to build from scratch is harvested. About 2.5 percent of the Go code is worth taking, and at most one piece of TypeScript:
 
 | Harvest item | Size | Destination |
 |---|---|---|
-| Focus graph shell on xyflow, without its layout code | About 3,400 lines | HOI4 Factory client, restyled to plain CSS, i18next and the CSP |
-| Event and decision preview cards | 274 and 164 lines | HOI4 Factory client |
+| Focus graph shell on xyflow: the wiring only, no layout code or styling | About 3,400 lines | HOI4 Factory client, only if it actually saves work when S04 is designed |
 | Hash-guarded span repair plan, per-edit finding delta, dead-flag lint, DLC lint rule | Small | Shared Rust engine |
 | draw.io sketch importer | 398 Go lines | Shared Rust engine |
 | 158 finding codes | Catalog | Test fixtures for the Rust engine |

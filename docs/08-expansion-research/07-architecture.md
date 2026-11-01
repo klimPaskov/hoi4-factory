@@ -59,7 +59,7 @@ flowchart LR
 | HOI4 Mod Setup | Project creation and import, preservation, recovery, install of the kit | Rust | Gains the preservation report (P4) |
 | HOI4 Factory server | Orchestration, checkpoints, grants and budgets, jobs, Git and GitHub, notes index, broker profiles for the engine, agent-tools and imagegen | Rust | New crates listed below |
 | HOI4 Factory agent loop | Model-agnostic loop. Loads kit skills and lessons as versioned product knowledge (A4) and project instructions as labelled data | Rust | Provider adapters from S03 |
-| HOI4 Factory client | Editors (focus first, harvested Hagane shell), review queue, jobs board, notes, Git views, tours | React and TypeScript | Plain CSS, i18n, strict CSP |
+| HOI4 Factory client | Editors (focus first, own design track, two-way with agents through the same operations per FR-5), review queue, jobs board, notes, Git views, tours | React and TypeScript | Plain CSS, i18n, strict CSP |
 | Local companion | Pairing with a project, game install discovery, mod folder sync, log upload, HOI4 Live Tools bridge for test cards | Rust | Optional (D-02). Full v1 scope (C4) |
 
 ## New HOI4 Factory server crates

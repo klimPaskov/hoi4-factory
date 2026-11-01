@@ -149,18 +149,20 @@ Repository: Chaos Redux, instruction, skill and tool files only. Starts after th
 
 ### W7 Focus layout in the Rust engine (FR-3 later)
 
+W3's verdict and inline renders and W7's layout results are also the data the S04 focus editor shows people (FR-5): a node a person drags is saved through the same rewrite operation, and the agent reads it back through inspect.
+
 Repository: hoi4-agent-tools. Solver layout per branch lane with `relative_position_id` anchors (D1), corridor insertion of new branches with untouched coordinates kept, shared geometry for renders and metrics, vanilla `offset` blocks. Acceptance: determinism across Windows, macOS and Linux, idempotent second call, untouched-focus hash unchanged, runtime far below today's 21 to 70 seconds.
 
 ### W8 Hagane Studio wind-down (A1)
 
-Repository: `hagane-works/hagane-studio`, once the maintainer controls it. Final tagged release, a README banner pointing to HOI4 Factory, maintenance-only fixes. Archived when the archive conditions in the [Hagane Works analysis](03-hagane-works-analysis.md#hagane-studio-reuse) are met.
+Repository: `hagane-works/hagane-studio`, once the maintainer controls it. Final tagged release, a README banner pointing to HOI4 Factory, maintenance-only fixes. The harvest is narrowed by A1-1: no UI look, no preview cards. Archived when the archive conditions in the [Hagane Works analysis](03-hagane-works-analysis.md#hagane-studio-reuse) are met.
 
 ## HOI4 Factory mapping (designs, built only in authorized stages)
 
 | Design | Planned stage | Depends on |
 |---|---|---|
 | Engine library linked into the server, reference closure before agent commits | S04 | W4 |
-| Focus editor on `@xyflow/react` with the harvested Hagane shell, visual review checkpoint, layout verdict gating | S04, through the UI design track | W3, W4, W7 |
+| Focus editor on `@xyflow/react` (Hagane's xyflow wiring only if it saves work, A1-1), two-way editing with the agent through the same operations (FR-5), visual review checkpoint, layout verdict gating | S04, through the UI design track | W3, W4, W7 |
 | Autonomy presets, checkpoints, review queue, decision history, intake consultation | S04 for the minimal checkpoint set, S05 for the full policy | S03 |
 | Jobs board (simple version), notes, Git save points and review views, onboarding tours | S06 | S05 |
 | Image adapter, assets screens, allowance with cheap-tier allowlist | S06 | W5 |
