@@ -6,6 +6,8 @@ Status: **Proposed future implementation stage**. Nothing in this packet was exe
 
 Deliver useful existing-map inspection, structured import planning and a carefully bounded edit. Treat a reference image as design input. Do not promise a playable generated world from an image.
 
+The agent-tools work behind this stage's MCP items (Q-1, M-1 to M-14, the engine moves and the coverage gaps) is planned in the [MCP improvement plan](../08-expansion-research/12-mcp-improvement-plan.md).
+
 The inspected Agent Tools geography-model synthesis path is unavailable. Reuse actual inspect/preview/validation features and implement only the independently verified missing import or edit operation authorized for this stage.
 
 This stage also adds the remaining layout editors under the S04 two-way pattern (FR-5): the map editor on `hoi4.map_inspect` and `hoi4.map_rewrite`, the technology editor on `hoi4.tech_inspect` and `hoi4.tech_render` with a new writer, and the GUI editor on `hoi4.gui_inspect`, `hoi4.gui_render` and `hoi4.gui_rewrite`. If review defers S07, the technology and GUI editors are deferred with it.

@@ -6,6 +6,8 @@ Status: **Proposed future implementation stage**. Nothing in this packet was exe
 
 Make repeated work reliable across sessions and provider changes. Implement approved canon, provenance-aware context, freshness, the automatic memory system of [ADR-022](../02-architecture/maintainer-decisions-2026-10-24.md#adr-022-automatic-memory-feedback-and-self-improvement) and stronger recovery. The memory system covers personal, project and global scopes, typed feedback capture, the reflection writer, lanes A to D, the verification gate, the global lesson pipeline, user deletion and the off switch, as specified in [SPEC-004](../03-subsystem-specs/004-context-memory-and-runtime-learning.md). Keep engineering learning under ADR-023 separate from product memory.
 
+The agent-tools work behind this stage's MCP items (Q-1, M-1 to M-14, the engine moves and the coverage gaps) is planned in the [MCP improvement plan](../08-expansion-research/12-mcp-improvement-plan.md).
+
 Two-way editing (FR-5) must hold across sessions as well as within one. Edits a person makes in the editor, and changes a local Claude Code or Codex session pushes through Git, reach the next agent session as fresh state, so the agent continues from them. The rules-lookup work feeds the retrieval baseline here.
 
 Do not add vector retrieval or a separate memory service by default. Do not build a page to browse or edit memories, which the maintainer declined. Canon and memory stay scoped to their project and account, and memory carries no authority. Do not convert inferred conversation statements into accepted lore.

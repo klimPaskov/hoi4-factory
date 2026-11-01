@@ -6,6 +6,8 @@ Status: **Proposed future implementation stage**. Nothing in this packet was exe
 
 Extend the single-agent workflow to invited human collaborators and a small task DAG. A project owner invites other accounts into the same server workspace with explicit project roles. Add controlled localization and asset pipelines, then selected event or decision authoring only where adapters support it.
 
+The agent-tools work behind this stage's MCP items (Q-1, M-1 to M-14, the engine moves and the coverage gaps) is planned in the [MCP improvement plan](../08-expansion-research/12-mcp-improvement-plan.md).
+
 Event, decision, character and idea editors follow the S04 two-way pattern (FR-5): each one shows the matching inspect and render tools to people, and people and agents write through the same rewrite operation. The writers they need are built in hoi4-agent-tools on the engine. A localisation tool covers every language, GFX assets are checked, `hoi4-imagegen-mcp` joins the tool profile, and Hagane Studio export ZIPs import with a preservation report. With the focus editor from S04, these editors and the import meet the editor and import conditions for archiving Hagane Studio.
 
 First prove one owner, one invited collaborator and one agent collaborating through owned branches and reviewed integration. A second agent worker is an experiment with disjoint scopes. Many workers and real-time co-editing of one file remain deferred. External contributors can still work through GitHub pull requests.

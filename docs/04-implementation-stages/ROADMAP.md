@@ -70,7 +70,7 @@ The engine (W4) is a Cargo workspace inside hoi4-agent-tools under Apache-2.0: `
 | Event, decision, character and idea routes on the engine | agent-tools | S06 | Each new writer is built on the engine's span edits, not on the TypeScript index |
 | TypeScript index retired | agent-tools | Target S06 exit, checked in S08 | No route reads the TypeScript index, or S08 lists the remaining route as an accepted limitation |
 
-The move order follows M-8: binaries, the symbol index (`mod_index`, then `source_lookup`), the whole-mod reference report in `script_validate`, the map hot paths, the remaining analyzers, then retiring the TypeScript index. The ZIN MCP worker owns that sequence in agent-tools. The two indexes must not disagree while both exist. ADR 0074 records one known difference: the TypeScript scanner treats `replace_path` as covering subfolders and the engine does not. Until a route moves, a server check that relies on load order uses the engine and labels the MCP answer it differs from.
+The move order follows M-8 and is work package WP-5 of the [MCP improvement plan](../08-expansion-research/12-mcp-improvement-plan.md): binaries, the symbol index (`mod_index`, then `source_lookup`), the whole-mod reference report in `script_validate`, the map hot paths, the remaining analyzers, then retiring the TypeScript index. The ZIN MCP worker owns that sequence in agent-tools. The two indexes must not disagree while both exist. ADR 0074 records one known difference: the TypeScript scanner treats `replace_path` as covering subfolders and the engine does not. Until a route moves, a server check that relies on load order uses the engine and labels the MCP answer it differs from.
 
 **Reference closure before every agent commit (S04 onward).** The server runs the linked engine on the proposal's worktree before an agent commit. A new finding at or above the project threshold blocks the commit and returns the finding to the agent. Existing findings recorded in the baseline do not block. Unknown references never count as a pass, and the review card shows their count. Repair plans from the engine become ordinary C-02 proposals, refused when the source hash changed.
 
@@ -132,9 +132,11 @@ HOI4 Factory and hoi4-agent-tools must be measurably ahead of `cpntodd/HOI4-MCP`
 
 The targets are defaults chosen for planning. S03 records the first baseline and the maintainer confirms or changes the targets then. From S03 on, every stage's exit gates include no regression on this benchmark: a result worse than the stored baseline beyond measured noise fails CI, and the baseline moves only on an improvement or a recorded maintainer decision. The MCP surfaces run in hoi4-agent-tools CI. The editor surfaces run in HOI4 Factory CI on the same pinned fixture set. Vanilla runs need a licensed game copy, so they run on a runner that holds one and never publish game files. Hosted CI runs the synthetic and public-mod parts.
 
-The rules-lookup measurement under way in a separate session feeds this benchmark's lookup surface and S05's retrieval baseline (EXP-05). If it lands before S04, S04 uses its improved tools. A separate MCP improvement plan, with the HOI4-MCP comparison, will be linked here when it is ready.
+The rules-lookup measurement under way in a separate session feeds this benchmark's lookup surface and S05's retrieval baseline (EXP-05). If it lands before S04, S04 uses its improved tools. The [MCP improvement plan](../08-expansion-research/12-mcp-improvement-plan.md) holds the HOI4-MCP comparison, the live-test findings, per-surface targets and the agent-tools work packages WP-1 to WP-9 that deliver them.
 
 ### Coverage gaps in hoi4-agent-tools
+
+The agent-tools side of these gaps is work package WP-8 of the [MCP improvement plan](../08-expansion-research/12-mcp-improvement-plan.md).
 
 | Gap today | Plan | Stage |
 |---|---|---|
@@ -152,7 +154,7 @@ The rules-lookup measurement under way in a separate session feeds this benchmar
 
 ### MCP improvement decisions (M-1 to M-15)
 
-The maintainer's MCP decisions of 2026-11-01 are recorded in the [expansion decision record](../08-expansion-research/00-decision-record.md). They are hoi4-agent-tools work unless the table says otherwise.
+The maintainer's MCP decisions of 2026-11-01 are recorded in the [expansion decision record](../08-expansion-research/00-decision-record.md). They are hoi4-agent-tools work unless the table says otherwise, delivered through the work packages of the [MCP improvement plan](../08-expansion-research/12-mcp-improvement-plan.md).
 
 | Decision | Lands in | HOI4 Factory stage that relies on it | Done when |
 |---|---|---|---|

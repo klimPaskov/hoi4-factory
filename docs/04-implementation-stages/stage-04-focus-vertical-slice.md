@@ -6,6 +6,8 @@ Status: **Proposed future implementation stage**. Nothing in this packet was exe
 
 Deliver the smallest useful end-to-end product in the browser. Create, upload or import a mod from GitHub, request a small focus branch, preview and adjust it, run the task without the canvas, review source and evidence, commit an owned branch, push it to the linked GitHub repository and open a pull request when authorized, and restore.
 
+The agent-tools work behind this stage's MCP items (Q-1, M-1 to M-14, the engine moves and the coverage gaps) is planned in the [MCP improvement plan](../08-expansion-research/12-mcp-improvement-plan.md).
+
 The focus canvas is the first two-way editor under FR-5. People drag, snap, link and edit fields, and the agent edits through the same `hoi4.focus_rewrite` operation, both saved to the native files. Each side sees the other's change at once. The shared Rust engine is linked into the server as a library, and its reference closure, lints, override audit and findings baseline (P1 to P4) run before every agent commit. Imports gain the preservation report.
 
 Support a deliberately bounded focus syntax subset. Do not build general visual editors, full maps, unrestricted autonomous plans, a many-agent factory or pushes to a shared default branch. Do not reuse Hagane Studio's visual design or its preview cards. Other editors follow in S06 and S07.

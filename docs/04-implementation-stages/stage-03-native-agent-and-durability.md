@@ -6,6 +6,8 @@ Status: **Proposed future implementation stage**. Nothing in this packet was exe
 
 Implement the native Rust agent loop and durable host state in the server. The loop runs where S01 placed it, in process or as a supervised worker. The model can inspect source and generate a bounded proposal through typed tools. Add controlled application in an owned fixture only after grants and receipts work. Model use is paid either by the user's own API key or by an operator credit allowance, metered per account and per task.
 
+The agent-tools work behind this stage's MCP items (Q-1, M-1 to M-14, the engine moves and the coverage gaps) is planned in the [MCP improvement plan](../08-expansion-research/12-mcp-improvement-plan.md).
+
 Do not introduce a fleet, unrestricted shell, broad visual editors, credit purchasing or a payment provider. End-user execution must be independent of developer coding clients, and no coding CLI is present in the server image.
 
 S03 also sets the tool ground the later stages stand on. The native loop reaches hoi4-agent-tools through one pinned tool profile, the same one Setup installs for a local Claude Code or Codex session. The engine binary ships in the image, and a missing engine is reported as unavailable, never replaced silently by the TypeScript path. The Q-1 benchmark baseline is recorded here, so every later stage can show no regression. Rewrite tools stay disabled until S04.

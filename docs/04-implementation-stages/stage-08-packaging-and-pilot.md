@@ -6,6 +6,8 @@ Status: **Proposed future implementation stage**. Nothing in this packet was exe
 
 Deploy and evaluate the selected product surface as a hosted web service built from Docker images. The first useful slice already exists. This stage makes its deployment, isolation, recovery, upgrade, licensing, game-rights and usability claims reviewable, then runs a pilot before any public domain exposure.
 
+The agent-tools work behind this stage's MCP items (Q-1, M-1 to M-14, the engine moves and the coverage gaps) is planned in the [MCP improvement plan](../08-expansion-research/12-mcp-improvement-plan.md).
+
 The release also carries the tool claims. Images contain the engine and the pinned agent-tools and `hoi4-imagegen-mcp` releases built from pinned source. The Q-1 head-to-head result is published with the release evidence, and the release states which Hagane Studio archive conditions are met.
 
 Do not add many workers, real-time co-editing, full-world generation, credit purchasing or Steam Workshop publishing as release polish. A deferred feature is absent or clearly disabled, never silently marked accepted. The hosting provider is chosen in this stage, and the images stay portable to any Linux host.
