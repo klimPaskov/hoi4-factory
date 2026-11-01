@@ -8,6 +8,8 @@ Deliver useful existing-map inspection, structured import planning and a careful
 
 The inspected Agent Tools geography-model synthesis path is unavailable. Reuse actual inspect/preview/validation features and implement only the independently verified missing import or edit operation authorized for this stage.
 
+This stage also adds the remaining layout editors under the S04 two-way pattern (FR-5): the map editor on `hoi4.map_inspect` and `hoi4.map_rewrite`, the technology editor on `hoi4.tech_inspect` and `hoi4.tech_render` with a new writer, and the GUI editor on `hoi4.gui_inspect`, `hoi4.gui_render` and `hoi4.gui_rewrite`. If review defers S07, the technology and GUI editors are deferred with it.
+
 ## Entry conditions
 
 S05 accepted. A synthetic structured map fixture, the server game reference for vanilla map comparison and an explicit map scope are available. S06 is needed only for shared asset or collaboration features used by the chosen map scope.
@@ -18,15 +20,28 @@ Before editing, read the target repository's current instructions. Preserve unre
 
 Read [implementation master goal](../06-agent-handoffs/IMPLEMENTATION_MASTER_GOAL.md), [shared instructions](../../AGENTS.md), [Claude guidance](../../CLAUDE.md), [roadmap](ROADMAP.md), [contracts](../02-architecture/contracts-and-interfaces.md), then [SPEC-006](../03-subsystem-specs/006-hoi4-tools-and-validation.md), [SPEC-007](../03-subsystem-specs/007-visual-state-synchronization.md), [SPEC-008](../03-subsystem-specs/008-maps.md), [SPEC-010](../03-subsystem-specs/010-assets-localization-and-content.md). Consult the [source registry](../00-research/01-research-sources.md) for the exact inspected pins. Use current local repository instructions to resolve implementation details and record any conflict with this planning baseline.
 
+## Engine, editors and tool quality
+
+The cross-stage plan is in [engine, editors and tools across stages](ROADMAP.md#engine-editors-and-tools-across-stages).
+
+| Topic | In S07 |
+|---|---|
+| Shared Rust engine | Map, technology and GUI checks run on the engine where it has a context model. Folders it counts as unchecked stay labelled unchecked |
+| Map editor | `hoi4.map_inspect` for the projection, `hoi4.map_rewrite` for the one bounded operation S07-W3 selects |
+| Technology editor | `hoi4.tech_inspect` and `hoi4.tech_render`, plus a new technology writer reusing the focus grid geometry |
+| GUI editor | `hoi4.gui_inspect`, `hoi4.gui_render` and `hoi4.gui_rewrite` |
+| Q-1 | No regression on T-BENCH-01. Map, technology and GUI surfaces join the benchmark where a comparator offers them |
+| Harvest and coding-agent integration | No new harvest item. The new writer joins the one tool profile |
+
 ## Implementation-sized work packets
 
 Each packet should produce a reviewable change and evidence before another packet expands its scope. Split a packet further if it cannot be reviewed in one ordinary engineering session. Owners are responsibilities, not mandatory simultaneous agents.
 
 | Packet | Owner | Deliverable | Work and contract boundary |
 |---|---|---|---|
-| S07-W1 | Map engineer | Read projection and dependencies | Load provinces, definitions, states, regions, terrain and related profile data from the workspace, falling back to the server game reference for inherited vanilla files. Expose unknown/missing inputs and exact source links. Build a tile or region index for bounded reads. |
+| S07-W1 | Map engineer | Read projections and dependencies | Load provinces, definitions, states, regions, terrain and related profile data from the workspace through `hoi4.map_inspect`, falling back to the server game reference for inherited vanilla files. Expose unknown/missing inputs and exact source links. Build a tile or region index for bounded reads. Build the technology and GUI projections from their inspect tools in the same way. |
 | S07-W2 | Import engineer | Structured import planner | Validate dimensions, formats, color/ID uniqueness and reference closure. Preserve IDs where possible, otherwise produce explicit remapping and affected consumers. Generate a reviewable plan before writes. |
-| S07-W3 | Map editor engineer | Bounded mutation | Select one operation such as a supported province assignment or terrain region change. Route it through C-02 and native preservation tools. Reject unsupported topology changes. |
+| S07-W3 | Editor engineer | Bounded two-way mutations | Select one map operation such as a supported province assignment or terrain region change, sent through `hoi4.map_rewrite` by both the editor and the agent. Add supported technology moves and links through the new writer and GUI layout edits through `hoi4.gui_rewrite`. Route all of them through C-02 and native preservation tools. Reject unsupported topology changes. Split this packet if it cannot be reviewed in one session. |
 | S07-W4 | Designer | Reference-image workflow | Store attribution, intended scale and design interpretation separately from exact map data. Show what remains to be modeled and validated. Keep image suggestions reversible. |
 | S07-W5 | Performance engineer | EXP-06 | Measure representative full-map read, tile cache memory, local redraw and dependency validation. Compare bounded update cost to full rebuild before choosing indexing strategy. |
 | S07-W6 | Reviewer | Game and topology verification | Run deterministic topology fixtures and, where a user operates the game, record a user-observed scenario on the declared build. Record unsupported builds and avoid transferring one scenario's result to all maps. |
@@ -39,7 +54,7 @@ A contract-only dependency permits parallel implementation after that interface 
 |---|---|---|
 | S07-W1 | S05 | Generation of a new playable world |
 | S07-W2 | S07-W1 | Treating a reference image as structured game input |
-| S07-W3 | S07-W1, S07-W2 | Arbitrary topology mutation |
+| S07-W3 | S07-W1, S07-W2 | Arbitrary topology mutation, an editor-only write path |
 | S07-W4 | S07-W1 contract | Unsupported geography synthesis or new paid image calls |
 | S07-W5 | S07-W1, S07-W2, S07-W3 | Choosing full-map rebuilds without measurement |
 | S07-W6 | S07-W1, S07-W2, S07-W3, S07-W4, S07-W5 | Advertising support for untested game builds |
@@ -47,6 +62,8 @@ A contract-only dependency permits parallel implementation after that interface 
 ## Verification plan
 
 Use F-MAP-STRUCTURED, F-MAP-BROKEN and F-MAP-REFERENCE. Include duplicate colors, missing definitions, out-of-range IDs, mismatched dimensions, broken state/region references, isolated invalid pixels, ambiguous image scale, asset collision and a changed source during import.
+
+Run T-EDIT-01 for the selected map operation and for the supported technology and GUI edits, including an agent edit while a person has the same element selected. Run T-BENCH-01 and compare with the stored baseline.
 
 Inject interruption after staged map outputs and after one dependent file is written. A rollback must restore the entire affected closure or stop with explicit conflicts. Benchmark on declared server hardware and source dimensions, including browser rendering of tiles. Generated synthetic fixtures must not contain redistributed game assets, and map tiles derived from the game reference are not offered for download.
 
@@ -60,6 +77,8 @@ Use the [test strategy](../05-verification/TEST-STRATEGY.md) and [evaluation mat
 4. Reference image upload never creates an unsupported game-ready claim.
 5. Known unavailable geography synthesis remains disabled or is separately implemented and validated, with evidence of what changed.
 6. Map recovery and performance results are recorded. Actual game evidence is scenario-specific and missing game evidence remains explicit.
+7. The map, technology and GUI editors pass parity across the gesture, native agent and coding-client paths on their supported operations, and agent edits appear in an open editor without reload.
+8. T-BENCH-01 shows no regression from the stored baseline.
 
 All gates are evaluated against the final stage revision. Changed inputs invalidate affected evidence. A known defect in the selected critical path requires a fix or an explicit narrower scope decision. Optional unavailable checks remain named limitations.
 
@@ -75,7 +94,7 @@ Record the result in `evidence/S07/learning-review.md`. Follow [reusable knowled
 
 ## Configuration checkpoint
 
-Record game reference build and DLC set, tool schema, map dimensions, memory budget and optional image-provider rights. Check that no game files or private reference assets enter images, exports or pull requests.
+Record game reference build and DLC set, tool schema and profile with the new writer, map dimensions, memory budget and optional image-provider rights. Check that no game files or private reference assets enter images, exports or pull requests.
 
 Record `evidence/S07/config-review.md`, including changed files, verified client or runtime versions, source provenance and any deferred live check. Update the [knowledge changelog](../07-developer-workflow/KNOWLEDGE-CHANGELOG.md) only for material accepted guidance changes.
 

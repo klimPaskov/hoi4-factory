@@ -731,6 +731,71 @@
       ],
       "oracle": "A global lesson forms only from de-identified signals seen in at least five unrelated projects, contains no user text or identifiers, passes the verification gate across those cases, and can be paused or removed by the maintainer.",
       "status": "Planned, not executed"
+    },
+    {
+      "id": "T-ENG-01",
+      "name": "Engine check, tool profile and no silent fallback",
+      "fixtures": [
+        "F-FOCUS-FIDELITY",
+        "F-BENCH"
+      ],
+      "stages": [
+        "S03",
+        "S04",
+        "S06",
+        "S08"
+      ],
+      "oracle": "The native loop and the coding-client profile name the same agent-tools release and engine revision. A missing engine yields an unavailable result, never a fallback. Before an agent commit the linked engine reports resolved, unresolved and unknown counts per kind, a new finding blocks the commit, baseline findings do not, and an incomplete verdict is never recorded as passed.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-EDIT-01",
+      "name": "Two-way editor and agent parity",
+      "fixtures": [
+        "F-FOCUS-SMALL",
+        "F-FOCUS-FIDELITY",
+        "F-COLLAB"
+      ],
+      "stages": [
+        "S04",
+        "S06",
+        "S07",
+        "S08"
+      ],
+      "oracle": "For each supported editor operation, the same intent as a person's gesture, a native agent tool call and a coding-client MCP call on a clone yields identical file bytes, projection and finding delta. An applied agent edit appears in an open editor without reload, a person's edit appears in the agent's next inspect and bundle, and a stale write from either side is refused with current hashes.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-BENCH-01",
+      "name": "Q-1 head-to-head benchmark and no regression",
+      "fixtures": [
+        "F-BENCH"
+      ],
+      "stages": [
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08"
+      ],
+      "oracle": "On the shared fixture set and question key, lookup accuracy, validation false positives and seeded defects caught, honest unknowns, tool latency and editor round trip are measured for HOI4 Factory, hoi4-agent-tools, cpntodd/HOI4-MCP and Hagane Studio with pinned versions. Results meet the recorded targets or name the gap, no surface is worse than the stored baseline beyond measured noise, and surfaces that could not run are listed as unavailable.",
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "T-IMPORT-01",
+      "name": "Import preservation report and findings baseline",
+      "fixtures": [
+        "F-SETUP-IMPORT",
+        "F-GITHUB-REPO",
+        "F-HAGANE-EXPORT"
+      ],
+      "stages": [
+        "S04",
+        "S06"
+      ],
+      "oracle": "Every imported path appears in the preservation report as parsed, kept byte-exact or not understood, every unapproved byte is unchanged, existing findings are recorded as the baseline and do not fail later checks, and a Hagane Studio export is recognized without adopting its platform conventions.",
+      "status": "Planned, not executed"
     }
   ]
 }

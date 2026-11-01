@@ -95,7 +95,8 @@
       ],
       "tests": [
         "T-SETUP-02",
-        "T-SETUP-03"
+        "T-SETUP-03",
+        "T-IMPORT-01"
       ],
       "oracle": "Existing and partial mod imports preserve unapproved files and use supported recovery variants.",
       "execution_status": "Planned, not executed."
@@ -229,7 +230,8 @@
       ],
       "tests": [
         "T-VIS-02",
-        "T-HOI-02"
+        "T-HOI-02",
+        "T-EDIT-01"
       ],
       "oracle": "Focus preview exposes supported relationships, source revision, icons and explicit fidelity diagnostics.",
       "execution_status": "Planned, not executed."
@@ -248,7 +250,8 @@
       ],
       "tests": [
         "T-VIS-01",
-        "T-VIS-03"
+        "T-VIS-03",
+        "T-EDIT-01"
       ],
       "oracle": "Supported move/property edits, undo and redo preserve unrelated bytes, unsupported edits refuse safely.",
       "execution_status": "Planned, not executed."
@@ -476,7 +479,8 @@
       ],
       "tests": [
         "T-HOI-01",
-        "T-HOI-02"
+        "T-HOI-02",
+        "T-ENG-01"
       ],
       "oracle": "Known bad fixtures fail appropriate checks and no render/simulation is called actual game evidence.",
       "execution_status": "Planned, not executed."
@@ -496,7 +500,8 @@
       ],
       "tests": [
         "T-SETUP-04",
-        "T-RUN-02"
+        "T-RUN-02",
+        "T-ENG-01"
       ],
       "oracle": "Adapter schema/version/health, timeout, cancellation and retry limits are observable and tested.",
       "execution_status": "Planned, not executed."
@@ -810,7 +815,8 @@
         "ADR-003"
       ],
       "tests": [
-        "T-SEC-02"
+        "T-SEC-02",
+        "T-ENG-01"
       ],
       "oracle": "MCP/skills are bounded adapters, optional ACP unsupported states are explicit and runtime replacement preserves host authority.",
       "execution_status": "Planned, not executed."
@@ -1145,6 +1151,25 @@
       "status": "Planned, not executed"
     },
     {
+      "id": "S03-G7",
+      "stage": "S03",
+      "ordinal": 7,
+      "tests": [
+        "T-ENG-01",
+        "T-SEC-02"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S03-G8",
+      "stage": "S03",
+      "ordinal": 8,
+      "tests": [
+        "T-BENCH-01"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
       "id": "S04-G1",
       "stage": "S04",
       "ordinal": 1,
@@ -1217,6 +1242,37 @@
       "status": "Planned, not executed"
     },
     {
+      "id": "S04-G8",
+      "stage": "S04",
+      "ordinal": 8,
+      "tests": [
+        "T-ENG-01",
+        "T-IMPORT-01",
+        "T-HOI-01"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S04-G9",
+      "stage": "S04",
+      "ordinal": 9,
+      "tests": [
+        "T-EDIT-01",
+        "T-VIS-03"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S04-G10",
+      "stage": "S04",
+      "ordinal": 10,
+      "tests": [
+        "T-BENCH-01",
+        "T-PERF-01"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
       "id": "S05-G1",
       "stage": "S05",
       "ordinal": 1,
@@ -1281,6 +1337,17 @@
       "status": "Planned, not executed"
     },
     {
+      "id": "S05-G7",
+      "stage": "S05",
+      "ordinal": 7,
+      "tests": [
+        "T-BENCH-01",
+        "T-CTX-02",
+        "T-VIS-03"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
       "id": "S06-G1",
       "stage": "S06",
       "ordinal": 1,
@@ -1339,6 +1406,35 @@
       "status": "Planned, not executed"
     },
     {
+      "id": "S06-G7",
+      "stage": "S06",
+      "ordinal": 7,
+      "tests": [
+        "T-EDIT-01",
+        "T-CONTENT-01",
+        "T-CONTENT-02"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S06-G8",
+      "stage": "S06",
+      "ordinal": 8,
+      "tests": [
+        "T-IMPORT-01"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S06-G9",
+      "stage": "S06",
+      "ordinal": 9,
+      "tests": [
+        "T-BENCH-01"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
       "id": "S07-G1",
       "stage": "S07",
       "ordinal": 1,
@@ -1391,6 +1487,25 @@
         "T-MAP-02",
         "T-PERF-02",
         "T-HOI-02"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S07-G7",
+      "stage": "S07",
+      "ordinal": 7,
+      "tests": [
+        "T-EDIT-01",
+        "T-MAP-02"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S07-G8",
+      "stage": "S07",
+      "ordinal": 8,
+      "tests": [
+        "T-BENCH-01"
       ],
       "status": "Planned, not executed"
     },
@@ -1456,6 +1571,18 @@
         "T-RUN-06",
         "T-ACCT-02",
         "T-SEC-02"
+      ],
+      "status": "Planned, not executed"
+    },
+    {
+      "id": "S08-G7",
+      "stage": "S08",
+      "ordinal": 7,
+      "tests": [
+        "T-BENCH-01",
+        "T-ENG-01",
+        "T-EDIT-01",
+        "T-DEPLOY-01"
       ],
       "status": "Planned, not executed"
     }

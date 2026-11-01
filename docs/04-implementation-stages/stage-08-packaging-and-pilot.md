@@ -6,6 +6,8 @@ Status: **Proposed future implementation stage**. Nothing in this packet was exe
 
 Deploy and evaluate the selected product surface as a hosted web service built from Docker images. The first useful slice already exists. This stage makes its deployment, isolation, recovery, upgrade, licensing, game-rights and usability claims reviewable, then runs a pilot before any public domain exposure.
 
+The release also carries the tool claims. Images contain the engine and the pinned agent-tools and `hoi4-imagegen-mcp` releases built from pinned source. The Q-1 head-to-head result is published with the release evidence, and the release states which Hagane Studio archive conditions are met.
+
 Do not add many workers, real-time co-editing, full-world generation, credit purchasing or Steam Workshop publishing as release polish. A deferred feature is absent or clearly disabled, never silently marked accepted. The hosting provider is chosen in this stage, and the images stay portable to any Linux host.
 
 ## Entry conditions
@@ -18,18 +20,30 @@ Before editing, read the target repository's current instructions. Preserve unre
 
 Read [implementation master goal](../06-agent-handoffs/IMPLEMENTATION_MASTER_GOAL.md), [shared instructions](../../AGENTS.md), [Claude guidance](../../CLAUDE.md), [roadmap](ROADMAP.md), [maintainer decisions](../02-architecture/maintainer-decisions-2026-10-24.md), [contracts](../02-architecture/contracts-and-interfaces.md), then [SPEC-001](../03-subsystem-specs/001-onboarding-and-mod-setup.md), [SPEC-002](../03-subsystem-specs/002-native-runtime-and-models.md), [SPEC-003](../03-subsystem-specs/003-orchestration-and-recovery.md), [SPEC-004](../03-subsystem-specs/004-context-memory-and-runtime-learning.md), [SPEC-005](../03-subsystem-specs/005-git-collaboration-and-review.md), [SPEC-006](../03-subsystem-specs/006-hoi4-tools-and-validation.md), [SPEC-007](../03-subsystem-specs/007-visual-state-synchronization.md), [SPEC-008](../03-subsystem-specs/008-maps.md), [SPEC-009](../03-subsystem-specs/009-focus-and-other-editors.md), [SPEC-010](../03-subsystem-specs/010-assets-localization-and-content.md), [SPEC-011](../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md), [SPEC-012](../03-subsystem-specs/012-engineering-guidance-skills-and-learning.md), [SPEC-013](../03-subsystem-specs/013-config-reuse-and-developer-environment.md). Consult the [source registry](../00-research/01-research-sources.md) for the exact inspected pins. Use current local repository instructions to resolve implementation details and record any conflict with this planning baseline.
 
+## Engine, editors and tool quality
+
+The cross-stage plan is in [engine, editors and tools across stages](ROADMAP.md#engine-editors-and-tools-across-stages).
+
+| Topic | In S08 |
+|---|---|
+| Shared Rust engine | Images build the engine from pinned source for amd64 and arm64. No route reads the TypeScript index, or the remaining one is an accepted limitation |
+| Editors | The advertised editors are exactly those whose parity tests passed. Each one is in the pilot |
+| Q-1 | The full T-BENCH-01 run against the release images, published with comparator pins, hardware and unavailable surfaces |
+| Hagane | The release notes state which archive conditions are met. Archiving itself is W8 and needs the companion stage too |
+| Coding-agent integration | The documented coding-client profile names the same releases as the images |
+
 ## Implementation-sized work packets
 
 Each packet should produce a reviewable change and evidence before another packet expands its scope. Split a packet further if it cannot be reviewed in one ordinary engineering session. Owners are responsibilities, not mandatory simultaneous agents.
 
 | Packet | Owner | Deliverable | Work and contract boundary |
 |---|---|---|---|
-| S08-W1 | Release engineer | Reproducible images and deployment | Pin Rust, browser client and tool dependencies, build Docker images with recorded digests, base image pins, SBOM and notices, and verify no coding CLI, game file or credential is in any image. Describe the service set in Compose, select the hosting provider and deploy to a non-public staging environment. Document how operators verify image authenticity. |
+| S08-W1 | Release engineer | Reproducible images and deployment | Pin Rust, browser client and tool dependencies, including the engine, agent-tools and `hoi4-imagegen-mcp` releases, build Docker images with recorded digests, base image pins, SBOM and notices, and verify no coding CLI, game file or credential is in any image. Describe the service set in Compose, select the hosting provider and deploy to a non-public staging environment. Document how operators verify image authenticity. |
 | S08-W2 | Security engineer | Boundary and tenant validation | Exercise cross-account access, member role limits, path and symlink escapes, malicious source and upload content, outbound destination checks on custom endpoints, agent tool containment, credential and GitHub token redaction, abuse and rate limits, destination fallback and stale worker fences. Evaluate a stronger runtime boundary than plain containers for model-directed tools. |
 | S08-W3 | Reliability engineer | EXP-08 backup, upgrade and account lifecycle | Test consistent backup and restore of PostgreSQL, Git volumes and artifact storage together, schema migration, interrupted image upgrade, rollback, game reference update and account deletion, while preserving native mod files, linked GitHub repositories and unresolved journals. |
-| S08-W4 | Evaluation owner | Three-profile scenario matrix | Run all selected scenarios with M-API-A, M-API-B and M-LOCAL-C under the declared budgets. Record exact model and provider versions, payment source, skips, failures, intervention and rework. |
+| S08-W4 | Evaluation owner | Three-profile scenario matrix and Q-1 | Run all selected scenarios with M-API-A, M-API-B and M-LOCAL-C under the declared budgets. Record exact model and provider versions, payment source, skips, failures, intervention and rework. Run T-BENCH-01 against the staging images and prepare the published result. |
 | S08-W5 | Product reviewer | Pilot on staging | Observe a non-scripter, technical contributor, maintainer and an invited collaborator using the staged service. Record task completion and comprehension of evidence limits. Do not infer usability from screenshots alone. |
-| S08-W6 | Maintainer | Rights, license and release decision | Complete and record the game-rights review for the hosted service with free use and optional credits. Confirm the AGPL-3.0 license inventory and source offer. Confirm privacy policy, data retention and account deletion. Review known defects, actual support matrix and evidence. Approve, narrow or defer public domain exposure. Do not expose the service publicly without the applicable authorization. |
+| S08-W6 | Maintainer | Rights, license and release decision | Complete and record the game-rights review for the hosted service with free use and optional credits. Confirm the AGPL-3.0 license inventory and source offer. Confirm privacy policy, data retention and account deletion. Review known defects, actual support matrix, the Q-1 result and evidence. Approve, narrow or defer public domain exposure. Do not expose the service publicly without the applicable authorization. |
 
 ## Packet dependencies and exclusions
 
@@ -48,7 +62,7 @@ A contract-only dependency permits parallel implementation after that interface 
 
 Run the acceptance matrix and scenario matrix against the deployed staging images, not only development servers. Include unsupported mod target version, unreachable custom endpoint, API refusal and rate limit, server restart during a task, agent worker crash, full disk on the Git volume, GitHub outage, revoked GitHub installation and corrupted or missing artifact recovery.
 
-Repeat critical source-loss, cross-account and authorization fixtures after image upgrade and restore. Restore a backup into a fresh deployment and confirm source, canon and task state agree. Actual game observations remain user-operated scenarios. A missing environment is a support limitation, not a passing test.
+Run T-ENG-01 and T-EDIT-01 against the staging images for every advertised editor. Repeat critical source-loss, cross-account and authorization fixtures after image upgrade and restore. Restore a backup into a fresh deployment and confirm source, canon and task state agree. Actual game observations remain user-operated scenarios. A missing environment is a support limitation, not a passing test.
 
 Use the [test strategy](../05-verification/TEST-STRATEGY.md) and [evaluation matrix](../05-verification/EVALUATION-MATRIX.md). Exercise production code for the behavior under test. Record exact revision, fixture hash, environment, command or action, result, evidence kind and limitation. A declared upstream test or successful source inspection does not replace running the required stage test.
 
@@ -60,6 +74,7 @@ Use the [test strategy](../05-verification/TEST-STRATEGY.md) and [evaluation mat
 4. Backup, image upgrade, rollback, account deletion and restore preserve source, accepted canon and recoverable task state under declared conditions.
 5. License inventory confirms AGPL-3.0 compatibility and excludes restricted or unlicensed reuse. Images and exports exclude game files, and the game-rights review is recorded before public domain exposure.
 6. Pilot findings, tenant isolation and abuse-limit results, cost, time and rework metrics and remaining risks support a concrete release decision. No automatic public exposure occurs.
+7. The release images carry the pinned engine and tool releases, every advertised editor passed parity on them, and T-BENCH-01 on the release images shows no regression and is published with its comparators and unavailable surfaces.
 
 All gates are evaluated against the final stage revision. Changed inputs invalidate affected evidence. A known defect in the selected critical path requires a fix or an explicit narrower scope decision. Optional unavailable checks remain named limitations.
 
@@ -75,7 +90,7 @@ Record the result in `evidence/S08/learning-review.md`. Follow [reusable knowled
 
 ## Configuration checkpoint
 
-Revalidate current Claude/Codex guidance and runtime profiles at the release pins. Review image digests, Compose and hosting configuration, optional MCP endpoints, secrets, GitHub App permissions, permissions, concurrency, rate limits, model capability changes and source manifest upgrades.
+Revalidate current Claude/Codex guidance and runtime profiles at the release pins. Review image digests, the engine and tool release pins, the coding-client profile, Compose and hosting configuration, optional MCP endpoints, secrets, GitHub App permissions, permissions, concurrency, rate limits, model capability changes and source manifest upgrades.
 
 Record `evidence/S08/config-review.md`, including changed files, verified client or runtime versions, source provenance and any deferred live check. Update the [knowledge changelog](../07-developer-workflow/KNOWLEDGE-CHANGELOG.md) only for material accepted guidance changes.
 

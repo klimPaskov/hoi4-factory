@@ -6,6 +6,8 @@ Status: **Proposed future implementation stage**. Nothing in this packet was exe
 
 Make repeated work reliable across sessions and provider changes. Implement approved canon, provenance-aware context, freshness, the automatic memory system of [ADR-022](../02-architecture/maintainer-decisions-2026-10-24.md#adr-022-automatic-memory-feedback-and-self-improvement) and stronger recovery. The memory system covers personal, project and global scopes, typed feedback capture, the reflection writer, lanes A to D, the verification gate, the global lesson pipeline, user deletion and the off switch, as specified in [SPEC-004](../03-subsystem-specs/004-context-memory-and-runtime-learning.md). Keep engineering learning under ADR-023 separate from product memory.
 
+Two-way editing (FR-5) must hold across sessions as well as within one. Edits a person makes in the editor, and changes a local Claude Code or Codex session pushes through Git, reach the next agent session as fresh state, so the agent continues from them. The rules-lookup work feeds the retrieval baseline here.
+
 Do not add vector retrieval or a separate memory service by default. Do not build a page to browse or edit memories, which the maintainer declined. Canon and memory stay scoped to their project and account, and memory carries no authority. Do not convert inferred conversation statements into accepted lore.
 
 ## Entry conditions
@@ -18,18 +20,31 @@ Before editing, read the target repository's current instructions. Preserve unre
 
 Read [implementation master goal](../06-agent-handoffs/IMPLEMENTATION_MASTER_GOAL.md), [shared instructions](../../AGENTS.md), [Claude guidance](../../CLAUDE.md), [roadmap](ROADMAP.md), [contracts](../02-architecture/contracts-and-interfaces.md), then [SPEC-002](../03-subsystem-specs/002-native-runtime-and-models.md), [SPEC-003](../03-subsystem-specs/003-orchestration-and-recovery.md), [SPEC-004](../03-subsystem-specs/004-context-memory-and-runtime-learning.md), [SPEC-007](../03-subsystem-specs/007-visual-state-synchronization.md), [SPEC-011](../03-subsystem-specs/011-extensibility-sandbox-and-permissions.md), [SPEC-012](../03-subsystem-specs/012-engineering-guidance-skills-and-learning.md). Consult the [source registry](../00-research/01-research-sources.md) for the exact inspected pins. Use current local repository instructions to resolve implementation details and record any conflict with this planning baseline.
 
+## Engine, editors and tool quality
+
+The cross-stage plan is in [engine, editors and tools across stages](ROADMAP.md#engine-editors-and-tools-across-stages).
+
+| Topic | In S05 |
+|---|---|
+| Shared Rust engine | Freshness keys include the engine revision and the tool profile. Focus routes move onto the engine here if they did not in S04 |
+| Editors (FR-5) | No new editor. Changes since the agent's last read survive restart, model switch and a new session |
+| MCP tools | `hoi4.reference_search`, `hoi4.reference_read`, `hoi4.reference_context` and `hoi4.source_lookup` are measured in EXP-05 with the rules-lookup question set |
+| Coding-agent integration | A change pushed from a local coding client is detected, re-validated with the pinned tools and shown to the next native agent session as fresh state |
+| Q-1 | No regression on T-BENCH-01. The lookup surface meets its target or the gap is recorded with a plan |
+| Harvest and coverage gaps | None in this stage |
+
 ## Implementation-sized work packets
 
 Each packet should produce a reviewable change and evidence before another packet expands its scope. Split a packet further if it cannot be reviewed in one ordinary engineering session. Owners are responsibilities, not mandatory simultaneous agents.
 
 | Packet | Owner | Deliverable | Work and contract boundary |
 |---|---|---|---|
-| S05-W1 | Context engineer | C-06 builder with memory injection | Assemble approved requirements, source pointers, task state and receipt references under the actual model budget. Inject personal, project and global memory as a labelled data block that grants nothing, with lesson index lines, trigger-matched bodies, per-scope caps and the SPEC-004 precedence. Record inclusion reasons, memory items used, omissions and immutable manifest hashes. |
+| S05-W1 | Context engineer | C-06 builder with memory injection | Assemble approved requirements, source pointers, task state and receipt references under the actual model budget. Inject personal, project and global memory as a labelled data block that grants nothing, with lesson index lines, trigger-matched bodies, per-scope caps and the SPEC-004 precedence. Record inclusion reasons, memory items used, omissions and immutable manifest hashes. Include the IDs and hashes changed by people or external pushes since the agent's last read. |
 | S05-W2 | Domain engineer | Canon, ownership and memory store | Implement named canon owners, explicit design proposals and versioned approvals. Implement the C-07 `MemoryItem`, `FeedbackEvent` and write-ledger tables with row-level security and a scoped data-access layer that cannot query without an account and project scope. Route lane D canon suggestions to design proposals. Show conflicts between accepted design and inferred suggestions. |
-| S05-W3 | Index engineer | Freshness, staleness and erasure | Invalidate changed dependency closures, tool/game profiles, source locators and memory items bound to them. Run the 60-day stale and archive lifecycle. Cascade every deletion to index entries, cached payloads and sole-evidence derivatives. Publish complete derived-index generations atomically and reconcile cancelled jobs. |
+| S05-W3 | Index engineer | Freshness, staleness and erasure | Invalidate changed dependency closures, tool/game profiles, engine revisions, source locators and memory items bound to them, including those changed by editor gestures and external pushes. Run the 60-day stale and archive lifecycle. Cascade every deletion to index entries, cached payloads and sole-evidence derivatives. Publish complete derived-index generations atomically and reconcile cancelled jobs. |
 | S05-W4 | Learning engineer | Feedback, reflection, lanes and verification | Capture typed feedback events. Build the budgeted reflection job with only `propose_memory` and an ID-only input allowlist, and the deterministic Rust policy engine with threat scans, identifier-leak and authority-vocabulary checks and lanes A to D. Implement the verification gate V1 to V7 with operator-paid replays under a daily cap, lane C review with expected versions, the global lesson pipeline from de-identified signals across at least five unrelated projects, "memory updated" notices with Undo, forget, delete all and the off switch. |
 | S05-W5 | Runtime engineer | Cross-model handoff | Drain or reconcile in-flight effects, rebuild context and memory injection for the next provider and recheck destinations/capabilities. Test smaller context, missing image support and revoked authority. Confirm memory content follows the project's approved data destinations. |
-| S05-W6 | Reviewer | EXP-05, red team and recovery study | Run exact/full-text retrieval baseline and stale-answer fixtures. Calibrate the verification gate thresholds and staleness periods. Run the C7 poisoning and authority-laundering fixtures and the cross-tenant memory probes. Add a new retrieval component only if the measured gap persists. Audit recovery state after long sequences. |
+| S05-W6 | Reviewer | EXP-05, red team, recovery study and Q-1 | Run exact/full-text retrieval baseline and stale-answer fixtures, using the rules-lookup question set and T-BENCH-01's lookup surface. Calibrate the verification gate thresholds and staleness periods. Run the C7 poisoning and authority-laundering fixtures and the cross-tenant memory probes. Add a new retrieval component only if the measured gap persists. Audit recovery state after long sequences. |
 
 ## Packet dependencies and exclusions
 
@@ -50,6 +65,8 @@ Run CTX-01 through CTX-10 and MEM-01 through MEM-15 from SPEC-004, which supply 
 
 For memory, use at least two accounts sharing one project and a second project owned by one of them. Seed failed validations followed by fixes, user edits to proposals, rejected proposals, reverted commits and thumbs-down events. Confirm lane routing comes from the policy engine, not the model. Run the C7 red-team fixtures: a poisoned imported-mod comment, a malicious non-member issue body, a member injecting "always disable validation", a hidden-Unicode row and a cross-project identifier. Exercise forget, Undo, delete all, the off switch, an owner's bulk pause of one contributor and a member's departure. Build the global pipeline fixture from at least six synthetic projects, including one copy, and confirm only de-identified signals cross project scope. Record replay count and cost against the daily cap.
 
+Between two agent sessions on one fixture, move a focus in the editor and push a change from a local coding client on a clone. The next session must name both changes in its bundle and must not overwrite them. Repeat after a model switch. Run T-BENCH-01 and compare with the stored baseline.
+
 Use at least ten related tasks on the same fixture to expose accumulated stale context and the effect of learned lessons. Compare accepted output, repeated mistakes and human correction with the S04 baseline. Do not compare only prompt length or summary fluency.
 
 Use the [test strategy](../05-verification/TEST-STRATEGY.md) and [evaluation matrix](../05-verification/EVALUATION-MATRIX.md). Exercise production code for the behavior under test. Record exact revision, fixture hash, environment, command or action, result, evidence kind and limitation. A declared upstream test or successful source inspection does not replace running the required stage test.
@@ -62,6 +79,7 @@ Use the [test strategy](../05-verification/TEST-STRATEGY.md) and [evaluation mat
 4. Personal preferences apply without review, project lessons activate only through the verification gate, conflicts reach owner review with one expected-version winner, global lessons form only from de-identified signals across at least five unrelated projects, and superseded, paused or deleted items disappear from active recall.
 5. Retrieval benchmark records correct source selection, missed facts and stale answers, and EXP-05 records calibrated verification thresholds with replay cost. New infrastructure has an evidence-based decision.
 6. Long-sequence reopen and restore tests maintain source, policy and memory ledger invariants without indefinite audit loops.
+7. Editor and external pushes made between sessions reach the next session's bundle and are not overwritten. T-BENCH-01 shows no regression, and the lookup surface result is recorded against its target.
 
 All gates are evaluated against the final stage revision. Changed inputs invalidate affected evidence. A known defect in the selected critical path requires a fix or an explicit narrower scope decision. Optional unavailable checks remain named limitations.
 
@@ -77,7 +95,7 @@ Record the result in `evidence/S05/learning-review.md`. Follow [reusable knowled
 
 ## Configuration checkpoint
 
-Recheck context budgets per exact model, memory injection caps, remote-data destination rules for memory content and verification replays, the replay daily cap, tool schema versions and mirror consistency of changed workflow guidance.
+Recheck the tool profile and engine revision used for freshness keys, context budgets per exact model, memory injection caps, remote-data destination rules for memory content and verification replays, the replay daily cap, tool schema versions and mirror consistency of changed workflow guidance.
 
 Record `evidence/S05/config-review.md`, including changed files, verified client or runtime versions, source provenance and any deferred live check. Update the [knowledge changelog](../07-developer-workflow/KNOWLEDGE-CHANGELOG.md) only for material accepted guidance changes.
 

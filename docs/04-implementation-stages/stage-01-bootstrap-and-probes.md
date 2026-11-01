@@ -84,6 +84,17 @@ Record current client versions, exact accepted settings, all intentionally disab
 
 Record `evidence/S01/config-review.md`, including changed files, verified client or runtime versions, source provenance and any deferred live check. Update the [knowledge changelog](../07-developer-workflow/KNOWLEDGE-CHANGELOG.md) only for material accepted guidance changes.
 
+## What later stages build on
+
+S01 is complete. This note, added on 2026-11-01, names the results later stages rely on. See [engine, editors and tools across stages](ROADMAP.md#engine-editors-and-tools-across-stages).
+
+| S01 result | Used by |
+|---|---|
+| EXP-02 writable focus subset and the Linux-image run of the agent-tools focus tools | S04 focus editor. Its gestures stay inside this subset until the engine and W7 widen it |
+| Rust agent loop probes with fake transports | S03 native loop, and the S03 tool profile shared with coding clients |
+| Container image with no coding CLI | S03 and S08 images, which also carry the engine built from pinned source |
+| GitHub App probe on a disposable repository | S04 publication and the S06 Hagane export import from GitHub |
+
 ## Standalone completion and continuation handoff
 
 S01 ends with environment, probe evidence, ADR dispositions and a proposed S02 entry contract. The next agent must be told which Setup binding is feasible on server paths, whether apply is cleared, which focus operations preserve source inside the image, which provider adapter approach and execution placement were selected, what the GitHub probe granted and which model or platform probes remain missing.

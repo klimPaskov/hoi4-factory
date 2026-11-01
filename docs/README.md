@@ -26,7 +26,7 @@ Implementation is deferred by the maintainer. The next implementation action, wh
 | docs/01-product | 50 requirements, users, required scenarios, optional visuals/autonomy and traceability |
 | docs/02-architecture | Maintainer decisions, the selected direction and two research candidates, ADRs, state model, ten contracts, deployment and security |
 | docs/03-subsystem-specs | 13 detailed subsystem specifications with functional, failure, recovery and acceptance behavior |
-| docs/04-implementation-stages | Eight stages, 48 work packets, 47 exit gates and prioritized deferred scope |
+| docs/04-implementation-stages | Eight stages, 48 work packets, 59 exit gates and prioritized deferred scope |
 | docs/05-verification | Fixtures, test catalog, three-profile evaluation, requirement/gate mappings, risks and executable package QA |
 | docs/06-agent-handoffs | One-stage implementation goal, Claude-first start prompt, portable start prompt, workflow guide and handoff template |
 | docs/07-developer-workflow | Exhaustive 196-field config migration, learning policy, skill source and deterministic synchronization |

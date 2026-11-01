@@ -80,6 +80,17 @@ Verify workspace root configuration, volume mounts, the read-only game reference
 
 Record `evidence/S02/config-review.md`, including changed files, verified client or runtime versions, source provenance and any deferred live check. Update the [knowledge changelog](../07-developer-workflow/KNOWLEDGE-CHANGELOG.md) only for material accepted guidance changes.
 
+## What later stages build on
+
+S02 is complete. This note, added on 2026-11-01, names the results later stages rely on. See [engine, editors and tools across stages](ROADMAP.md#engine-editors-and-tools-across-stages).
+
+| S02 result | Used by |
+|---|---|
+| Setup import flow for uploads and GitHub imports | S04 adds the import preservation report and findings baseline to it. S06 extends it to Hagane Studio export ZIPs |
+| Read-only game reference with build and DLC set | The engine reads effect, trigger and modifier vocabulary from its `documentation/` files and DLC names for the DLC lint. Q-1 vanilla benchmark runs use it where a licensed copy is present |
+| Per-account workspaces with owned worktrees | MCP tools run scoped to one workspace root. Person and agent edits land on owned branches through the same operations |
+| Temporary browser client | Replaced by the ADR-025 design track before S04. Every editor screen goes through that loop |
+
 ## Standalone completion and continuation handoff
 
 Provide the exact Setup pin, adapted service boundaries, C-01 fixture, failed and recovered operation evidence, account isolation results, GitHub App permission set and game reference identifiers. S03 may assume validated workspace registration per account, not universal game compatibility.

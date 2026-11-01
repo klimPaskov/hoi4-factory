@@ -169,7 +169,7 @@ Repository: `hagane-works/hagane-studio`, once the maintainer controls it. Final
 | Local companion full v1 | A new stage proposal after S06, with its own security review | Live Tools, W4 |
 | Import preservation report and findings baseline in the Setup flow | S04 or S05 | W4, Setup |
 
-Each stage packet is updated when the maintainer authorizes that stage. This plan does not change the stage files.
+At the maintainer's instruction, the stage files were updated on 2026-11-01 to plan this mapping across S01 to S08. The cross-stage plan is in the [stage roadmap](../04-implementation-stages/ROADMAP.md#engine-editors-and-tools-across-stages). No stage is authorized by that update.
 
 ## Git and release considerations
 

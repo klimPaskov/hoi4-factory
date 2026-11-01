@@ -196,7 +196,7 @@ def main() -> int:
         for f in ("learning-review.md", "config-review.md", "handoff.md"):
             if f not in t: structural.append(f"{sid}: missing {f} evidence")
     if len(packet_ids) != 48: structural.append(f"Expected 48 packet IDs, got {len(packet_ids)}")
-    if sum(gate_counts.values()) != 47: structural.append("Expected 47 numbered stage gates")
+    if sum(gate_counts.values()) != 59: structural.append("Expected 59 numbered stage gates")
     add("specification_and_stage_structure", structural, specifications=len(specs), stages=len(stages),
         unique_packets=len(packet_ids), stage_exit_gates=sum(gate_counts.values()))
     matrix_errors = []
