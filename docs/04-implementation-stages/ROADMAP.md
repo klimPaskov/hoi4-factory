@@ -165,7 +165,7 @@ The maintainer's MCP decisions of 2026-11-01 are recorded in the [expansion deci
 | M-7 HOI4-MCP measured once | Isolated container run | S03 baseline | One recorded head-to-head result. Later runs compare with our own baselines |
 | M-8 Rust move order | Engine route moves | S03 to S08, see the engine table above | The TypeScript index is retired |
 | M-9 coverage order | New inspect, render and rewrite tools | S06 (localisation, ideas, characters), S07 and the backlog (the later groups) | Each area has inspect, and render or rewrite where they help, with tests on the M-6 mods |
-| M-10 lookup vocabulary | Reference lookup tools | S05 (retrieval baseline EXP-05) | Vocabulary built from game localisation plus a short hand-checked list, with no embedding model |
+| M-10 lookup vocabulary | Reference lookup tools | S05 (retrieval baseline EXP-05) | Vocabulary built from game localisation plus a short hand-checked list. An optional local embedding layer, pinned by hash and fetched only when switched on, is kept only if it clearly beats word ranking on an untouched blind test set without hurting exact-name or negative queries. Word ranking stays the fallback |
 | M-11 writers with their editors | Event, decision and technology rewrite tools | S06 (event, decision), S07 (technology) | Each writer ships with its editor and passes T-EDIT-01 |
 | M-12 nightly real-game benchmark | A maintainer machine with the game | Every exit gate from S03 | Nightly results are stored locally with hashes, and a regression is flagged |
 | M-13 macOS arm64 CI | agent-tools Node CI | S03 | The job runs on every pull request |
