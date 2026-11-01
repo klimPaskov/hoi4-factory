@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.11, 2026-11-01, agents never start the game
+
+- CLAUDE.md now says agents never start Hearts of Iron IV on the maintainer's machines. In-game checks go to the HOI4 Live Tools MCP or the maintainer, with an exact list of what to check.
+
+Evidence: a session launched the game on the maintainer's machine on 2026-11-01, and the maintainer set the rule (D-17). Rollback: revert this commit and regenerate.
+
 ## 0.2.10, 2026-11-01, issues in every repository
 
 - The `track-issues` skill now files each problem in the repository it belongs to (hoi4-factory, hoi4-agent-tools, the kit, HOI4 Mod Setup or hoi4-imagegen-mcp), with an owner and a "Done when" check, and closes it only with proof. It no longer forbids issues on the upstream repositories. The rule against secrets and private paths is unchanged.

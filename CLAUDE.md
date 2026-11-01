@@ -25,6 +25,8 @@ Use `start-implementation-stage` to set scope, evidence and stop conditions. Pre
 
 Stay within the repository and its git-ignored `.work/` area. Never commit secrets, tokens, private paths or trust settings. Never modify user-level or system-level agent configuration. The project MCP connections stay disabled until reviewed. A user-scope MCP server may still be connected in a session, so do not use one for stage evidence unless it is pinned and reviewed.
 
+Agents never start Hearts of Iron IV on the maintainer's machines. In-game checks go to the HOI4 Live Tools MCP or to the maintainer, and the agent lists exactly what to check.
+
 Never fabricate model output, test results or evidence. Live model calls use real providers. Faults a live API cannot produce on demand are injected into recorded real responses and labelled as recorded-real replay. Mark anything that could not run as unavailable with the reason.
 
 ## Working environment
