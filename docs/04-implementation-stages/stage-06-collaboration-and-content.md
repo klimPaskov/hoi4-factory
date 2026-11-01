@@ -30,7 +30,7 @@ The cross-stage plan is in [engine, editors and tools across stages](ROADMAP.md#
 | Event editor | `hoi4.event_inspect`, `hoi4.event_render`, `hoi4.probability_inspect`, `hoi4.probability_analyze`, `hoi4.impact_inspect` and `hoi4.scenario_test`, plus a new event writer |
 | Decision editor | `hoi4.decision_inspect`, `hoi4.impact_inspect` and `hoi4.mechanic_test`, plus a new decision writer |
 | Character and idea editors | New inspect, render and rewrite tools for each |
-| Localisation and GFX | A localisation inspect and rewrite tool on the engine's reader, every language indexed, sprite and `.gfx` registration checks, DDS and profile checks through `hoi4-imagegen-mcp` |
+| Localisation and GFX | A localisation inspect and rewrite tool on the engine's reader, every language indexed, sprite and `.gfx` registration checks, DDS and profile checks through `hoi4-imagegen-mcp`. The hosted image adapter uses documented provider APIs only. The ChatGPT-login provider that is the default on a local install (D-12a) is never enabled in hosted HOI4 Factory, and a test checks that the hosted tool profile cannot select it |
 | Hagane harvest | Hagane export ZIP import with a preservation report. The draw.io sketch importer creates a new focus branch as a proposal |
 | Q-1 | No regression on T-BENCH-01. New writers and the localisation tool join the benchmark |
 | Coding-agent integration | The new tools are in the one tool profile, so local coding clients get them in the same release |
