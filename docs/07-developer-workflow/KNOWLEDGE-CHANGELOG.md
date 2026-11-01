@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.14, 2026-11-01, one-night in-game window
+
+- CLAUDE.md's rule that agents never start the game now names one exception (D-19): on the Windows PC during the night of 2026-11-01 to 2026-11-02, one runner session may start it through HOI4 Live Tools, one instance at a time, with no new launch after 09:00 local on 2026-11-02, restoring the user-folder files a launch rewrites. The rule applies again after the window.
+
+Evidence: maintainer decision D-19 of 2026-11-01, relayed by the coordinating session. Rollback: revert this commit and regenerate. Remove the exception text once the window has passed.
+
 ## 0.2.13, 2026-11-01, routine steps need no approval
 
 - CLAUDE.md now lets agents merge pull requests for authorized work once every required check is green and push the commits that finish authorized work, without waiting for the maintainer. Only true blockers wait: a sign-in or credential, money, access only the maintainer holds, the Mac and in-game checks. The rules against skipping failing checks, force pushes, lost work, new spending, starting the game and touching Docker Desktop are unchanged.
