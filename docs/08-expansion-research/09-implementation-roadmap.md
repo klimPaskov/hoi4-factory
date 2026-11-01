@@ -11,7 +11,7 @@ Status: **Approved by the maintainer on 2026-10-31** (Phase D). Following D-13, 
 | W2 | Committed on the kit's local `main` (`d7a8987`), not pushed. FR-1, P5, P6, P8, P9, P14 and a first P11 pass are done. Six skill rules that vanilla contradicts are corrected. D3 and D4 wording moves to W5, because no agent tool can operate a ComfyUI endpoint before the image server exists. Still open: slimming the largest skills, the focus rubric (with W3) and the image skill (with W5). The FR-1 check that needs a model run is unavailable | Kit `docs/development/guidance-audit-2026-10-31.md`, `LESSONS.md`. The contract, release, sync and quality checks pass |
 | W3, W4 | Running in their own sessions, each in its own hoi4-agent-tools worktree | Reported by those sessions |
 | W5 | In progress locally in `hoi4-imagegen-mcp`. Nothing in FR-2 needs the W4 engine, so the W4 edge is only an ordering preference. Creating the public repository and pushing wait for the maintainer's yes | None yet |
-| W6 | Blocked: the Chaos Redux tree has 1,450 uncommitted changes, which the maintainer has to commit or set aside first. It also needs W2, W4 and W5 | None |
+| W6 | Waiting. The maintainer commits the 1,450 uncommitted Chaos Redux changes themself, and nobody else touches them. W6 starts only when `git --no-optional-locks status` shows that tree clean and W2, W4 and W5 are done. If the tree is still dirty when the rest is ready, the maintainer is told once | None |
 | W7 | Waits for W3 and W4 | None |
 | W8 | Blocked: the maintainer's GitHub account has read access only to `hagane-works/hagane-studio`. It needs maintain or admin rights, or a transfer of the repository | `gh api` permissions on 2026-10-31 |
 
