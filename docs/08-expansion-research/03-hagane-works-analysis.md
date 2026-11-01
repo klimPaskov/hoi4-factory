@@ -111,11 +111,11 @@ These come from the hosted platform and Hagane Studio. They are carried into the
 
 Measured size: about 195,000 lines of non-test TypeScript and 234,000 lines of non-test Go, with almost no comments or architecture documents. Every editor works on JSON table rows and regenerates files on export. The Go parser keeps comments but not byte offsets and re-emits canonical text, so it cannot provide byte-preserving edits. Its focus grid differs from the game grid our tools use.
 
-The maintainer chose **harvest, then archive** (A1) and narrowed it on 2026-11-01 (A1-1): nothing of Hagane's look is reused, because HOI4 Factory's UI comes from its own design track (ADR-025), and only what would take a lot of work to build from scratch is harvested. About 2.5 percent of the Go code is worth taking, and at most one piece of TypeScript:
+The maintainer chose **harvest, then archive** (A1) and narrowed it to hard capabilities on 2026-11-01 (A1-1). HOI4 Factory builds its own interface through its own design track (ADR-025), and none of Hagane Studio's visual design is reused. Only capabilities that would be costly to rebuild from scratch are taken, each adapted to our architecture and design, and UI pieces our own tools already cover are dropped. Under Q-1 every harvested part must end up better than the original. About 2.5 percent of the Go code is worth taking, and at most one piece of TypeScript:
 
 | Harvest item | Size | Destination |
 |---|---|---|
-| Focus graph shell on xyflow: the wiring only, no layout code or styling | About 3,400 lines | HOI4 Factory client, only if it actually saves work when S04 is designed |
+| Focus graph shell on xyflow: the wiring only, no layout code or styling | About 3,400 lines | HOI4 Factory client, only if it saves real effort when S04 is designed |
 | Hash-guarded span repair plan, per-edit finding delta, dead-flag lint, DLC lint rule | Small | Shared Rust engine |
 | draw.io sketch importer | 398 Go lines | Shared Rust engine |
 | 158 finding codes | Catalog | Test fixtures for the Rust engine |
