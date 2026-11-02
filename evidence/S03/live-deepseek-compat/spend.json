@@ -1,0 +1,132 @@
+{
+  "paid_calls": 11,
+  "input_tokens": 3341,
+  "cached_input_tokens": 1019,
+  "output_tokens": 523,
+  "reasoning_tokens": 150,
+  "usd_off_peak": 0.000665157,
+  "usd_peak": 0.001330314,
+  "calls": [
+    {
+      "call": "deepseek-chat-legacy-name",
+      "kind": "adapter stream",
+      "input_tokens": 7,
+      "cached_input_tokens": 0,
+      "output_tokens": 1,
+      "reasoning_tokens": 0,
+      "usd_off_peak": 1.65e-06,
+      "usd_peak": 3.3e-06,
+      "captured_utc": "2026-11-02T14:23:38Z"
+    },
+    {
+      "call": "deepseek-default-thinking-turn-1",
+      "kind": "adapter stream",
+      "input_tokens": 385,
+      "cached_input_tokens": 0,
+      "output_tokens": 62,
+      "reasoning_tokens": 0,
+      "usd_off_peak": 9.495e-05,
+      "usd_peak": 0.0001899,
+      "captured_utc": "2026-11-02T14:22:51Z"
+    },
+    {
+      "call": "deepseek-default-thinking-turn-2",
+      "kind": "adapter stream",
+      "input_tokens": 460,
+      "cached_input_tokens": 256,
+      "output_tokens": 8,
+      "reasoning_tokens": 0,
+      "usd_off_peak": 3.6168e-05,
+      "usd_peak": 7.2336e-05,
+      "captured_utc": "2026-11-02T14:22:52Z"
+    },
+    {
+      "call": "deepseek-nothink-turn-1",
+      "kind": "adapter stream",
+      "input_tokens": 360,
+      "cached_input_tokens": 0,
+      "output_tokens": 61,
+      "reasoning_tokens": 0,
+      "usd_off_peak": 9.06e-05,
+      "usd_peak": 0.0001812,
+      "captured_utc": "2026-11-02T14:23:39Z"
+    },
+    {
+      "call": "deepseek-nothink-turn-2",
+      "kind": "adapter stream",
+      "input_tokens": 434,
+      "cached_input_tokens": 256,
+      "output_tokens": 6,
+      "reasoning_tokens": 0,
+      "usd_off_peak": 3.1068e-05,
+      "usd_peak": 6.2136e-05,
+      "captured_utc": "2026-11-02T14:23:40Z"
+    },
+    {
+      "call": "deepseek-reasoned-turn-1",
+      "kind": "adapter stream",
+      "input_tokens": 393,
+      "cached_input_tokens": 0,
+      "output_tokens": 106,
+      "reasoning_tokens": 48,
+      "usd_off_peak": 0.00012255,
+      "usd_peak": 0.0002451,
+      "captured_utc": "2026-11-02T14:23:29Z"
+    },
+    {
+      "call": "deepseek-reasoned-turn-2",
+      "kind": "adapter stream",
+      "input_tokens": 512,
+      "cached_input_tokens": 256,
+      "output_tokens": 72,
+      "reasoning_tokens": 0,
+      "usd_off_peak": 8.2368e-05,
+      "usd_peak": 0.000164736,
+      "captured_utc": "2026-11-02T14:23:30Z"
+    },
+    {
+      "call": "deepseek-tool-turn",
+      "kind": "adapter stream",
+      "input_tokens": 385,
+      "cached_input_tokens": 251,
+      "output_tokens": 62,
+      "reasoning_tokens": 0,
+      "usd_off_peak": 5.8053e-05,
+      "usd_peak": 0.000116106,
+      "captured_utc": "2026-11-02T14:22:53Z"
+    },
+    {
+      "call": "inference-probe",
+      "kind": "adapter stream (probe)",
+      "input_tokens": 339,
+      "cached_input_tokens": 0,
+      "output_tokens": 122,
+      "reasoning_tokens": 81,
+      "usd_off_peak": 0.00012405,
+      "usd_peak": 0.0002481,
+      "captured_utc": "2026-11-02T14:22:44Z"
+    },
+    {
+      "call": "exploratory-max-completion-tokens",
+      "kind": "curl, non-streaming",
+      "input_tokens": 33,
+      "cached_input_tokens": 0,
+      "output_tokens": 15,
+      "reasoning_tokens": 13,
+      "usd_off_peak": 1.395e-05,
+      "usd_peak": 2.79e-05,
+      "captured_utc": "2026-11-02T14:19:27Z"
+    },
+    {
+      "call": "exploratory-max-tokens",
+      "kind": "curl, non-streaming",
+      "input_tokens": 33,
+      "cached_input_tokens": 0,
+      "output_tokens": 8,
+      "reasoning_tokens": 8,
+      "usd_off_peak": 9.75e-06,
+      "usd_peak": 1.95e-05,
+      "captured_utc": "2026-11-02T14:19:27Z"
+    }
+  ]
+}

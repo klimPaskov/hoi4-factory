@@ -1,0 +1,122 @@
+{
+  "captured_utc": "2026-11-02T14:23:40Z",
+  "chunk_sizes": [
+    304,
+    292,
+    291,
+    1617
+  ],
+  "endpoint": "https://api.deepseek.com/chat/completions",
+  "evidence_kind": "live",
+  "model_reported": "deepseek-flash",
+  "model_requested": "deepseek-flash",
+  "name": "deepseek-nothink-turn-2",
+  "outcome": {
+    "ok": true,
+    "turn": {
+      "bytes": 2504,
+      "events": 9,
+      "finish_reason": "stop",
+      "model": "deepseek-flash",
+      "provider": "openai-chat-completions",
+      "response_id": "ebafc8b0-c623-4e1d-b050-a920b2bd8260",
+      "text": "Created notes/probe.txt.",
+      "tool_calls": [],
+      "usage": {
+        "cached_input_tokens": 256,
+        "input_tokens": 434,
+        "output_tokens": 6,
+        "reasoning_tokens": 0
+      }
+    }
+  },
+  "provider": "openai-chat-completions (DeepSeek, OpenAI-compatible profile)",
+  "redaction": "Authorization is never recorded. Response headers are not recorded. The body is byte-for-byte as received. The response id and system_fingerprint inside the body are kept because altering them would break byte fidelity, and they are not credentials.",
+  "request_body": {
+    "max_completion_tokens": 300,
+    "max_tokens": 200,
+    "messages": [
+      {
+        "content": "You are the HOI4 Factory S01 runtime probe. When asked to create a file, call the write_file tool exactly once. Keep output minimal.",
+        "role": "system"
+      },
+      {
+        "content": "Use the write_file tool to create notes/probe.txt whose content is one line: S01 runtime probe ok",
+        "role": "user"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"content\":\"S01 runtime probe ok\\n\",\"path\":\"notes/probe.txt\"}",
+              "name": "write_file"
+            },
+            "id": "call_00_2jEoL73m8QRfPUwsyzcb8854",
+            "type": "function"
+          }
+        ]
+      },
+      {
+        "content": "written",
+        "role": "tool",
+        "tool_call_id": "call_00_2jEoL73m8QRfPUwsyzcb8854"
+      }
+    ],
+    "model": "deepseek-flash",
+    "parallel_tool_calls": false,
+    "stream": true,
+    "stream_options": {
+      "include_usage": true
+    },
+    "thinking": {
+      "type": "disabled"
+    },
+    "tools": [
+      {
+        "function": {
+          "description": "Create or replace one file inside the task workspace.",
+          "name": "write_file",
+          "parameters": {
+            "additionalProperties": false,
+            "properties": {
+              "content": {
+                "description": "Complete file content",
+                "type": "string"
+              },
+              "path": {
+                "description": "Workspace-relative file path using forward slashes",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "content"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "response": {
+    "content_type": "not recorded",
+    "status": 200
+  },
+  "source_evidence": "evidence/S03/live-deepseek-compat/deepseek-nothink-turn-2.sse",
+  "spend": {
+    "call": "deepseek-nothink-turn-2",
+    "cost": {
+      "kind": "estimated",
+      "model_priced_as": "deepseek-flash",
+      "source": "https://api-docs.deepseek.com/quick_start/pricing (read 2026-11-02)",
+      "usd_off_peak": 3.1068e-05,
+      "usd_peak": 6.2136e-05
+    },
+    "model": "deepseek-flash"
+  },
+  "sse_bytes": 2504,
+  "sse_sha256": "c0815df4e0c7b37cbcd701198c41f355f0bf617eedf344959c52e3d90a5a2093"
+}

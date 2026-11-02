@@ -1,0 +1,75 @@
+{
+  "profile_id": "compatible:deepseek-flash@https://api.deepseek.com",
+  "connection": {
+    "state": "supported",
+    "basis": "probe",
+    "evidence": "model listing answered HTTP 200",
+    "observed_at": "2026-11-02T14:22:37Z"
+  },
+  "models": [
+    "deepseek-flash",
+    "deepseek-v4-pro"
+  ],
+  "capabilities": {
+    "text": {
+      "state": "unknown",
+      "basis": "not_probed",
+      "evidence": "not probed",
+      "observed_at": null
+    },
+    "tool_calls": {
+      "state": "unknown",
+      "basis": "not_probed",
+      "evidence": "not probed",
+      "observed_at": null
+    },
+    "parallel_tool_calls": {
+      "state": "unknown",
+      "basis": "not_probed",
+      "evidence": "not probed",
+      "observed_at": null
+    },
+    "streaming": {
+      "state": "unknown",
+      "basis": "not_probed",
+      "evidence": "not probed",
+      "observed_at": null
+    },
+    "strict_json_schema": {
+      "state": "unknown",
+      "basis": "not_probed",
+      "evidence": "not probed",
+      "observed_at": null
+    },
+    "image_input": {
+      "state": "unknown",
+      "basis": "not_probed",
+      "evidence": "image input is not used and not probed",
+      "observed_at": null
+    },
+    "usage_accounting": {
+      "state": "unknown",
+      "basis": "not_probed",
+      "evidence": "not probed",
+      "observed_at": null
+    },
+    "cancellation": {
+      "state": "unknown",
+      "basis": "not_probed",
+      "evidence": "not probed",
+      "observed_at": null
+    },
+    "model_listing": {
+      "state": "supported",
+      "basis": "probe",
+      "evidence": "2 models listed",
+      "observed_at": "2026-11-02T14:22:37Z"
+    }
+  },
+  "refusal": null,
+  "error": null,
+  "usage": null,
+  "notes": [],
+  "mode": "listing",
+  "probed_at": "2026-11-02T14:22:37Z"
+}

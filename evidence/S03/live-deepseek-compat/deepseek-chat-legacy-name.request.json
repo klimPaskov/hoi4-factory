@@ -1,0 +1,14 @@
+{
+  "max_completion_tokens": 32,
+  "messages": [
+    {
+      "content": "Say ok.",
+      "role": "user"
+    }
+  ],
+  "model": "deepseek-chat",
+  "stream": true,
+  "stream_options": {
+    "include_usage": true
+  }
+}

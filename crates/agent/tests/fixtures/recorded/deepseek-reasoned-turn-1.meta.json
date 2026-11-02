@@ -1,0 +1,130 @@
+{
+  "captured_utc": "2026-11-02T14:23:29Z",
+  "chunk_sizes": [
+    329,
+    313,
+    315,
+    942,
+    1880,
+    1880,
+    1262,
+    627,
+    1252,
+    1255,
+    1573,
+    315,
+    1577,
+    946,
+    941,
+    405,
+    455,
+    535,
+    1654,
+    329,
+    994,
+    1326,
+    328,
+    547
+  ],
+  "endpoint": "https://api.deepseek.com/chat/completions",
+  "evidence_kind": "live",
+  "model_reported": "deepseek-flash",
+  "model_requested": "deepseek-flash",
+  "name": "deepseek-reasoned-turn-1",
+  "outcome": {
+    "ok": true,
+    "turn": {
+      "bytes": 21980,
+      "events": 69,
+      "finish_reason": "tool_calls",
+      "model": "deepseek-flash",
+      "provider": "openai-chat-completions",
+      "response_id": "cf76767c-cb78-4071-b01b-07ac653b84b1",
+      "text": "",
+      "tool_calls": [
+        {
+          "arguments": {
+            "content": "sorted first",
+            "path": "notes/alpha.txt"
+          },
+          "id": "call_00_kzjHUOh1tpHHK5lB2Jcc5129",
+          "index": 0,
+          "name": "write_file",
+          "raw_arguments": "{\"path\": \"notes/alpha.txt\", \"content\": \"sorted first\"}"
+        }
+      ],
+      "usage": {
+        "cached_input_tokens": 0,
+        "input_tokens": 393,
+        "output_tokens": 106,
+        "reasoning_tokens": 48
+      }
+    }
+  },
+  "provider": "openai-chat-completions (DeepSeek, OpenAI-compatible profile)",
+  "redaction": "Authorization is never recorded. Response headers are not recorded. The body is byte-for-byte as received. The response id and system_fingerprint inside the body are kept because altering them would break byte fidelity, and they are not credentials.",
+  "request_body": {
+    "max_completion_tokens": 400,
+    "messages": [
+      {
+        "content": "You are the HOI4 Factory runtime probe. Create files only with the write_file tool, once per task.",
+        "role": "system"
+      },
+      {
+        "content": "Two candidate file names are notes/zeta.txt and notes/alpha.txt. Work out which one sorts first alphabetically, then use write_file to create that file with the content: sorted first",
+        "role": "user"
+      }
+    ],
+    "model": "deepseek-flash",
+    "parallel_tool_calls": false,
+    "stream": true,
+    "stream_options": {
+      "include_usage": true
+    },
+    "tools": [
+      {
+        "function": {
+          "description": "Create or replace one file inside the task workspace.",
+          "name": "write_file",
+          "parameters": {
+            "additionalProperties": false,
+            "properties": {
+              "content": {
+                "description": "Complete file content",
+                "type": "string"
+              },
+              "path": {
+                "description": "Workspace-relative file path using forward slashes",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "content"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "response": {
+    "content_type": "not recorded",
+    "status": 200
+  },
+  "source_evidence": "evidence/S03/live-deepseek-compat/deepseek-reasoned-turn-1.sse",
+  "spend": {
+    "call": "deepseek-reasoned-turn-1",
+    "cost": {
+      "kind": "estimated",
+      "model_priced_as": "deepseek-flash",
+      "source": "https://api-docs.deepseek.com/quick_start/pricing (read 2026-11-02)",
+      "usd_off_peak": 0.00012255,
+      "usd_peak": 0.0002451
+    },
+    "model": "deepseek-flash"
+  },
+  "sse_bytes": 21980,
+  "sse_sha256": "c1f42ead2f9abb0d44362f95d5f224cd6872acdffcabf57099a6081dd35d1b93"
+}

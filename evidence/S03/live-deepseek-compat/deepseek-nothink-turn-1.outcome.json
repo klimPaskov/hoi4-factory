@@ -1,0 +1,55 @@
+{
+  "captured_utc": "2026-11-02T14:23:39Z",
+  "chunk_sizes": [
+    304,
+    405,
+    990,
+    994,
+    1654,
+    988,
+    1657,
+    657,
+    469
+  ],
+  "cost": {
+    "kind": "estimated",
+    "model_priced_as": "deepseek-flash",
+    "source": "https://api-docs.deepseek.com/quick_start/pricing (read 2026-11-02)",
+    "usd_off_peak": 0.0000906,
+    "usd_peak": 0.0001812
+  },
+  "endpoint": "https://api.deepseek.com/chat/completions",
+  "evidence_kind": "live",
+  "name": "deepseek-nothink-turn-1",
+  "outcome": {
+    "ok": true,
+    "turn": {
+      "bytes": 8118,
+      "events": 25,
+      "finish_reason": "tool_calls",
+      "model": "deepseek-flash",
+      "provider": "openai-chat-completions",
+      "response_id": "7f33613b-3e6d-4302-8e01-49a1e4301326",
+      "text": "",
+      "tool_calls": [
+        {
+          "arguments": {
+            "content": "S01 runtime probe ok\n",
+            "path": "notes/probe.txt"
+          },
+          "id": "call_00_2jEoL73m8QRfPUwsyzcb8854",
+          "index": 0,
+          "name": "write_file",
+          "raw_arguments": "{\"path\": \"notes/probe.txt\", \"content\": \"S01 runtime probe ok\\n\"}"
+        }
+      ],
+      "usage": {
+        "cached_input_tokens": 0,
+        "input_tokens": 360,
+        "output_tokens": 61,
+        "reasoning_tokens": 0
+      }
+    }
+  },
+  "response_bytes": 8118
+}

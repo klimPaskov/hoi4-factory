@@ -1,0 +1,89 @@
+{
+  "cost": {
+    "kind": "estimated",
+    "model_priced_as": "deepseek-flash",
+    "source": "https://api-docs.deepseek.com/quick_start/pricing (read 2026-11-02)",
+    "usd_off_peak": 0.00012405,
+    "usd_peak": 0.0002481
+  },
+  "report": {
+    "capabilities": {
+      "cancellation": {
+        "basis": "not_probed",
+        "evidence": "not probed",
+        "observed_at": null,
+        "state": "unknown"
+      },
+      "image_input": {
+        "basis": "not_probed",
+        "evidence": "image input is not used and not probed",
+        "observed_at": null,
+        "state": "unknown"
+      },
+      "model_listing": {
+        "basis": "probe",
+        "evidence": "2 models listed",
+        "observed_at": "2026-11-02T14:22:44Z",
+        "state": "supported"
+      },
+      "parallel_tool_calls": {
+        "basis": "not_probed",
+        "evidence": "not probed",
+        "observed_at": null,
+        "state": "unknown"
+      },
+      "streaming": {
+        "basis": "probe",
+        "evidence": "93 stream events assembled",
+        "observed_at": "2026-11-02T14:22:44Z",
+        "state": "supported"
+      },
+      "strict_json_schema": {
+        "basis": "not_probed",
+        "evidence": "not probed",
+        "observed_at": null,
+        "state": "unknown"
+      },
+      "text": {
+        "basis": "probe",
+        "evidence": "2 characters of text",
+        "observed_at": "2026-11-02T14:22:44Z",
+        "state": "supported"
+      },
+      "tool_calls": {
+        "basis": "probe",
+        "evidence": "probe_echo call assembled with valid arguments",
+        "observed_at": "2026-11-02T14:22:44Z",
+        "state": "supported"
+      },
+      "usage_accounting": {
+        "basis": "probe",
+        "evidence": "usage reported: 339 in, 122 out",
+        "observed_at": "2026-11-02T14:22:44Z",
+        "state": "supported"
+      }
+    },
+    "connection": {
+      "basis": "probe",
+      "evidence": "inference answered HTTP 2xx and completed",
+      "observed_at": "2026-11-02T14:22:44Z",
+      "state": "supported"
+    },
+    "error": null,
+    "mode": "inference",
+    "models": [
+      "deepseek-flash",
+      "deepseek-v4-pro"
+    ],
+    "notes": [],
+    "probed_at": "2026-11-02T14:22:44Z",
+    "profile_id": "compatible:deepseek-flash@https://api.deepseek.com",
+    "refusal": null,
+    "usage": {
+      "cached_input_tokens": 0,
+      "input_tokens": 339,
+      "output_tokens": 122,
+      "reasoning_tokens": 81
+    }
+  }
+}

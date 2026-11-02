@@ -1,0 +1,46 @@
+{
+  "max_completion_tokens": 400,
+  "messages": [
+    {
+      "content": "You are the HOI4 Factory runtime probe. Create files only with the write_file tool, once per task.",
+      "role": "system"
+    },
+    {
+      "content": "Two candidate file names are notes/zeta.txt and notes/alpha.txt. Work out which one sorts first alphabetically, then use write_file to create that file with the content: sorted first",
+      "role": "user"
+    }
+  ],
+  "model": "deepseek-flash",
+  "parallel_tool_calls": false,
+  "stream": true,
+  "stream_options": {
+    "include_usage": true
+  },
+  "tools": [
+    {
+      "function": {
+        "description": "Create or replace one file inside the task workspace.",
+        "name": "write_file",
+        "parameters": {
+          "additionalProperties": false,
+          "properties": {
+            "content": {
+              "description": "Complete file content",
+              "type": "string"
+            },
+            "path": {
+              "description": "Workspace-relative file path using forward slashes",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "content"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "function"
+    }
+  ]
+}

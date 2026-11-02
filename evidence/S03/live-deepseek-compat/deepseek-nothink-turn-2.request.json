@@ -1,0 +1,69 @@
+{
+  "max_completion_tokens": 300,
+  "max_tokens": 200,
+  "messages": [
+    {
+      "content": "You are the HOI4 Factory S01 runtime probe. When asked to create a file, call the write_file tool exactly once. Keep output minimal.",
+      "role": "system"
+    },
+    {
+      "content": "Use the write_file tool to create notes/probe.txt whose content is one line: S01 runtime probe ok",
+      "role": "user"
+    },
+    {
+      "content": null,
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "function": {
+            "arguments": "{\"content\":\"S01 runtime probe ok\\n\",\"path\":\"notes/probe.txt\"}",
+            "name": "write_file"
+          },
+          "id": "call_00_2jEoL73m8QRfPUwsyzcb8854",
+          "type": "function"
+        }
+      ]
+    },
+    {
+      "content": "written",
+      "role": "tool",
+      "tool_call_id": "call_00_2jEoL73m8QRfPUwsyzcb8854"
+    }
+  ],
+  "model": "deepseek-flash",
+  "parallel_tool_calls": false,
+  "stream": true,
+  "stream_options": {
+    "include_usage": true
+  },
+  "thinking": {
+    "type": "disabled"
+  },
+  "tools": [
+    {
+      "function": {
+        "description": "Create or replace one file inside the task workspace.",
+        "name": "write_file",
+        "parameters": {
+          "additionalProperties": false,
+          "properties": {
+            "content": {
+              "description": "Complete file content",
+              "type": "string"
+            },
+            "path": {
+              "description": "Workspace-relative file path using forward slashes",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "content"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "function"
+    }
+  ]
+}

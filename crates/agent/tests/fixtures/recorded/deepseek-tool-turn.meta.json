@@ -1,0 +1,115 @@
+{
+  "captured_utc": "2026-11-02T14:22:53Z",
+  "chunk_sizes": [
+    329,
+    1069,
+    992,
+    1320,
+    331,
+    994,
+    1985,
+    657,
+    549
+  ],
+  "endpoint": "https://api.deepseek.com/chat/completions",
+  "evidence_kind": "live",
+  "model_reported": "deepseek-flash",
+  "model_requested": "deepseek-flash",
+  "name": "deepseek-tool-turn",
+  "outcome": {
+    "ok": true,
+    "turn": {
+      "bytes": 8226,
+      "events": 25,
+      "finish_reason": "tool_calls",
+      "model": "deepseek-flash",
+      "provider": "openai-chat-completions",
+      "response_id": "773a1f46-e06b-44fa-bc0b-37875ceec940",
+      "text": "",
+      "tool_calls": [
+        {
+          "arguments": {
+            "content": "S01 runtime probe ok\n",
+            "path": "notes/probe.txt"
+          },
+          "id": "call_00_ET_cYWeAx5IxjBLS1Pb9btD8652",
+          "index": 0,
+          "name": "write_file",
+          "raw_arguments": "{\"path\": \"notes/probe.txt\", \"content\": \"S01 runtime probe ok\\n\"}"
+        }
+      ],
+      "usage": {
+        "cached_input_tokens": 251,
+        "input_tokens": 385,
+        "output_tokens": 62,
+        "reasoning_tokens": 0
+      }
+    }
+  },
+  "provider": "openai-chat-completions (DeepSeek, OpenAI-compatible profile)",
+  "redaction": "Authorization is never recorded. Response headers are not recorded. The body is byte-for-byte as received. The response id and system_fingerprint inside the body are kept because altering them would break byte fidelity, and they are not credentials.",
+  "request_body": {
+    "max_completion_tokens": 300,
+    "messages": [
+      {
+        "content": "You are the HOI4 Factory S01 runtime probe. When asked to create a file, call the write_file tool exactly once. Keep output minimal.",
+        "role": "system"
+      },
+      {
+        "content": "Use the write_file tool to create notes/probe.txt whose content is one line: S01 runtime probe ok",
+        "role": "user"
+      }
+    ],
+    "model": "deepseek-flash",
+    "parallel_tool_calls": false,
+    "stream": true,
+    "stream_options": {
+      "include_usage": true
+    },
+    "tools": [
+      {
+        "function": {
+          "description": "Create or replace one file inside the task workspace.",
+          "name": "write_file",
+          "parameters": {
+            "additionalProperties": false,
+            "properties": {
+              "content": {
+                "description": "Complete file content",
+                "type": "string"
+              },
+              "path": {
+                "description": "Workspace-relative file path using forward slashes",
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "content"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      }
+    ]
+  },
+  "response": {
+    "content_type": "not recorded",
+    "status": 200
+  },
+  "source_evidence": "evidence/S03/live-deepseek-compat/deepseek-tool-turn.sse",
+  "spend": {
+    "call": "deepseek-tool-turn",
+    "cost": {
+      "kind": "estimated",
+      "model_priced_as": "deepseek-flash",
+      "source": "https://api-docs.deepseek.com/quick_start/pricing (read 2026-11-02)",
+      "usd_off_peak": 5.8053e-05,
+      "usd_peak": 0.000116106
+    },
+    "model": "deepseek-flash"
+  },
+  "sse_bytes": 8226,
+  "sse_sha256": "111148a16d3631a560f7b42338d7eaa814e29409ca72d193ae5137b9561bcdb6"
+}

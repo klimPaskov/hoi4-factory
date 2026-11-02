@@ -1,0 +1,84 @@
+{
+  "profile_id": "compatible:deepseek-flash@https://api.deepseek.com",
+  "connection": {
+    "state": "unsupported",
+    "basis": "probe",
+    "evidence": "provider_auth_failed: http_refusal",
+    "observed_at": "2026-11-02T14:22:36Z"
+  },
+  "models": [],
+  "capabilities": {
+    "text": {
+      "state": "unknown",
+      "basis": "not_probed",
+      "evidence": "not probed",
+      "observed_at": null
+    },
+    "tool_calls": {
+      "state": "unknown",
+      "basis": "not_probed",
+      "evidence": "not probed",
+      "observed_at": null
+    },
+    "parallel_tool_calls": {
+      "state": "unknown",
+      "basis": "not_probed",
+      "evidence": "not probed",
+      "observed_at": null
+    },
+    "streaming": {
+      "state": "unknown",
+      "basis": "not_probed",
+      "evidence": "not probed",
+      "observed_at": null
+    },
+    "strict_json_schema": {
+      "state": "unknown",
+      "basis": "not_probed",
+      "evidence": "not probed",
+      "observed_at": null
+    },
+    "image_input": {
+      "state": "unknown",
+      "basis": "not_probed",
+      "evidence": "image input is not used and not probed",
+      "observed_at": null
+    },
+    "usage_accounting": {
+      "state": "unknown",
+      "basis": "not_probed",
+      "evidence": "not probed",
+      "observed_at": null
+    },
+    "cancellation": {
+      "state": "unknown",
+      "basis": "not_probed",
+      "evidence": "not probed",
+      "observed_at": null
+    },
+    "model_listing": {
+      "state": "unknown",
+      "basis": "not_probed",
+      "evidence": "not probed",
+      "observed_at": null
+    }
+  },
+  "refusal": {
+    "status": 401,
+    "class": "auth",
+    "provider_code": "invalid_request_error",
+    "provider_type": "authentication_error",
+    "message": "Authentication Fails, Your api key: ****0000 is invalid (request_id: caea2cbc-aa82-46a1-a364-3c46ca43cbd2)"
+  },
+  "error": {
+    "code": "provider_auth_failed",
+    "retry_class": "requires_authorization",
+    "message": "provider refused request: HTTP 401 Auth Some(\"invalid_request_error\")",
+    "provider_status": 401,
+    "cost": "none"
+  },
+  "usage": null,
+  "notes": [],
+  "mode": "listing",
+  "probed_at": "2026-11-02T14:22:36Z"
+}

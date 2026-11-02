@@ -1,0 +1,39 @@
+{
+  "captured_utc": "2026-11-02T14:23:40Z",
+  "chunk_sizes": [
+    304,
+    292,
+    291,
+    1617
+  ],
+  "cost": {
+    "kind": "estimated",
+    "model_priced_as": "deepseek-flash",
+    "source": "https://api-docs.deepseek.com/quick_start/pricing (read 2026-11-02)",
+    "usd_off_peak": 0.000031068,
+    "usd_peak": 0.000062136
+  },
+  "endpoint": "https://api.deepseek.com/chat/completions",
+  "evidence_kind": "live",
+  "name": "deepseek-nothink-turn-2",
+  "outcome": {
+    "ok": true,
+    "turn": {
+      "bytes": 2504,
+      "events": 9,
+      "finish_reason": "stop",
+      "model": "deepseek-flash",
+      "provider": "openai-chat-completions",
+      "response_id": "ebafc8b0-c623-4e1d-b050-a920b2bd8260",
+      "text": "Created notes/probe.txt.",
+      "tool_calls": [],
+      "usage": {
+        "cached_input_tokens": 256,
+        "input_tokens": 434,
+        "output_tokens": 6,
+        "reasoning_tokens": 0
+      }
+    }
+  },
+  "response_bytes": 2504
+}

@@ -1,0 +1,239 @@
+{
+  "check": "S03-G6 (OpenAI-compatible profile) live on DeepSeek, as maintainer decision D-21 allows",
+  "issue": "klimPaskov/hoi4-factory#2",
+  "recorded": "2026-11-02",
+  "live_window_utc": "2026-11-02T14:19:27Z to 2026-11-02T14:23:41Z (a Monday, outside DeepSeek's peak hours, so off-peak rates applied)",
+  "scope_note": "DeepSeek serves the Chat Completions protocol, so this verifies the openai-compatible profile and the shared adapter in crates/agent/src/openai.rs. It does NOT verify the openai:gpt-5.4-nano profile. That profile still needs a funded OpenAI key, so issue #2 stays open.",
+  "base_revision": "10b1cd2b18314914a7f2a786b9c6a7837d522dc3",
+  "branch": "claude/deepseek-live",
+  "working_tree_note": "The live runs used the working tree on top of the base revision. crates/agent/src/ is unchanged. live_deepseek.rs gained one test (live_deepseek_follow_up_after_a_reasoned_tool_call_default_thinking) between the first and the fourth run. The tests that had already run were not edited. The hash below is of the final file.",
+  "test_files_sha256_before_formatting": {
+    "crates/agent/tests/live_deepseek.rs": "4d4b3132981a8b1d233942d360b1ba25ffb479dbe271cad572de25ab45eef765",
+    "crates/agent/tests/replay_deepseek.rs": "a36522536cd8b6016bfe64dd06ff1745b5668eff10b217a4fb908ac7034b4f54"
+  },
+  "test_files_note": "rustfmt was applied to the two test files after the runs, with no change to behavior. The committed files differ from the hashes above only by formatting.",
+  "environment": {
+    "os": "Windows 11 Pro 10.0.26200 (Microsoft Windows 10.0.26200.9711), Git Bash (MINGW64_NT-10.0-26200)",
+    "rustc": "1.97.1 (8bab26f4f 2026-07-14)",
+    "cargo": "1.97.1 (c980f4866 2026-06-30)",
+    "http_client": "reqwest 0.13.5 with rustls, built by factory_agent::destination::outbound_client (public-address policy, no redirects, no proxy)",
+    "cargo_target_dir": "the main checkout's target/ directory, shared",
+    "key_handling": "DEEPSEEK_API_KEY was read from the Windows user environment for each command into a shell variable and exported only for the cargo process. It was held in factory_agent::openai::ApiKey, whose Debug output is redacted. It was never echoed, logged or written. The request files in this directory hold request bodies only. No headers are recorded."
+  },
+  "endpoint": "https://api.deepseek.com (adapter posts to /chat/completions and lists /models)",
+  "model": {
+    "requested_by_maintainer": "deepseek-chat",
+    "listed_by_the_api": ["deepseek-flash", "deepseek-v4-pro"],
+    "used_for_the_runs": "deepseek-flash (DeepSeek-V4.1-Flash, context 1048576 tokens, max output 393216 tokens, vision input listed)",
+    "deepseek_chat_result": "GET /models does not list deepseek-chat and the pricing page does not name it. A chat completion with model deepseek-chat was nevertheless accepted (HTTP 200) and the stream reported model deepseek-flash. So deepseek-chat works today as an undocumented alias. Do not depend on it. Use deepseek-flash.",
+    "evidence": ["models-listing.response.json", "deepseek-chat-legacy-name.outcome.json", "deepseek-chat-legacy-name.sse"]
+  },
+  "commands": [
+    {
+      "command": "cargo test -p factory-agent --test live_deepseek --no-run",
+      "exit": 0,
+      "result": "compiled, no warnings"
+    },
+    {
+      "command": "DEEPSEEK_API_KEY=<from user env> DEEPSEEK_EVIDENCE_DIR=<this directory> cargo test -p factory-agent --test live_deepseek -- --ignored --test-threads=1 --nocapture live_deepseek_listing_probe live_deepseek_invalid_key",
+      "exit": 0,
+      "result": "2 passed. Free calls: GET /models once with the real key, once with a deliberately invalid key (HTTP 401)."
+    },
+    {
+      "command": "same, filter live_deepseek_inference_probe",
+      "exit": 0,
+      "result": "1 passed. One streaming inference call after a free listing."
+    },
+    {
+      "command": "same, filters live_deepseek_tool_turn_default_thinking live_deepseek_follow_up_after_a_tool_result",
+      "exit": 0,
+      "result": "2 passed, 3 inference calls (the follow-up test makes its own first turn)."
+    },
+    {
+      "command": "same, filter live_deepseek_follow_up_after_a_reasoned",
+      "exit": 0,
+      "result": "1 passed, 2 inference calls."
+    },
+    {
+      "command": "same, filters live_deepseek_tool_round_trip live_deepseek_legacy_model",
+      "exit": 0,
+      "result": "2 passed, 3 inference calls."
+    },
+    {
+      "command": "two curl calls to POST /chat/completions (non-streaming, thinking left at default) with max_completion_tokens 8 and with max_tokens 8, key passed through curl -K from stdin",
+      "exit": 0,
+      "result": "see exploratory_max_tokens below. Made before the Rust tests to bound the probe's spend."
+    },
+    {
+      "command": "cargo test -p factory-agent --test replay_deepseek",
+      "exit": 0,
+      "result": "6 passed. Offline replay of the three promoted recordings, no key and no network."
+    },
+    {
+      "command": "cargo test --no-fail-fast -p factory-agent (DEEPSEEK_API_KEY unset)",
+      "exit": 101,
+      "result": "Every test binary passed except one existing test, replay::disconnect_after_acceptance_is_reconcile_first_with_one_request, which fails on this Windows machine (see unrelated_windows_failure). The 8 live DeepSeek tests and the 3 Anthropic live tests were ignored as designed. 40 unit, 5 destination, 9 probe, 6 replay_deepseek and 13 worker tests passed."
+    },
+    {
+      "command": "scripts/py.sh scripts/validate_package.py --root . --working-tree",
+      "exit": 0,
+      "result": "status pass, 11 checks, none failed (run before this file was added)"
+    },
+    {
+      "command": "scripts/py.sh scripts/sync_skills.py --check",
+      "exit": 0,
+      "result": "status pass, no drift"
+    }
+  ],
+  "verified_live": {
+    "listing": "GET /models answered 200 with two models. The probe set connection and model_listing to supported by probe. Nothing else was claimed from the listing alone.",
+    "text": "Supported by probe. The probe call produced text and the adapter assembled it. A follow-up call produced a final text answer after a tool result (stop).",
+    "tool_calls": "Supported by probe. The probe call assembled a probe_echo call with valid string arguments. Separately a write_file tool turn finished with tool_calls and parseable arguments, three times (default thinking), and once with thinking disabled.",
+    "tool_result_round_trip": "The assistant tool_calls message plus a role tool message was accepted and answered with final text in three runs: twice in default thinking mode (one of them after 48 reasoning tokens), once with thinking disabled. See reasoning_content below.",
+    "streaming": "Supported by probe. 93 stream events assembled for the probe, 25 for a tool turn, 69 for a reasoned turn. Every stream ended with finish_reason and the [DONE] marker.",
+    "usage_accounting": "Supported by probe. Usage rides on the final chunk together with finish_reason. Every earlier chunk carries usage null, and there is no separate usage-only chunk. The adapter read it correctly, including cached tokens (prompt_tokens_details.cached_tokens equals DeepSeek's prompt_cache_hit_tokens in every recording) and reasoning tokens (completion_tokens_details.reasoning_tokens).",
+    "refusal": "A deliberately invalid key gave HTTP 401, type authentication_error, code invalid_request_error. The adapter classified it as Auth, provider_auth_failed, RequiresAuthorization, and the probe set connection to unsupported and stopped before any inference call.",
+    "destination_policy": "api.deepseek.com passed the public-address policy and the policy-bound resolver connected to it. Not tested against DeepSeek: redirects and proxy settings.",
+    "observed_capabilities_after_the_inference_probe": {
+      "model_listing": "supported/probe",
+      "text": "supported/probe",
+      "tool_calls": "supported/probe",
+      "streaming": "supported/probe",
+      "usage_accounting": "supported/probe",
+      "strict_json_schema": "unknown/not_probed (the adapter sends no strict flag for a compatible profile, as designed)",
+      "parallel_tool_calls": "unknown/not_probed",
+      "image_input": "unknown/not_probed",
+      "cancellation": "unknown/not_probed"
+    }
+  },
+  "not_verified": [
+    "The openai:gpt-5.4-nano profile and OpenAI's own wire behavior (needs a funded OpenAI key, issue #2).",
+    "strict JSON schema on tools (DeepSeek documents it as a beta feature behind a strict flag and a beta base URL. The compatible profile does not send it.).",
+    "Parallel tool calls. The adapter sends parallel_tool_calls false and DeepSeek accepted the field without comment, but DeepSeek does not document it, so no claim is made.",
+    "Cancelling a live stream mid-turn (closing the connection) and what DeepSeek bills for it.",
+    "Rate limit (429), insufficient balance (402), overload (503) and server error (500) refusals. They cannot be produced on demand without harming the account. DeepSeek documents 402 as Insufficient Balance. See finding F7.",
+    "Long outputs, large prompts, image input, deepseek-v4-pro, and the Anthropic-format endpoint.",
+    "Time to first byte and total latency were not measured as evidence. The live calls took roughly 1 to 2 seconds each."
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "title": "DeepSeek ignores max_completion_tokens, so the adapter's output bound does not bound DeepSeek",
+      "evidence": "Non-streaming curl, thinking at default: max_completion_tokens 8 gave 15 completion tokens and finish_reason stop. max_tokens 8 gave 8 completion tokens and finish_reason length. In the adapter's own probe, whose bound is 64, DeepSeek produced 122 output tokens. DeepSeek's API reference documents max_tokens only.",
+      "impact": "Cost and runaway-output protection cannot rely on the request bound for DeepSeek, or for any compatible server that only knows max_tokens. The default output cap in thinking mode is 64K tokens (documented), which at DeepSeek's prices is a few cents at worst. The host budget gate still applies.",
+      "suggestion": "Send max_tokens as well as, or instead of, max_completion_tokens for the openai-compatible kind (OpenAI's newer models reject max_tokens, so the OpenAI kind should keep max_completion_tokens). The replay test the_adapter_sends_max_completion_tokens_not_max_tokens pins today's behavior so the change is deliberate."
+    },
+    {
+      "id": "F2",
+      "title": "Thinking is on by default and the adapter cannot switch it off or set its effort",
+      "evidence": "deepseek-flash reasons unless the request says thinking disabled or reasoning_effort none. The probe call carried 81 reasoning tokens of 122 output tokens. The wire shows reasoning in delta.reasoning_content, which the assembler ignores, so reasoning text is never part of the Turn or persisted, matching the design note in request.rs. Reasoning tokens are counted inside completion_tokens, and so are billed at the output price. With thinking disabled through a test-only request field, both turns of the tool round trip worked.",
+      "impact": "Works, but output cost includes hidden reasoning, and a loop cannot choose to turn it off for DeepSeek. ModelRequest and the profile have no provider-specific request fields.",
+      "suggestion": "Add an optional per-profile extra request body (merged last, as openai::request_body already supports through its extra argument) so an operator can set thinking or reasoning_effort."
+    },
+    {
+      "id": "F3",
+      "title": "DeepSeek documents that reasoning_content must be sent back with tool calls, but today it was not enforced",
+      "evidence": "The DeepSeek thinking-mode guide says that for requests with tools the reasoning_content must be passed back in all later requests, and that omitting it returns HTTP 400. On 2026-11-02 two follow-up turns, built by the neutral ModelRequest (which has no field for reasoning), were accepted with 200. One followed a tool turn with no reasoning, the other followed a turn with 48 real reasoning tokens (deepseek-reasoned-turn-1 and -2).",
+      "impact": "Multi-turn tool use works today without reasoning_content on deepseek-flash. DeepSeek may start enforcing its documentation, or enforce it for other models, so a 400 on a follow-up is a plausible future failure. This observation is for one model on one day.",
+      "suggestion": "Keep the live test live_deepseek_follow_up_after_a_reasoned_tool_call_default_thinking as the canary. If it starts failing with a 400, either pass reasoning back inside a provider-private field of the profile or disable thinking for DeepSeek profiles (F2)."
+    },
+    {
+      "id": "F4",
+      "title": "deepseek-chat is an undocumented alias",
+      "evidence": "See model.deepseek_chat_result.",
+      "impact": "Anyone who configures deepseek-chat today gets deepseek-flash and its pricing. DeepSeek can retire the alias.",
+      "suggestion": "Document deepseek-flash as the compatible-profile example for DeepSeek."
+    },
+    {
+      "id": "F5",
+      "title": "Pricing depends on time of day and the repository has no DeepSeek price record",
+      "evidence": "DeepSeek's pricing page lists off-peak and peak rates (peak is 01:00 to 04:00 and 06:00 to 10:00 UTC on weekdays, excluding Chinese public holidays. Off-peak is half the peak rate). crates/agent/src/cost.rs holds prices for gpt-5.4-nano and claude-haiku-5-5 only, so estimate_micros returns NoPrice for DeepSeek.",
+      "impact": "A budget gate that meters a DeepSeek profile would see NoPrice. The live test computes cost from its own table. No production code changed.",
+      "suggestion": "If DeepSeek becomes an agent profile, add a deepseek-flash entry priced at the peak rate, which is the safe upper bound."
+    },
+    {
+      "id": "F6",
+      "title": "Documented but unobserved: 402 Insufficient Balance is classified as Other",
+      "evidence": "DeepSeek's error-code page documents 402 as Insufficient Balance. openai::classify_status maps 429 with a quota code to Quota, but any 402 falls to HttpClass::Other, which normalizes to provider_refused, Terminal, no cost. Not observed live, because it needs an empty balance.",
+      "impact": "Safe (terminal, never retried) but not labeled as exhausted quota, so any later operator alert or user message keyed on provider_quota_exhausted would miss a DeepSeek account that ran dry.",
+      "suggestion": "Map 402 to Quota in classify_status and add a unit test beside live_credit_exhausted_is_quota_not_retryable."
+    }
+  ],
+  "exploratory_max_tokens": {
+    "note": "Two non-streaming curl calls made before the Rust runs, to learn which output bound DeepSeek honors. Both left thinking at its default.",
+    "max_completion_tokens_8": {"request": "exploratory-max-completion-tokens.request.json", "response": "exploratory-max-completion-tokens.response.json", "finish_reason": "stop", "completion_tokens": 15},
+    "max_tokens_8": {"request": "exploratory-max-tokens.request.json", "response": "exploratory-max-tokens.response.json", "finish_reason": "length", "completion_tokens": 8}
+  },
+  "pricing": {
+    "source": "https://api-docs.deepseek.com/quick_start/pricing, fetched with curl and read from the raw page on 2026-11-02 (page sha256 579412351262de19f1b067420542d042dc9433f389be6d252d0f4c41b82f515b, which changes with the page)",
+    "deepseek-flash_usd_per_million_tokens": {
+      "off_peak": {"input_cache_hit": 0.003, "input_cache_miss": 0.15, "output": 0.6},
+      "peak": {"input_cache_hit": 0.006, "input_cache_miss": 0.3, "output": 1.2}
+    },
+    "billing_rule": "Cost is tokens times price. Reasoning tokens are part of completion_tokens and count as output."
+  },
+  "spend": {
+    "paid_inference_calls": 11,
+    "free_calls": "4 GET /models (3 with the real key, 1 refused with the invalid key)",
+    "input_tokens": 3341,
+    "of_which_cache_hit_tokens": 1019,
+    "output_tokens": 523,
+    "of_which_reasoning_tokens": 150,
+    "usd_at_the_off_peak_rates_that_applied": 0.000665157,
+    "usd_if_billed_at_peak_rates": 0.001330314,
+    "budget": "well under US$0.10 (about 0.7 percent of it)",
+    "basis": "Computed from the usage the provider reported in each response and the published prices. It is not read from a billing statement or the account balance, because no balance was recorded before the run. Per-call detail is in spend.json.",
+    "per_call_detail": "spend.json"
+  },
+  "recorded_real_fixtures": {
+    "note": "Three live streams were copied byte for byte into crates/agent/tests/fixtures/recorded/ with meta files (evidence_kind live), and crates/agent/tests/replay_deepseek.rs replays them through the real HTTP stack with faults injected into the real bytes.",
+    "fixtures": {
+      "deepseek-tool-turn": "111148a16d3631a560f7b42338d7eaa814e29409ca72d193ae5137b9561bcdb6",
+      "deepseek-reasoned-turn-1": "c1f42ead2f9abb0d44362f95d5f224cd6872acdffcabf57099a6081dd35d1b93",
+      "deepseek-nothink-turn-2": "c0815df4e0c7b37cbcd701198c41f355f0bf617eedf344959c52e3d90a5a2093"
+    },
+    "label": "recorded-real-replay. These do not replace the synthetic OpenAI fixtures that issue #2 asks to replace with a real OpenAI stream."
+  },
+  "unrelated_windows_failure": {
+    "test": "crates/agent/tests/replay.rs disconnect_after_acceptance_is_reconcile_first_with_one_request",
+    "observed": "Fails every time on this Windows 11 machine (6 of 6 runs) at replay.rs:134. The error's acceptance is Uncertain where the test expects Accepted.",
+    "unchanged_code": "Nothing in crates/agent/src or in replay.rs was changed on this branch. The failure is present on the base revision.",
+    "likely_cause_unverified": "The replay server's DisconnectAt closes the socket with SO_LINGER 0 (an RST). On Windows an RST can discard bytes the client has not read yet, so the client may see the reset before the response headers. That would classify the failure as Uncertain instead of Accepted. This was not confirmed.",
+    "tracking": "Falls under issue #3 (run the S03 tests on Windows)."
+  },
+  "files_sha256": {
+    "deepseek-chat-legacy-name.outcome.json": "e8597d542647a00855a959d785e3430e84d45a37bf88133ee805861f48d86b0f",
+    "deepseek-chat-legacy-name.request.json": "1673dee2d6bbac1fb95591e8a02695847badce03033c75fc4b1dbcca1af5f753",
+    "deepseek-chat-legacy-name.sse": "09864f3dc53690000977f085850bca6bb373a215abb6316c0612f6f8af75a36b",
+    "deepseek-default-thinking-turn-1.outcome.json": "aef12794746a1aa7fb03d7195535781eade62e8fbeee766cc8ac76c32232e538",
+    "deepseek-default-thinking-turn-1.request.json": "73fd0ce013931934baed8fcaba41756bbe775c383612ea736613a20db66a6273",
+    "deepseek-default-thinking-turn-1.sse": "25122ccee6e9429a8b3d5b05d7f36d91f0787bdf78b081713a5bab36413ebb64",
+    "deepseek-default-thinking-turn-2.outcome.json": "0ff93a8899e2cc7e0bdb54fde4b4e1f80394e73359ce4059723fee26632e1e0c",
+    "deepseek-default-thinking-turn-2.request.json": "6635e3ac9515c609acce49869c8796cc4aa331d96bf6d58c414fd4521cd05387",
+    "deepseek-default-thinking-turn-2.sse": "5e464a1565f75cc1db2964e5daa2cf3525fb1d75efe2b051e500b5a15a395a9f",
+    "deepseek-nothink-turn-1.outcome.json": "647812b19e6bcba24323cf4b46640025ad8eb2ef6ba3a0aa17e8fca1523fcb3d",
+    "deepseek-nothink-turn-1.request.json": "18dbde8533224962dbdefa11e9fc05952f46f6fd213369bf6a9fda6b96d70b21",
+    "deepseek-nothink-turn-1.sse": "8e67caadb3a6b3561c7de3d2548543ab90e19006c8dc0c72715dc122a59b6e0e",
+    "deepseek-nothink-turn-2.outcome.json": "555be8085c58efd01c9bab56c1de053ff55a63fa15cc192b2fde9ade79067155",
+    "deepseek-nothink-turn-2.request.json": "af35ccc965ea8f1beac4fa3a394c07b5403ce592fb6de10b0fc13e6e6ed9cea7",
+    "deepseek-nothink-turn-2.sse": "c0815df4e0c7b37cbcd701198c41f355f0bf617eedf344959c52e3d90a5a2093",
+    "deepseek-reasoned-turn-1.outcome.json": "8047b7693656c613e76a061ed62b73ee259a08cda744b438ef61b27c18183319",
+    "deepseek-reasoned-turn-1.request.json": "150adabf7e49fa26cbd2c34fbb378cc0df5d37db59da80f4ffe97c068fab8fd0",
+    "deepseek-reasoned-turn-1.sse": "c1f42ead2f9abb0d44362f95d5f224cd6872acdffcabf57099a6081dd35d1b93",
+    "deepseek-reasoned-turn-2.outcome.json": "e2f2af8b85e0088ef1e24e3bc4381f411c04c2d722bb49750934f14923125da8",
+    "deepseek-reasoned-turn-2.request.json": "807222f9c5375ec7a676e5a53c0afb4dc5bb165cfb26113e08e960be9a36ff51",
+    "deepseek-reasoned-turn-2.sse": "c7e29efde65162452758284a1008fdaa301dc4bb26a81ba4ce80f219e147b019",
+    "deepseek-tool-turn.outcome.json": "e885862a573ae5a90e29f797db28eb3a8df9429a09dcffe93a23daf2e1e62f42",
+    "deepseek-tool-turn.request.json": "73fd0ce013931934baed8fcaba41756bbe775c383612ea736613a20db66a6273",
+    "deepseek-tool-turn.sse": "111148a16d3631a560f7b42338d7eaa814e29409ca72d193ae5137b9561bcdb6",
+    "exploratory-max-completion-tokens.request.json": "ba0d624ca1f04f4fdc111659e11c0ebc151b9b3f62c6bfcee1e55debb2e9ce10",
+    "exploratory-max-completion-tokens.response.json": "7c39f7e47095d382f0d23af5ed47fd2cf477bc3a60e13bc6eb157782d7985c64",
+    "exploratory-max-tokens.request.json": "161f44bc55b59b3bbc82bda7239eefda0e11e50c4e541e367beabcf33bfbd398",
+    "exploratory-max-tokens.response.json": "68be25666002652472f97ed43b0959ed9c2cbd2ecc6af61457aa3528667f456b",
+    "inference-probe.report.json": "32728228f9dd7179293a873b9a7c60e677e475ee336e57db1a9deca66779d000",
+    "invalid-key.report.json": "191f9aa639b99913a72620d2e1bba19f2d81729e04772412b5496e4162c74b59",
+    "listing-probe.report.json": "4d32b423331be1ea165a2b544aaf6977ef82aefdb99e473c78bea088463dc256",
+    "models-listing.response.json": "b4a502059eb2dafad6380e0a57b2debf31219ae859cba9f0e019d48ae473be2f",
+    "spend.json": "c8165a27f6658b52be6c33c7b680678a270437a4b0c7dad2d9e0ab9574842977"
+  }
+}
