@@ -251,7 +251,7 @@ These are not maintainer decisions. The maintainer authorized S03 to proceed wit
 | Image model first | Every visual starts as an image from the image model: page mockups, the icon set, the logo and the mascot. Code then matches the chosen image. The approved mockups are the target look for every page round |
 | Icons | The generated icon set, sliced into masks that take the text color |
 | Logo | A sawtooth factory roof in a rounded-square outline, with no fill, drawn in the theme's text color (near-black on light, near-white on dark). The favicon follows the browser theme the same way |
-| Mascot | The brick factory character with a scarf and toolbelt. It guides people through the app in a tutorial phase, bouncing around and pointing at features. It is built from generated images, one per pose, moved with CSS |
+| Mascot | The brick factory character with a scarf and toolbelt. It guides people through the app in a tutorial phase, bouncing around and pointing at features. It is built from generated images, one per pose, moved with CSS. It appears only for tips, tutorials and when called up, never as page decoration |
 
 ### ADR-026: a desktop companion app, synced with the web app (2026-10-25)
 

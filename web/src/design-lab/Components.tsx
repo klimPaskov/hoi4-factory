@@ -420,7 +420,7 @@ export function ComponentsPage() {
           <EmptyState
             icon
             title={t('projects.emptyTitle')}
-            action={<Button variant="primary">{t('projects.emptyAction')}</Button>}
+            action={<Button variant="primary">{t('projects.create')}</Button>}
           >
             {t('projects.emptyBody')}
           </EmptyState>

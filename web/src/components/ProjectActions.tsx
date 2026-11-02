@@ -10,14 +10,12 @@ import { ErrorMessage, Field } from './ui';
 
 type Mode = 'idle' | 'rename' | 'delete';
 
-/** Rename and delete (with the 30-day restore window) for one project. */
-export function ProjectActions({
-  project,
-  onChanged,
-}: {
-  project: Project;
-  onChanged: (project: Project) => void;
-}) {
+/**
+ * Rename and delete (with the 30-day restore window) for one project. The project page shows
+ * the triggers and the open panel together. The project list shows the triggers in a table cell
+ * and the panel in a row of its own, so the two parts render separately.
+ */
+export function useProjectActions(project: Project, onChanged: (project: Project) => void) {
   const { t } = useTranslation();
   const [mode, setMode] = useState<Mode>('idle');
   const [name, setName] = useState(project.name);
@@ -25,10 +23,10 @@ export function ProjectActions({
   const [failure, setFailure] = useState<unknown>(null);
   const [busy, setBusy] = useState(false);
   const [version, setVersion] = useState(0);
-  const formRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const leftIdle = useRef(false);
-  useFocusOnError(formRef, version);
+  useFocusOnError(panelRef, version);
 
   // Closing a panel returns focus to the button that opened it.
   useEffect(() => {
@@ -38,8 +36,7 @@ export function ProjectActions({
 
   const canRename = project.role === 'owner' || project.role === 'maintainer';
   const canDelete = project.role === 'owner';
-  if (project.deleted_at) return null;
-  if (!canRename && !canDelete) return null;
+  const available = !project.deleted_at && (canRename || canDelete);
 
   function close() {
     setMode('idle');
@@ -88,83 +85,89 @@ export function ProjectActions({
     }
   }
 
-  return (
-    <div className="project-actions">
-      {mode === 'idle' ? (
-        <div className="button-row">
-          {canRename ? (
-            <button
-              type="button"
-              className="button secondary small-button"
-              ref={triggerRef}
-              onClick={() => {
-                setName(project.name);
-                setMode('rename');
-              }}
-            >
-              {t('project.rename')}
-            </button>
-          ) : null}
-          {canDelete ? (
-            <button
-              type="button"
-              className="button danger-outline small-button"
-              onClick={() => setMode('delete')}
-            >
-              {t('project.delete')}
-            </button>
-          ) : null}
-        </div>
+  const triggers = available ? (
+    <div className="button-row">
+      {canRename ? (
+        <button
+          type="button"
+          className="button ghost small-button"
+          ref={triggerRef}
+          aria-expanded={mode === 'rename'}
+          onClick={() => {
+            setName(project.name);
+            setMode(mode === 'rename' ? 'idle' : 'rename');
+          }}
+        >
+          {t('project.rename')}
+        </button>
       ) : null}
-
-      {mode === 'rename' ? (
-        <div ref={formRef}>
-          <form onSubmit={(e) => void submitRename(e)} noValidate className="inline-form">
-            {failure ? <ErrorMessage error={failure} focusable /> : null}
-            <Field
-              label={t('project.newName')}
-              value={name}
-              onChange={setName}
-              error={fieldError}
-              maxLength={400}
-            />
-            <div className="button-row">
-              <button type="submit" className="button primary small-button" disabled={busy}>
-                {busy ? t('common.saving') : t('common.save')}
-              </button>
-              <button type="button" className="button secondary small-button" onClick={close}>
-                {t('common.cancel')}
-              </button>
-            </div>
-          </form>
-        </div>
+      {canDelete ? (
+        <button
+          type="button"
+          className="button ghost small-button danger-text"
+          aria-expanded={mode === 'delete'}
+          onClick={() => setMode(mode === 'delete' ? 'idle' : 'delete')}
+        >
+          {t('project.delete')}
+        </button>
       ) : null}
+    </div>
+  ) : null;
 
-      {mode === 'delete' ? (
-        <div ref={formRef} className="confirm" role="group" aria-label={t('project.confirmDeleteLabel')}>
+  const panel =
+    mode === 'rename' ? (
+      <div ref={panelRef}>
+        <form onSubmit={(e) => void submitRename(e)} noValidate className="inline-form">
           {failure ? <ErrorMessage error={failure} focusable /> : null}
-          <p>
-            <Trans
-              i18nKey="project.confirmDelete"
-              values={{ name: project.name }}
-              components={{ name: <bdi dir="auto" className="strong" /> }}
-            />
-          </p>
+          <Field label={t('project.newName')} value={name} onChange={setName} error={fieldError} maxLength={400} />
           <div className="button-row">
-            <button
-              type="button"
-              className="button danger small-button"
-              disabled={busy}
-              onClick={() => void confirmDelete()}
-            >
-              {busy ? t('project.deleting') : t('project.confirmDeleteButton')}
+            <button type="submit" className="button primary small-button" disabled={busy}>
+              {busy ? t('common.saving') : t('common.save')}
             </button>
             <button type="button" className="button secondary small-button" onClick={close}>
               {t('common.cancel')}
             </button>
           </div>
+        </form>
+      </div>
+    ) : mode === 'delete' ? (
+      <div ref={panelRef} className="confirm" role="group" aria-label={t('project.confirmDeleteLabel')}>
+        {failure ? <ErrorMessage error={failure} focusable /> : null}
+        <p>
+          <Trans
+            i18nKey="project.confirmDelete"
+            values={{ name: project.name }}
+            components={{ name: <bdi dir="auto" className="strong" /> }}
+          />
+        </p>
+        <div className="button-row">
+          <button type="button" className="button danger small-button" disabled={busy} onClick={() => void confirmDelete()}>
+            {busy ? t('project.deleting') : t('project.confirmDeleteButton')}
+          </button>
+          <button type="button" className="button secondary small-button" onClick={close}>
+            {t('common.cancel')}
+          </button>
         </div>
-      ) : null}
+      </div>
+    ) : null;
+
+  return { available, mode, triggers, panel };
+}
+
+/** Rename and delete for one project, triggers and panel together (the project page). */
+export function ProjectActions({
+  project,
+  onChanged,
+}: {
+  project: Project;
+  onChanged: (project: Project) => void;
+}) {
+  const actions = useProjectActions(project, onChanged);
+  if (!actions.available) return null;
+  return (
+    <div className="project-actions">
+      {actions.mode === 'idle' ? actions.triggers : null}
+      {actions.panel}
     </div>
   );
 }
