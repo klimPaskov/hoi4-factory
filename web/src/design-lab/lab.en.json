@@ -2,42 +2,14 @@
   "designLab": {
     "title": "Design lab",
     "devOnly": "Development only. Nothing here reaches the production build, and nothing you do here is saved. All data is sample data.",
-    "rounds": "Open choices",
-    "round1": {
-      "title": "Round 1: overall direction",
-      "body": "Four directions, each applied to the project list with the same sample data. Try each at full width and at phone width, in light and dark, and click through creating, renaming, deleting and restoring a project. Pick one, combine parts of several, or ask for another round."
-    },
-    "open": "Open {{name}}",
-    "directions": {
-      "workbench": {
-        "name": "A. Workbench",
-        "summary": "A quiet, modern tool. Sidebar navigation, a dense table, neutral greys with one blue accent. Feels like GitHub or Linear."
-      },
-      "dossier": {
-        "name": "B. Dossier",
-        "summary": "1930s staff paperwork. Olive and brass on warm paper, serif headings, typewriter details, projects as file folders with stamps."
-      },
-      "warroom": {
-        "name": "C. War room",
-        "summary": "A command console. Dark navy first, amber and teal signals, condensed capitals, status readouts and a grid of project tiles. Closest to the game's own feel."
-      },
-      "studio": {
-        "name": "D. Studio",
-        "summary": "Friendly and roomy. Rounded cards, soft colors, big type and generous space, each project with a flag-style banner. Easiest for newcomers."
-      }
-    },
+    "openRounds": "Open choices",
+    "noRounds": "No open choices right now. The next page round appears here.",
+    "openVariant": "Open {{name}}",
+    "gone": "There is no such variant. It may have been removed after a choice.",
     "toolbar": {
       "label": "Design lab controls",
       "home": "Design lab",
-      "direction": "Direction",
       "state": "State",
-      "states": {
-        "populated": "With projects",
-        "empty": "No projects",
-        "loading": "Loading",
-        "error": "Error"
-      },
-      "unverified": "Unverified email",
       "width": "Width",
       "widths": {
         "full": "Full window",
@@ -45,9 +17,106 @@
         "both": "Desktop and phone"
       },
       "phoneFrame": "{{name}} at phone width",
-      "desktopFrame": "{{name}} at desktop width"
+      "desktopFrame": "{{name}} at desktop width",
+      "variant": "Variant"
     },
-    "notFound": "There is no such variant. It may have been removed after a choice.",
+    "components": {
+      "title": "Design system",
+      "subtitle": "Workbench, the chosen direction: the real tokens, styles and shared components from ui.tsx, in every variant and state. Switch the theme in the bar above.",
+      "link": "Design system: tokens and components",
+      "brand": "Logo mark",
+      "colors": "Color tokens",
+      "type": "Type",
+      "typeH1": "Page title, 24 pixels",
+      "typeH2": "Section title, 16 pixels",
+      "typeBody": "Body text is 15 pixels on a desktop and 16 pixels in form fields on phones, so phones never zoom in on focus.",
+      "typeSmall": "Small text, 13 pixels, for dates, hints and secondary details.",
+      "buttons": "Buttons",
+      "fields": "Form fields",
+      "objective": "What should the agent do?",
+      "model": "Model",
+      "modelHint": "The free monthly allowance pays for this model.",
+      "mode": "Mode",
+      "modeRead": "Read only: the agent looks at the mod and reports back",
+      "modeEdit": "Edit: the agent may change files",
+      "consent": "Start a Git history for this mod if it has none",
+      "notices": "Notices",
+      "warningTitle": "Waiting to be deleted",
+      "badges": "Status badges",
+      "running": "Running",
+      "paused": "Paused",
+      "failed": "Failed",
+      "inReview": "In review",
+      "cards": "Cards and facts",
+      "refresh": "Refresh",
+      "table": "Table (stacks into cards on phones)",
+      "colName": "Name",
+      "colVisibility": "Visibility",
+      "colCreated": "Created",
+      "colActions": "Actions",
+      "states": "Empty and loading states",
+      "steps": "Step indicator",
+      "stepsLabel": "Setup progress",
+      "stepScan": "Scan",
+      "stepExcerpts": "Excerpts",
+      "stepAnalyze": "Analyze",
+      "stepConfirm": "Confirm",
+      "stepPlan": "Plan",
+      "stepApply": "Apply",
+      "dialog": "Dialog",
+      "dialogBody": "A modal confirmation on the native dialog element: focus stays inside, Escape closes it, and focus returns to the button that opened it.",
+      "numbers": "Money and numbers",
+      "budget": "Budget",
+      "spent": "Spent",
+      "shell": "App shell",
+      "shellBody": "The sidebar holds the navigation, the game reference, the theme and the account. On phones it becomes a top bar with a Menu button. Every real page already uses it.",
+      "shellLink": "Open the project list in the new shell (sample data)",
+      "icons": "Icons (generated with the image model)",
+      "newParts": "From the mockups",
+      "meterLabel": "Free monthly allowance",
+      "segLegend": "Mode",
+      "segRead": "Read only",
+      "segEdit": "Edit",
+      "chipRemove": "Remove {{path}}",
+      "statProjects": "Projects",
+      "statRunning": "Tasks running",
+      "statSpent": "Spent this month",
+      "statDetail": "3 public",
+      "timelineLabel": "Agent activity",
+      "tl1": "Read common/national_focus/danube.txt",
+      "tl2": "Inspected the focus tree danube_focus: 38 focuses, no layout problems",
+      "tl3": "Writing common/ideas/danube_customs.txt",
+      "tlMeta": "12 minutes ago",
+      "flags": "Project avatars",
+      "mascot": "Mascot (generated images, moved with CSS)",
+      "mascotSays": "Hi, I am your factory guide. In the tutorial I hop over to each feature and point at it.",
+      "mascotPose": "Pose",
+      "mascotMotion": "Motion",
+      "motions": {
+        "enter": "Hop in",
+        "idle": "Idle bob",
+        "bounce": "Bounce",
+        "none": "Still"
+      }
+    },
+    "screens": {
+      "title": "Screens on sample data",
+      "body": "The real pages, served sample API answers instead of the server, so every state can be seen and captured. Each link opens in this tab and stays on sample data until you choose \"Leave sample data\" in the corner.",
+      "link": "Open the real screens on sample data",
+      "groups": {
+        "auth": "Sign in and account access",
+        "projects": "Project list",
+        "project": "Project page, upload and GitHub import",
+        "setup": "Setup wizard and recovery",
+        "tasks": "Task list",
+        "task": "Task page",
+        "account": "Account"
+      }
+    },
+    "fixtures": {
+      "badge": "Sample data: {{name}}",
+      "leave": "Leave sample data"
+    },
     "sample": {
       "projectCount_one": "{{count}} project",
       "projectCount_other": "{{count}} projects",
@@ -69,6 +138,28 @@
       "public": "Public",
       "dossierKicker": "Your files",
       "requisition": "Fill in a name to open a new file."
+    },
+    "mockups": {
+      "title": "Reference mockups",
+      "link": "Reference mockups made with the image model",
+      "body": "Generated with the image model before any page is built. They set the target look for every page round. Project avatars are abstract tricolors, never real national flags. Some mockups show data the API does not return yet, such as each project's source and Setup state in the list. Those parts need a small API addition, and I ask before building any.",
+      "items": {
+        "01-projects-desktop-light": "Project list, desktop, light",
+        "02-project-page-desktop-light": "Project page, desktop, light",
+        "03-setup-wizard-desktop-light": "Setup wizard, confirm step, desktop, light",
+        "04-tasks-desktop-light": "Task list with the new task panel, desktop, light",
+        "05-task-page-desktop-dark": "Running task page, desktop, dark",
+        "06-sign-in-desktop-light": "Sign in, desktop, light",
+        "07-account-desktop-light": "Account, desktop, light",
+        "08-phone-light": "Project list, menu and task page on phones",
+        "09-projects-empty-desktop-dark": "Empty project list with the unverified banner, desktop, dark",
+        "icon-sheet": "Generated icon set",
+        "mascot-3": "Mascot 3: the brick factory you picked",
+        "mascot-3a": "Mascot 3A: interwar industrial, riveted roof, production gauge, blueprint, conveyor-belt shoes",
+        "mascot-3b": "Mascot 3B: foreman cap, campaign map, steam whistle, scarf and toolbelt",
+        "mascot-3c": "Mascot 3C: simpler and rounder, production dial, smoke as a map arrow",
+        "logo-factory-sheet": "Factory logos 1 to 6, left to right, top row then bottom row"
+      }
     }
   }
 }

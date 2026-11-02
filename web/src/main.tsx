@@ -10,6 +10,12 @@ import './styles.css';
 
 applyTheme(readTheme());
 
+// Development only: the design lab's fixture mode can stand in for the server (ADR-025).
+if (import.meta.env.DEV) {
+  const { installFixtureMode } = await import('./design-lab/fixtureMode');
+  installFixtureMode();
+}
+
 const container = document.getElementById('root');
 if (!container) throw new Error('Missing #root element');
 

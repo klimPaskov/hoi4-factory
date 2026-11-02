@@ -2,6 +2,13 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.18, 2026-11-02, image-first UI design
+
+- The `ui-design-iteration` skill now starts every page and asset from the image model: page mockups first, then icons, logo and mascot poses, with one master image as the reference for consistency and fresh prompts when the maintainer asks for new ideas. Code then matches the chosen image. It also points to fixture mode and `web/scripts/lab-screenshots.mjs` for before and after captures, notes the maintainer's preference for minimal screens, and explains Vitest worker start timeouts on a saturated host.
+- CLAUDE.md notes that the Docker dev server polls for edits on Windows and should be stopped for client tests on a loaded machine.
+
+Evidence: maintainer instructions in the UI design track session on 2026-11-02. A mockup set, an icon set, logo rounds and 15 consistent mascot poses were produced this way. Vitest workers timed out at 60 seconds while the host CPU was at 100% with 2.3 GB free.
+
 ## 0.2.17, 2026-11-02, model and effort for new sessions
 
 - CLAUDE.md's delegation section now says that a new Claude Code session starts on Sonnet at medium or high effort, and on Opus at medium effort for harder tasks, instead of inheriting the starting session's model and effort.

@@ -1,19 +1,11 @@
-// Behavior shared by every variant, so variants differ only in layout and look. Everything runs
-// on local sample data: no request leaves the page.
+// Behavior shared by the variants of a round, so they differ only in layout and look. Everything
+// runs on local sample data: no request leaves the page.
 import { useId, useRef, useState, useSyncExternalStore, type FormEvent } from 'react';
 import { useLocation, useSearchParams } from 'react-router';
 import { Trans, useTranslation } from 'react-i18next';
 import type { Project } from '../api/types';
 import { applyTheme, readTheme, type ThemeChoice } from '../hooks';
 import { SAMPLE_GAME, SAMPLE_PROJECTS } from './fixtures';
-
-export type LabState = 'populated' | 'empty' | 'loading' | 'error';
-export const LAB_STATES: LabState[] = ['populated', 'empty', 'loading', 'error'];
-
-export interface DirectionProps {
-  state: LabState;
-  unverified: boolean;
-}
 
 const DAY = 86_400_000;
 
@@ -26,10 +18,8 @@ export interface SampleProjects {
   restore: (id: string) => void;
 }
 
-export function useSampleProjects(state: LabState): SampleProjects {
-  const [projects, setProjects] = useState<Project[]>(() =>
-    state === 'populated' ? SAMPLE_PROJECTS : [],
-  );
+export function useSampleProjects(populated: boolean): SampleProjects {
+  const [projects, setProjects] = useState<Project[]>(() => (populated ? SAMPLE_PROJECTS : []));
   const update = (id: string, change: Partial<Project>) =>
     setProjects((list) => list.map((p) => (p.id === id ? { ...p, ...change } : p)));
   return {

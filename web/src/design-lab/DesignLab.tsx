@@ -1,32 +1,21 @@
 // The design lab: development-only previews the maintainer chooses from (ADR-025). App.tsx adds
 // this route only when import.meta.env.DEV is true, so none of it reaches the production build.
-import type { ComponentType } from 'react';
+// It holds the approved design system, the real screens on sample data, and the open rounds:
+// three or four working variants of one page each, removed once the maintainer has chosen.
 import { Link, Route, Routes, useParams, useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
 import { usePageTitle } from '../hooks';
-import { DossierDirection } from './directions/Dossier';
-import { StudioDirection } from './directions/Studio';
-import { WarRoomDirection } from './directions/WarRoom';
-import { WorkbenchDirection } from './directions/Workbench';
+import { ComponentsPage } from './Components';
 import labStrings from './lab.en.json';
-import { LAB_STATES, useLabTheme, type DirectionProps, type LabState } from './shared';
+import { MockupsPage } from './Mockups';
+import { ROUNDS } from './rounds';
+import { SCENARIO_GROUPS, SCENARIOS } from './scenarios';
+import { useLabTheme } from './shared';
 import './lab.css';
 
 // Lab text lives in its own file, merged into the translations only in development.
 i18n.addResourceBundle('en', 'translation', labStrings, true, false);
-
-interface Variant {
-  id: string;
-  Component: ComponentType<DirectionProps>;
-}
-
-const DIRECTIONS: Variant[] = [
-  { id: 'workbench', Component: WorkbenchDirection },
-  { id: 'dossier', Component: DossierDirection },
-  { id: 'warroom', Component: WarRoomDirection },
-  { id: 'studio', Component: StudioDirection },
-];
 
 const WIDTHS = ['full', 'phone', 'both'] as const;
 type Width = (typeof WIDTHS)[number];
@@ -38,32 +27,76 @@ function LabIndex() {
     <div className="lab-page">
       <h1>{t('designLab.title')}</h1>
       <p className="lab-note">{t('designLab.devOnly')}</p>
-      <h2>{t('designLab.rounds')}</h2>
-      <section className="lab-round" aria-labelledby="lab-round-1">
-        <h3 id="lab-round-1">{t('designLab.round1.title')}</h3>
-        <p>{t('designLab.round1.body')}</p>
-        <ul className="lab-cards">
-          {DIRECTIONS.map(({ id }) => (
-            <li key={id} className="lab-card">
-              <h4>{t(`designLab.directions.${id}.name`)}</h4>
-              <p>{t(`designLab.directions.${id}.summary`)}</p>
-              <Link to={`direction/${id}`} className="lab-button">
-                {t('designLab.open', { name: t(`designLab.directions.${id}.name`) })}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <ul className="lab-links">
+        <li>
+          <Link to="mockups">{t('designLab.mockups.link')}</Link>
+        </li>
+        <li>
+          <Link to="components">{t('designLab.components.link')}</Link>
+        </li>
+        <li>
+          <Link to="screens">{t('designLab.screens.link')}</Link>
+        </li>
+      </ul>
+      <h2>{t('designLab.openRounds')}</h2>
+      {ROUNDS.length === 0 ? <p className="muted">{t('designLab.noRounds')}</p> : null}
+      {ROUNDS.map((round) => (
+        <section key={round.id} className="lab-round" aria-labelledby={`lab-round-${round.id}`}>
+          <h3 id={`lab-round-${round.id}`}>{t(`designLab.round.${round.id}.title`)}</h3>
+          <p>{t(`designLab.round.${round.id}.body`)}</p>
+          <ul className="lab-cards">
+            {round.variants.map(({ id }) => (
+              <li key={id} className="lab-card">
+                <h4>{t(`designLab.round.${round.id}.variants.${id}.name`)}</h4>
+                <p>{t(`designLab.round.${round.id}.variants.${id}.summary`)}</p>
+                <Link to={`round/${round.id}/${id}`} className="lab-button">
+                  {t('designLab.openVariant', { name: t(`designLab.round.${round.id}.variants.${id}.name`) })}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
     </div>
   );
 }
 
-function Toolbar({ current, name }: { current: string; name: string }) {
+function Screens() {
+  const { t } = useTranslation();
+  usePageTitle(t('designLab.screens.title'));
+  return (
+    <div className="lab-page">
+      <p>
+        <Link to="/design-lab">{t('designLab.toolbar.home')}</Link>
+      </p>
+      <h1>{t('designLab.screens.title')}</h1>
+      <p className="lab-note">{t('designLab.screens.body')}</p>
+      {SCENARIO_GROUPS.map((group) => (
+        <section key={group} aria-labelledby={`lab-group-${group}`}>
+          <h2 id={`lab-group-${group}`}>{t(`designLab.screens.groups.${group}`)}</h2>
+          <ul className="lab-scenarios">
+            {Object.entries(SCENARIOS)
+              .filter(([, scenario]) => scenario.group === group)
+              .map(([name]) => (
+                <li key={name}>
+                  <a href={`/design-lab/open?lab-scenario=${name}`}>{name}</a>
+                </li>
+              ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  );
+}
+
+function Toolbar({ roundId, current }: { roundId: string; current: string }) {
   const { t } = useTranslation();
   const [params, setParams] = useSearchParams();
   const [theme, setTheme] = useLabTheme();
-  const state = params.get('state') ?? 'populated';
+  const round = ROUNDS.find((r) => r.id === roundId);
+  const state = params.get('state') ?? round?.states[0] ?? '';
   const width = params.get('width') ?? 'full';
+  if (!round) return null;
 
   function set(key: string, value: string | null) {
     const next = new URLSearchParams(params);
@@ -78,34 +111,26 @@ function Toolbar({ current, name }: { current: string; name: string }) {
         {t('designLab.toolbar.home')}
       </Link>
       <fieldset className="lab-group">
-        <legend>{t('designLab.toolbar.direction')}</legend>
-        {DIRECTIONS.map(({ id }) => (
+        <legend>{t('designLab.toolbar.variant')}</legend>
+        {round.variants.map(({ id }) => (
           <Link
             key={id}
-            to={{ pathname: `/design-lab/direction/${id}`, search: params.toString() }}
+            to={{ pathname: `/design-lab/round/${round.id}/${id}`, search: params.toString() }}
             aria-current={id === current ? 'page' : undefined}
             className="lab-chip"
           >
-            {t(`designLab.directions.${id}.name`)}
+            {t(`designLab.round.${round.id}.variants.${id}.name`)}
           </Link>
         ))}
       </fieldset>
       <fieldset className="lab-group">
         <legend>{t('designLab.toolbar.state')}</legend>
-        {LAB_STATES.map((value) => (
+        {round.states.map((value) => (
           <label key={value} className="lab-chip">
             <input type="radio" name="lab-state" checked={state === value} onChange={() => set('state', value)} />
-            {t(`designLab.toolbar.states.${value}`)}
+            {t(`designLab.round.${round.id}.states.${value}`)}
           </label>
         ))}
-        <label className="lab-chip">
-          <input
-            type="checkbox"
-            checked={params.get('unverified') === '1'}
-            onChange={(event) => set('unverified', event.target.checked ? '1' : null)}
-          />
-          {t('designLab.toolbar.unverified')}
-        </label>
       </fieldset>
       <fieldset className="lab-group">
         <legend>{t('layout.theme')}</legend>
@@ -125,7 +150,6 @@ function Toolbar({ current, name }: { current: string; name: string }) {
           </label>
         ))}
       </fieldset>
-      <span className="sr-only">{name}</span>
     </div>
   );
 }
@@ -137,35 +161,35 @@ function frameSource(params: URLSearchParams): string {
   return `${window.location.pathname}?${next.toString()}`;
 }
 
-function DirectionPage() {
+function VariantPage() {
   const { t } = useTranslation();
-  const { id = '' } = useParams();
+  const { round: roundId = '', variant: variantId = '' } = useParams();
   const [params] = useSearchParams();
-  const variant = DIRECTIONS.find((d) => d.id === id);
-  const name = variant ? t(`designLab.directions.${variant.id}.name`) : t('designLab.title');
+  const round = ROUNDS.find((r) => r.id === roundId);
+  const variant = round?.variants.find((v) => v.id === variantId);
+  const name = variant ? t(`designLab.round.${roundId}.variants.${variantId}.name`) : t('designLab.title');
   usePageTitle(`${name} · ${t('designLab.title')}`);
-  if (!variant) {
+  if (!round || !variant) {
     return (
       <div className="lab-page">
-        <p>{t('designLab.notFound')}</p>
+        <p>{t('designLab.gone')}</p>
         <Link to="/design-lab">{t('designLab.toolbar.home')}</Link>
       </div>
     );
   }
 
-  const stateParam = params.get('state');
-  const state: LabState = LAB_STATES.includes(stateParam as LabState) ? (stateParam as LabState) : 'populated';
-  const unverified = params.get('unverified') === '1';
+  const stateParam = params.get('state') ?? '';
+  const state = round.states.includes(stateParam) ? stateParam : (round.states[0] ?? '');
   const width = (WIDTHS as readonly string[]).includes(params.get('width') ?? '') ? (params.get('width') as Width) : 'full';
   // Remount on every state change so each state starts from its own sample data.
-  const view = <variant.Component key={`${variant.id}-${state}-${unverified}`} state={state} unverified={unverified} />;
+  const view = <variant.Component key={`${variant.id}-${state}`} state={state} />;
 
   if (params.get('frame') === '1') return view;
 
   const source = frameSource(params);
   return (
     <>
-      <Toolbar current={variant.id} name={name} />
+      <Toolbar roundId={round.id} current={variant.id} />
       {width === 'full' ? view : null}
       {width !== 'full' ? (
         <div className="lab-frames">
@@ -185,7 +209,10 @@ export default function DesignLab() {
   return (
     <Routes>
       <Route index element={<LabIndex />} />
-      <Route path="direction/:id" element={<DirectionPage />} />
+      <Route path="components" element={<ComponentsPage />} />
+      <Route path="mockups" element={<MockupsPage />} />
+      <Route path="screens" element={<Screens />} />
+      <Route path="round/:round/:variant" element={<VariantPage />} />
       <Route path="*" element={<LabIndex />} />
     </Routes>
   );

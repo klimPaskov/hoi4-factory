@@ -239,6 +239,20 @@ These are not maintainer decisions. The maintainer authorized S03 to proceed wit
 
 **Start (maintainer, 2026-11-02).** The maintainer started the UI design track on 2026-11-02. It runs now, between S03 and S04, as its own interactive session that follows GOAL-UI and the `ui-design-iteration` skill. The maintainer chooses the overall direction and every page from live variants in the design lab, and the agent implements only what was chosen. Starting the track authorizes no stage. S04 stays unauthorized until the maintainer starts it.
 
+**Track choices (maintainer, 2026-11-02).** Recorded as they were made in the design lab. The full record with the variants offered is [DESIGN-DECISIONS](../design/DESIGN-DECISIONS.md).
+
+| Topic | Decision |
+|---|---|
+| Fonts | System font stacks only. No bundled font files |
+| Page order | Sign-in and the other auth pages, project list, project page, Setup wizard, task list, task page, account |
+| API additions | None. Designs use only the data the API returns today. A design that needs more data is changed instead |
+| Direction | Workbench: a quiet, modern tool with sidebar navigation, neutral greys and one blue accent |
+| Minimal screens | The interface stays minimal. The less detail on screen, the better |
+| Image model first | Every visual starts as an image from the image model: page mockups, the icon set, the logo and the mascot. Code then matches the chosen image. The approved mockups are the target look for every page round |
+| Icons | The generated icon set, sliced into masks that take the text color |
+| Logo | A sawtooth factory roof in a rounded-square outline, with no fill, drawn in the theme's text color (near-black on light, near-white on dark). The favicon follows the browser theme the same way |
+| Mascot | The brick factory character with a scarf and toolbelt. It guides people through the app in a tutorial phase, bouncing around and pointing at features. It is built from generated images, one per pose, moved with CSS |
+
 ### ADR-026: a desktop companion app, synced with the web app (2026-10-25)
 
 **Decision.** The web app stays the first priority and must support everything to the fullest and be very easy to use. Later, HOI4 Factory also ships a desktop app for macOS, Linux and Windows on the same server and account. A desktop app gives more local control: it can run locally installed tools such as HOI4 Live Tools and a locally installed Agent Tools MCP server, and use the user's own game. Project members on the web and on the desktop app work on the same projects, and their changes always sync, so it does not matter where a participant works.

@@ -23,7 +23,9 @@
     "theme": "Theme",
     "themeDark": "Dark",
     "themeLight": "Light",
-    "themeSystem": "Match system"
+    "themeSystem": "Match system",
+    "menu": "Menu",
+    "signedInAs": "Signed in as"
   },
   "nav": {
     "account": "Account",

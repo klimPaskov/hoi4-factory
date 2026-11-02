@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../auth';
 import { applyTheme, readTheme, type ThemeChoice } from '../hooks';
 import { GameReferenceIndicator } from './GameReference';
-import { ErrorMessage } from './ui';
+import { BrandMark, ErrorMessage, Icon } from './ui';
 import { VerifyBanner } from './VerifyBanner';
 
 function ThemeSelect() {
@@ -13,9 +13,7 @@ function ThemeSelect() {
   useEffect(() => applyTheme(theme), [theme]);
   return (
     <div className="theme-select">
-      <label htmlFor="theme-select" className="small">
-        {t('layout.theme')}
-      </label>
+      <label htmlFor="theme-select">{t('layout.theme')}</label>
       <select
         id="theme-select"
         value={theme}
@@ -29,12 +27,24 @@ function ThemeSelect() {
   );
 }
 
+/**
+ * The app shell: a sidebar with the navigation and account tools on wide screens, and a top bar
+ * whose Menu button opens the same panel on phones.
+ */
 export function Layout() {
   const { t } = useTranslation();
   const { state, signOut } = useAuth();
   const location = useLocation();
   const mainRef = useRef<HTMLElement>(null);
   const firstRender = useRef(true);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuFor, setMenuFor] = useState(location.pathname);
+
+  // A route change closes the phone menu.
+  if (menuFor !== location.pathname) {
+    setMenuFor(location.pathname);
+    setMenuOpen(false);
+  }
 
   // A route change is a new page: move focus to its content so keyboard and screen reader
   // users start at the top of it, the way a full page load would.
@@ -54,47 +64,96 @@ export function Layout() {
       <a className="skip-link" href="#main">
         {t('layout.skip')}
       </a>
-      <header className="site-header">
-        <div className="container header-row">
-          <Link to="/" className="brand">
-            {t('app.name')}
-          </Link>
-          <nav aria-label={t('layout.primaryNav')} className="nav">
-            {signedIn ? (
-              <>
-                <NavLink to="/" end>
-                  {t('nav.projects')}
-                </NavLink>
-                <NavLink to="/account">{t('nav.account')}</NavLink>
-              </>
-            ) : state.status === 'loading' ? null : (
-              <>
-                <NavLink to="/signin">{t('common.signIn')}</NavLink>
-                <NavLink to="/signup">{t('common.signUp')}</NavLink>
-              </>
-            )}
-          </nav>
-          <div className="header-tools">
-            {signedIn ? <GameReferenceIndicator /> : null}
-            <ThemeSelect />
-            {signedIn ? (
-              <button type="button" className="button secondary small-button" onClick={() => void signOut().catch(setSignOutError)}>
-                {t('common.signOut')}
-              </button>
-            ) : null}
+      <div className="app-shell">
+        <header className="app-side">
+          <div className="app-side-top">
+            <Link to="/" className="brand">
+              <BrandMark />
+              <span>{t('app.name')}</span>
+            </Link>
+            <button
+              type="button"
+              className="button ghost app-menu-button"
+              aria-expanded={menuOpen}
+              aria-controls="app-side-panel"
+              onClick={() => setMenuOpen((open) => !open)}
+            >
+              {t('layout.menu')}
+            </button>
           </div>
+          <div id="app-side-panel" className={`app-side-panel${menuOpen ? ' is-open' : ''}`}>
+            <nav aria-label={t('layout.primaryNav')}>
+              <ul className="app-nav">
+                {signedIn ? (
+                  <>
+                    <li>
+                      <NavLink to="/" end>
+                        <Icon name="folder" />
+                        {t('nav.projects')}
+                      </NavLink>
+                    </li>
+                    <li>
+                      <NavLink to="/account">
+                        <Icon name="account" />
+                        {t('nav.account')}
+                      </NavLink>
+                    </li>
+                  </>
+                ) : state.status === 'loading' ? null : (
+                  <>
+                    <li>
+                      <NavLink to="/signin">
+                        <Icon name="sign-out" />
+                        {t('common.signIn')}
+                      </NavLink>
+                    </li>
+                    <li>
+                      <NavLink to="/signup">
+                        <Icon name="plus" />
+                        {t('common.signUp')}
+                      </NavLink>
+                    </li>
+                  </>
+                )}
+              </ul>
+            </nav>
+            <div className="app-side-bottom">
+              {signedIn ? <GameReferenceIndicator /> : null}
+              <ThemeSelect />
+              {signedIn ? (
+                <div className="app-user">
+                  <p>
+                    {t('layout.signedInAs')}{' '}
+                    <bdi dir="auto" className="strong">
+                      {state.account.display_name}
+                    </bdi>
+                  </p>
+                  <button
+                    type="button"
+                    className="button secondary small-button"
+                    onClick={() => void signOut().catch(setSignOutError)}
+                  >
+                    <Icon name="sign-out" size="sm" />
+                    {t('common.signOut')}
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </header>
+        <div className="app-body">
+          <VerifyBanner />
+          {signOutError ? (
+            <div className="app-main">
+              <ErrorMessage error={signOutError} />
+            </div>
+          ) : null}
+          <main id="main" ref={mainRef} tabIndex={-1} className="app-main">
+            <Outlet />
+          </main>
+          <footer className="app-footer">{t('layout.footer')}</footer>
         </div>
-        <VerifyBanner />
-        {signOutError ? (
-          <div className="container">
-            <ErrorMessage error={signOutError} />
-          </div>
-        ) : null}
-      </header>
-      <main id="main" ref={mainRef} tabIndex={-1} className="container main">
-        <Outlet />
-      </main>
-      <footer className="container footer small muted">{t('layout.footer')}</footer>
+      </div>
     </>
   );
 }
