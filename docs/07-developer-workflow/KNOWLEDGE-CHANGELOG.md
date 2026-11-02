@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.15, 2026-11-02, read a mod's own rules before an in-game check
+
+- CLAUDE.md now says to read another project's CLAUDE.md or AGENTS.md before asking for an in-game check that loads its mod, and to follow its rules.
+
+Evidence: on 2026-11-02 the Meshy 3D session asked the in-game runner to place five ZIN units in game. ZIN's own rules forbid launching or capturing the game with ZIN loaded, and that was only noticed afterwards. Rollback: revert this commit and regenerate.
+
 ## 0.2.14, 2026-11-01, one-night in-game window
 
 - CLAUDE.md's rule that agents never start the game now names one exception (D-19): on the Windows PC during the night of 2026-11-01 to 2026-11-02, one runner session may start it through HOI4 Live Tools, one instance at a time, with no new launch after 09:00 local on 2026-11-02, restoring the user-folder files a launch rewrites. The rule applies again after the window.
