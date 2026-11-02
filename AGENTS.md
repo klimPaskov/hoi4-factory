@@ -65,7 +65,7 @@ On macOS only:
 
 ## Delegation and parallel work
 
-Delegate independent, bounded packets to subagents with explicit owned paths, inputs, expected outputs and checks. Use Haiku for mechanical work, Sonnet for code and drafting, and Opus only when a task clearly needs it. The parent reviews and integrates returned work. Follow the `delegate-parallel-work` skill for the details:
+Delegate independent, bounded packets to subagents with explicit owned paths, inputs, expected outputs and checks. Use Haiku for mechanical work, Sonnet for code and drafting, and Opus only when a task clearly needs it. A new Claude Code session does not inherit the starting session's model and effort. Start it on Sonnet at medium or high effort, and use Opus at medium effort for harder tasks, such as design-heavy work or a new subsystem (a maintainer preference of 2026-11-02). The parent reviews and integrates returned work. Follow the `delegate-parallel-work` skill for the details:
 
 - Create each worktree yourself with `git worktree add -b <branch> ../hoi4-factory-wt-<name> main` from the repository root, and give the agent that absolute path. Do not rely on automatic worktree isolation, which follows the session's current directory.
 - Subagents in this environment cannot create new Markdown files. Ask them to return report text and save it yourself.
