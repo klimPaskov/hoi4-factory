@@ -1,0 +1,564 @@
+/* Direction B: Dossier. 1930s staff paperwork: olive and brass on warm paper, serif headings,
+   typewriter details, projects as file folders with stamps. */
+.dir-dossier {
+  --bg: light-dark(#efe9dc, #191814);
+  --surface: light-dark(#fbf8f0, #23211a);
+  --folder: light-dark(#f5ecd2, #2a2820);
+  --text: light-dark(#2a261f, #ece5d3);
+  --muted: light-dark(#625947, #b4aa92);
+  --border: light-dark(#d6cbb1, #3c3a2f);
+  --border-strong: light-dark(#a99a78, #5e5846);
+  --primary: light-dark(#4a5527, #bcc783);
+  --primary-text: light-dark(#fbf7ea, #191b0d);
+  --primary-hover: light-dark(#3a4320, #ced8a0);
+  --brass: light-dark(#8a6a1c, #d8b45c);
+  --stamp: light-dark(#a3312a, #f2907f);
+  --band: light-dark(#3e4724, #262a18);
+  --band-2: light-dark(#4f5a30, #323722);
+  --band-text: light-dark(#f4efde, #ece5d3);
+  --link: var(--primary);
+  --danger: var(--stamp);
+  --danger-bg: light-dark(#f7e2dc, #3a1e19);
+  --focus: light-dark(#1f5fbf, #9cc0ff);
+  --radius: 3px;
+  --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+  --label: 'Gill Sans', 'Gill Sans MT', 'Segoe UI', system-ui, sans-serif;
+  --type: 'American Typewriter', 'Courier New', Courier, ui-monospace, monospace;
+  background-color: var(--bg);
+  background-image: radial-gradient(light-dark(rgb(60 40 10 / 0.035), rgb(255 240 200 / 0.025)) 1px, transparent 1px);
+  background-size: 5px 5px;
+  color: var(--text);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100vh;
+  overflow-wrap: break-word;
+  display: flex;
+  flex-direction: column;
+}
+
+.dir-dossier .mark-ring {
+  fill: none;
+  stroke: var(--brass);
+  stroke-width: 2;
+}
+.dir-dossier .mark-ring-thin {
+  stroke-width: 1;
+}
+.dir-dossier .mark-fg {
+  fill: var(--band-text);
+}
+.dir-dossier .mark-hole {
+  fill: var(--band);
+}
+
+.ds-wrap {
+  width: 100%;
+  max-width: 68rem;
+  margin: 0 auto;
+  padding-inline: 1.25rem;
+}
+.ds-type {
+  font-family: var(--type);
+}
+.ds-strong {
+  font-weight: 700;
+}
+.ds-muted {
+  color: var(--muted);
+}
+
+/* Header band with folder tabs */
+.ds-band {
+  background: var(--band);
+  color: var(--band-text);
+  padding-top: 0.75rem;
+}
+.ds-band-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  padding-bottom: 0.75rem;
+}
+.ds-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--band-text);
+  text-decoration: none;
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.ds-brand .mark {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+.ds-band-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.25rem;
+}
+.ds-gameref {
+  margin: 0;
+  font-size: 0.8125rem;
+}
+.ds-gameref-label {
+  font-family: var(--label);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.75rem;
+  color: light-dark(#d9cfae, #c9bf9f);
+}
+.ds-theme {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.dir-dossier .ds-theme label {
+  margin: 0;
+  font-family: var(--label);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: light-dark(#d9cfae, #c9bf9f);
+}
+.dir-dossier .ds-theme select {
+  width: auto;
+  min-height: 2.25rem;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.875rem;
+  background: var(--band-2);
+  color: var(--band-text);
+  border: 1px solid light-dark(#7d8656, #4f553a);
+}
+.ds-tabs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 0.35rem;
+}
+.ds-tabs a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 1.25rem;
+  border-radius: 6px 6px 0 0;
+  background: var(--band-2);
+  color: var(--band-text);
+  text-decoration: none;
+  font-family: var(--label);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.ds-tabs a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.ds-tabs a[aria-current='page'] {
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Telegram (unverified email) */
+.ds-telegram {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  padding: 0.85rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-inline-start: 6px solid var(--brass);
+}
+.ds-telegram p {
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+/* Page */
+.ds-main {
+  flex: 1;
+  padding-top: 1.75rem;
+  padding-bottom: 3rem;
+}
+.ds-title {
+  border-bottom: 3px double var(--brass);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.75rem;
+}
+.ds-kicker {
+  margin: 0 0 0.25rem;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.dir-dossier h1 {
+  font-family: var(--serif);
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.005em;
+}
+.dir-dossier h2 {
+  font-family: var(--serif);
+  font-size: 1.35rem;
+}
+.ds-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 20rem;
+  grid-template-areas: 'list sheet';
+  gap: 2rem;
+  align-items: start;
+}
+.ds-list {
+  grid-area: list;
+}
+
+/* Requisition sheet */
+.ds-sheet {
+  grid-area: sheet;
+  position: sticky;
+  top: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-top: 6px solid var(--primary);
+  padding: 1.1rem 1.15rem 1.25rem;
+  box-shadow: 4px 4px 0 var(--border);
+}
+.ds-sheet h2 {
+  margin-bottom: 0.25rem;
+}
+.ds-sheet-help {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+.dir-dossier label {
+  font-family: var(--label);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.8125rem;
+}
+.dir-dossier .hint {
+  color: var(--muted);
+}
+.dir-dossier input[type='text'] {
+  border: 0;
+  border-bottom: 2px solid var(--border-strong);
+  border-radius: 0;
+  background: light-dark(#fffdf6, #1d1b15);
+  font-family: var(--type);
+}
+.dir-dossier input[type='text']:focus-visible {
+  border-bottom-color: var(--primary);
+}
+.dir-dossier .has-error input[type='text'] {
+  border-bottom-color: var(--danger);
+}
+
+/* Buttons */
+.ds-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0 1.1rem;
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--primary);
+  font-family: var(--label);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+}
+.ds-btn:hover {
+  background: light-dark(rgb(74 85 39 / 0.08), rgb(188 199 131 / 0.1));
+}
+.ds-btn-primary {
+  background: var(--primary);
+  color: var(--primary-text);
+}
+.ds-btn-primary:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+.ds-btn-danger {
+  background: var(--stamp);
+  border-color: var(--stamp);
+  color: light-dark(#fff8f0, #1f0c08);
+}
+.ds-btn-danger:hover {
+  background: var(--stamp);
+  filter: brightness(1.08);
+}
+.ds-btn-band {
+  border-color: light-dark(#a7ae84, #6c7350);
+  color: var(--band-text);
+  min-height: 2.25rem;
+}
+.ds-btn-band:hover {
+  background: var(--band-2);
+}
+.ds-btn-wide {
+  width: 100%;
+}
+.ds-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.ds-text-button {
+  background: none;
+  border: 0;
+  padding: 0.5rem 0;
+  min-height: 2.75rem;
+  font-family: var(--type);
+  font-size: 0.875rem;
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.ds-text-danger {
+  color: var(--stamp);
+}
+
+/* Folders */
+.ds-folders {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1.6rem;
+}
+.ds-folder {
+  position: relative;
+  background: var(--folder);
+  border: 1px solid var(--border-strong);
+  border-radius: 0 6px 6px 6px;
+  padding: 0.9rem 1.15rem 0.35rem;
+  box-shadow: 0 2px 0 var(--border);
+}
+.ds-folder::before {
+  content: '';
+  position: absolute;
+  top: -0.85rem;
+  inset-inline-start: -1px;
+  width: 8.5rem;
+  height: 0.85rem;
+  background: var(--folder);
+  border: 1px solid var(--border-strong);
+  border-bottom: 0;
+  border-radius: 6px 10px 0 0;
+}
+.ds-folder-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.9rem;
+  margin-bottom: 0.4rem;
+}
+.ds-stamp {
+  display: inline-block;
+  font-family: var(--type);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  padding: 0.05rem 0.45rem;
+  border: 2px solid currentColor;
+  border-radius: 3px;
+  transform: rotate(-2.5deg);
+}
+.ds-stamp-private {
+  color: var(--stamp);
+}
+.ds-stamp-public {
+  color: var(--primary);
+}
+.ds-role {
+  font-family: var(--label);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+.ds-folder-title {
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  margin: 0 0 0.15rem;
+}
+.ds-folder-title a {
+  color: var(--text);
+  text-decoration: none;
+}
+.ds-folder-title a:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--brass);
+  text-underline-offset: 4px;
+}
+.ds-folder-meta {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+.ds-folder-actions {
+  display: flex;
+  gap: 1.25rem;
+  margin: 0;
+}
+.ds-inline {
+  border-top: 1px dashed var(--border-strong);
+  margin-top: 0.6rem;
+  padding: 0.85rem 0 0.85rem;
+  max-width: 34rem;
+}
+.ds-confirm p {
+  margin-bottom: 0.75rem;
+}
+
+/* States */
+.ds-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--muted);
+  padding: 1.5rem 0;
+}
+.ds-loading-mark {
+  width: 1.1rem;
+  height: 1.1rem;
+  border: 2px solid var(--border-strong);
+  border-top-color: var(--brass);
+  border-radius: 50%;
+  animation: ds-spin 1s linear infinite;
+}
+@keyframes ds-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.ds-notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  padding: 0.85rem 1rem;
+  border: 2px solid var(--stamp);
+  background: var(--danger-bg);
+  color: var(--stamp);
+}
+.ds-notice p {
+  margin: 0;
+  font-weight: 600;
+}
+.ds-notice .ds-btn {
+  color: var(--text);
+  border-color: var(--text);
+}
+.ds-empty {
+  border: 2px dashed var(--border-strong);
+  padding: 2rem 1.5rem;
+  text-align: center;
+  background: light-dark(rgb(255 255 255 / 0.35), rgb(0 0 0 / 0.12));
+}
+.ds-empty p {
+  max-width: 30rem;
+  margin: 0 auto 1.25rem;
+  color: var(--muted);
+}
+
+/* Pending */
+.ds-pending {
+  margin-top: 2.5rem;
+  border-top: 1px solid var(--border-strong);
+  padding-top: 1.25rem;
+}
+.ds-pending-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.ds-pending-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px dashed var(--border-strong);
+}
+.ds-pending-list p {
+  margin: 0;
+  font-size: 0.8125rem;
+}
+.ds-struck {
+  text-decoration: line-through;
+  text-decoration-color: var(--stamp);
+  text-decoration-thickness: 2px;
+}
+
+.ds-footer {
+  padding-block: 1.25rem;
+  border-top: 3px double var(--brass);
+  font-family: var(--type);
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-loading-mark {
+    animation: none;
+  }
+}
+
+@media (max-width: 48rem) {
+  .ds-wrap {
+    padding-inline: 1rem;
+  }
+  .ds-band-tools {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .ds-gameref {
+    width: 100%;
+  }
+  .dir-dossier .ds-theme select {
+    min-height: 2.75rem;
+    font-size: 1rem;
+  }
+  .ds-btn-band {
+    min-height: 2.75rem;
+  }
+  .ds-tabs a {
+    padding: 0 1rem;
+  }
+  .dir-dossier h1 {
+    font-size: 1.9rem;
+  }
+  .ds-columns {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'sheet'
+      'list';
+    gap: 1.75rem;
+  }
+  .ds-sheet {
+    position: static;
+  }
+}

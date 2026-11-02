@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import en from '../i18n/locales/en.json';
+import lab from '../design-lab/lab.en.json';
 
 // Every source file, as text. Test files and this check are not part of the shipped interface.
 const modules = import.meta.glob('../**/*.{ts,tsx}', {
@@ -16,10 +17,17 @@ function stripComments(code: string): string {
   return code.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
 }
 
-function lookup(key: string): unknown {
+function lookup(key: string, root: unknown = en): unknown {
   return key.split('.').reduce<unknown>((node, part) => {
     return node && typeof node === 'object' ? (node as Record<string, unknown>)[part] : undefined;
-  }, en);
+  }, root);
+}
+
+// The development-only design lab keeps its own text in design-lab/lab.en.json, merged into the
+// translations only when the lab loads, so production bundles carry none of it.
+function exists(path: string, key: string): boolean {
+  const roots = path.includes('/design-lab/') ? [en, lab] : [en];
+  return roots.some((root) => lookup(key, root) !== undefined || lookup(`${key}_other`, root) !== undefined);
 }
 
 describe('interface text lives in the translation file', () => {
@@ -63,9 +71,7 @@ describe('interface text lives in the translation file', () => {
       const code = stripComments(raw);
       for (const match of [...code.matchAll(call), ...code.matchAll(keyProp)]) {
         const key = match[2] ?? '';
-        const found =
-          lookup(key) !== undefined || lookup(`${key}_other`) !== undefined;
-        if (!found) missing.push(`${path}: ${key}`);
+        if (!exists(path, key)) missing.push(`${path}: ${key}`);
       }
     }
     expect(missing).toEqual([]);
@@ -81,6 +87,7 @@ describe('interface text lives in the translation file', () => {
       }
     };
     walk(en, '');
+    walk(lab, 'lab');
     expect(empty).toEqual([]);
   });
 

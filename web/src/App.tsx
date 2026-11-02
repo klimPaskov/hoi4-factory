@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Link, Navigate, Outlet, Route, Routes, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './auth';
@@ -16,6 +17,10 @@ import { ProjectPage } from './pages/Project';
 import { TaskPage } from './pages/Task';
 import { TasksPage } from './pages/Tasks';
 import { ProjectsPage } from './pages/Projects';
+
+// The design lab (ADR-025) exists only in development builds. In a production build the
+// condition is the constant `false`, so the lab and its chunk are left out entirely.
+const DesignLab = import.meta.env.DEV ? lazy(() => import('./design-lab/DesignLab')) : null;
 
 /** Waits for the "who am I" answer before any page decides what to show. */
 function AuthBoundary() {
@@ -60,6 +65,16 @@ function NotFoundPage() {
 export function AppRoutes() {
   return (
     <Routes>
+      {DesignLab ? (
+        <Route
+          path="design-lab/*"
+          element={
+            <Suspense fallback={<Loading />}>
+              <DesignLab />
+            </Suspense>
+          }
+        />
+      ) : null}
       <Route element={<Layout />}>
         <Route element={<AuthBoundary />}>
           <Route path="signin" element={<SignInPage />} />

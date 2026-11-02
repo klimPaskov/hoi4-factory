@@ -1,0 +1,74 @@
+{
+  "designLab": {
+    "title": "Design lab",
+    "devOnly": "Development only. Nothing here reaches the production build, and nothing you do here is saved. All data is sample data.",
+    "rounds": "Open choices",
+    "round1": {
+      "title": "Round 1: overall direction",
+      "body": "Four directions, each applied to the project list with the same sample data. Try each at full width and at phone width, in light and dark, and click through creating, renaming, deleting and restoring a project. Pick one, combine parts of several, or ask for another round."
+    },
+    "open": "Open {{name}}",
+    "directions": {
+      "workbench": {
+        "name": "A. Workbench",
+        "summary": "A quiet, modern tool. Sidebar navigation, a dense table, neutral greys with one blue accent. Feels like GitHub or Linear."
+      },
+      "dossier": {
+        "name": "B. Dossier",
+        "summary": "1930s staff paperwork. Olive and brass on warm paper, serif headings, typewriter details, projects as file folders with stamps."
+      },
+      "warroom": {
+        "name": "C. War room",
+        "summary": "A command console. Dark navy first, amber and teal signals, condensed capitals, status readouts and a grid of project tiles. Closest to the game's own feel."
+      },
+      "studio": {
+        "name": "D. Studio",
+        "summary": "Friendly and roomy. Rounded cards, soft colors, big type and generous space, each project with a flag-style banner. Easiest for newcomers."
+      }
+    },
+    "toolbar": {
+      "label": "Design lab controls",
+      "home": "Design lab",
+      "direction": "Direction",
+      "state": "State",
+      "states": {
+        "populated": "With projects",
+        "empty": "No projects",
+        "loading": "Loading",
+        "error": "Error"
+      },
+      "unverified": "Unverified email",
+      "width": "Width",
+      "widths": {
+        "full": "Full window",
+        "phone": "Phone",
+        "both": "Desktop and phone"
+      },
+      "phoneFrame": "{{name}} at phone width",
+      "desktopFrame": "{{name}} at desktop width"
+    },
+    "notFound": "There is no such variant. It may have been removed after a choice.",
+    "sample": {
+      "projectCount_one": "{{count}} project",
+      "projectCount_other": "{{count}} projects",
+      "filter": "Filter projects",
+      "noMatch": "No project name contains \"{{query}}\".",
+      "columns": {
+        "name": "Name",
+        "visibility": "Visibility",
+        "role": "Your role",
+        "created": "Created",
+        "actions": "Actions"
+      },
+      "actionsFor": "Actions for {{name}}",
+      "menu": "Menu",
+      "signedInAs": "Signed in as {{name}}",
+      "welcome": "Welcome back, {{name}}",
+      "lead": "Pick up where you left off, or start a new mod.",
+      "summary": "Project summary",
+      "public": "Public",
+      "dossierKicker": "Your files",
+      "requisition": "Fill in a name to open a new file."
+    }
+  }
+}

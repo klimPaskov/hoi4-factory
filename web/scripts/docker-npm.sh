@@ -7,7 +7,9 @@ IMAGE="node:22-bookworm-slim@sha256:de170b39439eb0e5a3444ad7d60b015614a381e10fec
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 if command -v cygpath >/dev/null 2>&1; then HERE="$(cygpath -m "$HERE")"; fi
 PORTS=""
-if [ "${1:-}" = "run" ] && [ "${2:-}" = "dev" ]; then PORTS="-p 5173:5173"; fi
+# The dev server publishes its port and polls for edits, because file events from the host
+# do not reach the container on Windows.
+if [ "${1:-}" = "run" ] && [ "${2:-}" = "dev" ]; then PORTS="-p 5173:5173 -e FACTORY_DEV_POLL=1"; fi
 # shellcheck disable=SC2086
 MSYS_NO_PATHCONV=1 exec docker run --rm $PORTS \
   -v "$HERE:/app" -w /app \
