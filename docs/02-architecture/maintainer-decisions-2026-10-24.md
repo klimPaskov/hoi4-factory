@@ -237,6 +237,8 @@ These are not maintainer decisions. The maintainer authorized S03 to proceed wit
 
 **Effect on stages.** Stages keep building working screens for their features. S03 adds only minimal task and API key screens with the existing components. Screens added by S04 and later stages use the design system the track produces, and new or changed pages go through the same preview-and-pick loop. S08 still runs the usability pilot. The workflow is the `ui-design-iteration` skill, and the session goal is [GOAL-UI](../06-agent-handoffs/GOAL-UI.md).
 
+**Start (maintainer, 2026-11-02).** The maintainer started the UI design track on 2026-11-02. It runs now, between S03 and S04, as its own interactive session that follows GOAL-UI and the `ui-design-iteration` skill. The maintainer chooses the overall direction and every page from live variants in the design lab, and the agent implements only what was chosen. Starting the track authorizes no stage. S04 stays unauthorized until the maintainer starts it.
+
 ### ADR-026: a desktop companion app, synced with the web app (2026-10-25)
 
 **Decision.** The web app stays the first priority and must support everything to the fullest and be very easy to use. Later, HOI4 Factory also ships a desktop app for macOS, Linux and Windows on the same server and account. A desktop app gives more local control: it can run locally installed tools such as HOI4 Live Tools and a locally installed Agent Tools MCP server, and use the user's own game. Project members on the web and on the desktop app work on the same projects, and their changes always sync, so it does not matter where a participant works.
