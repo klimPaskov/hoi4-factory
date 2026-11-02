@@ -39,6 +39,8 @@ The user can watch the C-03 event stream and can pause, resume, interrupt or rev
 
 Stage disposition: complete, with G6 partial as planned.
 
+**G6 update, 2026-11-02 (D-21).** G6 stays partial, but the live gap is narrower. The OpenAI-compatible adapter ran live against DeepSeek (`deepseek-flash` at `https://api.deepseek.com`). The inference probe observed text, tool calls, streaming and usage accounting, model listing worked, a tool-result round trip completed in three runs, and an invalid key gave a 401 classified as an auth refusal. Eleven paid calls cost about US$0.00067, computed from the reported usage and DeepSeek's published off-peak prices. The evidence is in [live-deepseek-compat/run.json](live-deepseek-compat/run.json), and three real streams are recorded-real replay fixtures (`crates/agent/tests/fixtures/recorded/deepseek-*`, `replay_deepseek.rs`), with ignored live tests in `live_deepseek.rs`. Still not live-verified: the `openai:gpt-5.4-nano` profile itself (it needs a funded OpenAI key), strict JSON schema, parallel tool calls, cancellation, and 402, 429 and 5xx refusals. Findings for the adapter: DeepSeek ignores `max_completion_tokens` and honours `max_tokens`, the adapter cannot set `thinking` or `reasoning_effort`, a 402 for insufficient balance would be classified as `Other`, there is no DeepSeek price record in `cost.rs`, and `deepseek-chat` works only as an undocumented alias of `deepseek-flash`.
+
 ## What was built
 
 - `crates/agent` (W1):
