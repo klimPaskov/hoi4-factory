@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
       port: 5173,
       // Inside Docker on Windows, edits on the host never reach the container as file events.
       // web/scripts/docker-npm.sh sets FACTORY_DEV_POLL so the dev server polls instead.
-      watch: env.FACTORY_DEV_POLL ? { usePolling: true, interval: 300 } : undefined,
+      watch: env.FACTORY_DEV_POLL ? { usePolling: true, interval: 1000 } : undefined,
       proxy: {
         '/api': { target: env.FACTORY_API_TARGET ?? 'http://127.0.0.1:8080' },
       },

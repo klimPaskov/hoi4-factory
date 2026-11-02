@@ -12,7 +12,7 @@ import {
 } from '../api/accounts';
 import { ApiError } from '../api/client';
 import { useAuth } from '../auth';
-import { Alert, ErrorMessage, Field, Loading } from '../components/ui';
+import { Alert, ErrorMessage, Field, Icon, Loading } from '../components/ui';
 import { describeError, fieldForError } from '../errors';
 import { useFocusOnError, usePageTitle } from '../hooks';
 
@@ -33,6 +33,7 @@ function GithubButton() {
   const { t } = useTranslation();
   return (
     <a className="button secondary block" href={GITHUB_SIGN_IN_URL}>
+      <Icon name="branch" size="sm" />
       {t('auth.github')}
     </a>
   );

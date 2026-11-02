@@ -7,7 +7,7 @@ import { GameReferenceIndicator } from './GameReference';
 import { BrandMark, ErrorMessage, Icon } from './ui';
 import { VerifyBanner } from './VerifyBanner';
 
-function ThemeSelect() {
+export function ThemeSelect() {
   const { t } = useTranslation();
   const [theme, setTheme] = useState<ThemeChoice>(readTheme);
   useEffect(() => applyTheme(theme), [theme]);

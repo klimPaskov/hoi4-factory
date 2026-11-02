@@ -37,4 +37,11 @@ One master image fixes the character, and every pose was generated with it as th
 
 ## Pages
 
-None redesigned yet. Next: the sign-in round.
+### Sign in, create account, verify email, reset password (2026-11-02)
+
+- Offered: four generated mockups ([A minimal card](mockups/10-signin-a-minimal.webp), [B mascot welcome](mockups/11-signin-b-mascot.webp), [C split panel](mockups/12-signin-c-split.webp), [D one step at a time](mockups/13-signin-d-onestep-dark.webp)).
+- Chosen: C. The maintainer then asked for the cinematic blue panel of the first sign-in mockup and for the mascot to lean in from a real edge, not float. A [revised mockup](mockups/14-signin-c-cinematic.webp) was generated and approved. The peek pose was regenerated because the first one had odd anatomy. The panel artwork is a generated image (`web/src/assets/auth-panel.webp`, 24 KB) under a blue wash.
+- Built: the auth pages leave the sidebar shell for their own `AuthLayout`. The panel holds the mark, the name and one line. The mascot slides in from the left edge and stands on the bottom edge, and stays still with reduced motion. The form is larger and centered. On phones the panel becomes a slim bar with the mark. Behavior, routes and API calls are unchanged.
+- Before: [screenshots/before](screenshots/before/) (`signin-*`, `signup-*`, `forgot-password-*`, `reset-password-*`, `verify-*`). After: [screenshots/after](screenshots/after/).
+
+Next: the project list round.

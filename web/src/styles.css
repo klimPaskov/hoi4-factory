@@ -1519,6 +1519,128 @@ textarea {
 .flag-c6 { background: #f4f1ea; }
 .flag-c7 { background: #8e3b46; }
 
+/* ----- Auth shell (sign-in round, variant C revised: docs/design/mockups/14-signin-c-cinematic) */
+
+.auth-shell {
+  display: grid;
+  grid-template-columns: minmax(20rem, 42%) minmax(0, 1fr);
+  flex: 1;
+  min-height: 100vh;
+}
+/* The cinematic panel: a generated deep-blue map artwork (src/assets/auth-panel.webp) under a
+   brighter blue wash, the same in both themes, with light text on it. */
+.auth-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 12vh var(--space-6) var(--space-6);
+  background:
+    linear-gradient(160deg, rgb(52 104 236 / 0.7), rgb(29 70 190 / 0.45) 55%, rgb(12 28 74 / 0.2)),
+    #12234f url('./assets/auth-panel.webp') center / cover no-repeat;
+  color: #f2f5fb;
+  overflow: hidden;
+}
+.auth-panel .brand {
+  color: #ffffff;
+}
+.auth-brand {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: 0;
+  font-size: 2.5rem;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.auth-brand .brand-mark {
+  width: 4rem;
+  height: 4rem;
+}
+.auth-pitch {
+  max-width: 26rem;
+  margin: 0;
+  font-size: var(--text-base);
+  color: #e3e9f7;
+}
+/* The mascot leans in from the panel's left edge and stands on its bottom edge. The image is
+   cut straight on its left side, so that side sits exactly on the edge. */
+.auth-mascot {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  line-height: 0;
+}
+.auth-mascot .mascot {
+  display: block;
+}
+.auth-panel .auth-mascot .mascot-img {
+  display: block;
+  width: auto;
+  height: min(58vh, 34rem);
+  animation: mascot-peek 0.7s cubic-bezier(0.3, 1.3, 0.6, 1) 0.3s both;
+}
+@keyframes mascot-peek {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: none;
+  }
+}
+.auth-main {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4) var(--space-6) var(--space-7);
+  background: var(--surface);
+}
+.auth-tools {
+  display: flex;
+  justify-content: flex-end;
+}
+.auth-form {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.auth-form > * {
+  width: 100%;
+  max-width: 26rem;
+}
+.auth-main .auth-card {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+.auth-main .auth-card h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-bottom: var(--space-5);
+}
+.auth-main .button.block,
+.auth-main input[type='email'],
+.auth-main input[type='password'],
+.auth-main input[type='text'] {
+  min-height: 3rem;
+  font-size: var(--text-md);
+}
+.auth-main label {
+  font-size: var(--text-base);
+}
+.auth-main .auth-card > p.small {
+  text-align: center;
+  font-size: var(--text-base);
+}
+.auth-main .auth-card > p.small a {
+  text-decoration: none;
+}
+.auth-main .auth-card > p.small a:hover {
+  text-decoration: underline;
+}
+
 /* ----- Mascot ---------------------------------------------------------------------------- */
 
 .mascot {
@@ -1710,6 +1832,33 @@ textarea {
 /* ----- Phones ---------------------------------------------------------------------------- */
 
 @media (max-width: 48rem) {
+  .auth-shell {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+  }
+  .auth-panel {
+    padding: var(--space-4);
+  }
+  .auth-pitch,
+  .auth-mascot {
+    display: none;
+  }
+  .auth-brand {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--text-lg);
+  }
+  .auth-brand .brand-mark {
+    width: 2rem;
+    height: 2rem;
+  }
+  .auth-main {
+    padding: var(--space-3) var(--space-4) var(--space-6);
+  }
+  .auth-form {
+    align-items: flex-start;
+  }
   .app-shell {
     grid-template-columns: minmax(0, 1fr);
   }

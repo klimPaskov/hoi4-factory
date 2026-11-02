@@ -141,7 +141,8 @@
     "signUpButton": "Create account",
     "signUpTitle": "Create your account",
     "signingIn": "Signing in…",
-    "signingUp": "Creating account…"
+    "signingUp": "Creating account…",
+    "pitch": "Build Hearts of Iron IV mods with AI agents. Free and open source."
   },
   "verify": {
     "already": "Your email address is already verified.",

@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { Link, Navigate, Outlet, Route, Routes, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './auth';
+import { AuthLayout } from './components/AuthLayout';
 import { Layout } from './components/Layout';
 import { ErrorMessage, Loading } from './components/ui';
 import { usePageTitle } from './hooks';
@@ -75,13 +76,17 @@ export function AppRoutes() {
           }
         />
       ) : null}
-      <Route element={<Layout />}>
+      <Route element={<AuthLayout />}>
         <Route element={<AuthBoundary />}>
           <Route path="signin" element={<SignInPage />} />
           <Route path="signup" element={<SignUpPage />} />
           <Route path="forgot-password" element={<ForgotPasswordPage />} />
           <Route path="reset-password" element={<ResetPasswordPage />} />
           <Route path="verify-email" element={<VerifyEmailPage />} />
+        </Route>
+      </Route>
+      <Route element={<Layout />}>
+        <Route element={<AuthBoundary />}>
           <Route element={<RequireAuth />}>
             <Route index element={<ProjectsPage />} />
             <Route path="projects/:id" element={<ProjectPage />} />

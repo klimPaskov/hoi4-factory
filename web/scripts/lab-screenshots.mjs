@@ -129,7 +129,13 @@ try {
   const target = await (await fetch(`http://127.0.0.1:${port}/json/new?about:blank`, { method: 'PUT' })).json();
   const page = await connect(target.webSocketDebuggerUrl);
   await page.send('Page.enable');
-  await page.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: theme }] });
+  // Reduced motion shows every animation's final state: a background tab may never advance them.
+  await page.send('Emulation.setEmulatedMedia', {
+    features: [
+      { name: 'prefers-color-scheme', value: theme },
+      { name: 'prefers-reduced-motion', value: 'reduce' },
+    ],
+  });
   mkdirSync(resolve(outDir), { recursive: true });
   for (const width of widths) {
     const mobile = width < 600;

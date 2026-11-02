@@ -158,7 +158,12 @@
         "mascot-3a": "Mascot 3A: interwar industrial, riveted roof, production gauge, blueprint, conveyor-belt shoes",
         "mascot-3b": "Mascot 3B: foreman cap, campaign map, steam whistle, scarf and toolbelt",
         "mascot-3c": "Mascot 3C: simpler and rounder, production dial, smoke as a map arrow",
-        "logo-factory-sheet": "Factory logos 1 to 6, left to right, top row then bottom row"
+        "logo-factory-sheet": "Factory logos 1 to 6, left to right, top row then bottom row",
+        "10-signin-a-minimal": "Sign in A: minimal centered card",
+        "11-signin-b-mascot": "Sign in B: the mascot welcomes you beside the form",
+        "12-signin-c-split": "Sign in C: split, a calm brand panel with the mascot peeking",
+        "13-signin-d-onestep-dark": "Sign in D: one step at a time (email first), shown in dark",
+        "14-signin-c-cinematic": "Sign in C, revised: cinematic panel, mascot leaning in from the edge"
       }
     }
   }
