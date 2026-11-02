@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.16, 2026-11-02, a second in-game night
+
+- CLAUDE.md's game-launch rule now names two exceptions: D-19 for the night of 2026-11-01 to 2026-11-02, and D-20 from 00:00 local on 2026-11-03 for the checks the first night missed. Both windows end with no new launch after 09:00 local, and the rule applies again outside them.
+
+Evidence: maintainer decision D-20 of 2026-11-02, relayed by the coordinating session. Rollback: revert this commit and regenerate. Remove both exceptions once the second window has passed.
+
 ## 0.2.15, 2026-11-02, read a mod's own rules before an in-game check
 
 - CLAUDE.md now says to read another project's CLAUDE.md or AGENTS.md before asking for an in-game check that loads its mod, and to follow its rules.
