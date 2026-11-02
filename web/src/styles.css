@@ -1519,6 +1519,157 @@ textarea {
 .flag-c6 { background: #f4f1ea; }
 .flag-c7 { background: #8e3b46; }
 
+/* ----- Project list (mockup docs/design/mockups/20-projects-a-table) ---------------------- */
+
+.new-project {
+  max-width: 34rem;
+}
+.filter {
+  position: relative;
+  max-width: 20rem;
+  margin-bottom: var(--space-3);
+  color: var(--muted);
+}
+.filter .icon {
+  position: absolute;
+  inset-inline-start: 0.7rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.filter input[type='search'] {
+  min-height: var(--control-h);
+  padding-inline-start: 2.1rem;
+}
+.project-name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.project-table .project-name a {
+  color: var(--text);
+  text-decoration: none;
+}
+.cell-actions .button-row {
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  gap: 0;
+}
+.cell-actions .button.ghost {
+  color: var(--link);
+  font-weight: 500;
+}
+.cell-actions .button.ghost.danger-text {
+  color: var(--danger);
+}
+.project-table .project-name a:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+.button.danger-text {
+  color: var(--danger);
+}
+.button.danger-text:hover:not(:disabled) {
+  background: var(--danger-bg);
+}
+.row-panel > td {
+  background: var(--surface-2);
+  padding-block: var(--space-3) var(--space-4);
+}
+.row-panel .confirm {
+  background: var(--surface);
+}
+.table-loading {
+  padding: var(--space-2) var(--space-4);
+}
+.first-project {
+  max-width: 34rem;
+  margin: 12vh auto 0;
+  text-align: center;
+}
+.first-project h2 {
+  font-size: var(--text-lg);
+  margin-bottom: var(--space-4);
+}
+.first-project-row {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+.first-project-row input {
+  flex: 1;
+  min-width: 0;
+}
+.first-project .field-error {
+  justify-content: center;
+}
+.pending {
+  margin-top: var(--space-5);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 0 var(--space-4);
+}
+.pending summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 3rem;
+  cursor: pointer;
+  list-style: none;
+}
+.pending summary::-webkit-details-marker {
+  display: none;
+}
+.pending summary::before {
+  content: '';
+  width: 0.45rem;
+  height: 0.45rem;
+  margin-inline-end: var(--space-1);
+  border-inline-end: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: rotate(-45deg);
+  transition: transform 0.15s;
+}
+.pending[open] summary::before {
+  transform: rotate(45deg);
+}
+.pending summary h2 {
+  margin: 0;
+  font-size: var(--text-base);
+}
+.count {
+  padding: 0 0.5rem;
+  border-radius: var(--radius-full);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+.pending-list {
+  list-style: none;
+  margin: 0 0 var(--space-3);
+  padding: 0;
+}
+.pending-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--border);
+}
+.pending-list li > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+}
+.pending-list li p {
+  margin: 0;
+}
+
 /* ----- Auth shell (sign-in round, variant C revised: docs/design/mockups/14-signin-c-cinematic) */
 
 .auth-shell {
@@ -1832,6 +1983,21 @@ textarea {
 /* ----- Phones ---------------------------------------------------------------------------- */
 
 @media (max-width: 48rem) {
+  .filter {
+    max-width: none;
+  }
+  .first-project {
+    margin-top: var(--space-5);
+  }
+  .first-project-row {
+    flex-direction: column;
+  }
+  .cell-actions .button-row {
+    justify-content: flex-start;
+  }
+  .cell-actions .button.ghost:first-child {
+    margin-inline-start: -0.65rem;
+  }
   .auth-shell {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto 1fr;

@@ -4,14 +4,29 @@ import { describe, expect, it } from 'vitest';
 import { envelope, mockApi, project, renderApp, signedIn } from './helpers';
 
 describe('project list', () => {
-  it('shows a clear call to action when there are no projects', async () => {
+  it('shows a single name field when there are no projects', async () => {
     mockApi({ ...signedIn(), 'GET /projects': { json: { projects: [] } } });
     renderApp('/');
     expect(await screen.findByRole('heading', { name: 'You have no projects yet' })).toBeInTheDocument();
-    const action = screen.getByRole('button', { name: 'Create your first project' });
+    expect(screen.getByLabelText('Project name')).toHaveAttribute('placeholder', 'Name your first project');
+    expect(screen.getByRole('button', { name: 'Create project' })).toBeInTheDocument();
+    // No separate "New project" button competes with the field.
+    expect(screen.queryByRole('button', { name: 'New project' })).not.toBeInTheDocument();
+  });
+
+  it('opens the new project form from the header and filters the list', async () => {
+    mockApi({
+      ...signedIn(),
+      'GET /projects': { json: { projects: [project({ id: 'prj_1', name: 'Danube' }), project({ id: 'prj_2', name: 'Nordic Union' })] } },
+    });
+    renderApp('/');
     const user = userEvent.setup();
-    await user.click(action);
-    expect(screen.getByLabelText('Project name')).toHaveFocus();
+    expect(await screen.findByText('2 projects')).toBeInTheDocument();
+    await user.type(screen.getByLabelText('Filter projects'), 'nord');
+    expect(screen.queryByRole('link', { name: 'Danube' })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Nordic Union' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'New project' }));
+    expect(screen.getByRole('form', { name: 'New project' })).toBeInTheDocument();
   });
 
   it('sends a guest to sign in and shows loading first', async () => {

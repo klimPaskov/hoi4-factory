@@ -163,7 +163,11 @@
         "11-signin-b-mascot": "Sign in B: the mascot welcomes you beside the form",
         "12-signin-c-split": "Sign in C: split, a calm brand panel with the mascot peeking",
         "13-signin-d-onestep-dark": "Sign in D: one step at a time (email first), shown in dark",
-        "14-signin-c-cinematic": "Sign in C, revised: cinematic panel, mascot leaning in from the edge"
+        "14-signin-c-cinematic": "Sign in C, revised: cinematic panel, mascot leaning in from the edge",
+        "20-projects-a-table": "Project list A: minimal table",
+        "21-projects-b-cards": "Project list B: cards with flag banners",
+        "22-projects-c-list": "Project list C: quiet list, inline create, actions on hover",
+        "23-projects-empty-mascot": "Project list, empty: the mascot points at the first project field (goes with any variant)"
       }
     }
   }

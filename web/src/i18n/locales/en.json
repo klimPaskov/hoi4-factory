@@ -203,8 +203,7 @@
     "create": "Create project",
     "created": "Created {{date}}",
     "creating": "Creating…",
-    "emptyAction": "Create your first project",
-    "emptyBody": "A project holds one mod and everything that is done to it. Give it a name to start, then create a new mod, upload one or import one from GitHub.",
+    "emptyBody": "A project holds one mod. You can upload it, import it from GitHub or start fresh next.",
     "emptyTitle": "You have no projects yet",
     "loading": "Loading your projects…",
     "nameHint": "You can rename it later.",
@@ -213,7 +212,19 @@
     "pendingBody": "These projects are waiting to be deleted for good. Restore one before its date to keep it.",
     "pendingTitle": "Waiting to be deleted",
     "title": "Projects",
-    "yourProjects": "Your projects"
+    "yourProjects": "Your projects",
+    "emptyPlaceholder": "Name your first project",
+    "count_one": "{{count}} project",
+    "count_other": "{{count}} projects",
+    "filter": "Filter projects",
+    "noMatch": "No project name contains \"{{query}}\".",
+    "columns": {
+      "name": "Name",
+      "visibility": "Visibility",
+      "role": "Your role",
+      "created": "Created",
+      "actions": "Actions"
+    }
   },
   "project": {
     "back": "All projects",

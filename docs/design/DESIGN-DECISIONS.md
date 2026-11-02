@@ -27,6 +27,7 @@ Every current screen was captured on sample data before any design change, in li
 | Icons | A generated icon sheet | Used, sliced into 24 alpha masks that take the text color (`web/src/assets/icons`) | Consistent stroke icons from one image |
 | Logo | Two generated sheets, four standalone concepts, four fresh concepts, six simple factory icons | The original sawtooth factory roof in a rounded-square outline, no fill, drawn in the theme's text color. The favicon follows the browser theme | Calm and readable at 16 pixels on both themes |
 | Mascot | A brass robot, a courier pigeon, a brick factory and a balloon cartographer, then three Hearts of Iron versions of the brick factory | The original brick factory with a scarf and toolbelt, with real eyes instead of window eyes | Friendly guide for a tutorial that points at features |
+| Mascot use | Not offered. The maintainer set it | Only for tips, tutorials and when called up. Never as page decoration | Keeps screens minimal |
 | Mascot build | Layered SVG with CSS, or generated images with CSS | Generated images, one per pose, moved with CSS | SVG would lose the detail |
 
 Real national flags and political or military insignia are kept out of every image. One generated logo concept was set aside because it read as the NATO emblem.
@@ -44,4 +45,12 @@ One master image fixes the character, and every pose was generated with it as th
 - Built: the auth pages leave the sidebar shell for their own `AuthLayout`. The panel holds the mark, the name and one line. The mascot slides in from the left edge and stands on the bottom edge, and stays still with reduced motion. The form is larger and centered. On phones the panel becomes a slim bar with the mark. Behavior, routes and API calls are unchanged.
 - Before: [screenshots/before](screenshots/before/) (`signin-*`, `signup-*`, `forgot-password-*`, `reset-password-*`, `verify-*`). After: [screenshots/after](screenshots/after/).
 
-Next: the project list round.
+### Project list (2026-11-02)
+
+- Offered: three generated layouts ([A minimal table](mockups/20-projects-a-table.webp), [B cards](mockups/21-projects-b-cards.webp), [C quiet list](mockups/22-projects-c-list.webp)) and an [empty state with the mascot](mockups/23-projects-empty-mascot.webp).
+- Chosen: A, and the one-field empty state. The maintainer then set a rule: the mascot appears only for tips, tutorials and when called up, never as page decoration. The empty state keeps the single field and one line of help without the mascot. The sign-in panel keeps its mascot, which the maintainer asked for.
+- Built: a page header with the count and a New project button that opens the form under it, a filter field, a table with a flag-style avatar, visibility badge, role, created date and quiet Rename and Delete per row, with the rename or delete panel in a row of its own. Waiting projects sit in a collapsed section that opens when a project is deleted. On phones the table stacks into cards. Rename and delete moved into a `useProjectActions` hook that the project page shares. Data and API calls are unchanged.
+- Tests: the empty state test now checks the single field, and a new test covers the header form and the filter.
+- Before: `projects-*` in [screenshots/before](screenshots/before/). After: `projects-*` in [screenshots/after](screenshots/after/).
+
+Next: the project page round.
