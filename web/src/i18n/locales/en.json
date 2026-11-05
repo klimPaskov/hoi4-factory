@@ -760,6 +760,7 @@
     "notVerified": "Verify your email address to use the free monthly allowance.",
     "unknown_one": "{{count}} use is not known yet and is counted at its reserved amount.",
     "unknown_other": "{{count}} uses are not known yet and are counted at their reserved amount.",
-    "userKey": "Spent with your own keys: {{amount}}"
+    "userKey": "Spent with your own keys: {{amount}}",
+    "used": "Used this month"
   }
 }

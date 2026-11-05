@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { GITHUB_LINK_URL } from '../api/accounts';
 import { useAuth } from '../auth';
 import { ApiKeysSection } from '../components/ApiKeys';
-import { Alert, ErrorMessage } from '../components/ui';
+import { Alert, Badge, ErrorMessage } from '../components/ui';
 import { UsageSummary } from '../components/UsageSummary';
 import { formatDate } from '../format';
 import { usePageTitle } from '../hooks';
@@ -31,7 +31,7 @@ export function AccountPage() {
   }
 
   return (
-    <>
+    <div className="account">
       <h1>{t('account.title')}</h1>
       <section className="card" aria-labelledby="account-details">
         <h2 id="account-details">{t('account.details')}</h2>
@@ -41,11 +41,15 @@ export function AccountPage() {
           <dt>{t('auth.email')}</dt>
           <dd dir="ltr">{account.email}</dd>
           <dt>{t('account.emailStatus')}</dt>
-          <dd>{account.email_verified ? t('account.verified') : t('account.notVerified')}</dd>
+          <dd>
+            <Badge tone={account.email_verified ? 'success' : 'warning'}>
+              {account.email_verified ? t('account.verified') : t('account.notVerified')}
+            </Badge>
+          </dd>
           <dt>{t('account.github')}</dt>
           <dd>
             {account.github_linked ? (
-              t('account.githubLinked')
+              <Badge tone="success">{t('account.githubLinked')}</Badge>
             ) : (
               <>
                 {t('account.githubNotLinked')}{' '}
@@ -87,6 +91,6 @@ export function AccountPage() {
           </div>
         )}
       </section>
-    </>
+    </div>
   );
 }

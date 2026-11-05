@@ -121,6 +121,26 @@
             "summary": "Activity, Attempts, Permission and Settings tabs under the title."
           }
         ]
+      },
+      "account": {
+        "title": "Account",
+        "question": "How should the account page look?",
+        "why": "A matches the approved account target, is the simplest to scan, and keeps every control where people expect it.",
+        "outcome": "Provisional: stacked cards.",
+        "options": [
+          {
+            "name": "Stacked cards",
+            "summary": "Your details, usage with a meter, model keys as quiet rows, and sessions, one card each in one column."
+          },
+          {
+            "name": "Settings list",
+            "summary": "A small section menu on the left and plain settings rows on the right, no cards."
+          },
+          {
+            "name": "Usage first",
+            "summary": "A large allowance panel on top, then model keys and account side by side."
+          }
+        ]
       }
     },
     "toolbar": {

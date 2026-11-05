@@ -81,4 +81,11 @@ One master image fixes the character, and every pose was generated with it as th
 - Built: a status card with the task state, a paused badge, the mode and model, a spend meter, and Start, Pause or Resume, Interrupt and Revoke grant for the running attempt. Unknown effects stay visible as a warning card. The activity log shows each event's summary first, with its type, number and time, a live or polling status line, and the raw payload behind Details. Attempts (permission and result for each) fold away and open by themselves when the task needs review, is blocked or waits for input. Task settings fold away. Behavior and API calls are unchanged.
 - Before: `task-*` in [screenshots/before](screenshots/before/). After: `task-*` in [screenshots/after](screenshots/after/).
 
-Next: the account round.
+### Account (2026-11-06, provisional)
+
+- Offered: three generated layouts ([stacked cards](mockups/70-account-a-cards.webp), [settings list](mockups/71-account-b-settings.webp), [usage first](mockups/72-account-c-usage.webp)).
+- Provisional: stacked cards, chosen overnight. It matches the approved account target and is the simplest to scan. The design lab's front page shows the options with this one marked.
+- Built: one narrow column of cards. Your details show the email and GitHub states as badges. Usage shows the allowance left as one line and a meter of what was used this month, with the unknown-cost note and the spend with your own keys. Model keys are quiet rows with Delete as a text button and the same confirmation. Sessions are unchanged. Behavior and API calls are unchanged.
+- Before: `account-*` in [screenshots/before](screenshots/before/). After: `account-*` in [screenshots/after](screenshots/after/).
+
+All pages in the default order now follow the design. The maintainer reviews the provisional choices on the design lab's front page.

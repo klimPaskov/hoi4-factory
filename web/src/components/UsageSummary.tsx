@@ -3,7 +3,7 @@ import { ApiError } from '../api/client';
 import { getUsage } from '../api/tasks';
 import { formatMicros } from '../format';
 import { useAsync } from '../hooks';
-import { Alert, ErrorMessage, Loading, NotAvailableYet } from './ui';
+import { Alert, ErrorMessage, Loading, Meter, NotAvailableYet } from './ui';
 
 /** The free monthly allowance and what has been spent this month. */
 export function UsageSummary() {
@@ -24,12 +24,20 @@ export function UsageSummary() {
       {state.status === 'ready' ? (
         <>
           {state.data.verified ? (
-            <p>
-              {t('usage.allowance', {
-                left: formatMicros(state.data.remaining_allowance_micros),
-                total: formatMicros(state.data.allowance_micros),
-              })}
-            </p>
+            <>
+              <p className="usage-left">
+                {t('usage.allowance', {
+                  left: formatMicros(state.data.remaining_allowance_micros),
+                  total: formatMicros(state.data.allowance_micros),
+                })}
+              </p>
+              <Meter
+                label={t('usage.used')}
+                value={state.data.allowance_micros - state.data.remaining_allowance_micros}
+                max={state.data.allowance_micros}
+                text={formatMicros(state.data.allowance_micros - state.data.remaining_allowance_micros)}
+              />
+            </>
           ) : (
             <Alert kind="info">{t('usage.notVerified')}</Alert>
           )}

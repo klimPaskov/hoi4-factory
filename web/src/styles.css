@@ -1533,6 +1533,46 @@ textarea {
 .flag-c6 { background: #f4f1ea; }
 .flag-c7 { background: #8e3b46; }
 
+/* ----- Account (mockup docs/design/mockups/70-account-a-cards, provisional) -------------- */
+
+.account {
+  max-width: 48rem;
+}
+.usage-left {
+  font-size: var(--text-lg);
+  font-weight: 650;
+}
+.key-rows {
+  list-style: none;
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+.key-row {
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--border);
+}
+.key-row:first-child {
+  border-top: 0;
+}
+.key-row-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+}
+.key-row h3 {
+  margin: 0;
+}
+.key-row p {
+  margin: 0;
+}
+.key-row .confirm {
+  margin-top: var(--space-3);
+}
+
 /* ----- Task page (mockup docs/design/mockups/61-task-b-story, provisional) ---------------- */
 
 .task-status {
