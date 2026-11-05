@@ -829,7 +829,19 @@ td.path,
   color: var(--danger);
 }
 
-/* The Setup wizard's own step list (to be redesigned in its page round). */
+/* The Setup wizard (mockup docs/design/mockups/40-setup-a-horizontal): a stepper, then the
+   current step and the one just finished. Earlier finished steps open on request. */
+.wizard-toggle {
+  margin-bottom: var(--space-2);
+  font-size: var(--text-sm);
+}
+.wizard-step.wizard-current > h3 {
+  font-size: var(--text-lg);
+  margin-bottom: var(--space-3);
+}
+.wizard-step.wizard-done > h3 {
+  font-size: var(--text-sm);
+}
 .wizard {
   list-style: none;
   margin: 0;
@@ -844,7 +856,9 @@ td.path,
   font-weight: 500;
 }
 .wizard-step.wizard-current {
-  border-top: 2px solid var(--primary);
+  border-top: 0;
+  padding-top: var(--space-1);
+  order: 1;
 }
 .wizard-step.wizard-done h3 {
   color: var(--muted);
@@ -1518,6 +1532,78 @@ textarea {
 .flag-c5 { background: #2b2a30; }
 .flag-c6 { background: #f4f1ea; }
 .flag-c7 { background: #8e3b46; }
+
+/* ----- Project page (mockup docs/design/mockups/32-project-c-guided) ---------------------- */
+
+.project-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+.project-title .badge {
+  font-size: var(--text-xs);
+  letter-spacing: 0;
+}
+.project-head .page-actions {
+  align-items: center;
+}
+.project-head .page-actions .button-row {
+  gap: 0;
+}
+.project-head .button.ghost {
+  color: var(--link);
+  font-weight: 500;
+}
+.project-head .button.ghost.danger-text {
+  color: var(--danger);
+}
+.project-panel {
+  margin-bottom: var(--space-5);
+}
+.next-step {
+  padding: var(--space-5);
+}
+.next-step h2 {
+  font-size: var(--text-lg);
+}
+.later {
+  margin-top: var(--space-3);
+  border-top: 1px solid var(--border);
+}
+.later summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 3rem;
+  cursor: pointer;
+  list-style: none;
+  color: var(--muted);
+}
+.later summary::-webkit-details-marker {
+  display: none;
+}
+.later summary::before {
+  content: '';
+  width: 0.45rem;
+  height: 0.45rem;
+  margin-inline-end: var(--space-1);
+  border-inline-end: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 0.15s;
+}
+.later[open] summary::before {
+  transform: rotate(45deg);
+}
+.later summary h2 {
+  margin: 0;
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+.later[open] > :not(summary) {
+  margin-bottom: var(--space-4);
+}
 
 /* ----- Project list (mockup docs/design/mockups/20-projects-a-table) ---------------------- */
 

@@ -254,13 +254,19 @@
       "private": "Private",
       "public": "Public"
     },
-    "tasksTitle": "Tasks",
     "tasksBody": "Give the agent a job to do on this mod, watch what it does, and review the result.",
-    "tasksLink": "Open tasks"
+    "tasksLink": "Open tasks",
+    "steps": {
+      "label": "Project progress",
+      "bring": "Bring in the mod",
+      "setup": "Set it up",
+      "tasks": "Give the agent tasks"
+    },
+    "sourceTitle": "Mod source",
+    "nextTitle": "Give the agent tasks",
+    "nextButton": "Give the agent a task"
   },
   "workspace": {
-    "emptyBody": "Bring a mod in with one of the options below.",
-    "emptyTitle": "No mod in this project yet",
     "files": "Files",
     "loading": "Checking the workspace…",
     "origin": "Came from",
@@ -285,7 +291,6 @@
       "planned": "Plan ready",
       "scanned": "Scanned"
     },
-    "title": "Workspace",
     "what": "Workspace status"
   },
   "bring": {
@@ -584,7 +589,10 @@
       },
       "rescan": "Scan the mod again",
       "dismiss": "Close this message"
-    }
+    },
+    "showEarlier_one": "Show the earlier step",
+    "showEarlier_other": "Show the {{count}} earlier steps",
+    "hideEarlier": "Hide the earlier steps"
   },
   "tasks": {
     "title": "Tasks",

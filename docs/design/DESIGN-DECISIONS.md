@@ -53,4 +53,18 @@ One master image fixes the character, and every pose was generated with it as th
 - Tests: the empty state test now checks the single field, and a new test covers the header form and the filter.
 - Before: `projects-*` in [screenshots/before](screenshots/before/). After: `projects-*` in [screenshots/after](screenshots/after/).
 
-Next: the project page round.
+### Project page (2026-11-05)
+
+- Offered: three generated layouts ([A overview cards](mockups/30-project-a-overview.webp), [B tabs](mockups/31-project-b-tabs.webp), [C guided next step](mockups/32-project-c-guided.webp)).
+- Chosen by the maintainer: C.
+- Built: the header holds the title with its visibility badge and quiet Open tasks, Rename and Delete. Under it a three-step line (bring in the mod, set it up, give the agent tasks) and only the current step as a card. Finished steps stay reachable in collapsed Mod source and Setup sections. A refresh of the workspace after a Setup step keeps the wizard mounted, so its messages stay. Data and API calls are unchanged.
+- Before: `project-*` and `setup-*` in [screenshots/before](screenshots/before/). After: the same names in [screenshots/after](screenshots/after/).
+
+### Setup wizard (2026-11-06, provisional)
+
+- Offered: three generated layouts ([A horizontal stepper](mockups/40-setup-a-horizontal.webp), [B vertical steps](mockups/41-setup-b-vertical.webp), [C one question at a time](mockups/42-setup-c-focused.webp)).
+- Provisional: A. The maintainer was asleep and asked that work continue without waiting for approval. A matches the project page's step line and the approved target mockup. The design lab's front page shows the options with A marked, so the maintainer can switch it.
+- Built: the Setup card shows a numbered stepper, then the current step and the one just finished. Earlier finished steps open with "Show the earlier steps". All steps stay in one list, so none loses its state or message as the wizard moves on. One test now picks the visible "Scan again" button, because step 1 is folded away.
+- After: `setup-*` in [screenshots/after](screenshots/after/).
+
+Next: the task list round.

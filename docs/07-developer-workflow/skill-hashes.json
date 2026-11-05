@@ -170,15 +170,15 @@
     {
       "name": "ui-design-iteration",
       "source": "docs/07-developer-workflow/skill-workflows/ui-design-iteration/BODY.md",
-      "body_sha256": "82cae3d94ec3340f7046a4bf0dd921f30580f260ef8afc0e6c10565a133329cc",
+      "body_sha256": "93e6c0fcde49b2d5359581d0819f9065464b953d8041d31b256d183a575d748c",
       "generated": [
         {
           "path": ".claude/skills/ui-design-iteration/SKILL.md",
-          "sha256": "260839a87aecf55f83e1cf18ba07ee8bb483b39fbebb04e6875477219b40ac4f"
+          "sha256": "6f49b45d51bf0ab8f57d71d21aa902383fac8c3fc84ff3ee335e792050b7812c"
         },
         {
           "path": ".codex/skills/ui-design-iteration/SKILL.md",
-          "sha256": "260839a87aecf55f83e1cf18ba07ee8bb483b39fbebb04e6875477219b40ac4f"
+          "sha256": "6f49b45d51bf0ab8f57d71d21aa902383fac8c3fc84ff3ee335e792050b7812c"
         },
         {
           "path": ".codex/skills/ui-design-iteration/agents/openai.yaml",
@@ -186,7 +186,7 @@
         },
         {
           "path": ".agents/skills/ui-design-iteration/SKILL.md",
-          "sha256": "260839a87aecf55f83e1cf18ba07ee8bb483b39fbebb04e6875477219b40ac4f"
+          "sha256": "6f49b45d51bf0ab8f57d71d21aa902383fac8c3fc84ff3ee335e792050b7812c"
         },
         {
           "path": ".agents/skills/ui-design-iteration/agents/openai.yaml",

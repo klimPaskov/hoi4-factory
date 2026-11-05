@@ -2,6 +2,13 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.23, 2026-11-06, one decision at a time in the design lab
+
+- The skill's image step now paces generation: one image at a time, 10 to 20 seconds apart, a longer wait after an error, and a stop when the account is signed out (W5-5).
+- The `ui-design-iteration` skill now has a review step: the lab's front page shows only the one open decision as large lettered options, a full-screen in-page viewer switches options with the arrow keys, and decided questions move to an archive page.
+
+Evidence: the maintainer found the mixed page of every generated image confusing and asked for a simple review with arrow-key switching, 2026-11-05.
+
 ## 0.2.22, 2026-11-05, the maintainer's ratings stay private
 
 - CLAUDE.md now says the maintainer's own ratings and review verdicts stay in private notes. Public repositories, docs, test fixtures, release notes and videos state the resulting rule instead of quoting, citing or attributing them.

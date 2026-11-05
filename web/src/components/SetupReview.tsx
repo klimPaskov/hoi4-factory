@@ -11,7 +11,7 @@ import {
   type SetupStatus,
 } from '../api/intake';
 import { useAsync } from '../hooks';
-import { Alert, ErrorMessage, Loading } from './ui';
+import { Alert, ErrorMessage, Loading, StepIndicator } from './ui';
 import { AnalyzeStep } from './setup/AnalyzeStep';
 import { ApplyStep } from './setup/ApplyStep';
 import { ConfirmStep } from './setup/ConfirmStep';
@@ -107,6 +107,7 @@ function Wizard({
     () => (initialScan ?? loaded.status?.scan)?.mode ?? loaded.status?.session?.mode ?? 'existing',
   );
   const [editingValues, setEditingValues] = useState(false);
+  const [showEarlier, setShowEarlier] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [scanFailure, setScanFailure] = useState<unknown>(null);
   const [recovery, setRecovery] = useState<SetupRecovery | null>(loaded.recovery);
@@ -278,26 +279,48 @@ function Wizard({
             </p>
           </div>
         ) : (
-          <ol className="wizard" aria-label={t('setup.listLabel')}>
-            {ids.map((id, index) => {
-              const state = index < currentIndex ? 'done' : index === currentIndex ? 'current' : 'upcoming';
-              return (
-                <li
-                  key={id}
-                  className={`wizard-step wizard-${state}`}
-                  aria-current={state === 'current' ? 'step' : undefined}
-                >
-                  <h3>
-                    {t('setup.stepHeading', { n: index + 1, title: t(`setup.steps.${id}`) })}
-                    {state === 'upcoming' ? null : (
+          <>
+            <StepIndicator
+              label={t('setup.listLabel')}
+              steps={ids.map((id, index) => ({
+                label: t(`setup.steps.${id}`),
+                state: index < currentIndex ? 'done' : index === currentIndex ? 'current' : 'upcoming',
+              }))}
+            />
+            {currentIndex > 1 ? (
+              <button
+                type="button"
+                className="link-button wizard-toggle"
+                aria-expanded={showEarlier}
+                onClick={() => setShowEarlier((open) => !open)}
+              >
+                {showEarlier ? t('setup.hideEarlier') : t('setup.showEarlier', { count: currentIndex - 1 })}
+              </button>
+            ) : null}
+            {/* One stable list, so a step keeps its state (and any message it shows) as the
+                wizard moves on. Only the current step and the one just finished show by default. */}
+            <ol className="wizard" aria-label={t('setup.listLabel')}>
+              {ids.map((id, index) => {
+                const state = index < currentIndex ? 'done' : index === currentIndex ? 'current' : 'upcoming';
+                if (state === 'upcoming') return null;
+                const hidden = state === 'done' && !showEarlier && index !== currentIndex - 1;
+                return (
+                  <li
+                    key={id}
+                    className={`wizard-step wizard-${state}`}
+                    aria-current={state === 'current' ? 'step' : undefined}
+                    hidden={hidden}
+                  >
+                    <h3>
+                      {t('setup.stepHeading', { n: index + 1, title: t(`setup.steps.${id}`) })}
                       <span className="sr-only"> {t(`setup.stepState.${state}`)}</span>
-                    )}
-                  </h3>
-                  {state === 'upcoming' ? null : body(id, state)}
-                </li>
-              );
-            })}
-          </ol>
+                    </h3>
+                    {body(id, state)}
+                  </li>
+                );
+              })}
+            </ol>
+          </>
         )}
       </section>
     </>
