@@ -2,6 +2,13 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.20, 2026-11-05, clean up after yourself
+
+- CLAUDE.md now says every session and agent cleans up before it reports a task done: merged worktrees and their Rust build copies, renders, probe output, logs, archives, test containers and one-off Docker images, and its own clones and builds inside WSL. It notes that space freed inside WSL or Docker returns to C: only after a compaction, and that shared Docker images, build cache and volumes need the maintainer.
+- The `delegate-parallel-work` skill adds the same cleanup rule to every brief.
+
+Evidence: on 2026-11-05 C: had 7.2 GB free, three days after a cleanup left 165 GB. Measured causes were 45 GB of Steam and the game in Ubuntu, 17 GB of Docker build cache, 8.7 GB of WSL crash dumps from a packaged Electron test, and Rust build copies left by finished worktrees. Deleting the dumps and build entries older than two hours freed 41.5 GB. Rollback: revert this commit and regenerate.
+
 ## 0.2.18, 2026-11-02, image-first UI design
 
 - The `ui-design-iteration` skill now starts every page and asset from the image model: page mockups first, then icons, logo and mascot poses, with one master image as the reference for consistency and fresh prompts when the maintainer asks for new ideas. Code then matches the chosen image. It also points to fixture mode and `web/scripts/lab-screenshots.mjs` for before and after captures, notes the maintainer's preference for minimal screens, and explains Vitest worker start timeouts on a saturated host.
