@@ -9,6 +9,12 @@ This is the versioned index of accepted engineering guidance changes. Detailed c
 
 Evidence: maintainer instructions in the UI design track session on 2026-11-02. A mockup set, an icon set, logo rounds and 15 consistent mascot poses were produced this way. Vitest workers timed out at 60 seconds while the host CPU was at 100% with 2.3 GB free.
 
+## 0.2.19, 2026-11-05, the second in-game night moves
+
+- CLAUDE.md's game-launch rule now places the second window from 00:00 local on 2026-11-06 (D-22), because the D-20 night never ran after sessions stopped on 2026-11-02.
+
+Evidence: maintainer decision D-22 of 2026-11-05. Rollback: revert this commit and regenerate. Remove both exceptions once the window has passed.
+
 ## 0.2.18, 2026-11-02, shared-checkout pushes and the DeepSeek key
 
 - CLAUDE.md's delegation section now warns that pushing `main` from a shared checkout publishes every local commit on it, and says to give committing sessions their own worktrees or to check `git log origin/main..main` first.
