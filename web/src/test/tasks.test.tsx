@@ -127,6 +127,34 @@ describe('task list and create form', () => {
     expect(screen.getByText(/Spent \$0\.0012 of \$0\.20/)).toBeInTheDocument();
   });
 
+  it('groups tasks by what they need and opens the form from the header', async () => {
+    mockApi({
+      ...base(),
+      'GET /projects/prj_1/tasks': {
+        json: {
+          tasks: [
+            task({ id: 'tsk_r', objective: 'Review me', state: 'in_review' }),
+            task({ id: 'tsk_w', objective: 'Working on it', state: 'running' }),
+            task({ id: 'tsk_c', objective: 'All done', state: 'cancelled' }),
+          ],
+        },
+      },
+      'GET /model-profiles': { json: profiles },
+      'GET /account/api-keys': { json: keys },
+    });
+    renderApp('/projects/prj_1/tasks');
+    const needsYou = (await screen.findByRole('heading', { name: /Needs you/ })).closest('section')!;
+    expect(within(needsYou).getByRole('link', { name: 'Review me' })).toBeInTheDocument();
+    const working = screen.getByRole('heading', { name: /Working/ }).closest('section')!;
+    expect(within(working).getByRole('link', { name: 'Working on it' })).toBeInTheDocument();
+    // Finished tasks are folded away, not mixed into the other groups.
+    expect(within(needsYou).queryByRole('link', { name: 'All done' })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/What should the agent do/)).not.toBeInTheDocument();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'New task' }));
+    expect(await screen.findByLabelText(/What should the agent do/)).toBeInTheDocument();
+  });
+
   it('submits the contract body for an edit task funded by a saved key', async () => {
     const { requests } = mockApi({
       ...base(),

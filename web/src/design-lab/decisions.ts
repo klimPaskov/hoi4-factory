@@ -15,6 +15,7 @@ export const OPEN: Decision | null = null;
  * maintainer can confirm it or switch to another option. `chosen` indexes `options`.
  */
 export const PROVISIONAL: (Decision & { chosen: number })[] = [
+  { id: 'tasks', options: ['52-tasks-c-grouped', '50-tasks-a-panel', '51-tasks-b-composer'], chosen: 0 },
   { id: 'setup', options: ['40-setup-a-horizontal', '41-setup-b-vertical', '42-setup-c-focused'], chosen: 0 },
 ];
 

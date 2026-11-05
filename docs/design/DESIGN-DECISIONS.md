@@ -67,4 +67,11 @@ One master image fixes the character, and every pose was generated with it as th
 - Built: the Setup card shows a numbered stepper, then the current step and the one just finished. Earlier finished steps open with "Show the earlier steps". All steps stay in one list, so none loses its state or message as the wizard moves on. One test now picks the visible "Scan again" button, because step 1 is folded away.
 - After: `setup-*` in [screenshots/after](screenshots/after/).
 
-Next: the task list round.
+### Task list (2026-11-06, provisional)
+
+- Offered: three generated layouts ([table and side panel](mockups/50-tasks-a-panel.webp), [ask first](mockups/51-tasks-b-composer.webp), [grouped by state](mockups/52-tasks-c-grouped.webp)).
+- Provisional: grouped by state, chosen overnight. Reviews and blocked tasks come first, which suits a minimal screen, and it needs no new data. The design lab's front page shows the options with this one marked, so the maintainer can switch it.
+- Built: a header with a New task button, tasks grouped under "Needs you" (waiting for you, in review, blocked) and "Working" (planned, ready, running, paused), and finished tasks (completed, cancelled) in a collapsed group. Each row shows the objective, a state badge, the mode and the spend. A project with no tasks shows the form straight away. The form keeps its fields and behavior. A new test covers the grouping and the header button.
+- Before: `tasks-*` in [screenshots/before](screenshots/before/). After: `tasks-*` in [screenshots/after](screenshots/after/).
+
+Next: the task page round.

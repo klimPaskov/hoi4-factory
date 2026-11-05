@@ -81,6 +81,26 @@
             "summary": "A narrow centered card with a progress bar and \"step 4 of 6\", nothing else."
           }
         ]
+      },
+      "tasks": {
+        "title": "Task list",
+        "question": "How should a project's task list look?",
+        "why": "A groups tasks by what they need, so reviews and blocked tasks come first. It is the calmest of the three and uses only data the server already returns.",
+        "outcome": "Provisional: grouped by what each task needs.",
+        "options": [
+          {
+            "name": "Grouped by state",
+            "summary": "\"Needs you\" first, then \"Working\", with finished tasks folded away. New task opens a form under the title."
+          },
+          {
+            "name": "Table and side panel",
+            "summary": "A full table with mode, state, spend and model, and the new task form in a panel on the right."
+          },
+          {
+            "name": "Ask first",
+            "summary": "A large composer box at the top, like a chat, and a one-line list of tasks below it."
+          }
+        ]
       }
     },
     "toolbar": {
