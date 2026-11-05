@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.22, 2026-11-05, the maintainer's ratings stay private
+
+- CLAUDE.md now says the maintainer's own ratings and review verdicts stay in private notes. Public repositories, docs, test fixtures, release notes and videos state the resulting rule instead of quoting, citing or attributing them.
+
+Evidence: on 2026-11-05 the maintainer said their gallery ratings must not appear in public-facing docs. The same day a public hoi4-imagegen pull request carried a test fixture labelled with their verdicts and a private notes path, and the trailer's sources doc described their ratings. Rollback: revert this commit and regenerate.
+
 ## 0.2.20, 2026-11-05, clean up after yourself
 
 - CLAUDE.md now says every session and agent cleans up before it reports a task done: merged worktrees and their Rust build copies, renders, probe output, logs, archives, test containers and one-off Docker images, and its own clones and builds inside WSL. It notes that space freed inside WSL or Docker returns to C: only after a compaction, and that shared Docker images, build cache and volumes need the maintainer.
