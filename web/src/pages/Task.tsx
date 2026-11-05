@@ -14,7 +14,7 @@ import {
   type TaskDetail,
 } from '../api/tasks';
 import { TaskEvents } from '../components/TaskEvents';
-import { Alert, ErrorMessage, Loading, NotAvailableYet } from '../components/ui';
+import { Alert, Badge, ErrorMessage, Icon, Loading, Meter, NotAvailableYet, type Tone } from '../components/ui';
 import { formatDateTime, formatMicros } from '../format';
 import { useAsync, usePageTitle } from '../hooks';
 
@@ -51,6 +51,27 @@ function TaskView({ projectId, taskId }: { projectId: string; taskId: string }) 
   );
 }
 
+// The task page follows docs/design/mockups/61-task-b-story (provisional overnight choice): the
+// state, spend and controls on top, the live activity below, and the details folded away.
+
+function taskTone(task: TaskDetail['task']): Tone {
+  if (task.paused) return 'warning';
+  switch (task.state) {
+    case 'running':
+      return 'accent';
+    case 'waiting_for_input':
+      return 'warning';
+    case 'in_review':
+      return 'info';
+    case 'completed':
+      return 'success';
+    case 'blocked':
+      return 'danger';
+    default:
+      return 'neutral';
+  }
+}
+
 function TaskBody({
   projectId,
   taskId,
@@ -68,6 +89,7 @@ function TaskBody({
   const [failure, setFailure] = useState<unknown>(null);
   const [conflict, setConflict] = useState(false);
   const active = attempts.find((a) => ACTIVE_ATTEMPT_STATES.includes(a.state));
+  const needsAttention = task.state === 'in_review' || task.state === 'blocked' || task.state === 'waiting_for_input';
 
   // Reads the task again without the loading state, so the page does not jump.
   async function refresh() {
@@ -105,36 +127,33 @@ function TaskBody({
         </Alert>
       ) : null}
 
-      <section className="card" aria-labelledby="task-details-title">
-        <h2 id="task-details-title">{t('tasks.title')}</h2>
-        <dl className="facts">
-          <dt>{t('tasks.fields.state')}</dt>
-          <dd>
-            {t(`tasks.states.${task.state}`)}
-            {task.paused ? ` · ${t('tasks.paused')}` : ''}
-          </dd>
-          <dt>{t('tasks.fields.mode')}</dt>
-          <dd>{t(`tasks.modes.${task.mode}`)}</dd>
-          {task.allowed_paths.length > 0 ? (
+      <section className="card task-status" aria-labelledby="task-status-title">
+        <h2 id="task-status-title" className="sr-only">
+          {t('tasks.statusTitle')}
+        </h2>
+        <div className="task-status-head">
+          <span className="task-status-state">
+            <Badge tone={taskTone(task)} live={task.state === 'running' && !task.paused}>
+              {t(`tasks.states.${task.state}`)}
+            </Badge>
+            {task.paused ? <Badge tone="warning">{t('tasks.paused')}</Badge> : null}
+          </span>
+          <span className="muted small">
+            {t(`tasks.modes.${task.mode}`)} {'· '}
+            <bdi dir="ltr">{task.model.profile_id}</bdi>
+          </span>
+        </div>
+        <Meter
+          label={t('tasks.fields.spent')}
+          value={task.spent_micros}
+          max={task.budget_micros}
+          text={
             <>
-              <dt>{t('tasks.fields.paths')}</dt>
-              <dd dir="ltr">{task.allowed_paths.join(', ')}</dd>
+              {t('tasks.spentOf', { amount: formatMicros(task.spent_micros), budget: formatMicros(task.budget_micros) })}
+              {task.spend_unknown ? ` · ${t('tasks.spentUnknown')}` : ''}
             </>
-          ) : null}
-          <dt>{t('tasks.fields.budget')}</dt>
-          <dd>{formatMicros(task.budget_micros)}</dd>
-          <dt>{t('tasks.fields.spent')}</dt>
-          <dd>
-            {formatMicros(task.spent_micros)}
-            {task.spend_unknown ? ` · ${t('tasks.spentUnknown')}` : ''}
-          </dd>
-          <dt>{t('tasks.fields.model')}</dt>
-          <dd dir="ltr">{task.model.profile_id}</dd>
-          <dt>{t('tasks.fields.funding')}</dt>
-          <dd>{t(`tasks.funded.${task.model.funding}`)}</dd>
-          <dt>{t('tasks.fields.turns')}</dt>
-          <dd>{task.max_turns}</dd>
-        </dl>
+          }
+        />
         <div className="button-row">
           {!active && !task.paused ? (
             <button
@@ -143,6 +162,7 @@ function TaskBody({
               disabled={busy}
               onClick={() => void act(() => startAttempt(projectId, taskId, task.version))}
             >
+              <Icon name="play" size="sm" />
               {busy ? t('tasks.actions.working') : t('tasks.actions.start')}
             </button>
           ) : null}
@@ -153,6 +173,7 @@ function TaskBody({
               disabled={busy}
               onClick={() => void act(() => resumeTask(projectId, taskId, task.version))}
             >
+              <Icon name="play" size="sm" />
               {t('tasks.actions.resume')}
             </button>
           ) : (
@@ -162,9 +183,32 @@ function TaskBody({
               disabled={busy}
               onClick={() => void act(() => pauseTask(projectId, taskId, task.version))}
             >
+              <Icon name="pause" size="sm" />
               {t('tasks.actions.pause')}
             </button>
           )}
+          {active && active.state !== 'interrupt_requested' && active.state !== 'reconciling' ? (
+            <button
+              type="button"
+              className="button danger-outline"
+              disabled={busy}
+              onClick={() => void act(() => interruptAttempt(projectId, taskId, active.id))}
+            >
+              <Icon name="stop" size="sm" />
+              {t('tasks.actions.interrupt')}
+            </button>
+          ) : null}
+          {active && !active.grant.revoked ? (
+            <button
+              type="button"
+              className="button ghost danger-text"
+              disabled={busy}
+              onClick={() => void act(() => revokeGrant(projectId, taskId, active.grant.id))}
+            >
+              <Icon name="revoke" size="sm" />
+              {t('tasks.actions.revoke')}
+            </button>
+          ) : null}
         </div>
       </section>
 
@@ -186,41 +230,52 @@ function TaskBody({
         </section>
       ) : null}
 
-      <section className="card" aria-labelledby="task-attempts-title">
-        <h2 id="task-attempts-title">{t('tasks.attemptsTitle')}</h2>
+      <TaskEvents projectId={projectId} taskId={taskId} onNew={() => void refresh()} />
+
+      <details className="later" open={needsAttention}>
+        <summary>
+          <h2>
+            {t('tasks.attemptsTitle')} <span className="count">{attempts.length}</span>
+          </h2>
+        </summary>
         {attempts.length === 0 ? <p className="muted">{t('tasks.noAttempts')}</p> : null}
         {attempts.map((attempt) => (
-          <AttemptCard
-            key={attempt.id}
-            attempt={attempt}
-            busy={busy}
-            onInterrupt={() => void act(() => interruptAttempt(projectId, taskId, attempt.id))}
-            onRevoke={() => void act(() => revokeGrant(projectId, taskId, attempt.grant.id))}
-          />
+          <AttemptCard key={attempt.id} attempt={attempt} />
         ))}
-      </section>
+      </details>
 
-      <TaskEvents projectId={projectId} taskId={taskId} onNew={() => void refresh()} />
+      <details className="later">
+        <summary>
+          <h2>{t('tasks.settingsTitle')}</h2>
+        </summary>
+        <dl className="facts">
+          <dt>{t('tasks.fields.mode')}</dt>
+          <dd>{t(`tasks.modes.${task.mode}`)}</dd>
+          {task.allowed_paths.length > 0 ? (
+            <>
+              <dt>{t('tasks.fields.paths')}</dt>
+              <dd dir="ltr">{task.allowed_paths.join(', ')}</dd>
+            </>
+          ) : null}
+          <dt>{t('tasks.fields.budget')}</dt>
+          <dd>{formatMicros(task.budget_micros)}</dd>
+          <dt>{t('tasks.fields.model')}</dt>
+          <dd dir="ltr">{task.model.profile_id}</dd>
+          <dt>{t('tasks.fields.funding')}</dt>
+          <dd>{t(`tasks.funded.${task.model.funding}`)}</dd>
+          <dt>{t('tasks.fields.turns')}</dt>
+          <dd>{task.max_turns}</dd>
+        </dl>
+      </details>
     </>
   );
 }
 
-function AttemptCard({
-  attempt,
-  busy,
-  onInterrupt,
-  onRevoke,
-}: {
-  attempt: Attempt;
-  busy: boolean;
-  onInterrupt: () => void;
-  onRevoke: () => void;
-}) {
+function AttemptCard({ attempt }: { attempt: Attempt }) {
   const { t } = useTranslation();
-  const live = ACTIVE_ATTEMPT_STATES.includes(attempt.state);
   const { grant, outcome } = attempt;
   return (
-    <article className="card" aria-label={t('tasks.attempt', { n: attempt.attempt_no })}>
+    <article className="card attempt" aria-label={t('tasks.attempt', { n: attempt.attempt_no })}>
       <h3>{t('tasks.attempt', { n: attempt.attempt_no })}</h3>
       <p>
         <strong>{t(`tasks.attemptStates.${attempt.state}`)}</strong>
@@ -230,20 +285,8 @@ function AttemptCard({
         {attempt.finished_at ? ` · ${t('tasks.finished', { date: formatDateTime(attempt.finished_at) })}` : ''}
       </p>
       {attempt.error_code ? <p>{t('tasks.error', { code: attempt.error_code })}</p> : null}
-      <dl className="facts">
-        <dt>{t('tasks.grantTitle')}</dt>
-        <dd>{grant.revoked ? t('tasks.grantRevoked') : t('tasks.grantActive')}</dd>
-        <dt>{t('tasks.grantClasses')}</dt>
-        <dd dir="ltr">{grant.operation_classes.join(', ') || t('tasks.none')}</dd>
-        <dt>{t('tasks.grantRoots')}</dt>
-        <dd dir="ltr">{grant.allowed_roots.join(', ') || t('tasks.none')}</dd>
-        <dt>{t('tasks.grantEpoch')}</dt>
-        <dd>{grant.revocation_epoch}</dd>
-        <dt>{t('tasks.grantExpires')}</dt>
-        <dd>{formatDateTime(grant.expires_at)}</dd>
-      </dl>
       {outcome ? (
-        <div>
+        <div className="attempt-outcome">
           <h4>{t('tasks.outcomeTitle')}</h4>
           <p dir="auto">{outcome.summary}</p>
           <dl className="facts">
@@ -270,20 +313,19 @@ function AttemptCard({
           </dl>
         </div>
       ) : null}
-      {live ? (
-        <div className="button-row">
-          {attempt.state !== 'interrupt_requested' && attempt.state !== 'reconciling' ? (
-            <button type="button" className="button danger-outline" disabled={busy} onClick={onInterrupt}>
-              {t('tasks.actions.interrupt')}
-            </button>
-          ) : null}
-          {!grant.revoked ? (
-            <button type="button" className="button danger-outline" disabled={busy} onClick={onRevoke}>
-              {t('tasks.actions.revoke')}
-            </button>
-          ) : null}
-        </div>
-      ) : null}
+      <h4>{t('tasks.grantTitle')}</h4>
+      <dl className="facts">
+        <dt>{t('tasks.grantState')}</dt>
+        <dd>{grant.revoked ? t('tasks.grantRevoked') : t('tasks.grantActive')}</dd>
+        <dt>{t('tasks.grantClasses')}</dt>
+        <dd dir="ltr">{grant.operation_classes.join(', ') || t('tasks.none')}</dd>
+        <dt>{t('tasks.grantRoots')}</dt>
+        <dd dir="ltr">{grant.allowed_roots.join(', ') || t('tasks.none')}</dd>
+        <dt>{t('tasks.grantEpoch')}</dt>
+        <dd>{grant.revocation_epoch}</dd>
+        <dt>{t('tasks.grantExpires')}</dt>
+        <dd>{formatDateTime(grant.expires_at)}</dd>
+      </dl>
     </article>
   );
 }

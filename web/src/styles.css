@@ -1533,6 +1533,87 @@ textarea {
 .flag-c6 { background: #f4f1ea; }
 .flag-c7 { background: #8e3b46; }
 
+/* ----- Task page (mockup docs/design/mockups/61-task-b-story, provisional) ---------------- */
+
+.task-status {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+}
+.task-status-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+}
+.task-status-state {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.task-status-state .badge {
+  font-size: var(--text-sm);
+  padding: 0.15rem 0.7rem;
+}
+.live-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+.live-status::before {
+  content: '';
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--border-strong);
+}
+.live-stream::before {
+  background: var(--success);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+.event-log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.event-log li {
+  padding: var(--space-2) 0;
+  border-top: 1px solid var(--border);
+}
+.event-log li:first-child {
+  border-top: 0;
+}
+.event-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-4);
+  margin: 0;
+}
+.event-summary {
+  font-weight: 500;
+}
+.event-log details summary {
+  font-size: var(--text-xs);
+  color: var(--muted);
+  cursor: pointer;
+}
+.attempt h4 {
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+@media (prefers-reduced-motion: reduce) {
+  .live-stream::before {
+    animation: none;
+  }
+}
+
 /* ----- Task list (mockup docs/design/mockups/52-tasks-c-grouped, provisional) ------------- */
 
 .new-task {

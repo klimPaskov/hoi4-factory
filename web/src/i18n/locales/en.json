@@ -701,7 +701,7 @@
     "pendingTitle": "Actions with an unknown outcome",
     "pendingBody": "The agent started these actions, but the server does not know whether they finished. They must be checked before a new attempt can start, so that nothing is done twice or lost.",
     "pendingItem": "{{tool}} ({{status}}), operation {{id}}",
-    "eventsTitle": "Event log",
+    "eventsTitle": "Activity",
     "eventsEmpty": "No events yet.",
     "eventsLive": "Live updates are on.",
     "eventsPolling": "Live updates are not available, so the log is checked every few seconds.",
@@ -710,7 +710,11 @@
       "needsYou": "Needs you",
       "working": "Working",
       "finished": "Finished"
-    }
+    },
+    "statusTitle": "Status",
+    "settingsTitle": "Task settings",
+    "spentOf": "{{amount}} of {{budget}}",
+    "grantState": "State"
   },
   "apiKeys": {
     "title": "Model API keys",

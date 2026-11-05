@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { eventStreamUrl, listEvents, type RunEvent } from '../api/tasks';
 import { formatDateTime } from '../format';
-import { Alert } from './ui';
 
 const PAGE = 200;
 const POLL_MS = 3000;
@@ -130,18 +129,27 @@ export function TaskEvents({
   const { events, mode } = useTaskEvents(projectId, taskId, onNew);
 
   return (
-    <section className="card" aria-labelledby="task-events-title">
-      <h2 id="task-events-title">{t('tasks.eventsTitle')}</h2>
-      <Alert kind="info">{mode === 'stream' ? t('tasks.eventsLive') : t('tasks.eventsPolling')}</Alert>
+    <section className="card task-events" aria-labelledby="task-events-title">
+      <div className="card-head">
+        <h2 id="task-events-title">{t('tasks.eventsTitle')}</h2>
+      </div>
+      <p className={`live-status live-${mode}`} role="status">
+        {mode === 'stream' ? t('tasks.eventsLive') : t('tasks.eventsPolling')}
+      </p>
       {events.length === 0 ? (
         <p className="muted">{t('tasks.eventsEmpty')}</p>
       ) : (
-        <ol className="project-list" aria-labelledby="task-events-title">
+        <ol className="event-log" aria-labelledby="task-events-title">
           {events.map((event) => (
             <li key={event.seq}>
-              <p>
-                <strong>{event.seq}</strong> <span className="muted small">{formatDateTime(event.created_at)}</span>{' '}
-                <code>{event.type}</code> <bdi dir="auto">{event.summary}</bdi>
+              <p className="event-line">
+                <bdi dir="auto" className="event-summary">
+                  {event.summary}
+                </bdi>
+                <span className="muted small">
+                  <code>{event.type}</code> {'· '}#{event.seq} {'· '}
+                  {formatDateTime(event.created_at)}
+                </span>
               </p>
               <details>
                 <summary>{t('tasks.eventsDetails')}</summary>

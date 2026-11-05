@@ -101,6 +101,26 @@
             "summary": "A large composer box at the top, like a chat, and a one-line list of tasks below it."
           }
         ]
+      },
+      "taskPage": {
+        "title": "Task page",
+        "question": "How should one task's page look while the agent works and after it finishes?",
+        "why": "A keeps one column: the state, spend and controls on top and the activity below, with details folded away. It is the most minimal and works best on phones.",
+        "outcome": "Provisional: the single-column story.",
+        "options": [
+          {
+            "name": "Single-column story",
+            "summary": "A status card with the state, a spend meter and the controls, then the live activity. Attempts and settings fold away."
+          },
+          {
+            "name": "Two columns",
+            "summary": "The live activity timeline on the left, permission and settings cards on the right."
+          },
+          {
+            "name": "Tabs",
+            "summary": "Activity, Attempts, Permission and Settings tabs under the title."
+          }
+        ]
       }
     },
     "toolbar": {

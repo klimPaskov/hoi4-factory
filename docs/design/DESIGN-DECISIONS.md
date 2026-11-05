@@ -74,4 +74,11 @@ One master image fixes the character, and every pose was generated with it as th
 - Built: a header with a New task button, tasks grouped under "Needs you" (waiting for you, in review, blocked) and "Working" (planned, ready, running, paused), and finished tasks (completed, cancelled) in a collapsed group. Each row shows the objective, a state badge, the mode and the spend. A project with no tasks shows the form straight away. The form keeps its fields and behavior. A new test covers the grouping and the header button.
 - Before: `tasks-*` in [screenshots/before](screenshots/before/). After: `tasks-*` in [screenshots/after](screenshots/after/).
 
-Next: the task page round.
+### Task page (2026-11-06, provisional)
+
+- Offered: three generated layouts ([two columns](mockups/60-task-a-columns.webp), [single-column story](mockups/61-task-b-story.webp), [tabs](mockups/62-task-c-tabs.webp)).
+- Provisional: the single-column story, chosen overnight. It keeps the controls and the live activity on one calm column and works on phones. The design lab's front page shows the options with this one marked.
+- Built: a status card with the task state, a paused badge, the mode and model, a spend meter, and Start, Pause or Resume, Interrupt and Revoke grant for the running attempt. Unknown effects stay visible as a warning card. The activity log shows each event's summary first, with its type, number and time, a live or polling status line, and the raw payload behind Details. Attempts (permission and result for each) fold away and open by themselves when the task needs review, is blocked or waits for input. Task settings fold away. Behavior and API calls are unchanged.
+- Before: `task-*` in [screenshots/before](screenshots/before/). After: `task-*` in [screenshots/after](screenshots/after/).
+
+Next: the account round.
