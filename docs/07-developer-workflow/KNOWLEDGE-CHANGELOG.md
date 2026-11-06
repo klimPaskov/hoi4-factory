@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.27, 2026-11-06, kit changes can break every Setup install
+
+- CLAUDE.md now says that HOI4 Mod Setup installs from kit `main`, so a kit PR that moves or rewrites files with Setup component markers, or changes the package manifest, must pass Setup's offline acceptance or the kit's Setup-reading test before it merges.
+
+Evidence: kit #82 (context budget) left `hoi4-project-rules` references `mcp-usage.md` and `skill-routing.md` ending with an unterminated optional block for `workflow.live_tools` and `workflow.live_testing`. Setup's component adapter refused them, so every install of kit `main` failed, the released Setup 0.9.2 included. The kit's own CI passed. Kit #85 removed the dangling markers and added a test that reads every tracked file the way Setup does. Rollback: revert this commit and regenerate.
+
 ## 0.2.26, 2026-11-06, provisional design choices and opening the lab
 
 - The `ui-design-iteration` skill now covers provisional picks when the maintainer asks that work go on without approval, and says to list them in chat in the lab's order with the lab's letters.
