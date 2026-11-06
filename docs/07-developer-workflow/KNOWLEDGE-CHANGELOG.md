@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.25, 2026-11-06, look at visual work before calling it done
+
+- CLAUDE.md now says visual work is finished only after it has been rendered at the viewer's size and in close-up, looked at, and reviewed by a fresh-context reviewer that sees only the images and the quality bar. Passing numeric checks is not evidence that it looks right.
+
+Evidence: on 2026-11-06 the 3D units trailer's first cut showed seven ZIN units that had passed every geometry check with 0 errors, next to existing Chaos Redux units. The maintainer saw holes in the meshes and deformed animations in both at first glance, and said the models are nowhere near acceptable. Rollback: revert this commit and regenerate.
+
 ## 0.2.24, 2026-11-06, no bare Python REPL
 
 - CLAUDE.md now says never to start Python without a script, `-c` or `-m`, and to look for large task output files under the Claude temp folder first when C: suddenly fills.
