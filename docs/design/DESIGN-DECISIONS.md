@@ -60,32 +60,32 @@ One master image fixes the character, and every pose was generated with it as th
 - Built: the header holds the title with its visibility badge and quiet Open tasks, Rename and Delete. Under it a three-step line (bring in the mod, set it up, give the agent tasks) and only the current step as a card. Finished steps stay reachable in collapsed Mod source and Setup sections. A refresh of the workspace after a Setup step keeps the wizard mounted, so its messages stay. Data and API calls are unchanged.
 - Before: `project-*` and `setup-*` in [screenshots/before](screenshots/before/). After: the same names in [screenshots/after](screenshots/after/).
 
-### Setup wizard (2026-11-06, provisional)
+### Setup wizard (2026-11-06)
 
 - Offered: three generated layouts ([A horizontal stepper](mockups/40-setup-a-horizontal.webp), [B vertical steps](mockups/41-setup-b-vertical.webp), [C one question at a time](mockups/42-setup-c-focused.webp)).
-- Provisional: A. The maintainer was asleep and asked that work continue without waiting for approval. A matches the project page's step line and the approved target mockup. The design lab's front page shows the options with A marked, so the maintainer can switch it.
-- Built: the Setup card shows a numbered stepper, then the current step and the one just finished. Earlier finished steps open with "Show the earlier steps". All steps stay in one list, so none loses its state or message as the wizard moves on. One test now picks the visible "Scan again" button, because step 1 is folded away.
+- Provisional overnight: A, because it matched the project page's step line. Chosen by the maintainer on review: B.
+- Built: the Setup card shows the six steps as a column on the left (done steps checked, the current one highlighted) and the current step and the one just finished on the right. On a phone the column turns back into a row of numbered circles. `StepIndicator` takes a `vertical` flag for this. Earlier finished steps open with "Show the earlier steps". All steps stay in one list, so none loses its state or message as the wizard moves on. One test now picks the visible "Scan again" button, because step 1 is folded away.
 - After: `setup-*` in [screenshots/after](screenshots/after/).
 
-### Task list (2026-11-06, provisional)
+### Task list (2026-11-06)
 
 - Offered: three generated layouts ([table and side panel](mockups/50-tasks-a-panel.webp), [ask first](mockups/51-tasks-b-composer.webp), [grouped by state](mockups/52-tasks-c-grouped.webp)).
-- Provisional: grouped by state, chosen overnight. Reviews and blocked tasks come first, which suits a minimal screen, and it needs no new data. The design lab's front page shows the options with this one marked, so the maintainer can switch it.
-- Built: a header with a New task button, tasks grouped under "Needs you" (waiting for you, in review, blocked) and "Working" (planned, ready, running, paused), and finished tasks (completed, cancelled) in a collapsed group. Each row shows the objective, a state badge, the mode and the spend. A project with no tasks shows the form straight away. The form keeps its fields and behavior. A new test covers the grouping and the header button.
+- Provisional overnight: grouped by state. Chosen by the maintainer on review: the table with a side panel.
+- Built: one table of every task with the objective, mode, state badge, spend with a small meter, and model. New task in the header opens the form in a panel beside the table, and Cancel closes it. On narrow screens the panel moves above the table, and on phones the table rows become cards. A project with no tasks shows the form straight away. The form keeps its fields and behavior. A test covers the table, the panel and Cancel.
 - Before: `tasks-*` in [screenshots/before](screenshots/before/). After: `tasks-*` in [screenshots/after](screenshots/after/).
 
-### Task page (2026-11-06, provisional)
+### Task page (2026-11-06)
 
 - Offered: three generated layouts ([two columns](mockups/60-task-a-columns.webp), [single-column story](mockups/61-task-b-story.webp), [tabs](mockups/62-task-c-tabs.webp)).
-- Provisional: the single-column story, chosen overnight. It keeps the controls and the live activity on one calm column and works on phones. The design lab's front page shows the options with this one marked.
-- Built: a status card with the task state, a paused badge, the mode and model, a spend meter, and Start, Pause or Resume, Interrupt and Revoke grant for the running attempt. Unknown effects stay visible as a warning card. The activity log shows each event's summary first, with its type, number and time, a live or polling status line, and the raw payload behind Details. Attempts (permission and result for each) fold away and open by themselves when the task needs review, is blocked or waits for input. Task settings fold away. Behavior and API calls are unchanged.
+- Provisional overnight: the single-column story. Chosen by the maintainer on review: C, tabs.
+- Built: the title with the state badge, the spend meter, then Activity, Attempts, Permission and Settings tabs with Start, Pause or Resume, Interrupt and Revoke grant at the end of the tab row. A new `Tabs` component follows the ARIA tab pattern (arrow keys, Home and End) and keeps every panel mounted, so the live activity stream keeps running on another tab. A task that needs review, is blocked or waits for input opens on Attempts. Permission shows the newest attempt's grant. Unknown effects stay visible above the tabs. The activity log shows each event's summary first, with its type, number and time, a live or polling status line, and the raw payload behind Details. A test covers the tabs and the arrow keys. Behavior and API calls are unchanged.
 - Before: `task-*` in [screenshots/before](screenshots/before/). After: `task-*` in [screenshots/after](screenshots/after/).
 
-### Account (2026-11-06, provisional)
+### Account (2026-11-06)
 
 - Offered: three generated layouts ([stacked cards](mockups/70-account-a-cards.webp), [settings list](mockups/71-account-b-settings.webp), [usage first](mockups/72-account-c-usage.webp)).
-- Provisional: stacked cards, chosen overnight. It matches the approved account target and is the simplest to scan. The design lab's front page shows the options with this one marked.
+- Provisional overnight: stacked cards. Confirmed by the maintainer on review.
 - Built: one narrow column of cards. Your details show the email and GitHub states as badges. Usage shows the allowance left as one line and a meter of what was used this month, with the unknown-cost note and the spend with your own keys. Model keys are quiet rows with Delete as a text button and the same confirmation. Sessions are unchanged. Behavior and API calls are unchanged.
 - Before: `account-*` in [screenshots/before](screenshots/before/). After: `account-*` in [screenshots/after](screenshots/after/).
 
-All pages in the default order now follow the design. The maintainer reviews the provisional choices on the design lab's front page.
+All pages in the default order follow the design, and every choice is the maintainer's.

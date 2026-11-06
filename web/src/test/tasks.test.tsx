@@ -127,7 +127,7 @@ describe('task list and create form', () => {
     expect(screen.getByText(/Spent \$0\.0012 of \$0\.20/)).toBeInTheDocument();
   });
 
-  it('groups tasks by what they need and opens the form from the header', async () => {
+  it('lists tasks in one table and opens the form in a side panel', async () => {
     mockApi({
       ...base(),
       'GET /projects/prj_1/tasks': {
@@ -143,16 +143,19 @@ describe('task list and create form', () => {
       'GET /account/api-keys': { json: keys },
     });
     renderApp('/projects/prj_1/tasks');
-    const needsYou = (await screen.findByRole('heading', { name: /Needs you/ })).closest('section')!;
-    expect(within(needsYou).getByRole('link', { name: 'Review me' })).toBeInTheDocument();
-    const working = screen.getByRole('heading', { name: /Working/ }).closest('section')!;
-    expect(within(working).getByRole('link', { name: 'Working on it' })).toBeInTheDocument();
-    // Finished tasks are folded away, not mixed into the other groups.
-    expect(within(needsYou).queryByRole('link', { name: 'All done' })).not.toBeInTheDocument();
+    const table = await screen.findByRole('table', { name: '3 tasks' });
+    for (const name of ['Review me', 'Working on it', 'All done']) {
+      expect(within(table).getByRole('link', { name })).toBeInTheDocument();
+    }
+    expect(within(table).getByRole('columnheader', { name: 'Spend' })).toBeInTheDocument();
     expect(screen.queryByLabelText(/What should the agent do/)).not.toBeInTheDocument();
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'New task' }));
     expect(await screen.findByLabelText(/What should the agent do/)).toBeInTheDocument();
+    // The table stays beside the form, and Cancel closes the panel.
+    expect(screen.getByRole('table', { name: '3 tasks' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(screen.queryByLabelText(/What should the agent do/)).not.toBeInTheDocument();
   });
 
   it('submits the contract body for an edit task funded by a saved key', async () => {
@@ -269,8 +272,19 @@ describe('task detail', () => {
     expect(screen.getByText(/Stop requested: the agent has not confirmed/)).toBeInTheDocument();
     expect(screen.getByText('Succeeded')).toBeInTheDocument();
     expect(screen.getByText('Added a focus')).toBeInTheDocument();
-    expect(screen.getAllByText('read_file, write_file')).toHaveLength(2);
+    // The Permission tab shows the newest attempt's grant.
+    expect(screen.getAllByText('read_file, write_file')).toHaveLength(1);
     expect(screen.getByText(/write_file \(unknown\), operation op_9/)).toBeInTheDocument();
+    // Activity is the open tab. The arrow keys move between tabs.
+    const activity = screen.getByRole('tab', { name: 'Activity' });
+    expect(activity).toHaveAttribute('aria-selected', 'true');
+    const user = userEvent.setup();
+    activity.focus();
+    await user.keyboard('{ArrowRight}');
+    expect(screen.getByRole('tab', { name: /Attempts/ })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: /Attempts/ })).toHaveFocus();
+    expect(screen.getByRole('tabpanel', { name: /Attempts/ })).toHaveTextContent('Added a focus');
+    await user.keyboard('{ArrowLeft}');
     expect(await screen.findByText('Event 2')).toBeInTheDocument();
     expect(screen.getByText('Event 1')).toBeInTheDocument();
     await waitFor(() => expect(FakeEventSource.instances).toHaveLength(1));

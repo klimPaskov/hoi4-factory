@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, type ButtonHTMLAttributes, type ReactNode, type Ref } from 'react';
+import { useEffect, useId, useRef, type ButtonHTMLAttributes, type KeyboardEvent, type ReactNode, type Ref } from 'react';
 import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { describeError } from '../errors';
@@ -354,9 +354,18 @@ export function Skeleton({ label, rows = 4 }: { label: string; rows?: number }) 
 export type StepState = 'done' | 'current' | 'upcoming' | 'error';
 
 /** Where a multi-step flow stands: numbered circles on a line, done steps checked. */
-export function StepIndicator({ label, steps }: { label: string; steps: { label: string; state: StepState }[] }) {
+export function StepIndicator({
+  label,
+  steps,
+  vertical = false,
+}: {
+  label: string;
+  steps: { label: string; state: StepState }[];
+  /** A column beside the content on wide screens. It turns back into a row on narrow ones. */
+  vertical?: boolean;
+}) {
   return (
-    <ol className="steps" aria-label={label}>
+    <ol className={vertical ? 'steps steps-vertical' : 'steps'} aria-label={label}>
       {steps.map((step, index) => (
         <li key={step.label} className={`step step-${step.state}`} aria-current={step.state === 'current' ? 'step' : undefined}>
           <span className="step-dot" aria-hidden="true">
@@ -366,6 +375,85 @@ export function StepIndicator({ label, steps }: { label: string; steps: { label:
         </li>
       ))}
     </ol>
+  );
+}
+
+// ----- Tabs ------------------------------------------------------------------------------
+
+/**
+ * Tabs with the ARIA tab pattern: arrow keys, Home and End move between tabs. Every panel stays
+ * mounted and only the chosen one shows, so a panel that streams (the activity log) keeps running.
+ */
+export function Tabs({
+  label,
+  tabs,
+  value,
+  onChange,
+  aside,
+}: {
+  label: string;
+  tabs: { id: string; label: ReactNode; panel: ReactNode }[];
+  value: string;
+  onChange: (id: string) => void;
+  /** Shown at the end of the tab row, such as the controls of the thing the tabs describe. */
+  aside?: ReactNode;
+}) {
+  const base = useId();
+  const refs = useRef<(HTMLButtonElement | null)[]>([]);
+  function onKeyDown(event: KeyboardEvent<HTMLButtonElement>) {
+    const index = tabs.findIndex((tab) => tab.id === value);
+    const rtl = getComputedStyle(event.currentTarget).direction === 'rtl';
+    const step: Record<string, number> = { ArrowRight: rtl ? -1 : 1, ArrowLeft: rtl ? 1 : -1 };
+    let next = -1;
+    if (event.key in step) next = (index + (step[event.key] ?? 0) + tabs.length) % tabs.length;
+    else if (event.key === 'Home') next = 0;
+    else if (event.key === 'End') next = tabs.length - 1;
+    if (next < 0) return;
+    event.preventDefault();
+    const tab = tabs[next];
+    if (!tab) return;
+    onChange(tab.id);
+    refs.current[next]?.focus();
+  }
+  return (
+    <div className="tabs">
+      <div className="tabs-bar">
+        <div role="tablist" aria-label={label} className="tab-list">
+          {tabs.map((tab, index) => (
+            <button
+              key={tab.id}
+              ref={(el) => {
+                refs.current[index] = el;
+              }}
+              type="button"
+              role="tab"
+              id={`${base}-tab-${tab.id}`}
+              aria-controls={`${base}-panel-${tab.id}`}
+              aria-selected={tab.id === value}
+              tabIndex={tab.id === value ? 0 : -1}
+              className="tab"
+              onClick={() => onChange(tab.id)}
+              onKeyDown={onKeyDown}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        {aside ? <div className="tabs-aside">{aside}</div> : null}
+      </div>
+      {tabs.map((tab) => (
+        <div
+          key={tab.id}
+          role="tabpanel"
+          id={`${base}-panel-${tab.id}`}
+          aria-labelledby={`${base}-tab-${tab.id}`}
+          hidden={tab.id !== value}
+          className="tab-panel"
+        >
+          {tab.panel}
+        </div>
+      ))}
+    </div>
   );
 }
 

@@ -279,14 +279,16 @@ function Wizard({
             </p>
           </div>
         ) : (
-          <>
+          <div className="setup-layout">
             <StepIndicator
+              vertical
               label={t('setup.listLabel')}
               steps={ids.map((id, index) => ({
                 label: t(`setup.steps.${id}`),
                 state: index < currentIndex ? 'done' : index === currentIndex ? 'current' : 'upcoming',
               }))}
             />
+            <div className="setup-body">
             {currentIndex > 1 ? (
               <button
                 type="button"
@@ -320,7 +322,8 @@ function Wizard({
                 );
               })}
             </ol>
-          </>
+            </div>
+          </div>
         )}
       </section>
     </>

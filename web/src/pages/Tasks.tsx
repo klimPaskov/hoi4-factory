@@ -11,7 +11,6 @@ import {
   type ModelProfile,
   type Task,
   type TaskMode,
-  type TaskState,
 } from '../api/tasks';
 import { Badge, Button, ErrorMessage, Field, Loading, NotAvailableYet, PageHeader, type Tone } from '../components/ui';
 import { formatMicros, formatNumber } from '../format';
@@ -22,11 +21,8 @@ export function TasksPage() {
   return <TasksView key={id} projectId={id} />;
 }
 
-// The task list follows docs/design/mockups/52-tasks-c-grouped (provisional overnight choice):
-// tasks grouped by what they need, "Needs you" first, finished ones folded away.
-
-const NEEDS_YOU: TaskState[] = ['waiting_for_input', 'in_review', 'blocked'];
-const FINISHED: TaskState[] = ['completed', 'cancelled'];
+// The task list follows docs/design/mockups/50-tasks-a-panel (the maintainer's choice B): one
+// table of every task, and the new task form in a panel beside it.
 
 function stateTone(task: Task): Tone {
   if (task.paused) return 'warning';
@@ -74,74 +70,69 @@ function TasksView({ projectId }: { projectId: string }) {
           <ErrorMessage error={state.error} onRetry={state.reload} />
         )
       ) : null}
-      {state.status === 'ready' && (!hasTasks || formOpen) ? (
-        <NewTaskForm projectId={projectId} onCancel={hasTasks ? () => setFormOpen(false) : undefined} />
-      ) : null}
-      {state.status === 'ready' && hasTasks ? <TaskList projectId={projectId} tasks={state.data} /> : null}
-    </>
-  );
-}
-
-function TaskRow({ projectId, task }: { projectId: string; task: Task }) {
-  const { t } = useTranslation();
-  return (
-    <li className="task-row">
-      <Link className="task-objective" to={`/projects/${encodeURIComponent(projectId)}/tasks/${encodeURIComponent(task.id)}`}>
-        <bdi dir="auto">{task.objective}</bdi>
-      </Link>
-      <span className="task-meta">
-        <Badge tone={stateTone(task)} live={task.state === 'running' && !task.paused}>
-          {task.paused ? t('tasks.paused') : t(`tasks.states.${task.state}`)}
-        </Badge>
-        <span className="muted small">{t(`tasks.modes.${task.mode}`)}</span>
-        <span className="muted small task-spend">
-          {t('tasks.spent', { amount: formatMicros(task.spent_micros), budget: formatMicros(task.budget_micros) })}
-        </span>
-      </span>
-    </li>
-  );
-}
-
-function TaskGroup({ id, title, projectId, tasks }: { id: string; title: string; projectId: string; tasks: Task[] }) {
-  if (tasks.length === 0) return null;
-  return (
-    <section className="task-group" aria-labelledby={`tasks-${id}`}>
-      <h2 id={`tasks-${id}`}>
-        {title} <span className="count">{formatNumber(tasks.length)}</span>
-      </h2>
-      <ul className="task-rows">
-        {tasks.map((task) => (
-          <TaskRow key={task.id} projectId={projectId} task={task} />
-        ))}
-      </ul>
-    </section>
-  );
-}
-
-function TaskList({ projectId, tasks }: { projectId: string; tasks: Task[] }) {
-  const { t } = useTranslation();
-  const needsYou = tasks.filter((task) => NEEDS_YOU.includes(task.state));
-  const finished = tasks.filter((task) => FINISHED.includes(task.state));
-  const working = tasks.filter((task) => !NEEDS_YOU.includes(task.state) && !FINISHED.includes(task.state));
-  return (
-    <>
-      <TaskGroup id="needs-you" title={t('tasks.groups.needsYou')} projectId={projectId} tasks={needsYou} />
-      <TaskGroup id="working" title={t('tasks.groups.working')} projectId={projectId} tasks={working} />
-      {finished.length > 0 ? (
-        <details className="later task-finished">
-          <summary>
-            <h2>
-              {t('tasks.groups.finished')} <span className="count">{formatNumber(finished.length)}</span>
-            </h2>
-          </summary>
-          <ul className="task-rows">
-            {finished.map((task) => (
-              <TaskRow key={task.id} projectId={projectId} task={task} />
-            ))}
-          </ul>
-        </details>
+      {state.status === 'ready' && !hasTasks ? <NewTaskForm projectId={projectId} /> : null}
+      {state.status === 'ready' && hasTasks ? (
+        <div className={formOpen ? 'tasks-layout with-panel' : 'tasks-layout'}>
+          <TaskTable projectId={projectId} tasks={state.data} />
+          {formOpen ? <NewTaskForm projectId={projectId} onCancel={() => setFormOpen(false)} /> : null}
+        </div>
       ) : null}
     </>
+  );
+}
+
+function TaskTable({ projectId, tasks }: { projectId: string; tasks: Task[] }) {
+  const { t } = useTranslation();
+  return (
+    <div className="table-wrap">
+      <table className="data-table task-table">
+        <caption className="sr-only">{t('tasks.listLabel', { count: tasks.length, n: formatNumber(tasks.length) })}</caption>
+        <thead>
+          <tr>
+            <th scope="col">{t('tasks.columns.objective')}</th>
+            <th scope="col">{t('tasks.columns.mode')}</th>
+            <th scope="col">{t('tasks.columns.state')}</th>
+            <th scope="col">{t('tasks.columns.spend')}</th>
+            <th scope="col">{t('tasks.columns.model')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {tasks.map((task) => (
+            <tr key={task.id}>
+              <th scope="row" className="task-objective">
+                <Link to={`/projects/${encodeURIComponent(projectId)}/tasks/${encodeURIComponent(task.id)}`}>
+                  <bdi dir="auto">{task.objective}</bdi>
+                </Link>
+              </th>
+              <td className="cell-nowrap">{t(`tasks.modes.${task.mode}`)}</td>
+              <td className="cell-nowrap">
+                <Badge tone={stateTone(task)} live={task.state === 'running' && !task.paused}>
+                  {task.paused ? t('tasks.paused') : t(`tasks.states.${task.state}`)}
+                </Badge>
+              </td>
+              <td className="task-spend">
+                <span className="sr-only">
+                  {t('tasks.spent', { amount: formatMicros(task.spent_micros), budget: formatMicros(task.budget_micros) })}
+                </span>
+                <span aria-hidden="true">
+                  {t('tasks.spentOf', { amount: formatMicros(task.spent_micros), budget: formatMicros(task.budget_micros) })}
+                </span>
+                <meter
+                  className="meter-bar"
+                  min={0}
+                  max={task.budget_micros}
+                  value={Math.min(task.spent_micros, task.budget_micros)}
+                  aria-hidden="true"
+                />
+              </td>
+              <td className="cell-nowrap">
+                <bdi dir="ltr">{task.model.profile_id}</bdi>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
@@ -162,7 +153,7 @@ function NewTaskForm({ projectId, onCancel }: { projectId: string; onCancel?: ()
   });
 
   return (
-    <section className="card new-task" aria-labelledby="new-task-title">
+    <section className={onCancel ? 'card new-task task-panel' : 'card new-task'} aria-labelledby="new-task-title">
       <h2 id="new-task-title">{t('tasks.newTitle')}</h2>
       {onCancel ? null : <p className="muted">{t('tasks.emptyBody')}</p>}
       {profiles.status === 'loading' || keys.status === 'loading' ? <Loading /> : null}

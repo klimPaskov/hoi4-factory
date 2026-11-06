@@ -65,16 +65,16 @@
       "setup": {
         "title": "Setup wizard",
         "question": "How should the Setup wizard show its six steps?",
-        "why": "A matches the step line on the project page and the approved target mockup, and shows only the current step plus the one just finished.",
-        "outcome": "Provisional: A, the horizontal stepper.",
+        "why": "The maintainer chose vertical steps over the overnight horizontal pick.",
+        "outcome": "Chosen by the maintainer: vertical steps.",
         "options": [
-          {
-            "name": "Horizontal stepper",
-            "summary": "Numbered circles across the top of the Setup card, the current step below, earlier steps folded away."
-          },
           {
             "name": "Vertical steps",
             "summary": "A narrow list of the six steps on the left and the current step on the right."
+          },
+          {
+            "name": "Horizontal stepper",
+            "summary": "Numbered circles across the top of the Setup card, the current step below, earlier steps folded away."
           },
           {
             "name": "One question at a time",
@@ -85,16 +85,16 @@
       "tasks": {
         "title": "Task list",
         "question": "How should a project's task list look?",
-        "why": "A groups tasks by what they need, so reviews and blocked tasks come first. It is the calmest of the three and uses only data the server already returns.",
-        "outcome": "Provisional: grouped by what each task needs.",
+        "why": "The maintainer chose the table over the overnight grouped pick.",
+        "outcome": "Chosen by the maintainer: the table with a side panel.",
         "options": [
-          {
-            "name": "Grouped by state",
-            "summary": "\"Needs you\" first, then \"Working\", with finished tasks folded away. New task opens a form under the title."
-          },
           {
             "name": "Table and side panel",
             "summary": "A full table with mode, state, spend and model, and the new task form in a panel on the right."
+          },
+          {
+            "name": "Grouped by state",
+            "summary": "\"Needs you\" first, then \"Working\", with finished tasks folded away. New task opens a form under the title."
           },
           {
             "name": "Ask first",
@@ -105,9 +105,13 @@
       "taskPage": {
         "title": "Task page",
         "question": "How should one task's page look while the agent works and after it finishes?",
-        "why": "A keeps one column: the state, spend and controls on top and the activity below, with details folded away. It is the most minimal and works best on phones.",
-        "outcome": "Provisional: the single-column story.",
+        "why": "The maintainer chose tabs over the overnight single-column pick.",
+        "outcome": "Chosen by the maintainer: tabs.",
         "options": [
+          {
+            "name": "Tabs",
+            "summary": "Activity, Attempts, Permission and Settings tabs under the title."
+          },
           {
             "name": "Single-column story",
             "summary": "A status card with the state, a spend meter and the controls, then the live activity. Attempts and settings fold away."
@@ -115,18 +119,14 @@
           {
             "name": "Two columns",
             "summary": "The live activity timeline on the left, permission and settings cards on the right."
-          },
-          {
-            "name": "Tabs",
-            "summary": "Activity, Attempts, Permission and Settings tabs under the title."
           }
         ]
       },
       "account": {
         "title": "Account",
         "question": "How should the account page look?",
-        "why": "A matches the approved account target, is the simplest to scan, and keeps every control where people expect it.",
-        "outcome": "Provisional: stacked cards.",
+        "why": "The maintainer kept the overnight pick.",
+        "outcome": "Chosen by the maintainer: stacked cards.",
         "options": [
           {
             "name": "Stacked cards",

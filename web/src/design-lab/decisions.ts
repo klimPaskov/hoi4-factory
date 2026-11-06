@@ -14,14 +14,13 @@ export const OPEN: Decision | null = null;
  * waiting for approval). Each is built and shown on the front page with its alternatives, so the
  * maintainer can confirm it or switch to another option. `chosen` indexes `options`.
  */
-export const PROVISIONAL: (Decision & { chosen: number })[] = [
-  { id: 'account', options: ['70-account-a-cards', '71-account-b-settings', '72-account-c-usage'], chosen: 0 },
-  { id: 'taskPage', options: ['61-task-b-story', '60-task-a-columns', '62-task-c-tabs'], chosen: 0 },
-  { id: 'tasks', options: ['52-tasks-c-grouped', '50-tasks-a-panel', '51-tasks-b-composer'], chosen: 0 },
-  { id: 'setup', options: ['40-setup-a-horizontal', '41-setup-b-vertical', '42-setup-c-focused'], chosen: 0 },
-];
+export const PROVISIONAL: (Decision & { chosen: number })[] = [];
 
 export const HISTORY: Decision[] = [
+  { id: 'account', options: ['70-account-a-cards', '71-account-b-settings', '72-account-c-usage'] },
+  { id: 'taskPage', options: ['62-task-c-tabs', '61-task-b-story', '60-task-a-columns'] },
+  { id: 'tasks', options: ['50-tasks-a-panel', '52-tasks-c-grouped', '51-tasks-b-composer'] },
+  { id: 'setup', options: ['41-setup-b-vertical', '40-setup-a-horizontal', '42-setup-c-focused'] },
   { id: 'projectPage', options: ['32-project-c-guided', '30-project-a-overview', '31-project-b-tabs'] },
   { id: 'projectList', options: ['20-projects-a-table', '21-projects-b-cards', '22-projects-c-list', '23-projects-empty-mascot'] },
   {

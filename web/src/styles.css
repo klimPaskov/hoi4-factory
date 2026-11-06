@@ -829,8 +829,75 @@ td.path,
   color: var(--danger);
 }
 
-/* The Setup wizard (mockup docs/design/mockups/40-setup-a-horizontal): a stepper, then the
-   current step and the one just finished. Earlier finished steps open on request. */
+/* The Setup wizard (mockup docs/design/mockups/41-setup-b-vertical): the steps in a column
+   beside the current step and the one just finished. Earlier finished steps open on request. */
+.setup-layout {
+  display: grid;
+  grid-template-columns: 12rem minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+.setup-body {
+  min-width: 0;
+}
+.steps-vertical {
+  flex-direction: column;
+  margin: 0;
+  padding: var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+}
+.steps-vertical .step {
+  flex: none;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  border-radius: var(--radius);
+  text-align: start;
+}
+.steps-vertical .step + .step::before {
+  top: calc(-50% + 0.4rem);
+  inset-inline-start: calc(var(--space-2) + 0.875rem - 1px);
+  inset-inline-end: auto;
+  width: 2px;
+  height: calc(100% - 1.75rem);
+}
+.steps-vertical .step-current {
+  background: var(--primary-soft);
+}
+.steps-vertical .step-current .step-dot {
+  box-shadow: none;
+}
+@media (max-width: 48rem) {
+  .setup-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-3);
+  }
+  .steps-vertical {
+    flex-direction: row;
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+  .steps-vertical .step {
+    flex: 1 1 0;
+    flex-direction: column;
+    padding: 0;
+    text-align: center;
+  }
+  .steps-vertical .step + .step::before {
+    top: 0.875rem;
+    inset-inline-start: auto;
+    inset-inline-end: calc(50% + 1.1rem);
+    width: calc(100% - 2.2rem);
+    height: 2px;
+  }
+  .steps-vertical .step-current {
+    background: none;
+  }
+}
 .wizard-toggle {
   margin-bottom: var(--space-2);
   font-size: var(--text-sm);
@@ -1533,7 +1600,7 @@ textarea {
 .flag-c6 { background: #f4f1ea; }
 .flag-c7 { background: #8e3b46; }
 
-/* ----- Account (mockup docs/design/mockups/70-account-a-cards, provisional) -------------- */
+/* ----- Account (mockup docs/design/mockups/70-account-a-cards) --------------------------- */
 
 .account {
   max-width: 48rem;
@@ -1573,28 +1640,71 @@ textarea {
   margin-top: var(--space-3);
 }
 
-/* ----- Task page (mockup docs/design/mockups/61-task-b-story, provisional) ---------------- */
+/* ----- Task page (mockup docs/design/mockups/62-task-c-tabs) ----------------------------- */
 
-.task-status {
-  display: grid;
-  gap: var(--space-3);
-  padding: var(--space-4) var(--space-5);
-}
-.task-status-head {
+.task-title {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2) var(--space-4);
+  gap: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-3);
 }
-.task-status-state {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+.task-title h1 {
+  margin: 0;
 }
-.task-status-state .badge {
+.task-title .badge {
   font-size: var(--text-sm);
   padding: 0.15rem 0.7rem;
+}
+.tabs {
+  margin-top: var(--space-4);
+}
+.tabs-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--space-4);
+}
+.tab-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+.tab:hover {
+  color: var(--text);
+}
+.tab[aria-selected='true'] {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: 650;
+}
+.tab:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+  border-radius: var(--radius-sm);
+}
+.tabs-aside {
+  padding-bottom: var(--space-2);
+}
+.tabs-aside .button-row {
+  margin: 0;
 }
 .live-status {
   display: flex;
@@ -1654,64 +1764,55 @@ textarea {
   }
 }
 
-/* ----- Task list (mockup docs/design/mockups/52-tasks-c-grouped, provisional) ------------- */
+/* ----- Task list (mockup docs/design/mockups/50-tasks-a-panel) --------------------------- */
 
 .new-task {
   max-width: 40rem;
 }
-.task-group {
-  margin-bottom: var(--space-5);
+.tasks-layout {
+  display: grid;
+  gap: var(--space-4);
+  align-items: start;
 }
-.task-group h2,
-.task-finished summary h2 {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--text-base);
-  margin-bottom: var(--space-2);
+.tasks-layout.with-panel {
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
 }
-.task-finished summary h2 {
+.task-panel {
+  position: sticky;
+  top: var(--space-4);
+  max-width: none;
   margin: 0;
 }
-.task-rows {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-}
-.task-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2) var(--space-4);
-  padding: var(--space-3) var(--space-4);
-  border-top: 1px solid var(--border);
-}
-.task-row:first-child {
-  border-top: 0;
-}
-.task-objective {
-  flex: 1 1 20rem;
-  min-width: 0;
-  color: var(--text);
+.task-table .task-objective {
+  min-width: 14rem;
   font-weight: 600;
+}
+.task-table .task-objective a {
+  color: var(--text);
   text-decoration: none;
 }
-.task-objective:hover {
+.task-table .task-objective a:hover {
   color: var(--primary);
   text-decoration: underline;
 }
-.task-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-2) var(--space-3);
-}
 .task-spend {
+  min-width: 8rem;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.task-spend .meter-bar {
+  display: block;
+  margin-top: var(--space-1);
+  height: 0.35rem;
+}
+@media (max-width: 64rem) {
+  .tasks-layout.with-panel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .tasks-layout.with-panel .task-panel {
+    position: static;
+    order: -1;
+  }
 }
 
 /* ----- Project page (mockup docs/design/mockups/32-project-c-guided) ---------------------- */
