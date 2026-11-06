@@ -89,3 +89,13 @@ One master image fixes the character, and every pose was generated with it as th
 - Before: `account-*` in [screenshots/before](screenshots/before/). After: `account-*` in [screenshots/after](screenshots/after/).
 
 All pages in the default order follow the design, and every choice is the maintainer's.
+
+## Handoff (2026-11-06)
+
+The maintainer declared the design done on 2026-11-06.
+
+- **System.** The Workbench direction: system font stacks, neutral greys with one blue accent, light and dark themes through `light-dark()` tokens in `web/src/styles.css`. Shared components live in `web/src/components/ui.tsx`. They include buttons, fields, badges, cards, a stepper (horizontal or vertical), a native meter, chips, a segmented control, tabs, a native dialog and flag avatars. Icons are generated alpha masks colored by the text color. The logo is the factory roof in a rounded outline that follows the theme's text color. The brick factory mascot appears only for tips and tutorials, and on the sign-in panel.
+- **Pages done.** Sign-in and the other auth pages, the project list, the project page, the Setup wizard, the task list, the task page and the account page. Each section above lists what was offered, what was chosen and its before and after screenshots.
+- **Left for later.** No page in the current client is left. Pages that later stages add follow the `ui-design-iteration` skill and reuse these components. The mascot's tutorial phase (guiding a new user through the features) has poses and CSS motion ready but no tutorial flow yet, because that needs a product decision about when it starts.
+- **Design lab.** It stays in the development build only, with the component gallery, the screens on sample data and the decision history. The production build contains no lab code.
+- **README.** It has no screenshots, so nothing changed there.

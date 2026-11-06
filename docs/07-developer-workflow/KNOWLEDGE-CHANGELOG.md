@@ -2,6 +2,13 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.26, 2026-11-06, provisional design choices and opening the lab
+
+- The `ui-design-iteration` skill now covers provisional picks when the maintainer asks that work go on without approval, and says to list them in chat in the lab's order with the lab's letters.
+- It also says to start the dev server and confirm the page before sending the maintainer to the lab. The Docker npm script runs only from Git Bash or zsh, and a lagging shared checkout is served from a worktree at `origin/main`.
+
+Evidence: on 2026-11-06 the maintainer ran the dev server command in PowerShell and nothing opened. The shared checkout was 18 commits behind `origin/main` and lacked the lab work, and the chat summary listed the four provisional pages in the reverse of the lab's order. Rollback: revert this commit and regenerate.
+
 ## 0.2.25, 2026-11-06, look at visual work before calling it done
 
 - CLAUDE.md now says visual work is finished only after it has been rendered at the viewer's size and in close-up, looked at, and reviewed by a fresh-context reviewer that sees only the images and the quality bar. Passing numeric checks is not evidence that it looks right.
