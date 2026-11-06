@@ -1,6 +1,6 @@
 # Implementation roadmap
 
-Status: **In implementation**. S01 to S03 are complete. The UI design track is next, then S04. Each stage still needs its own authorization. [MASTER_GOAL](../MASTER_GOAL.md) defines the product, the [maintainer decisions](../02-architecture/maintainer-decisions-2026-10-24.md) of 2026-10-24 set the hosted web, Rust runtime, Docker, GitHub and licensing direction, and each stage below defines a separately reviewable unit of work.
+Status: **In implementation**. S01 to S03 and the UI design track are complete. S04 is next, once its entry items are done (see [package status](../PACKAGE_STATUS.md#s04-readiness-checked-on-2026-11-06)). Each stage still needs its own authorization. [MASTER_GOAL](../MASTER_GOAL.md) defines the product, the [maintainer decisions](../02-architecture/maintainer-decisions-2026-10-24.md) of 2026-10-24 set the hosted web, Rust runtime, Docker, GitHub and licensing direction, and each stage below defines a separately reviewable unit of work.
 
 On 2026-11-01 the maintainer asked for every stage plan to be updated at once, so the whole path is planned before the next authorization. The stage files now say how each stage uses the shared Rust engine, the visual editors with two-way editing (FR-5), the narrowed Hagane harvest (A1, A1-1), the MCP tools and the tool quality bar (Q-1). The cross-stage plan is in [engine, editors and tools across stages](#engine-editors-and-tools-across-stages). This update authorizes no stage.
 
