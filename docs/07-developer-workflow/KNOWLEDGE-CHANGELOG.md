@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.28, 2026-11-06, merges and pushes need no asking
+
+- CLAUDE.md's routine-steps rule now records D-23. Agents merge and push without asking the maintainer, in every repository the work touches, mods included, and also for configuration changes a recorded decision approved. The D-18 limits stay.
+
+Evidence: a Chaos Redux session left a decision-approved configuration PR for the maintainer to merge, and the maintainer said not to ask again for merges or pushes. Rollback: revert this commit and regenerate.
+
 ## 0.2.27, 2026-11-06, kit changes can break every Setup install
 
 - CLAUDE.md now says that HOI4 Mod Setup installs from kit `main`, so a kit PR that moves or rewrites files with Setup component markers, or changes the package manifest, must pass Setup's offline acceptance or the kit's Setup-reading test before it merges.
