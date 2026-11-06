@@ -54,6 +54,7 @@ On both machines:
 On Windows only:
 
 - The locale encoding is cp1252, and Python text-mode writes produce CRLF. Write files in binary mode or with `newline="\n"`.
+- Never start Python without a script, `-c` or `-m`, above all in a background task. Python 3.13's REPL started without a console prints the same `_pyrepl` traceback in a loop until the disk is full. On 2026-11-06 one background task wrote a 50 GB output file under `%TEMP%\claude` and left C: with 2 GB. `scripts/py.sh` refuses to run with no arguments and sets `PYTHON_BASIC_REPL=1`. When C: suddenly fills, look for large `*.output` files under `%TEMP%\claude` first.
 - Shell heredocs passed into Python can alter backslash escapes, and a Python heredoc that edits files containing backslashes or `'''` can fail silently or abort the command. Make such edits with the Edit tool, and check that an edit applied.
 - Git Bash corrupts non-ASCII text passed on a command line, for example `curl -d` with accents or emoji. Write such payloads to a UTF-8 file and send them with `--data-binary @file`.
 - Scripts that pass host paths to `docker run` convert them with `cygpath -m` when it exists and set `MSYS_NO_PATHCONV=1`, as `scripts/linux-tests.sh` does. Both are no-ops on macOS.

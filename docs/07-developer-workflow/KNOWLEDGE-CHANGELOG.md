@@ -2,6 +2,13 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.24, 2026-11-06, no bare Python REPL
+
+- CLAUDE.md now says never to start Python without a script, `-c` or `-m`, and to look for large task output files under the Claude temp folder first when C: suddenly fills.
+- `scripts/py.sh` refuses to run with no arguments and sets `PYTHON_BASIC_REPL=1`.
+
+Evidence: at 07:39 on 2026-11-06 a background task's Python 3.13 REPL, started without a console, looped one `_pyrepl` WinError traceback into a 50 GB output file and left C: with 2.2 GB free. The 3D session found it when its writes were about to fail. Deleting the file brought C: back to 52 GB. Rollback: revert this commit and regenerate.
+
 ## 0.2.23, 2026-11-06, one decision at a time in the design lab
 
 - The skill's image step now paces generation: one image at a time, 10 to 20 seconds apart, a longer wait after an error, and a stop when the account is signed out (W5-5).
