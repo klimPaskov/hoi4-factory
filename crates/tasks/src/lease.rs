@@ -6,7 +6,7 @@
 //! it was authorized under and the effect boundary refuses any other. A timeout may allow
 //! replacement; it never authorizes the previous owner to continue.
 //!
-//! Time comes from the database clock (`now()`), so replicas with skewed clocks agree.
+//! Time comes from the database clock, so replicas with skewed clocks agree. Expiry is set with `clock_timestamp()`, because `now()` is the transaction start and a slow transaction would spend its own lease.
 //! `check_fence` locks the lease row `FOR SHARE`: a takeover waits for the in-flight check's
 //! transaction, so an effect that passed its check cannot be overtaken mid-transaction.
 
@@ -93,7 +93,7 @@ pub async fn acquire_lease(
     let row = sqlx::query(
         "INSERT INTO workspace_leases (project_id, owner_account_id, holder_incarnation, generation,
              expires_at, updated_at)
-         VALUES ($1, $2, $3, 1, now() + make_interval(secs => $4), now())
+         VALUES ($1, $2, $3, 1, clock_timestamp() + make_interval(secs => $4), now())
          ON CONFLICT (project_id) DO UPDATE SET
              holder_incarnation = EXCLUDED.holder_incarnation,
              generation = CASE
@@ -132,7 +132,7 @@ pub async fn renew_lease(
     ttl: Duration,
 ) -> Result<Lease, FenceError> {
     let row = sqlx::query(
-        "UPDATE workspace_leases SET expires_at = now() + make_interval(secs => $4), updated_at = now()
+        "UPDATE workspace_leases SET expires_at = clock_timestamp() + make_interval(secs => $4), updated_at = now()
          WHERE project_id = $1 AND holder_incarnation = $2 AND generation = $3 AND expires_at > now()
          RETURNING generation, expires_at",
     )

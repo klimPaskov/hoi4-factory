@@ -912,6 +912,9 @@ impl Runner {
             .arg(self.worker_generation.to_string())
             .env_clear()
             .env("PATH", "/usr/local/bin:/usr/bin:/bin");
+        // Windows sockets fail to start without SystemRoot, so the cleared environment keeps it.
+        #[cfg(windows)]
+        cmd.env("SystemRoot", std::env::var("SystemRoot").unwrap_or_else(|_| r"C:\Windows".into()));
         if let Ok(v) = std::env::var("RUST_LOG") {
             cmd.env("RUST_LOG", v);
         }
