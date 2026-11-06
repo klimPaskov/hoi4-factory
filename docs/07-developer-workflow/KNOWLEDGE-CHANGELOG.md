@@ -2,6 +2,13 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.29, 2026-11-06, a Live Tools game window and development stays on Windows
+
+- CLAUDE.md's in-game exceptions now include D-24: one runner session may start the game from 00:00 to 09:00 local on 2026-11-07 for the HOI4 Live Tools checklist, under the same limits as the earlier nights.
+- The decision record adds D-25: HOI4 Factory development, S04 included, stays on the Windows PC and does not move to the Mac.
+
+Evidence: the Live Tools session merged its DLC prepare step, launch fixes and four check tools, all tested offline only, with ten in-game checks left. The maintainer chose tonight for them and said S04 starts on Windows. Rollback: revert this commit and regenerate.
+
 ## 0.2.28, 2026-11-06, merges and pushes need no asking
 
 - CLAUDE.md's routine-steps rule now records D-23. Agents merge and push without asking the maintainer, in every repository the work touches, mods included, and also for configuration changes a recorded decision approved. The D-18 limits stay.
