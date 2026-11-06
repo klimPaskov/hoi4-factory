@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.30, 2026-11-06, stop only your own processes
+
+- CLAUDE.md's clean-up rule now says to stop only processes you started, matched by PID or your own session folder, never by a broad command-line pattern.
+
+Evidence: the trailer session stopped its own render by matching any `blender.exe` whose command line contained "scratchpad", and also stopped two other sessions' background Blender jobs. Rollback: revert this commit and regenerate.
+
 ## 0.2.29, 2026-11-06, a Live Tools game window and development stays on Windows
 
 - CLAUDE.md's in-game exceptions now include D-24: one runner session may start the game from 00:00 to 09:00 local on 2026-11-07 for the HOI4 Live Tools checklist, under the same limits as the earlier nights.
