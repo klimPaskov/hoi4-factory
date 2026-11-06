@@ -12,7 +12,7 @@
 //!
 //! In debug builds only, the environment variable
 //! `FACTORY_AGENT_WORKER_TEST_FAULT` injects worker faults for supervision
-//! tests: `ignore_cancel` (never answer a cancel, hang), `exit_mid_turn` (exit
+//! tests: `ignore_cancel` (never answer a cancel, hang), `grandchild` and `ignore_cancel_grandchild` (also start a helper process, see `spawn_idle_grandchild`), `exit_mid_turn` (exit
 //! with code 3 once the provider accepted the request) and `stale_generation`
 //! (stamp results with the previous generation) and `old_protocol` (report the
 //! previous protocol version in `Hello`). Release builds do not read it.
@@ -39,6 +39,25 @@ fn test_fault() -> Option<String> {
 fn test_fault() -> Option<String> {
     None
 }
+
+/// Test fault: start a helper process that outlives the worker unless the whole tree is killed.
+#[cfg(debug_assertions)]
+fn spawn_idle_grandchild() {
+    if let Ok(exe) = std::env::current_exe()
+        && let Ok(child) = std::process::Command::new(exe)
+            .args(["--generation", "0"])
+            .env(TEST_FAULT_ENV, "idle")
+            .stdin(std::process::Stdio::null())
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .spawn()
+    {
+        diag(&format!("grandchild {}", child.id()));
+    }
+}
+
+#[cfg(not(debug_assertions))]
+fn spawn_idle_grandchild() {}
 
 fn diag(msg: &str) {
     eprintln!("factory-agent-worker: {msg}");
@@ -90,6 +109,13 @@ where
     W: AsyncWrite + Unpin + Send + 'static,
 {
     let to_io = |e: FrameError| std::io::Error::other(e.to_string());
+    match test_fault().as_deref() {
+        Some("idle") => loop {
+            tokio::time::sleep(std::time::Duration::from_secs(300)).await;
+        },
+        Some("grandchild" | "ignore_cancel_grandchild") => spawn_idle_grandchild(),
+        _ => {}
+    }
     let hello = Frame {
         schema_version: SCHEMA_VERSION,
         worker_generation: generation,
@@ -224,7 +250,10 @@ async fn run_one(
                 }
                 Some(Ok(f)) => match f.body {
                     Body::Cancel if f.request_id == frame.request_id && f.attempt_id == frame.attempt_id => {
-                        if test_fault().as_deref() == Some("ignore_cancel") {
+                        if matches!(
+                            test_fault().as_deref(),
+                            Some("ignore_cancel" | "ignore_cancel_grandchild")
+                        ) {
                             diag("test fault ignore_cancel: hanging after cancel");
                             std::future::pending::<()>().await;
                         }

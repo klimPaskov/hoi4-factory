@@ -298,10 +298,17 @@ async fn handle(
                         }
                     }
                     Some(Err(_)) => {
-                        // Abortive close: RST instead of a clean chunked end.
-                        #[allow(deprecated)]
-                        let _ = s.set_linger(Some(std::time::Duration::ZERO));
-                        return Ok(());
+                        // Abortive close: RST instead of a clean chunked end. On Windows an RST
+                        // also discards data the client has not read yet, so the client would never
+                        // see the response head. A FIN without the final chunk is the same fault there.
+                        #[cfg(not(windows))]
+                        {
+                            #[allow(deprecated)]
+                            let _ = s.set_linger(Some(std::time::Duration::ZERO));
+                            return Ok(());
+                        }
+                        #[cfg(windows)]
+                        return s.shutdown().await;
                     }
                     None => {
                         s.write_all(b"0\r\n\r\n").await?;

@@ -70,6 +70,8 @@ pub struct WorkerProcess {
     stale_rejected: u64,
     in_flight: Option<(String, String)>,
     exited: bool,
+    #[cfg(windows)]
+    job: Option<crate::job_windows::KillJob>,
 }
 
 fn status_parts(s: &ExitStatus) -> (Option<i32>, Option<i32>) {
@@ -102,6 +104,8 @@ impl WorkerProcess {
         let mut child = cmd
             .spawn()
             .map_err(|e| SupervisorError::Spawn(e.to_string()))?;
+        #[cfg(windows)]
+        let job_handle = child.raw_handle().unwrap_or(std::ptr::null_mut());
         let (Some(mut stdout), Some(mut stderr_pipe), Some(stdin)) =
             (child.stdout.take(), child.stderr.take(), child.stdin.take())
         else {
@@ -144,6 +148,8 @@ impl WorkerProcess {
             stale_rejected: 0,
             in_flight: None,
             exited: false,
+            #[cfg(windows)]
+            job: crate::job_windows::KillJob::adopt(job_handle),
         };
         let first = match tokio::time::timeout(handshake_timeout, me.frames.recv()).await {
             Err(_) => {
@@ -359,6 +365,18 @@ impl WorkerProcess {
         match tokio::time::timeout(Duration::from_secs(2), self.child.wait()).await {
             Ok(Ok(status)) => {
                 self.exited = true;
+                // Helpers the worker started must not outlive it; a Job Object has no group id to signal later.
+                #[cfg(windows)]
+                if let Some(job) = &self.job {
+                    job.kill();
+                }
+                #[cfg(unix)]
+                if let Some(pid) = self.child.id() {
+                    // SAFETY: killpg only signals the group the worker led; ESRCH is ignored.
+                    unsafe {
+                        libc::killpg(pid as libc::pid_t, libc::SIGKILL);
+                    }
+                }
                 status_parts(&status)
             }
             _ => self.kill_group().await,
@@ -377,6 +395,10 @@ impl WorkerProcess {
 
     /// Kill the worker and everything in its process group, then reap it.
     async fn kill_group(&mut self) -> (Option<i32>, Option<i32>) {
+        #[cfg(windows)]
+        if let Some(job) = &self.job {
+            job.kill();
+        }
         if self.exited {
             return (None, None);
         }
