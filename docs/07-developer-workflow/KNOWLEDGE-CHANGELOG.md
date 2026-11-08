@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.32, 2026-11-08, a ZIN static-model check window
+
+- CLAUDE.md's in-game exceptions now include D-29: from 2026-11-08 to 2026-11-09 one named session may start the isolated WSL Linux copy with ZIN loaded to check three ZIN static models, never the Windows game.
+
+Evidence: the maintainer approved fixing the Castle of Yeldenne, the Golden Court of Parim and the Galley of Aenor and checking them in game. Rollback: revert this commit and regenerate.
+
 ## 0.2.31, 2026-11-08, keep the desktop app under its memory limit
 
 - CLAUDE.md now says a coordinator runs long work as separate sessions rather than background subagents in its own process, keeps about six sessions live, archives finished ones, and resumes paused sessions after a crash.
