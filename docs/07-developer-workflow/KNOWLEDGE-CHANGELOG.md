@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.36, 2026-11-08, a coordinator workflow for large multi-session work
+
+- New maintainer-only skill `coordinate-sessions` (D-32): one coordinator session, an hourly check-in, a private status page fed by one JSON snapshot, messaging limits between sessions, and handovers to a fresh coordinator or restarts of running sessions at their break points.
+
+Evidence: on 2026-11-08 the first coordinator's context grew too costly, a new coordinator took over from a written note, built the status page and found that running sessions cannot be moved under a new parent and that the app pauses cross-session messages after about ten. Rollback: revert this commit and regenerate.
+
 ## 0.2.35, 2026-11-08, a Live Tools acceptance window
 
 - CLAUDE.md's in-game exceptions now include D-30: from 18:00 on 2026-11-08 to 06:00 on 2026-11-09 one named runner may start the Windows game through HOI4 Live Tools for its release acceptance.

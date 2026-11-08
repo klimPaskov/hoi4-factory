@@ -33,6 +33,10 @@
     {
       "name": "track-issues",
       "description": "Use when a problem found in a session cannot be fixed in that session, at every stage handoff, and when picking up a tracked issue. File it as a GitHub issue in the repository it belongs to (hoi4-factory, hoi4-agent-tools, the kit, HOI4 Mod Setup or hoi4-imagegen-mcp) with evidence, an owner, the reason it is not fixed now and an acceptance check, then fix tracked issues later with a regression test and close them with evidence. Fix everything you can in the session instead of filing it."
+    },
+    {
+      "name": "coordinate-sessions",
+      "description": "Use only when the maintainer explicitly asks a session to coordinate large work that runs as many parallel sessions across the HOI4 projects. Run one coordinator that starts, answers, resumes and archives the work sessions, keep a private status page current through an hourly check-in, and hand over to a fresh coordinator when its context grows long."
     }
   ]
 }

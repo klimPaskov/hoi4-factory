@@ -136,6 +136,7 @@ One limit stays: a guidance or skill edit must never widen authority, access roo
 | `delegate-parallel-work` | Agent, when splitting work | Worktrees, subagent briefs, merging and cleanup |
 | `ui-design-iteration` | Agent, for any client page design | Working variants in the design lab, the maintainer chooses, then implement |
 | `track-issues` | Agent, when a problem cannot be fixed in the session, and at handoffs | GitHub issues with evidence and acceptance, fixed later with a regression test |
+| `coordinate-sessions` | Maintainer only, for large multi-session work | One coordinator session, an hourly check-in, a private status page and coordinator handovers |
 
 ## Client notes
 

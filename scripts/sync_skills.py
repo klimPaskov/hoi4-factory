@@ -26,10 +26,11 @@ EXPECTED_NAMES = {
     "delegate-parallel-work",
     "ui-design-iteration",
     "track-issues",
+    "coordinate-sessions",
 }
 CLIENTS = (".claude", ".codex", ".agents")
 # ADR-023: these workflows stay invocable only by the maintainer. The others run automatically.
-MANUAL_ONLY = {"start-implementation-stage", "audit-hoi4-integrations"}
+MANUAL_ONLY = {"start-implementation-stage", "audit-hoi4-integrations", "coordinate-sessions"}
 
 
 def digest(data: bytes) -> str:

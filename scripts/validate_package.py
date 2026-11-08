@@ -60,6 +60,7 @@ SKILLS = {
     "delegate-parallel-work",
     "ui-design-iteration",
     "track-issues",
+    "coordinate-sessions",
 }
 STAGE_SECTIONS = [
     "Objective and non-goals", "Entry conditions", "Read-first sequence and reuse",
@@ -253,8 +254,8 @@ def main() -> int:
                 skill_errors.append(f"{p.relative_to(root)}: invalid name")
             if not 30 <= len(desc) <= 1024: skill_errors.append(f"{name}: unusable description")
             # ADR-023: stage start and integration audits stay maintainer-invoked. Validation and lesson
-            # capture run automatically at handoff.
-            manual = name in {"start-implementation-stage", "audit-hoi4-integrations"}
+            # capture run automatically at handoff. D-32: session coordination starts only on request.
+            manual = name in {"start-implementation-stage", "audit-hoi4-integrations", "coordinate-sessions"}
             if client == ".claude" and (values.get("disable-model-invocation") == "true") != manual:
                 skill_errors.append(f"{name}: Claude invocation mode differs from ADR-023")
     # ADR-024: CLAUDE.md is canonical and AGENTS.md must be its byte-identical copy.

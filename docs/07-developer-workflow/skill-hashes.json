@@ -2,7 +2,7 @@
   "schema_version": 1,
   "version": "0.1.1",
   "generator": "scripts/sync_skills.py",
-  "metadata_sha256": "e20e336b548223ab091698ec26869e132a6d872bf4915c1699a7f225cf0f453c",
+  "metadata_sha256": "b3760102a3847c9658cae3ded2c98160bd45e6a8a1c31006b06bd9afdc86566a",
   "scope": "Only these repository projections. No personal installation.",
   "skills": [
     {
@@ -56,6 +56,33 @@
         {
           "path": ".agents/skills/capture-engineering-lessons/agents/openai.yaml",
           "sha256": "8619a54e8c098122a7f3881394f84ca89b684366e848233a29ad18b6ec363935"
+        }
+      ]
+    },
+    {
+      "name": "coordinate-sessions",
+      "source": "docs/07-developer-workflow/skill-workflows/coordinate-sessions/BODY.md",
+      "body_sha256": "9febd35d921f7f64286ce0ccfa1906b8f2314130523a9c36188ecdba7a236228",
+      "generated": [
+        {
+          "path": ".claude/skills/coordinate-sessions/SKILL.md",
+          "sha256": "c1ffa3cc10e05df94fd19744004f79bfec1cd985c4dc47464291c98072c00882"
+        },
+        {
+          "path": ".codex/skills/coordinate-sessions/SKILL.md",
+          "sha256": "f752658d0b59437a10c96dc0a93974db41c41942ea94ecc74f5e80a9a1afaaef"
+        },
+        {
+          "path": ".codex/skills/coordinate-sessions/agents/openai.yaml",
+          "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94"
+        },
+        {
+          "path": ".agents/skills/coordinate-sessions/SKILL.md",
+          "sha256": "f752658d0b59437a10c96dc0a93974db41c41942ea94ecc74f5e80a9a1afaaef"
+        },
+        {
+          "path": ".agents/skills/coordinate-sessions/agents/openai.yaml",
+          "sha256": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94"
         }
       ]
     },
