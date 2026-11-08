@@ -313,3 +313,113 @@ async fn real_server_unavailable_when_not_a_mod() {
     assert!(!inv.is_healthy());
     assert_eq!(inv.available_count(), 0);
 }
+
+/// S04: the focus editor profile. The model sees only read tools, the host can rewrite, and the
+/// session reads exactly the artifacts its own results linked (issue #5). Runs on the
+/// F-FOCUS-SMALL fixture whenever FACTORY_AGENT_TOOLS_NODE and _ENTRY are set.
+#[tokio::test]
+async fn real_focus_editor_profile_reads_artifacts_and_rewrites_for_the_host_only() {
+    let (Some(node), Some(entry)) = (
+        std::env::var_os("FACTORY_AGENT_TOOLS_NODE"),
+        std::env::var_os("FACTORY_AGENT_TOOLS_ENTRY"),
+    ) else {
+        eprintln!("SKIPPED: set FACTORY_AGENT_TOOLS_NODE and FACTORY_AGENT_TOOLS_ENTRY");
+        return;
+    };
+    let install = AgentToolsInstall {
+        node: node.into(),
+        entry: entry.into(),
+    };
+    let fixture =
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("../server/tests/fixtures/focus-small");
+    let dir = tempfile::tempdir().expect("tempdir");
+    let base = dir.path().canonicalize().expect("canonical");
+    let mod_root = base.join("mod");
+    copy_dir(&fixture, &mod_root);
+    let state = factory_hoi4_tools::prepare_state_dir(&base.join("state")).expect("state");
+    let spec = agent_tools_spec(&install, &mod_root, &state, game_root().as_deref());
+
+    let (probe, _) = McpClient::start(&spec).await.expect("start");
+    let real = probe.list_tools().await.expect("list");
+    let rewrite = real
+        .iter()
+        .find(|t| t.name == "hoi4.focus_rewrite")
+        .expect("focus_rewrite listed");
+    eprintln!("schema hoi4.focus_rewrite {}", rewrite.schema_sha256);
+    probe.shutdown().await;
+
+    let mut session =
+        ToolSession::start(spec, factory_hoi4_tools::agent_tools_focus_editor()).await;
+    assert!(session.inventory().is_healthy());
+    let exposed: Vec<String> = session
+        .exposed_tools()
+        .into_iter()
+        .map(|t| t.name)
+        .collect();
+    assert!(
+        !exposed.iter().any(|n| n.contains("rewrite")),
+        "{exposed:?}"
+    );
+    assert_eq!(exposed.len(), 9);
+
+    let deadline = || Instant::now() + Duration::from_secs(180);
+    // An artifact no result linked is refused before the server sees it.
+    let made_up = "hoi4-agent://workspace/current/artifact/00/00/x.json";
+    assert!(matches!(
+        session.read_artifact(made_up, deadline()).await,
+        Err(factory_hoi4_tools::ToolError::UnknownArtifact(_))
+    ));
+
+    let inspect = session
+        .call(
+            "agent_tools_focus_inspect",
+            &json!({"treeId": "exp_basic_tree"}),
+            deadline(),
+        )
+        .await
+        .expect("inspect");
+    assert!(!inspect.output.is_error);
+    let uri = inspect.output.structured.as_ref().unwrap()["artifacts"][0]["uri"]
+        .as_str()
+        .expect("artifact uri")
+        .to_owned();
+    let artifact = session
+        .read_artifact(&uri, deadline())
+        .await
+        .expect("read artifact");
+    let doc: Value = serde_json::from_str(&artifact.text).expect("artifact json");
+    let mut plan = doc["plans"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|p| p["id"] == "exp_basic_tree")
+        .expect("plan")
+        .clone();
+    for f in plan["focuses"].as_array_mut().unwrap() {
+        if f["id"] == "exp_left" {
+            f["cost"] = json!(9);
+        }
+    }
+
+    let source = mod_root.join("common/national_focus/exp_basic.txt");
+    let before = std::fs::read_to_string(&source).unwrap();
+    let r = session
+        .call(
+            factory_hoi4_tools::profile::FOCUS_REWRITE,
+            &json!({"relativePath": "common/national_focus/exp_basic.txt", "treeId": "exp_basic_tree", "plan": plan}),
+            deadline(),
+        )
+        .await
+        .expect("rewrite");
+    assert!(!r.output.is_error, "{:?}", r.output.structured);
+    let after = std::fs::read_to_string(&source).unwrap();
+    assert_eq!(
+        after,
+        before.replacen(
+            "\t\tcost = 5\n\t\tai_will_do = { factor = 2 }",
+            "\t\tcost = 9\n\t\tai_will_do = { factor = 2 }",
+            1
+        )
+    );
+    session.shutdown().await;
+}

@@ -1,0 +1,9 @@
+﻿l_english:
+ exp_root:0 "Root"
+ exp_root_desc:0 "The first focus."
+ exp_left:0 "Left"
+ exp_left_desc:0 "Go left."
+ exp_right:0 "Right"
+ exp_right_desc:0 "Go right."
+ exp_join:0 "Join"
+ exp_join_desc:0 "Both roads meet."

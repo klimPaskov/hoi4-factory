@@ -91,6 +91,9 @@ pub fn agent_tools_spec(
     spec.env = env;
     spec.startup_timeout = Duration::from_secs(60);
     spec.default_call_timeout = Duration::from_secs(120);
+    // Focus inspect artifacts of a large mod run to several MiB (about 1 MiB for one tree of the
+    // agent-tools acceptance fixture with the game loaded), and one resources/read is one frame.
+    spec.max_frame_bytes = 32 * 1024 * 1024;
     spec
 }
 

@@ -24,8 +24,8 @@ pub use mcp::{
 };
 pub use profile::{
     EffectClass, ProfileMode, ProfileTool, RetryPolicy, ServerIdentity, ToolProfile,
-    agent_tools_read_only,
+    agent_tools_focus_editor, agent_tools_read_only,
 };
 pub use session::{
-    AttemptRecord, CallRecord, CatalogRefresh, ExposedTool, ToolCallResult, ToolError, ToolSession,
+    ArtifactText, AttemptRecord, CallRecord, CatalogRefresh, ExposedTool, ToolCallResult, ToolError, ToolSession,
 };

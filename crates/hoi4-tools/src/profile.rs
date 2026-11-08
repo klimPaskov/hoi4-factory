@@ -43,6 +43,10 @@ pub struct ServerIdentity {
 #[serde(rename_all = "snake_case")]
 pub enum ProfileMode {
     ReadOnly,
+    /// Read tools for the model, plus `Write` tools that only host code may call (S04: the focus
+    /// editor's `hoi4.focus_rewrite`). Write tools are never offered to the model, and the host
+    /// guards every write with expected file hashes before and after.
+    HostGuardedWrite,
 }
 
 /// What a tool does to the world, which decides whether it may be retried.
@@ -482,6 +486,50 @@ pub fn agent_tools_read_only() -> ToolProfile {
         ],
     }
 }
+
+/// The S04 focus editor profile: the read-only tools for the model, and `hoi4.focus_rewrite` for
+/// the host's focus operation translator only. People and the agent send the same focus
+/// operations; the host turns both into the same rewrite request (FR-5, T-EDIT-01).
+pub fn agent_tools_focus_editor() -> ToolProfile {
+    let mut profile = agent_tools_read_only();
+    profile.id = "hoi4-agent-tools.focus-editor.v1".into();
+    profile.mode = ProfileMode::HostGuardedWrite;
+    profile.tools.push(tool(
+        "hoi4.focus_rewrite",
+        FOCUS_REWRITE,
+        "Rewrite one focus tree from a complete plan. Host only: never offered to the model.",
+        EffectClass::Write,
+        focus_rewrite_host_schema(),
+        180,
+        64 * 1024,
+        FOCUS_REWRITE_SCHEMA_HASH,
+    ));
+    profile
+}
+
+/// The host's name for `hoi4.focus_rewrite` in [`agent_tools_focus_editor`].
+pub const FOCUS_REWRITE: &str = "agent_tools_focus_rewrite";
+
+/// The arguments the host builds for a rewrite. The plan is the tool's own focus-tree plan, read
+/// from `hoi4.focus_inspect` and changed by one focus operation, so its shape is the tool's
+/// contract (checked by the tool's own strict schema), not a model-facing input.
+fn focus_rewrite_host_schema() -> Value {
+    json!({
+        "type": "object",
+        "properties": {
+            "relativePath": {"type": "string", "pattern": "^common/national_focus/[A-Za-z0-9_. -]+[.]txt$"},
+            "treeId": {"type": "string", "minLength": 1, "maxLength": 256},
+            "layoutMode": {"type": "string", "enum": ["authored", "engine"]},
+            "plan": {"type": "object"}
+        },
+        "required": ["relativePath", "treeId"],
+        "additionalProperties": false
+    })
+}
+
+/// Input-schema hash of `hoi4.focus_rewrite` in the pinned server.
+const FOCUS_REWRITE_SCHEMA_HASH: Option<&str> =
+    Some("e084cc5d040d47568614b5c7ce7f00ec9dbdd89fb18b4ec850395d6d104ec07e");
 
 /// Input-schema hashes of the pinned server ([`AGENT_TOOLS_VERSION`]), in profile order.
 const SCHEMA_HASHES: [Option<&str>; 9] = [

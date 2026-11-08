@@ -6,7 +6,7 @@
 //! in read-only mode without sending it, bounds the output, and retries only `PureRead` calls.
 //! A `DerivedJob` or any call whose outcome is unknown is never repeated automatically.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::time::{Duration, Instant};
 
 use serde::Serialize;
@@ -44,6 +44,16 @@ pub enum ToolError {
     ReadOnlyRefused { name: String },
     #[error("{error} (after {attempts} attempt(s))")]
     Mcp { error: McpError, attempts: u32 },
+    #[error("no tool result of this session linked the artifact {0}")]
+    UnknownArtifact(String),
+}
+
+/// The text of an artifact read with [`ToolSession::read_artifact`].
+#[derive(Debug, Clone, Serialize)]
+pub struct ArtifactText {
+    pub uri: String,
+    pub mime_type: Option<String>,
+    pub text: String,
 }
 
 impl ToolError {
@@ -95,6 +105,8 @@ pub struct ToolSession {
     inventory: Inventory,
     validators: HashMap<String, jsonschema::Validator>,
     records: Vec<CallRecord>,
+    /// Artifact URIs linked by this session's tool results: the only ones it will read.
+    artifacts: HashSet<String>,
 }
 
 impl std::fmt::Debug for ToolSession {
@@ -136,6 +148,7 @@ impl ToolSession {
             inventory,
             validators,
             records: Vec::new(),
+            artifacts: HashSet::new(),
         }
     }
 
@@ -152,6 +165,8 @@ impl ToolSession {
         self.profile
             .tools
             .iter()
+            // A write tool is for host code only and never offered to the model.
+            .filter(|t| t.effect_class != EffectClass::Write)
             .filter(|t| {
                 self.inventory
                     .tool(&t.exposed_name)
@@ -330,6 +345,7 @@ impl ToolSession {
                     name: exposed_name.into(),
                 });
             }
+            (ProfileMode::HostGuardedWrite, _) => {}
         }
         self.check_args(exposed_name, final_arguments)?;
         let mut arguments = final_arguments.clone();
@@ -387,6 +403,9 @@ impl ToolSession {
         };
         let result = match outcome {
             Ok(mut output) => {
+                // Artifacts are listed before the output is cut, so a linked artifact stays
+                // readable even when the inline result was truncated.
+                self.remember_artifacts(&output);
                 record.truncated = bound_output(&mut output, tool.max_output_bytes);
                 Ok(ToolCallResult {
                     output,
@@ -439,6 +458,65 @@ impl ToolSession {
                 Some(tool_timeout.min(remaining)),
             )
             .await
+    }
+
+    fn remember_artifacts(&mut self, output: &ToolOutput) {
+        let Some(list) = output
+            .structured
+            .as_ref()
+            .and_then(|s| s.get("artifacts"))
+            .and_then(Value::as_array)
+        else {
+            return;
+        };
+        for a in list {
+            if let Some(uri) = a.get("uri").and_then(Value::as_str) {
+                self.artifacts.insert(uri.to_owned());
+            }
+        }
+    }
+
+    /// Reads an artifact that a tool result of this session linked (issue #5). Any other URI is
+    /// refused before the server sees it, so a model cannot name another workspace's resource.
+    /// Returns the text of the first content item and its MIME type.
+    pub async fn read_artifact(
+        &mut self,
+        uri: &str,
+        deadline: Instant,
+    ) -> Result<ArtifactText, ToolError> {
+        if !self.artifacts.contains(uri) {
+            return Err(ToolError::UnknownArtifact(uri.to_owned()));
+        }
+        let remaining = deadline.saturating_duration_since(Instant::now());
+        let client = self.client.as_ref().ok_or(ToolError::Mcp {
+            error: McpError::Transport {
+                message: "no live server".into(),
+            },
+            attempts: 1,
+        })?;
+        let contents = client
+            .read_resource(uri, remaining)
+            .await
+            .map_err(|error| ToolError::Mcp { error, attempts: 1 })?;
+        let first = contents.first().cloned().unwrap_or(Value::Null);
+        let text = first
+            .get("text")
+            .and_then(Value::as_str)
+            .map(str::to_owned)
+            .ok_or_else(|| ToolError::Mcp {
+                error: McpError::Protocol {
+                    message: "the artifact has no text content".into(),
+                },
+                attempts: 1,
+            })?;
+        Ok(ArtifactText {
+            uri: uri.to_owned(),
+            mime_type: first
+                .get("mimeType")
+                .and_then(Value::as_str)
+                .map(str::to_owned),
+            text,
+        })
     }
 
     /// Stops the server process (and its group).

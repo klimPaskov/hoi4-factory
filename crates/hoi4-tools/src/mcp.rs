@@ -714,6 +714,23 @@ impl McpClient {
         })
     }
 
+    /// Reads a resource (`resources/read`) and returns its `contents` array.
+    pub async fn read_resource(
+        &self,
+        uri: &str,
+        timeout: Duration,
+    ) -> Result<Vec<Value>, McpError> {
+        let result = self
+            .request("resources/read", json!({ "uri": uri }), timeout)
+            .await?;
+        match result.get("contents") {
+            Some(Value::Array(items)) => Ok(items.clone()),
+            _ => Err(McpError::Protocol {
+                message: "resources/read result has no contents array".into(),
+            }),
+        }
+    }
+
     /// True while the session has not ended.
     pub fn is_alive(&self) -> bool {
         self.shared.ended_error().is_none()
