@@ -2,6 +2,13 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.39, 2026-11-08, CLAUDE.md slimmed (D-42)
+
+- CLAUDE.md keeps every rule as a short line. Dated incident stories, measurements and one-time history moved to the new [engineering lessons](ENGINEERING-LESSONS.md), which says which rule each story belongs to. CLAUDE.md links to it from its opening paragraph and from the section on keeping the guidance current, which now says to put new stories there.
+- No rule was added, removed or widened. The "(learned in S03)" heading suffix and the dated asides moved with their stories.
+
+Evidence: a diff audit of the old and new CLAUDE.md (every removed clause is a story, a date or a measurement, and each is in the lessons file). Rollback: revert this commit and regenerate.
+
 ## 0.2.38, 2026-11-08, S04 lessons on Agent Tools, Windows Git and formatting
 
 - CLAUDE.md now says a rewrite Agent Tools answered with `status: "blocked"` is a refusal even without an error flag, lists the files to change together when the Agent Tools release is re-pinned, and says to isolate `HOME`, `APPDATA` and the `XDG_*` folders when running Agent Tools by hand.
