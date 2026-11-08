@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.34, 2026-11-08, HOI4 images come from hoi4-imagegen only
+
+- CLAUDE.md now says every HOI4 image is made with hoi4-imagegen, never the general `gptimage` MCP, because only hoi4-imagegen paces the shared ChatGPT sign-in across processes.
+
+Evidence: OpenAI revoked the sign-in at 15:29 UTC on 2026-11-08 while both tools generated at once. Rollback: revert this commit and regenerate.
+
 ## 0.2.32, 2026-11-08, a ZIN static-model check window
 
 - CLAUDE.md's in-game exceptions now include D-29: from 2026-11-08 to 2026-11-09 one named session may start the isolated WSL Linux copy with ZIN loaded to check three ZIN static models, never the Windows game.
