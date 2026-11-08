@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.35, 2026-11-08, a Live Tools acceptance window
+
+- CLAUDE.md's in-game exceptions now include D-30: from 18:00 on 2026-11-08 to 06:00 on 2026-11-09 one named runner may start the Windows game through HOI4 Live Tools for its release acceptance.
+
+Evidence: the maintainer approved the window because the Live Tools release process requires a passing live acceptance run. Rollback: revert this commit and regenerate.
+
 ## 0.2.34, 2026-11-08, HOI4 images come from hoi4-imagegen only
 
 - CLAUDE.md now says every HOI4 image is made with hoi4-imagegen, never the general `gptimage` MCP, because only hoi4-imagegen paces the shared ChatGPT sign-in across processes.
