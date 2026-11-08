@@ -2,6 +2,14 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.38, 2026-11-08, S04 lessons on Agent Tools, Windows Git and formatting
+
+- CLAUDE.md now says a rewrite Agent Tools answered with `status: "blocked"` is a refusal even without an error flag, lists the files to change together when the Agent Tools release is re-pinned, and says to isolate `HOME`, `APPDATA` and the `XDG_*` folders when running Agent Tools by hand.
+- Windows notes: Git over HTTP stalls after a `401` until the caller's timeout, the host's npm 12 needs a `package-lock.json` copy of a shipped shrinkwrap, and heredocs with apostrophes can break the Bash tool.
+- Verification note: the Rust code is not rustfmt-clean, so format only your own new files.
+
+Evidence: in S04 a blocked rewrite was first recorded as applied (fixed in `focus/session.rs` with a regression test in `tests/focus.rs`), the fake GitHub's 401 made a test wait 178 s per call, and `cargo fmt -p factory-server` rewrote twelve untouched files. Rollback: revert this commit and regenerate.
+
 ## 0.2.37, 2026-11-08, review of how the work is run
 
 - Decisions now live per project under `docs/decisions/`, each file with an in-force list, and IDs continue as one global D- sequence (D-35). CLAUDE.md's reading order and recording rule point there. The two older records carry a history banner.
