@@ -522,3 +522,114 @@ async fn a_new_engine_finding_blocks_an_agent_commit() {
     assert!(findings.contains("REF_UNKNOWN_TRIGGER") && findings.contains("agx_unknown_trigger"), "{findings}");
     assert_eq!(git(&wt, &["rev-parse", "HEAD"]), head, "nothing was committed");
 }
+
+/// T-EDIT-01 for focus creation: the operations the native agent sent in the live DeepSeek run
+/// (`evidence/S04/live-w3/proposals.json`, recorded real output), replayed as a person's gesture
+/// and as a coding client's raw `hoi4.focus_rewrite` call on separate copies of F-FOCUS-SMALL,
+/// give byte-identical focus files and the same projection of the tree.
+#[tokio::test]
+async fn gesture_agent_and_coding_client_paths_give_identical_bytes() {
+    let Some(e) = editor().await else { return };
+    let recorded: Value = serde_json::from_slice(
+        &std::fs::read(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../evidence/S04/live-w3/proposals.json")).unwrap(),
+    )
+    .unwrap();
+    let agent = &recorded["proposals"][0];
+    assert_eq!(agent["actorKind"], "native_agent");
+    let ops = agent["operations"].clone();
+    let agent_source = agent["after"][SOURCE].as_str().unwrap().to_owned();
+    let agent_loc = agent["after"]["localisation/english/exp_basic_tree_l_english.yml"].as_str().unwrap().to_owned();
+    // The agent started from the fixture's exact bytes.
+    let fixture_source = std::fs::read(Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/focus-small").join(SOURCE)).unwrap();
+    assert_eq!(agent["before"][SOURCE].as_str().unwrap(), factory_server::focus::session::sha256_hex(&fixture_source));
+
+    // 1. The gesture path: the same operations through the editor route.
+    let p = e.projection().await;
+    let r = e.ops(&e.alice, p["projectionHash"].as_str().unwrap(), ops.clone()).await;
+    assert_eq!(r.status, 201, "{}", r.text);
+    let gesture_source = factory_server::focus::session::sha256_hex(&e.source());
+    let gesture_loc = factory_server::focus::session::sha256_hex(&std::fs::read(e.worktree().join("localisation/english/exp_basic_tree_l_english.yml")).unwrap());
+    assert_eq!(gesture_source, agent_source, "gesture and native agent give the same focus file");
+    assert_eq!(gesture_loc, agent_loc, "and the same localisation");
+
+    // 2. The coding-client path: a separate Agent Tools server on a clone, called directly with
+    // the request the host builds for these operations, as a local Claude Code or Codex session
+    // with the same tool profile would send it.
+    let install = factory_hoi4_tools::AgentToolsInstall::from_env().unwrap();
+    let dir = tempfile::tempdir().unwrap();
+    let base = dir.path().canonicalize().unwrap();
+    let clone = base.join("mod");
+    for entry in fixture_entries() {
+        let path = clone.join(String::from_utf8(entry.name.clone()).unwrap());
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        std::fs::write(path, &entry.data).unwrap();
+    }
+    let settings = factory_server::agent::AgentToolsSettings { install: install.clone(), game_root: None };
+    let mut host = factory_server::focus::session::FocusSession::start(&settings, &clone, &base.join("host-state")).await.unwrap();
+    let built = host.inspect("exp_basic_tree").await.unwrap();
+    let parsed: Vec<factory_server::focus::ops::FocusOp> = serde_json::from_value(ops.clone()).unwrap();
+    let (request, _) = factory_server::focus::session::FocusSession::request(&built, &parsed).unwrap();
+    host.shutdown().await;
+    let state = factory_hoi4_tools::prepare_state_dir(&base.join("client-state")).unwrap();
+    let spec = factory_hoi4_tools::agent_tools_spec(&install, &clone, &state, None);
+    let (client, _) = factory_hoi4_tools::McpClient::start(&spec).await.unwrap();
+    let out = client.call_tool("hoi4.focus_rewrite", request, Some(Duration::from_secs(240))).await.unwrap();
+    assert!(!out.is_error, "{:?}", out.structured);
+    client.shutdown().await;
+    let client_source = factory_server::focus::session::sha256_hex(&std::fs::read(clone.join(SOURCE)).unwrap());
+    assert_eq!(client_source, agent_source, "the coding-client call gives the same focus file");
+
+    // The projections agree on the tree's structure.
+    let shape = |p: &Value| -> Vec<Value> {
+        let mut nodes: Vec<Value> = p["nodes"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|n| json!([n["id"], n["x"], n["y"], n["cost"], n["prerequisiteGroups"], n["editable"]]))
+            .collect();
+        nodes.sort_by_key(|v| v.to_string());
+        nodes
+    };
+    let mut host2 = factory_server::focus::session::FocusSession::start(&settings, &clone, &base.join("host-state-2")).await.unwrap();
+    let client_projection = host2.inspect("exp_basic_tree").await.unwrap();
+    host2.shutdown().await;
+    assert_eq!(shape(&client_projection.projection), shape(&r.body["projection"]));
+}
+
+/// W4: a pending proposal can be discarded on the canvas. Its files return to their exact earlier
+/// bytes, but only while nothing else changed them since.
+#[tokio::test]
+async fn an_uncommitted_proposal_is_discarded_exactly_or_not_at_all() {
+    let Some(e) = editor().await else { return };
+    let p = e.projection().await;
+    let original = e.source();
+    let r = e
+        .ops(
+            &e.alice,
+            p["projectionHash"].as_str().unwrap(),
+            json!([{"op": "create", "focus_id": "exp_tmp", "x": 4, "y": 3, "cost": 2, "prerequisites": ["exp_join"], "icon": "GFX_exp_icon_join", "title": "Temporary", "description": "Will be discarded.", "reward": "add_political_power = 5"}]),
+        )
+        .await;
+    assert_eq!(r.status, 201, "{}", r.text);
+    let id = r.body["proposal"]["id"].as_str().unwrap().to_owned();
+    let loc = e.worktree().join("localisation/english/exp_basic_tree_l_english.yml");
+    assert!(loc.exists());
+
+    let d = e.alice.client.post(&format!("{}/proposals/{id}/discard", e.base()), json!({})).await;
+    assert_eq!(d.status, 200, "{}", d.text);
+    assert_eq!(e.source(), original, "the focus file is byte-identical to before");
+    assert!(!loc.exists(), "the localisation file the proposal created is gone");
+    let again = e.alice.client.post(&format!("{}/proposals/{id}/discard", e.base()), json!({})).await;
+    assert_eq!(again.status, 422, "{}", again.text);
+
+    // A proposal whose file was changed since is not discarded, and nothing is written.
+    let p = e.projection().await;
+    let r = e.ops(&e.alice, p["projectionHash"].as_str().unwrap(), json!([{"op": "set_cost", "focus_id": "exp_left", "cost": 9}])).await;
+    assert_eq!(r.status, 201, "{}", r.text);
+    let id = r.body["proposal"]["id"].as_str().unwrap().to_owned();
+    let edited = String::from_utf8(e.source()).unwrap().replacen("cost = 7", "cost = 8", 1);
+    std::fs::write(e.worktree().join(SOURCE), &edited).unwrap();
+    let refused = e.alice.client.post(&format!("{}/proposals/{id}/discard", e.base()), json!({})).await;
+    assert_eq!(refused.status, 409, "{}", refused.text);
+    assert_eq!(e.source(), edited.as_bytes(), "the later edit survives");
+}

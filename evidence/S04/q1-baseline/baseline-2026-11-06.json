@@ -1,0 +1,567 @@
+{
+  "cases": {
+    "chaos_redux.asset.sound-audit-clean": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.character.unknown-trait": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.decision.inventory-category": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.decision.inventory-unknown-id": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.decision.unknown-id": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.error_log.other-mod-launch": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.event.focused-noise": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.event.helpers-resolved": {
+      "inline": false,
+      "passed": true
+    },
+    "chaos_redux.event.roots-namespace": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.event.roots-unknown-namespace": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.event.state-flow-subject": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.event.unknown-event": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.event.upstream-caller": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.gui.unknown-window": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.idea.unknown-id": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.impact.unknown-symbol": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.localisation.scripted-text-is-information": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.localisation.unknown-key": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.map.unknown-state": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.mod_index.cold-overview": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.probability.adapter-and-steps": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.source_lookup.cold-first": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.source_lookup.event-caller": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.source_lookup.unknown-symbol": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.system.raids-named-by-id": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.system.unknown-hook-is-information": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.system.unknown-id": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.unit.oob-audit-clean": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.unit.unknown-variant": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.validation.complete-snippet": {
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.validation.known-good-decisions": {
+      "falsePositives": 0,
+      "files": 40,
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.validation.known-good-events": {
+      "falsePositives": 0,
+      "files": 40,
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.validation.known-good-focus": {
+      "falsePositives": 0,
+      "files": 40,
+      "inline": true,
+      "passed": true
+    },
+    "chaos_redux.validation.known-good-helpers": {
+      "falsePositives": 0,
+      "files": 40,
+      "inline": true,
+      "passed": true
+    },
+    "ito.mod_index.cold-overview": {
+      "inline": true,
+      "passed": true
+    },
+    "ito.validation.known-good-decisions": {
+      "falsePositives": 0,
+      "files": 3,
+      "inline": true,
+      "passed": true
+    },
+    "ito.validation.known-good-events": {
+      "falsePositives": 0,
+      "files": 8,
+      "inline": true,
+      "passed": true
+    },
+    "ito.validation.known-good-focus": {
+      "falsePositives": 0,
+      "files": 1,
+      "inline": true,
+      "passed": true
+    },
+    "ito.validation.known-good-helpers": {
+      "falsePositives": 0,
+      "files": 18,
+      "inline": true,
+      "passed": true
+    },
+    "kaiserreich.asset.flags-one-pixel-off-are-information": {
+      "inline": true,
+      "passed": true
+    },
+    "kaiserreich.asset.png-named-dds-reads": {
+      "inline": true,
+      "passed": true
+    },
+    "kaiserreich.idea.audit-no-unknown-modifiers": {
+      "inline": true,
+      "passed": true
+    },
+    "kaiserreich.localisation.blank-files-quiet": {
+      "inline": true,
+      "passed": true
+    },
+    "kaiserreich.mod_index.cold-overview": {
+      "inline": true,
+      "passed": true
+    },
+    "kaiserreich.system.replaced-on-actions-keep-game-hooks": {
+      "inline": true,
+      "passed": true
+    },
+    "kaiserreich.unit.variant-audit-clean": {
+      "inline": true,
+      "passed": true
+    },
+    "kaiserreich.validation.known-good-decisions": {
+      "falsePositives": 0,
+      "files": 40,
+      "inline": true,
+      "passed": true
+    },
+    "kaiserreich.validation.known-good-events": {
+      "falsePositives": 0,
+      "files": 40,
+      "inline": true,
+      "passed": true
+    },
+    "kaiserreich.validation.known-good-focus": {
+      "falsePositives": 0,
+      "files": 40,
+      "inline": true,
+      "passed": true
+    },
+    "kaiserreich.validation.known-good-helpers": {
+      "falsePositives": 0,
+      "files": 40,
+      "inline": true,
+      "passed": true
+    },
+    "owb.asset.missing-event-picture": {
+      "inline": true,
+      "passed": true
+    },
+    "owb.idea.missing-sprite-found": {
+      "inline": true,
+      "passed": true
+    },
+    "owb.mod_index.cold-overview": {
+      "inline": false,
+      "passed": false
+    },
+    "owb.system.mio-audit-no-warnings": {
+      "inline": true,
+      "passed": true
+    },
+    "owb.unit.grid-from-defines": {
+      "inline": true,
+      "passed": true
+    },
+    "owb.unit.regiment-below-the-grid": {
+      "inline": true,
+      "passed": true
+    },
+    "owb.validation.known-good-decisions": {
+      "falsePositives": 0,
+      "files": 40,
+      "inline": true,
+      "passed": true
+    },
+    "owb.validation.known-good-events": {
+      "falsePositives": 0,
+      "files": 40,
+      "inline": true,
+      "passed": true
+    },
+    "owb.validation.known-good-focus": {
+      "falsePositives": 0,
+      "files": 40,
+      "inline": true,
+      "passed": true
+    },
+    "owb.validation.known-good-helpers": {
+      "falsePositives": 0,
+      "files": 40,
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.asset.flag-wrong-size": {
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.asset.sound-file-saved-under-another-name": {
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.asset.sprite-texture-header": {
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.idea.definition-inline": {
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.localisation.key-every-language": {
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.localisation.language-own-key": {
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.lookup.exact-has-war-with": {
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.lookup.exact-timed-idea": {
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.lookup.negative": {
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.map.state-lookup": {
+      "inline": false,
+      "passed": false
+    },
+    "vanilla.probability.verified-build": {
+      "inline": false,
+      "passed": false
+    },
+    "vanilla.source_lookup.cold-event": {
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.source_lookup.warm-event": {
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.system.bop-decision-category-created": {
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.system.mio-include-and-traits": {
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.system.on-actions-audit-clean": {
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.system.special-projects-audit-clean": {
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.technology.explain": {
+      "inline": false,
+      "passed": false
+    },
+    "vanilla.unit.duplicated-archetype-is-equipment": {
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.unit.equipment-slots-clean": {
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.unit.oob-two-regiments-in-one-slot": {
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.unit.variant-from-country-history": {
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.validation.dangling-event-is-a-warning": {
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.validation.known-good-decisions": {
+      "falsePositives": 0,
+      "files": 80,
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.validation.known-good-events": {
+      "falsePositives": 0,
+      "files": 120,
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.validation.known-good-focus": {
+      "falsePositives": 0,
+      "files": 60,
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.validation.known-good-helpers": {
+      "falsePositives": 0,
+      "files": 120,
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.validation.owner-comparison-still-flagged": {
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.validation.owner-tag-trigger": {
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.validation.owner-target-trigger": {
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.validation.timed-idea-right-id": {
+      "inline": true,
+      "passed": true
+    },
+    "vanilla.validation.timed-idea-wrong-id": {
+      "inline": false,
+      "passed": false
+    },
+    "vanilla.validation.unknown-idea-argument": {
+      "inline": true,
+      "passed": true
+    },
+    "zin.localisation.audit-undefined-desc": {
+      "inline": false,
+      "passed": false
+    },
+    "zin.mod_index.cold-overview": {
+      "inline": true,
+      "passed": true
+    },
+    "zin.validation.known-good-decisions": {
+      "falsePositives": 0,
+      "files": 19,
+      "inline": true,
+      "passed": true
+    },
+    "zin.validation.known-good-events": {
+      "falsePositives": 0,
+      "files": 40,
+      "inline": true,
+      "passed": true
+    },
+    "zin.validation.known-good-focus": {
+      "falsePositives": 0,
+      "files": 40,
+      "inline": true,
+      "passed": true
+    },
+    "zin.validation.known-good-helpers": {
+      "falsePositives": 0,
+      "files": 40,
+      "inline": true,
+      "passed": true
+    }
+  },
+  "corpora": {
+    "atlantis": "1.0.0|0b4c5b9ca9ab8d993e0760a398c4904055730d28||eac7ed795e2e7c33df0acc64c79937816221bc4c9776bdbd7cd8293c97100eb4",
+    "chaos_redux": "0.1|074e5b39e52552b6ce29b436127b9168282cd4f6||5c59eb623679d0558d2e6cf7a97ae940eb3a547db4ec1e2e57b0ddaed11fe50d",
+    "ito": "0.1|cb93e71a9844929bb6316bcffb0906063eaa393a||66e491b8d165f45ad9552575bf8123d19578b4b4fb6a6863686d0d324ea0be35",
+    "kaiserreich": "1.7||5627406412597448048|de26222ae2a3bb11262896f4714b91b0fb21b6bf5430c5c3bf9535b75b9fb428",
+    "owb": "5.1.12c||654354088233066370|e22291670045b3a28eeda395f0d9a1f8e6cd8a7f323fc56ef8750d5500770551",
+    "vanilla": "1.19.4.2|||952f1df0300ad90e536f6d98be9764c0105b171c632f5f9beef09e1aa9eab007",
+    "zin": "0.1.0|40ac4ca2ffc983c483e12cbb06f861088f4f990d||2560e3d9f0fc7f34eb3235ac7f423e6171a97e9e3e3fadf0dd1559bca85a8a60"
+  },
+  "latency": {
+    "chaos_redux.asset.sound-audit-clean": 10585,
+    "chaos_redux.character.unknown-trait": 52078,
+    "chaos_redux.decision.inventory-category": 214171,
+    "chaos_redux.decision.inventory-unknown-id": 143972,
+    "chaos_redux.decision.unknown-id": 118479,
+    "chaos_redux.error_log.other-mod-launch": 127471,
+    "chaos_redux.event.focused-noise": 62309,
+    "chaos_redux.event.helpers-resolved": 110654,
+    "chaos_redux.event.roots-namespace": 166184,
+    "chaos_redux.event.roots-unknown-namespace": 47384,
+    "chaos_redux.event.state-flow-subject": 450256,
+    "chaos_redux.event.unknown-event": 208845,
+    "chaos_redux.event.upstream-caller": 223057,
+    "chaos_redux.gui.unknown-window": 94485,
+    "chaos_redux.idea.unknown-id": 5015,
+    "chaos_redux.impact.unknown-symbol": 41744,
+    "chaos_redux.localisation.scripted-text-is-information": 2723,
+    "chaos_redux.localisation.unknown-key": 27440,
+    "chaos_redux.map.unknown-state": 102375,
+    "chaos_redux.mod_index.cold-overview": 50188,
+    "chaos_redux.probability.adapter-and-steps": 98630,
+    "chaos_redux.source_lookup.cold-first": 97293,
+    "chaos_redux.source_lookup.event-caller": 56540,
+    "chaos_redux.source_lookup.unknown-symbol": 185307,
+    "chaos_redux.system.raids-named-by-id": 4877,
+    "chaos_redux.system.unknown-hook-is-information": 4836,
+    "chaos_redux.system.unknown-id": 5885,
+    "chaos_redux.unit.oob-audit-clean": 6363,
+    "chaos_redux.unit.unknown-variant": 6392,
+    "chaos_redux.validation.complete-snippet": 295,
+    "chaos_redux.validation.known-good-decisions": 6602,
+    "chaos_redux.validation.known-good-events": 11480,
+    "chaos_redux.validation.known-good-focus": 4760,
+    "chaos_redux.validation.known-good-helpers": 5285,
+    "ito.mod_index.cold-overview": 20384,
+    "ito.validation.known-good-decisions": 2423,
+    "ito.validation.known-good-events": 19669,
+    "ito.validation.known-good-focus": 7910,
+    "ito.validation.known-good-helpers": 6599,
+    "kaiserreich.asset.flags-one-pixel-off-are-information": 51465,
+    "kaiserreich.asset.png-named-dds-reads": 5995,
+    "kaiserreich.idea.audit-no-unknown-modifiers": 25099,
+    "kaiserreich.localisation.blank-files-quiet": 8641,
+    "kaiserreich.mod_index.cold-overview": 125829,
+    "kaiserreich.system.replaced-on-actions-keep-game-hooks": 13147,
+    "kaiserreich.unit.variant-audit-clean": 9719,
+    "kaiserreich.validation.known-good-decisions": 4599,
+    "kaiserreich.validation.known-good-events": 5782,
+    "kaiserreich.validation.known-good-focus": 6882,
+    "kaiserreich.validation.known-good-helpers": 9857,
+    "owb.asset.missing-event-picture": 6994,
+    "owb.idea.missing-sprite-found": 52302,
+    "owb.mod_index.cold-overview": 136289,
+    "owb.system.mio-audit-no-warnings": 5163,
+    "owb.unit.grid-from-defines": 5505,
+    "owb.unit.regiment-below-the-grid": 6069,
+    "owb.validation.known-good-decisions": 28406,
+    "owb.validation.known-good-events": 8442,
+    "owb.validation.known-good-focus": 19417,
+    "owb.validation.known-good-helpers": 21850,
+    "vanilla.asset.flag-wrong-size": 65990,
+    "vanilla.asset.sound-file-saved-under-another-name": 3631,
+    "vanilla.asset.sprite-texture-header": 3335,
+    "vanilla.idea.definition-inline": 21958,
+    "vanilla.localisation.key-every-language": 8018,
+    "vanilla.localisation.language-own-key": 1853,
+    "vanilla.lookup.exact-has-war-with": 50,
+    "vanilla.lookup.exact-timed-idea": 94,
+    "vanilla.lookup.negative": 114,
+    "vanilla.map.state-lookup": 29065,
+    "vanilla.probability.verified-build": 11,
+    "vanilla.source_lookup.cold-event": 28868,
+    "vanilla.source_lookup.warm-event": 310,
+    "vanilla.system.bop-decision-category-created": 3204,
+    "vanilla.system.mio-include-and-traits": 3057,
+    "vanilla.system.on-actions-audit-clean": 3900,
+    "vanilla.system.special-projects-audit-clean": 3596,
+    "vanilla.technology.explain": 41346,
+    "vanilla.unit.duplicated-archetype-is-equipment": 3868,
+    "vanilla.unit.equipment-slots-clean": 3209,
+    "vanilla.unit.oob-two-regiments-in-one-slot": 3747,
+    "vanilla.unit.variant-from-country-history": 3627,
+    "vanilla.validation.dangling-event-is-a-warning": 2765,
+    "vanilla.validation.known-good-decisions": 34053,
+    "vanilla.validation.known-good-events": 9375,
+    "vanilla.validation.known-good-focus": 13592,
+    "vanilla.validation.known-good-helpers": 6523,
+    "vanilla.validation.owner-comparison-still-flagged": 55,
+    "vanilla.validation.owner-tag-trigger": 67,
+    "vanilla.validation.owner-target-trigger": 59,
+    "vanilla.validation.timed-idea-right-id": 2181,
+    "vanilla.validation.timed-idea-wrong-id": 17496,
+    "vanilla.validation.unknown-idea-argument": 2370,
+    "zin.localisation.audit-undefined-desc": 12785,
+    "zin.mod_index.cold-overview": 66065,
+    "zin.validation.known-good-decisions": 7925,
+    "zin.validation.known-good-events": 35629,
+    "zin.validation.known-good-focus": 1053,
+    "zin.validation.known-good-helpers": 1229
+  },
+  "machine": {
+    "cores": 12,
+    "cpu": "AMD Ryzen 5 7500F 6-Core Processor",
+    "engineSha256": "ead2d6c766ad9028231f2983d5b197a525ebc0769938e0dd097049133cf5a7c0",
+    "memoryGb": 32,
+    "node": "v24.15.0",
+    "platform": "win32-x64"
+  },
+  "suite": "real"
+}

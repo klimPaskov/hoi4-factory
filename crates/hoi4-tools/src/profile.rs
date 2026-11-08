@@ -377,8 +377,8 @@ fn tool(
 /// The pinned HOI4 Agent Tools: its commit (also `AGENT_TOOLS_REV` in `docker/server.Dockerfile`)
 /// and package version. Move both together, then refresh [`SCHEMA_HASHES`] from the real server
 /// (the `real_agent_tools` test prints them) and rerun that test.
-pub const AGENT_TOOLS_REV: &str = "be00dfb3d0e3fde76c59f3b5da487d4f57b89948";
-pub const AGENT_TOOLS_VERSION: &str = "4.11.0";
+pub const AGENT_TOOLS_REV: &str = "73a5d7199ab7d1e4e3aeca74598d946512e23f3d";
+pub const AGENT_TOOLS_VERSION: &str = "4.12.0";
 
 /// The S03 profile: nine read tools of the pinned HOI4 Agent Tools, nothing that writes mod source.
 pub fn agent_tools_read_only() -> ToolProfile {

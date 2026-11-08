@@ -6,6 +6,7 @@
 //! | `POST .../focus/trees/{tree}/operations` | `CreateTask`, edit task | Apply focus operations as one C-02 proposal, with the person as actor |
 //! | `GET /projects/{id}/tasks/{task}/proposals` | member | The task's change proposals, oldest first |
 //! | `GET .../proposals/{proposal}` | member | One proposal: summary, diffs, hashes and checks |
+//! | `POST .../proposals/{proposal}/discard` | `CreateTask` | Put an uncommitted proposal's files back, if nothing changed them since |
 //!
 //! An editor session is an ordinary edit task, so a person's gestures, the agent's edits and a
 //! later commit share one worktree, one event stream and one proposal list.
@@ -39,6 +40,7 @@ pub fn router(state: &ServerState) -> Router {
         .route("/projects/{id}/tasks/{task}/focus/trees/{tree}/operations", post(operations))
         .route("/projects/{id}/tasks/{task}/proposals", get(proposals))
         .route("/projects/{id}/tasks/{task}/proposals/{proposal}", get(proposal))
+        .route("/projects/{id}/tasks/{task}/proposals/{proposal}/discard", post(discard))
         .layer(middleware::from_fn_with_state(accepted, origin_guard))
         .with_state(state.clone())
 }
@@ -181,4 +183,20 @@ async fn proposal(
     let found = store::get_proposal(&mut tx, task.id, pid).await?;
     tx.commit().await?;
     found.map(Json).ok_or_else(|| ApiError::not_found().into())
+}
+
+async fn discard(
+    principal: Principal,
+    State(state): State<ServerState>,
+    Path((id, task, proposal)): Path<(String, String, String)>,
+) -> Result<Json<Value>, Fail> {
+    let rt = runtime(&state)?;
+    let project = active_project_for(&state, &principal, &id, Permission::CreateTask).await?;
+    let task = load_task(rt, &principal, &project, &task).await?;
+    let pid: uuid::Uuid = proposal.parse().map_err(|_| Fail::from(ApiError::not_found()))?;
+    let (root, _) = ensure_worktree(&state, &project, task.id).await?;
+    let done = crate::focus::apply::discard_proposal(rt, &TaskKeys::of(&task, principal.account_id()), &root, ActorKind::Person(principal.account_id()), pid)
+        .await
+        .map_err(focus_fail)?;
+    Ok(Json(done))
 }

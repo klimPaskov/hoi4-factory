@@ -35,6 +35,7 @@ pub use error::{IntakeError, RetryClass};
 pub use github::{
     GithubApi, GithubConfig, GithubEndpoints, GithubError, GithubImporter, HttpGithubApi,
     ImportOutcome, ImportRequest, InstallationInfo, InstallationRef, InstallationToken, LinkState,
+    NewPullRequest, PUBLISHABLE_PREFIX, PublishTarget, PullRef, PullRequest,
     ObservedRef, PreparedImport, RepositoryAllowlist, RepositoryInfo, RepositoryLink,
     VisibleRepository, app_jwt, parse_full_name,
 };

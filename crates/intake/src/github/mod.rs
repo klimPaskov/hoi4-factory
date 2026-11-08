@@ -7,10 +7,11 @@ mod link;
 
 pub use api::{
     GithubApi, GithubEndpoints, GithubError, HttpGithubApi, InstallationAccount, InstallationInfo,
-    InstallationToken, RepositoryInfo,
+    InstallationToken, NewPullRequest, PullRef, PullRequest, RepositoryInfo,
 };
 pub use import::{
-    GithubConfig, GithubImporter, ImportOutcome, ImportRequest, PreparedImport, VisibleRepository,
+    GithubConfig, GithubImporter, ImportOutcome, ImportRequest, PUBLISHABLE_PREFIX, PreparedImport,
+    PublishTarget, VisibleRepository,
 };
 pub use jwt::app_jwt;
 pub use link::{

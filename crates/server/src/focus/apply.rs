@@ -222,6 +222,7 @@ pub async fn apply_operations(
             semantic_summary: summary,
             diffs: json!(diffs),
             after_projection_id: after_id,
+            before_contents: &rewritten.before_contents,
         },
     )
     .await
@@ -305,6 +306,7 @@ pub async fn record_file_proposal(
     let before: BTreeMap<String, String> = files.iter().map(|(p, b, _)| (p.clone(), hash(b))).collect();
     let after: BTreeMap<String, String> = files.iter().map(|(p, _, a)| (p.clone(), hash(a))).collect();
     let changed_paths: Vec<String> = files.iter().map(|(p, _, _)| p.clone()).collect();
+    let before_contents: BTreeMap<String, Option<Vec<u8>>> = files.iter().map(|(p, b, _)| (p.clone(), b.clone())).collect();
     let diffs: Vec<Value> = files
         .iter()
         .map(|(p, b, a)| json!({"path": p, "diff": super::session::unified_diff(p, b.as_deref(), a.as_deref())}))
@@ -331,6 +333,7 @@ pub async fn record_file_proposal(
             semantic_summary: json!({"added": [], "changed": [], "removed": [], "files": changed_paths}),
             diffs: json!(diffs),
             after_projection_id: None,
+            before_contents: &before_contents,
         },
     )
     .await
@@ -352,4 +355,54 @@ pub async fn record_file_proposal(
     tx.commit().await.map_err(db)?;
     rt.notify(task.id);
     Ok(Some(proposal))
+}
+
+/// Discards an uncommitted proposal: each of its files goes back to the bytes it had before the
+/// proposal, but only while the file still holds what the proposal wrote. A file changed since
+/// (by a person, the agent or a later proposal) refuses the whole discard and nothing is written.
+pub async fn discard_proposal(rt: &AgentRuntime, task: &TaskKeys, root: &Path, actor: ActorKind, id: uuid::Uuid) -> Result<Value, FocusError> {
+    let slot = rt.focus().slot(task.id);
+    let _guard = slot.lock().await;
+    let mut tx = rt.tx(task.acting).await.map_err(|e| db(e.code))?;
+    let proposal = store::get_proposal(&mut tx, task.id, id).await.map_err(db)?.ok_or(FocusError::Internal { message: "no such proposal".into() })?;
+    let contents = store::before_contents(&mut tx, task.id, id).await.map_err(db)?;
+    tx.commit().await.map_err(db)?;
+    if proposal["state"] != "applied" {
+        return Err(FocusError::OperationRefused {
+            error: super::ops::OpError { code: "not_open", focus_id: String::new(), message: "Only an uncommitted proposal can be discarded.".into() },
+        });
+    }
+    let paths: Vec<String> = proposal["changedPaths"].as_array().into_iter().flatten().filter_map(|v| v.as_str().map(str::to_owned)).collect();
+    let mut changed_since = BTreeMap::new();
+    for p in &paths {
+        let now = std::fs::read(root.join(p)).ok().map(|b| super::session::sha256_hex(&b)).unwrap_or_else(|| super::session::ABSENT.to_owned());
+        if Some(now.as_str()) != proposal["after"][p].as_str() {
+            changed_since.insert(p.clone(), now);
+        }
+    }
+    if !changed_since.is_empty() || paths.iter().any(|p| !contents.contains_key(p)) {
+        return Err(FocusError::StaleBase { current: changed_since });
+    }
+    for p in &paths {
+        match &contents[p] {
+            Some(bytes) => std::fs::write(root.join(p), bytes).map_err(|e| FocusError::Internal { message: e.to_string() })?,
+            None => std::fs::remove_file(root.join(p)).map_err(|e| FocusError::Internal { message: e.to_string() })?,
+        }
+    }
+    let mut tx = rt.tx(task.acting).await.map_err(|e| db(e.code))?;
+    store::set_state(&mut tx, task.id, &[id], "applied", "discarded").await.map_err(db)?;
+    let draft = event(
+        None,
+        match actor {
+            ActorKind::Person(a) => Actor::user(a),
+            _ => Actor::Host,
+        },
+        "source_changed",
+        "A proposal was discarded",
+        json!({"discarded_proposal_id": id, "actor_kind": actor.as_str(), "tree_id": proposal["treeId"], "changed_ids": proposal["changedIds"], "changed_paths": paths, "file_hashes": proposal["before"]}),
+    );
+    factory_tasks::append_event(&mut tx, task.id, draft).await.map_err(|e| db(e.to_string()))?;
+    tx.commit().await.map_err(db)?;
+    rt.notify(task.id);
+    Ok(json!({"discarded": id, "restored_paths": paths}))
 }

@@ -27,7 +27,8 @@ use factory_workspace::{
 };
 
 use super::api::{
-    GithubApi, GithubEndpoints, GithubError, InstallationInfo, InstallationToken, RepositoryInfo,
+    GithubApi, GithubEndpoints, GithubError, InstallationInfo, InstallationToken, NewPullRequest,
+    PullRequest, RepositoryInfo,
 };
 use super::jwt::app_jwt;
 use super::link::{InstallationRef, ObservedRef, RepositoryAllowlist, parse_full_name};
@@ -654,5 +655,141 @@ mod tests {
     fn malformed_lines_are_a_protocol_error() {
         let bad = "nothex\trefs/heads/main\n";
         assert!(parse_refs(bad.as_bytes(), 10, "x").is_err());
+    }
+}
+
+/// Where an owned branch is published: the link's installation and repository, checked against
+/// the project's allowlist (S04, C-10).
+pub struct PublishTarget<'a> {
+    pub installation: &'a InstallationRef,
+    /// `owner/name`.
+    pub repository: &'a str,
+    pub allowlist: &'a RepositoryAllowlist,
+    /// The repository's default branch, which is never pushed to.
+    pub default_branch: Option<&'a str>,
+}
+
+/// Branches the factory may push: its own task branches only.
+pub const PUBLISHABLE_PREFIX: &str = "hoi4factory/";
+
+impl GithubImporter {
+    /// A token limited to the one repository of `target`, with the import's checks: the
+    /// allowlist, an installation limited to selected repositories, and a token that names
+    /// exactly that repository.
+    async fn repository_token(&self, target: &PublishTarget<'_>) -> Result<SecretString, IntakeError> {
+        if !target.allowlist.contains(target.repository) {
+            return Err(IntakeError::RepositoryNotAllowed);
+        }
+        let (_, name) = parse_full_name(target.repository)
+            .ok_or_else(|| IntakeError::InvalidRequest("repository must be owner/name".into()))?;
+        let (installation_id, jwt) = self.credentials(target.installation)?;
+        self.require_selected(&jwt, installation_id).await?;
+        let token = self
+            .api
+            .create_installation_token(jwt.expose(), installation_id, Some(&[name.to_owned()]))
+            .await
+            .map_err(|err| match err {
+                GithubError::Status { status: 422, .. } => IntakeError::RepositoryNotInInstallation,
+                other => other.into(),
+            })?;
+        match token.repositories.as_slice() {
+            [only] if only.eq_ignore_ascii_case(target.repository) => Ok(token.token),
+            _ => Err(IntakeError::RepositoryNotInInstallation),
+        }
+    }
+
+    fn check_branch(target: &PublishTarget<'_>, branch: &str) -> Result<(), IntakeError> {
+        if !branch.starts_with(PUBLISHABLE_PREFIX) || !valid_branch_name(branch) {
+            return Err(IntakeError::InvalidRequest("only the factory's own task branches are published".into()));
+        }
+        if target.default_branch == Some(branch) {
+            return Err(IntakeError::InvalidRequest("the default branch is never pushed to".into()));
+        }
+        Ok(())
+    }
+
+    /// The commit `refs/heads/<branch>` points at on the remote, `None` when it does not exist.
+    /// This is how a lost push reply is reconciled.
+    pub async fn remote_branch(&self, target: &PublishTarget<'_>, branch: &str) -> Result<Option<String>, IntakeError> {
+        Self::check_branch(target, branch)?;
+        let token = self.repository_token(target).await?;
+        let auth = GitAuth::new(&self.config.endpoints.clone_base, token.expose());
+        let url = self.config.endpoints.clone_url(target.repository);
+        let wanted = format!("refs/heads/{branch}");
+        let listing = gitcmd::run(self.storage.data_root(), &["ls-remote", "--heads", "--", &url, &wanted], Some(&auth), self.config.ls_remote_timeout)
+            .await
+            .map_err(map_git)?;
+        let text = String::from_utf8_lossy(&listing.stdout);
+        Ok(text
+            .lines()
+            .filter_map(|l| l.split_once('\t'))
+            .find(|(_, name)| *name == wanted)
+            .map(|(sha, _)| sha.to_owned()))
+    }
+
+    /// Pushes `local_commit` of the repository at `repo_dir` to `refs/heads/<branch>` on the
+    /// remote, without force: a branch that moved elsewhere is refused by Git. Returns the
+    /// remote branch commit read back after the push.
+    pub async fn push_branch(
+        &self,
+        target: &PublishTarget<'_>,
+        repo_dir: &std::path::Path,
+        local_commit: &str,
+        branch: &str,
+    ) -> Result<String, IntakeError> {
+        Self::check_branch(target, branch)?;
+        Oid::new(local_commit).map_err(|_| IntakeError::InvalidRequest("not a commit id".into()))?;
+        let token = self.repository_token(target).await?;
+        let auth = GitAuth::new(&self.config.endpoints.clone_base, token.expose());
+        let url = self.config.endpoints.clone_url(target.repository);
+        let refspec = format!("{local_commit}:refs/heads/{branch}");
+        gitcmd::run(repo_dir, &["push", "--porcelain", "--", &url, &refspec], Some(&auth), self.config.fetch_timeout)
+            .await
+            .map_err(map_git)?;
+        self.remote_branch(target, branch)
+            .await?
+            .ok_or_else(|| IntakeError::GithubProtocol("the pushed branch is not on the remote".into()))
+    }
+
+    /// Fetches `refs/heads/<branch>` of the remote into `refs/hoi4factory/remote/<branch>` of the
+    /// repository at `repo_dir`, so changes pushed from outside the factory can be detected and
+    /// taken in. Returns the fetched commit, `None` when the remote has no such branch.
+    pub async fn fetch_branch(
+        &self,
+        target: &PublishTarget<'_>,
+        repo_dir: &std::path::Path,
+        branch: &str,
+    ) -> Result<Option<String>, IntakeError> {
+        let Some(remote) = self.remote_branch(target, branch).await? else {
+            return Ok(None);
+        };
+        let token = self.repository_token(target).await?;
+        let auth = GitAuth::new(&self.config.endpoints.clone_base, token.expose());
+        let url = self.config.endpoints.clone_url(target.repository);
+        let refspec = format!("+refs/heads/{branch}:refs/hoi4factory/remote/{branch}");
+        gitcmd::run(repo_dir, &["fetch", "--no-tags", "--quiet", "--", &url, &refspec], Some(&auth), self.config.fetch_timeout)
+            .await
+            .map_err(map_git)?;
+        Ok(Some(remote))
+    }
+
+    /// The pull requests whose head is `branch` of the repository's owner.
+    pub async fn find_pulls(&self, target: &PublishTarget<'_>, branch: &str) -> Result<Vec<PullRequest>, IntakeError> {
+        Self::check_branch(target, branch)?;
+        let (owner, _) = parse_full_name(target.repository)
+            .ok_or_else(|| IntakeError::InvalidRequest("repository must be owner/name".into()))?;
+        let token = self.repository_token(target).await?;
+        Ok(self.api.list_pulls(token.expose(), target.repository, &format!("{owner}:{branch}")).await?)
+    }
+
+    /// Opens a pull request from `branch` into the default branch. Never merges.
+    pub async fn open_pull(&self, target: &PublishTarget<'_>, branch: &str, title: &str, body: &str) -> Result<PullRequest, IntakeError> {
+        Self::check_branch(target, branch)?;
+        let base = target
+            .default_branch
+            .ok_or_else(|| IntakeError::InvalidRequest("the repository has no default branch on record".into()))?;
+        let token = self.repository_token(target).await?;
+        let new = NewPullRequest { title: title.to_owned(), head: branch.to_owned(), base: base.to_owned(), body: body.to_owned() };
+        Ok(self.api.create_pull(token.expose(), target.repository, &new).await?)
     }
 }

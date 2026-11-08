@@ -108,11 +108,20 @@ pub struct State_ {
     pub git_reject_all: bool,
     /// Reject Git requests once this many have been served.
     pub git_reject_after: Option<usize>,
+    /// Answer 500 to Git requests once this many have been served: an outage, not a refused
+    /// credential. Git on Windows stalls after a 401 until the caller's timeout, so tests that
+    /// only need a failed request use this.
+    pub git_error_after: Option<usize>,
     pub rate_limit_installation: bool,
     pub installation_status_override: Option<u16>,
     pub repo_status_override: Option<u16>,
     pub minted: u32,
     pub git_root: PathBuf,
+    /// Pull requests created through the API (S04).
+    pub pulls: Vec<Value>,
+    pub pull_creates: u32,
+    /// Create the next pull request, then answer 502 as if the reply was lost.
+    pub lose_next_pull_reply: bool,
 }
 
 pub struct FakeGithub {
@@ -147,6 +156,10 @@ impl FakeGithub {
             repo_status_override: None,
             minted: 0,
             git_root: git_root.to_path_buf(),
+            pulls: Vec::new(),
+            git_error_after: None,
+            pull_creates: 0,
+            lose_next_pull_reply: false,
         }));
         let app = Router::new().fallback(handle).with_state(state.clone());
         let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
@@ -274,6 +287,68 @@ async fn handle(State(state): State<Shared>, request: Request) -> Response {
                 200,
                 json!({"total_count": repos.len(), "repositories": repos}),
             )
+        }
+        (&Method::GET, ["repos", owner, name, "pulls"]) => {
+            let Some(covered) = covered_by(&state, &parts.headers) else {
+                return json_response(401, json!({"message": "Bad credentials"}));
+            };
+            let full = format!("{owner}/{name}").to_lowercase();
+            if !covered.contains(&full) {
+                return not_found();
+            }
+            let head = query
+                .split('&')
+                .find_map(|kv| kv.strip_prefix("head="))
+                .map(|h| h.replace("%3A", ":").replace("%2F", "/"))
+                .unwrap_or_default();
+            let s = state.lock().unwrap();
+            let list: Vec<Value> = s
+                .pulls
+                .iter()
+                .filter(|p| p["_repo"] == json!(full) && format!("{owner}:{}", p["head"]["ref"].as_str().unwrap_or("")) == head)
+                .cloned()
+                .collect();
+            json_response(200, json!(list))
+        }
+        (&Method::POST, ["repos", owner, name, "pulls"]) => {
+            let Some(covered) = covered_by(&state, &parts.headers) else {
+                return json_response(401, json!({"message": "Bad credentials"}));
+            };
+            let full = format!("{owner}/{name}").to_lowercase();
+            if !covered.contains(&full) {
+                return not_found();
+            }
+            let request: Value = serde_json::from_slice(&body).unwrap_or(Value::Null);
+            let head = request["head"].as_str().unwrap_or("").to_owned();
+            let base = request["base"].as_str().unwrap_or("").to_owned();
+            let git_root = state.lock().unwrap().git_root.clone();
+            let bare = git_root.join(owner).join(format!("{name}.git"));
+            let sha = |r: &str| {
+                std::process::Command::new("git")
+                    .args(["rev-parse", "--verify", "--quiet", &format!("refs/heads/{r}")])
+                    .current_dir(&bare)
+                    .output()
+                    .ok()
+                    .filter(|o| o.status.success())
+                    .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned())
+            };
+            let (Some(head_sha), Some(base_sha)) = (sha(&head), sha(&base)) else {
+                return json_response(422, json!({"message": "Validation Failed"}));
+            };
+            let mut s = state.lock().unwrap();
+            s.pull_creates += 1;
+            let number = s.pulls.len() as u64 + 1;
+            let pr = json!({
+                "number": number, "html_url": format!("https://github.com/{owner}/{name}/pull/{number}"),
+                "state": "open", "title": request["title"], "body": request["body"],
+                "head": {"ref": head, "sha": head_sha}, "base": {"ref": base, "sha": base_sha},
+                "_repo": full,
+            });
+            s.pulls.push(pr.clone());
+            if std::mem::take(&mut s.lose_next_pull_reply) {
+                return json_response(502, json!({"message": "Bad Gateway"}));
+            }
+            json_response(201, pr)
         }
         (&Method::GET, ["repos", owner, name]) => {
             let full = format!("{owner}/{name}").to_lowercase();
@@ -408,6 +483,14 @@ async fn git_backend(
             status,
         });
     };
+    let outage = {
+        let s = state.lock().unwrap();
+        s.git_error_after.is_some_and(|n| s.git_calls.len() >= n)
+    };
+    if outage {
+        record(500);
+        return json_response(500, json!({"message": "outage"}));
+    }
     if !allowed {
         record(401);
         return Response::builder()

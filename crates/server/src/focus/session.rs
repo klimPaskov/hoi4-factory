@@ -72,6 +72,8 @@ pub struct Rewritten {
     pub change: PlanChange,
     /// One unified diff per changed path (`path`, `diff`), for the review card.
     pub diffs: Vec<(String, String)>,
+    /// The bytes before the change of each changed path, `None` for a file that did not exist.
+    pub before_contents: BTreeMap<String, Option<Vec<u8>>>,
 }
 
 /// A unified diff of two file versions, with lossy text for non-UTF-8 bytes.
@@ -363,7 +365,8 @@ impl FocusSession {
                 (p.clone(), unified_diff(p, before_bytes[p].as_deref(), now.as_deref()))
             })
             .collect();
-        Ok(Rewritten { request_sha256, before, after, changed_paths, change, diffs })
+        let before_contents = changed_paths.iter().map(|p| (p.clone(), before_bytes[p].clone())).collect();
+        Ok(Rewritten { request_sha256, before, after, changed_paths, change, diffs, before_contents })
     }
 
     pub async fn shutdown(self) {

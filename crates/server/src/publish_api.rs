@@ -6,6 +6,11 @@
 //! | `POST .../tasks/{task}/commit` | `ApproveProposal` | Commit the listed proposals, bound to their hashes, after the check |
 //! | `POST .../tasks/{task}/restore` | `ApproveProposal` | Undo one factory commit, keeping later edits |
 //! | `GET .../tasks/{task}/publications` | member | Commits, pushes, pull requests and restores of the task |
+//! | `POST .../tasks/{task}/publication-grants` | `Publish` | A C-08 grant for `push_owned_branch` and `open_pull_request` on this task's branch |
+//! | `POST .../tasks/{task}/push` | `Publish`, a grant | Push the task branch to the linked GitHub repository |
+//! | `POST .../tasks/{task}/pull-request` | `Publish`, a grant | Open a pull request from the task branch into the default branch, never merge |
+//! | `GET .../tasks/{task}/download` | member | The task branch's committed files as a ZIP |
+//! | `POST .../tasks/{task}/sync` | `CreateTask` | Take in commits pushed to the task branch from outside the factory, and list what changed |
 //!
 //! Each effect has an idempotency key. Repeating a request with the same key returns the first
 //! result, and a request whose reply was lost is reconciled by reading the branch.
@@ -41,6 +46,11 @@ pub fn router(state: &ServerState) -> Router {
         .route("/projects/{id}/tasks/{task}/commit", post(commit))
         .route("/projects/{id}/tasks/{task}/restore", post(restore))
         .route("/projects/{id}/tasks/{task}/publications", get(publications))
+        .route("/projects/{id}/tasks/{task}/publication-grants", post(publication_grant))
+        .route("/projects/{id}/tasks/{task}/push", post(push))
+        .route("/projects/{id}/tasks/{task}/pull-request", post(pull_request))
+        .route("/projects/{id}/tasks/{task}/download", get(download))
+        .route("/projects/{id}/tasks/{task}/sync", post(sync))
         .layer(middleware::from_fn_with_state(accepted, origin_guard))
         .with_state(state.clone())
 }
@@ -406,4 +416,387 @@ async fn publications(
         })
         .collect();
     Ok(Json(json!({ "publications": list })))
+}
+
+// ---- GitHub publication (C-10) ----
+
+fn github_fail(e: factory_intake::IntakeError) -> Fail {
+    use factory_intake::IntakeError as E;
+    let (status, retry) = match &e {
+        E::RepositoryNotAllowed | E::RepositoryNotInInstallation | E::AccessRevoked => (StatusCode::FORBIDDEN, RetryClass::RequiresAuthorization),
+        E::GithubRateLimited { .. } | E::GithubUnavailable(_) => (StatusCode::SERVICE_UNAVAILABLE, RetryClass::ReconcileFirst),
+        E::InvalidRequest(_) => (StatusCode::UNPROCESSABLE_ENTITY, RetryClass::Terminal),
+        _ => (StatusCode::BAD_GATEWAY, RetryClass::ReconcileFirst),
+    };
+    Fail::from(ApiError::new(status, e.code(), e.to_string(), retry))
+}
+
+/// The project's active GitHub link and its allowlist.
+async fn link_for(state: &ServerState, principal: &Principal, project: &Project) -> Result<(factory_intake::RepositoryLink, factory_intake::RepositoryAllowlist), Fail> {
+    let store = state.intake.service.store();
+    let links = store.links_for_project(principal.account_id().0, project.id.0).await.map_err(github_fail)?;
+    let link = links
+        .into_iter()
+        .find(|l| l.state == factory_intake::LinkState::Active)
+        .ok_or_else(|| Fail::from(ApiError::conflict("no_repository_link", "This project is not linked to a GitHub repository.")))?;
+    let allowlist = store.allowlist(principal.account_id().0, project.id.0).await.map_err(github_fail)?;
+    Ok((link, allowlist))
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct GrantBody {
+    operation_classes: Vec<String>,
+}
+
+/// A publication grant: separate from the task's editing grant, held by a person who may
+/// publish, limited to push and pull request on this task's branch, valid for two hours.
+async fn publication_grant(
+    principal: Principal,
+    State(state): State<ServerState>,
+    Path((id, task)): Path<(String, String)>,
+    ApiJson(body): ApiJson<GrantBody>,
+) -> Result<(StatusCode, Json<Value>), Fail> {
+    let rt = runtime(&state)?;
+    let project = active_project_for(&state, &principal, &id, Permission::Publish).await?;
+    let role = project.role.ok_or_else(ApiError::not_found)?;
+    let task = load_task(rt, &principal, &project, &task).await?;
+    let mut classes = Vec::new();
+    for c in &body.operation_classes {
+        match factory_broker::OperationClass::parse(c) {
+            Some(class @ (factory_broker::OperationClass::PushOwnedBranch | factory_broker::OperationClass::OpenPullRequest)) => classes.push(class),
+            _ => return Err(ApiError::invalid_request("A publication grant names push_owned_branch and open_pull_request only.").with_id("field", "operation_classes").into()),
+        }
+    }
+    let (link, _) = link_for(&state, &principal, &project).await?;
+    let branch = factory_workspace::task_branch_name(&ws_task(task.id));
+    let now = chrono::Utc::now();
+    let mut tx = rt.tx(principal.account_id()).await?;
+    let grant = factory_broker::issue_grant(
+        &mut tx,
+        factory_broker::NewGrant {
+            project_id: task.project_id,
+            owner_account_id: task.owner_account_id,
+            grantor_account_id: principal.account_id(),
+            task_id: task.id.0,
+            operation_classes: classes,
+            allowed_roots: vec![branch.clone()],
+            provider_destinations: vec![format!("github:{}", link.repository_full_name)],
+            max_cost_micros: 0,
+            max_turns: 0,
+            max_changed_files: 0,
+            expires_at: now + chrono::Duration::hours(2),
+            policy_version: crate::agent::runner::POLICY_VERSION.to_owned(),
+            proposal_sha256: None,
+        },
+        role,
+        now,
+    )
+    .await
+    .map_err(|e| Fail::from(ApiError::forbidden(e.to_string())))?;
+    tx.commit().await?;
+    Ok((StatusCode::CREATED, Json(json!({ "grant_id": grant.id.0, "epoch": grant.revocation_epoch, "branch": branch, "repository": link.repository_full_name, "expires_at": grant.expires_at }))))
+}
+
+/// Checks the grant for `class` immediately before the effect and records the intent, in one
+/// transaction (C-08: check before each effect; C-10: intent before the call).
+async fn grant_and_intent(
+    rt: &crate::agent::AgentRuntime,
+    principal: &Principal,
+    keys: &TaskKeys,
+    grant: Uuid,
+    epoch: i64,
+    class: factory_broker::OperationClass,
+    kind: &str,
+    key: &str,
+    intent: &Value,
+) -> Result<Uuid, Fail> {
+    let mut tx = rt.tx(principal.account_id()).await?;
+    let snapshot = factory_broker::check_for_effect(&mut tx, factory_broker::GrantId(grant), epoch, class, chrono::Utc::now())
+        .await
+        .map_err(|e| Fail::from(ApiError::new(StatusCode::FORBIDDEN, "grant_refused", e.to_string(), RetryClass::RequiresAuthorization)))?;
+    if snapshot.grant.task_id != keys.id.0 {
+        return Err(Fail::from(ApiError::new(StatusCode::FORBIDDEN, "grant_refused", "The grant is for another task.", RetryClass::RequiresAuthorization)));
+    }
+    let id = publish::insert_intent(&mut tx, keys, kind, key, Some(grant), intent).await?;
+    tx.commit().await?;
+    Ok(id)
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct PushBody {
+    grant_id: Uuid,
+    epoch: i64,
+    idempotency_key: String,
+}
+
+async fn push(
+    principal: Principal,
+    State(state): State<ServerState>,
+    Path((id, task)): Path<(String, String)>,
+    ApiJson(body): ApiJson<PushBody>,
+) -> Result<(StatusCode, Json<Value>), Fail> {
+    let rt = runtime(&state)?;
+    let project = active_project_for(&state, &principal, &id, Permission::Publish).await?;
+    let task = load_task(rt, &principal, &project, &task).await?;
+    if !valid_key(&body.idempotency_key) {
+        return Err(ApiError::invalid_request("Give an idempotency key.").into());
+    }
+    let keys = TaskKeys::of(&task, principal.account_id());
+    let (link, allowlist) = link_for(&state, &principal, &project).await?;
+    let installation = factory_intake::InstallationRef::new(link.installation_ref.clone()).map_err(github_fail)?;
+    let target = factory_intake::PublishTarget {
+        installation: &installation,
+        repository: &link.repository_full_name,
+        allowlist: &allowlist,
+        default_branch: link.default_branch.as_deref(),
+    };
+    let github = state.intake.service.github();
+    let (_, worktree) = open(&state, &project, &task).await?;
+    let branch = worktree.branch().to_owned();
+    let local = worktree.expected_head().to_string();
+
+    // A request seen before: return its result, or reconcile a lost reply by reading the remote.
+    let mut tx = rt.tx(principal.account_id()).await?;
+    let existing = publish::find_publication(&mut tx, task.id, "push", &body.idempotency_key).await?;
+    tx.commit().await?;
+    if let Some(p) = existing {
+        if p.state == "succeeded" {
+            return Ok((StatusCode::OK, Json(json!({ "publication_id": p.id, "result": p.result, "replayed": true }))));
+        }
+        let wanted = p.intent["commit"].as_str().unwrap_or_default().to_owned();
+        let remote = github.remote_branch(&target, &branch).await.map_err(github_fail)?;
+        let mut tx = rt.tx(principal.account_id()).await?;
+        let response = if remote.as_deref() == Some(wanted.as_str()) {
+            let result = json!({ "branch": branch, "remote_commit": wanted, "repository": link.repository_full_name, "reconciled": true });
+            publish::settle(&mut tx, p.id, "succeeded", &result).await?;
+            Ok((StatusCode::OK, Json(json!({ "publication_id": p.id, "result": result, "replayed": true }))))
+        } else {
+            publish::settle(&mut tx, p.id, "failed", &json!({ "reconciled": true, "remote_commit": remote })).await?;
+            Err(Fail::from(ApiError::conflict("push_not_applied", "That push never reached GitHub. Use a new idempotency key to push again.")))
+        };
+        tx.commit().await?;
+        return response;
+    }
+
+    let intent = json!({ "branch": branch, "commit": local, "repository": link.repository_full_name });
+    let pub_id = grant_and_intent(rt, &principal, &keys, body.grant_id, body.epoch, factory_broker::OperationClass::PushOwnedBranch, "push", &body.idempotency_key, &intent).await?;
+    let pushed = github.push_branch(&target, worktree.work_dir(), &local, &branch).await;
+    let mut tx = rt.tx(principal.account_id()).await?;
+    let response = match pushed {
+        Ok(remote) if remote == local => {
+            let result = json!({ "branch": branch, "remote_commit": remote, "repository": link.repository_full_name });
+            publish::settle(&mut tx, pub_id, "succeeded", &result).await?;
+            factory_tasks::append_event(&mut tx, task.id, event(None, Actor::user(principal.account_id()), "pushed", "Branch pushed to GitHub", json!({ "publication_id": pub_id, "result": result })))
+                .await
+                .map_err(internal)?;
+            Ok((StatusCode::CREATED, Json(json!({ "publication_id": pub_id, "result": result }))))
+        }
+        Ok(remote) => {
+            publish::settle(&mut tx, pub_id, "unknown", &json!({ "remote_commit": remote, "expected": local })).await?;
+            Err(Fail::from(ApiError::new(StatusCode::CONFLICT, "push_unconfirmed", "GitHub shows another commit on the branch. Reconcile before pushing again.", RetryClass::ReconcileFirst)))
+        }
+        Err(e) => {
+            // The push may or may not have landed: leave the intent for reconciliation.
+            publish::settle(&mut tx, pub_id, "unknown", &json!({ "error": e.code() })).await?;
+            Err(github_fail(e))
+        }
+    };
+    tx.commit().await?;
+    rt.notify(task.id);
+    response
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct PullBody {
+    grant_id: Uuid,
+    epoch: i64,
+    idempotency_key: String,
+    title: String,
+    #[serde(default)]
+    body: String,
+}
+
+async fn pull_request(
+    principal: Principal,
+    State(state): State<ServerState>,
+    Path((id, task)): Path<(String, String)>,
+    ApiJson(body): ApiJson<PullBody>,
+) -> Result<(StatusCode, Json<Value>), Fail> {
+    let rt = runtime(&state)?;
+    let project = active_project_for(&state, &principal, &id, Permission::Publish).await?;
+    let task = load_task(rt, &principal, &project, &task).await?;
+    let title = body.title.trim().to_owned();
+    if !valid_key(&body.idempotency_key) || title.is_empty() || title.chars().count() > 200 || body.body.chars().count() > 20_000 {
+        return Err(ApiError::invalid_request("A title of 1 to 200 characters, a body of up to 20,000 and an idempotency key.").into());
+    }
+    let keys = TaskKeys::of(&task, principal.account_id());
+    let (link, allowlist) = link_for(&state, &principal, &project).await?;
+    let installation = factory_intake::InstallationRef::new(link.installation_ref.clone()).map_err(github_fail)?;
+    let target = factory_intake::PublishTarget {
+        installation: &installation,
+        repository: &link.repository_full_name,
+        allowlist: &allowlist,
+        default_branch: link.default_branch.as_deref(),
+    };
+    let github = state.intake.service.github();
+    let branch = factory_workspace::task_branch_name(&ws_task(task.id));
+    let as_result = |pr: &factory_intake::PullRequest| {
+        json!({ "number": pr.number, "url": pr.html_url, "state": pr.state, "head": pr.head.branch, "head_commit": pr.head.sha, "base": pr.base.branch, "repository": link.repository_full_name })
+    };
+
+    let mut tx = rt.tx(principal.account_id()).await?;
+    let existing = publish::find_publication(&mut tx, task.id, "pull_request", &body.idempotency_key).await?;
+    tx.commit().await?;
+    if let Some(p) = &existing
+        && p.state == "succeeded"
+    {
+        return Ok((StatusCode::OK, Json(json!({ "publication_id": p.id, "result": p.result, "replayed": true }))));
+    }
+    // Before any create, and to reconcile a lost reply: a pull request from this branch may
+    // already exist. Then it is the result, and nothing new is opened.
+    let found = github.find_pulls(&target, &branch).await.map_err(github_fail)?;
+    if let Some(pr) = found.iter().find(|p| p.state == "open").or(found.first()) {
+        let result = as_result(pr);
+        let mut tx = rt.tx(principal.account_id()).await?;
+        let pub_id = match &existing {
+            Some(p) => p.id,
+            None => {
+                let snapshot_intent = json!({ "branch": branch, "title": title, "existing": true });
+                tx.commit().await?;
+                let id = grant_and_intent(rt, &principal, &keys, body.grant_id, body.epoch, factory_broker::OperationClass::OpenPullRequest, "pull_request", &body.idempotency_key, &snapshot_intent).await?;
+                tx = rt.tx(principal.account_id()).await?;
+                id
+            }
+        };
+        publish::settle(&mut tx, pub_id, "succeeded", &json!({ "pull_request": result, "reconciled": true })).await?;
+        tx.commit().await?;
+        return Ok((StatusCode::OK, Json(json!({ "publication_id": pub_id, "result": { "pull_request": result, "reconciled": true }, "replayed": true }))));
+    }
+    if github.remote_branch(&target, &branch).await.map_err(github_fail)?.is_none() {
+        return Err(ApiError::conflict("branch_not_pushed", "Push the task branch before opening a pull request.").into());
+    }
+    let pub_id = match &existing {
+        Some(p) => p.id,
+        None => {
+            let intent = json!({ "branch": branch, "title": title, "base": link.default_branch });
+            grant_and_intent(rt, &principal, &keys, body.grant_id, body.epoch, factory_broker::OperationClass::OpenPullRequest, "pull_request", &body.idempotency_key, &intent).await?
+        }
+    };
+    let opened = github.open_pull(&target, &branch, &title, &body.body).await;
+    let mut tx = rt.tx(principal.account_id()).await?;
+    let response = match opened {
+        Ok(pr) => {
+            let result = json!({ "pull_request": as_result(&pr) });
+            publish::settle(&mut tx, pub_id, "succeeded", &result).await?;
+            factory_tasks::append_event(&mut tx, task.id, event(None, Actor::user(principal.account_id()), "pull_request_opened", "Pull request opened", json!({ "publication_id": pub_id, "result": result })))
+                .await
+                .map_err(internal)?;
+            Ok((StatusCode::CREATED, Json(json!({ "publication_id": pub_id, "result": result }))))
+        }
+        Err(e) => {
+            publish::settle(&mut tx, pub_id, "unknown", &json!({ "error": e.code() })).await?;
+            Err(github_fail(e))
+        }
+    };
+    tx.commit().await?;
+    rt.notify(task.id);
+    response
+}
+
+// ---- working outside the factory (gate 6) ----
+
+/// The committed state of the task branch as a ZIP, to keep editing the mod elsewhere.
+async fn download(
+    principal: Principal,
+    State(state): State<ServerState>,
+    Path((id, task)): Path<(String, String)>,
+) -> Result<axum::response::Response, Fail> {
+    use axum::response::IntoResponse;
+    let rt = runtime(&state)?;
+    let project = project_for(&state, &principal, &id, Permission::ReadProject).await?;
+    let task = load_task(rt, &principal, &project, &task).await?;
+    let (_, worktree) = open(&state, &project, &task).await?;
+    let head = worktree.expected_head().clone();
+    let repo = worktree.repo().clone();
+    let bytes = tokio::task::spawn_blocking(move || repo.archive_zip(&head)).await.map_err(internal)?.map_err(internal)?;
+    let name = format!("hoi4factory-{}-{}.zip", &task.id.to_string()[..8], &worktree.expected_head().as_str()[..12]);
+    Ok((
+        [
+            (axum::http::header::CONTENT_TYPE, "application/zip".to_owned()),
+            (axum::http::header::CONTENT_DISPOSITION, format!("attachment; filename=\"{name}\"")),
+        ],
+        bytes,
+    )
+        .into_response())
+}
+
+/// Takes in work pushed to the task branch on GitHub from outside the factory. A remote branch
+/// that descends from the factory's branch is fast-forwarded and its changed files are listed;
+/// one that diverged is reported and nothing moves.
+async fn sync(
+    principal: Principal,
+    State(state): State<ServerState>,
+    Path((id, task)): Path<(String, String)>,
+) -> Result<Json<Value>, Fail> {
+    let rt = runtime(&state)?;
+    let project = active_project_for(&state, &principal, &id, Permission::CreateTask).await?;
+    let task = load_task(rt, &principal, &project, &task).await?;
+    let (link, allowlist) = link_for(&state, &principal, &project).await?;
+    let installation = factory_intake::InstallationRef::new(link.installation_ref.clone()).map_err(github_fail)?;
+    let target = factory_intake::PublishTarget {
+        installation: &installation,
+        repository: &link.repository_full_name,
+        allowlist: &allowlist,
+        default_branch: link.default_branch.as_deref(),
+    };
+    let (_, worktree) = open(&state, &project, &task).await?;
+    let branch = worktree.branch().to_owned();
+    let local = worktree.expected_head().clone();
+    let fetched = state.intake.service.github().fetch_branch(&target, worktree.work_dir(), &branch).await.map_err(github_fail)?;
+    let Some(remote) = fetched else {
+        return Ok(Json(json!({ "external_changes": false, "remote": null, "local": local.as_str() })));
+    };
+    let remote = Oid::new(remote).map_err(internal)?;
+    if remote == local {
+        return Ok(Json(json!({ "external_changes": false, "remote": remote.as_str(), "local": local.as_str() })));
+    }
+    let mut wt = worktree;
+    let (l2, r2) = (local.clone(), remote.clone());
+    let outcome = tokio::task::spawn_blocking(move || {
+        let repo = wt.repo().clone();
+        if repo.is_ancestor(&r2, &l2).map_err(|e| e.to_string())? {
+            return Ok::<_, String>(("behind", Vec::new(), l2));
+        }
+        if !repo.is_ancestor(&l2, &r2).map_err(|e| e.to_string())? {
+            return Ok(("diverged", Vec::new(), l2));
+        }
+        let changed = repo.changed_between(&l2, &r2).map_err(|e| e.to_string())?;
+        let now = wt.fast_forward(&r2).map_err(|e| e.to_string())?;
+        Ok(("fast_forward", changed, now))
+    })
+    .await
+    .map_err(internal)?
+    .map_err(|e| Fail::from(ApiError::conflict("sync_failed", "The outside changes could not be taken in. The worktree is unchanged.")).with_details(json!({ "reason": e })))?;
+    match outcome {
+        ("diverged", _, _) => Err(Fail::from(ApiError::conflict("diverged", "The branch on GitHub and the factory's branch both have new commits. Nothing was changed."))
+            .with_details(json!({ "remote": remote.as_str(), "local": local.as_str() }))),
+        ("behind", _, _) => Ok(Json(json!({ "external_changes": false, "remote": remote.as_str(), "local": local.as_str(), "remote_is_behind": true }))),
+        (_, changed, now) => {
+            let mut tx = rt.tx(principal.account_id()).await?;
+            factory_tasks::append_event(
+                &mut tx,
+                task.id,
+                event(None, Actor::user(principal.account_id()), "external_changes", "Changes made outside the factory were taken in", json!({ "from": local.as_str(), "to": now.as_str(), "changed_paths": changed }))
+                    .with_snapshot(now.to_string()),
+            )
+            .await
+            .map_err(internal)?;
+            tx.commit().await?;
+            rt.notify(task.id);
+            Ok(Json(json!({ "external_changes": true, "from": local.as_str(), "to": now.as_str(), "changed_paths": changed })))
+        }
+    }
 }

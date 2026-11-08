@@ -109,6 +109,33 @@ pub struct NewProposal<'a> {
     pub semantic_summary: Value,
     pub diffs: Value,
     pub after_projection_id: Option<Uuid>,
+    /// Path -> bytes before the change (`None` when the file did not exist).
+    pub before_contents: &'a BTreeMap<String, Option<Vec<u8>>>,
+}
+
+fn encode_contents(contents: &BTreeMap<String, Option<Vec<u8>>>) -> Value {
+    use base64::Engine;
+    let map: serde_json::Map<String, Value> = contents
+        .iter()
+        .map(|(p, b)| (p.clone(), b.as_ref().map(|b| json!(base64::engine::general_purpose::STANDARD.encode(b))).unwrap_or(Value::Null)))
+        .collect();
+    Value::Object(map)
+}
+
+/// The bytes before a proposal, by path (`None`: the file did not exist).
+pub async fn before_contents(conn: &mut PgConnection, task: TaskId, id: Uuid) -> Result<BTreeMap<String, Option<Vec<u8>>>, sqlx::Error> {
+    use base64::Engine;
+    let value: Option<Value> = sqlx::query_scalar("SELECT before_contents FROM change_proposals WHERE task_id = $1 AND id = $2")
+        .bind(task)
+        .bind(id)
+        .fetch_optional(&mut *conn)
+        .await?;
+    Ok(value
+        .and_then(|v| v.as_object().cloned())
+        .unwrap_or_default()
+        .into_iter()
+        .map(|(p, v)| (p, v.as_str().and_then(|s| base64::engine::general_purpose::STANDARD.decode(s).ok())))
+        .collect())
 }
 
 const PROPOSAL_COLUMNS: &str = "id, task_id, actor_kind, actor_account_id, attempt_id, tree_id, tool_operation, tool_version,
@@ -145,8 +172,8 @@ pub async fn insert_proposal(conn: &mut PgConnection, p: &NewProposal<'_>) -> Re
         "INSERT INTO change_proposals (id, task_id, project_id, owner_account_id, actor_kind, actor_account_id,
              attempt_id, tree_id, tool_operation, tool_version, base_projection_hash, operations, request_sha256,
              before_hashes, after_hashes, changed_paths, changed_ids, semantic_summary, diffs, proposal_hash, state,
-             after_projection_id)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, 'applied', $21)
+             after_projection_id, before_contents)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, 'applied', $21, $22)
          RETURNING {PROPOSAL_COLUMNS}"
     ))
     .bind(id)
@@ -170,6 +197,7 @@ pub async fn insert_proposal(conn: &mut PgConnection, p: &NewProposal<'_>) -> Re
     .bind(&p.diffs)
     .bind(&hash)
     .bind(p.after_projection_id)
+    .bind(encode_contents(p.before_contents))
     .fetch_one(&mut *conn)
     .await?;
     proposal_json(&row)

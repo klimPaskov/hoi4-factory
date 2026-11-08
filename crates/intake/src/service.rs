@@ -71,6 +71,11 @@ impl IntakeService {
         &self.store
     }
 
+    /// The GitHub side, for publishing an owned branch through a link (S04).
+    pub fn github(&self) -> &GithubImporter {
+        &self.github
+    }
+
     // ---- uploads ----
 
     /// Receive a ZIP archive into a new workspace of `project`.

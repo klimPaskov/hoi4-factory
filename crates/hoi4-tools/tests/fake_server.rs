@@ -217,9 +217,11 @@ async fn call_returns_content_and_inventory_is_healthy() {
     let mut session = ToolSession::start(fx.spec("normal"), profile("1.0.0", 100_000)).await;
     assert!(session.inventory().is_healthy());
     assert!(session.inventory().version_matches);
-    // fake.write exists on the server and is Available in the inventory; it is the call-time
-    // read-only check that refuses it.
-    assert_eq!(session.exposed_tools().len(), 3);
+    // fake.write exists on the server and is Available in the inventory, but a write tool is
+    // never offered to the model (S04). Calling it is still refused by the read-only check
+    // (`read_only_mode_refuses_a_write_before_the_server_sees_it`).
+    assert!(session.inventory().tools.iter().any(|t| t.mcp_name == "fake.write" && t.state == ToolState::Available));
+    assert_eq!(session.exposed_tools().len(), 2);
     let r = session
         .call("fake_read", &json!({"text":"hi"}), soon())
         .await

@@ -28,7 +28,7 @@ tracing = "0.1"
 # The shared Rust engine (closure, lints, override audit, findings baseline), linked from the same
 # hoi4-agent-tools commit the server image installs (docker/server.Dockerfile AGENT_TOOLS_VERSION,
 # crates/hoi4-tools/src/profile.rs AGENT_TOOLS_REV). A test in crates/engine-check checks they agree.
-hoi4-engine = { git = "https://github.com/klimPaskov/hoi4-agent-tools", rev = "be00dfb3d0e3fde76c59f3b5da487d4f57b89948" }
+hoi4-engine = { git = "https://github.com/klimPaskov/hoi4-agent-tools", rev = "73a5d7199ab7d1e4e3aeca74598d946512e23f3d" }
 
 # ---------------------------------------------------------------------------------------------
 # HOI4-Mod-Setup pin. This is the ONE place to bump when the upstream pull requests merge:
