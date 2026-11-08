@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.31, 2026-11-08, keep the desktop app under its memory limit
+
+- CLAUDE.md now says a coordinator runs long work as separate sessions rather than background subagents in its own process, keeps about six sessions live, archives finished ones, and resumes paused sessions after a crash.
+
+Evidence: the desktop app restarted five times on 2026-11-08. Its log showed process memory at 11.5 GB across about ten sessions, governor evictions under critical memory pressure, and a 1 GB transcript being tail-loaded. Rollback: revert this commit and regenerate.
+
 ## 0.2.30, 2026-11-06, stop only your own processes
 
 - CLAUDE.md's clean-up rule now says to stop only processes you started, matched by PID or your own session folder, never by a broad command-line pattern.
