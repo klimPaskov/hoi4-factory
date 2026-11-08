@@ -1,0 +1,37 @@
+{
+  "machine": {
+    "agent_tools": "4.12.0",
+    "arch": "x86_64",
+    "build": "debug",
+    "os": "windows",
+    "threads": 12
+  },
+  "results": [
+    {
+      "cold_projection_ms": 25117,
+      "fixture": "F-FOCUS-SMALL",
+      "gesture_round_trip_ms": [
+        26830,
+        19707,
+        24777,
+        92668,
+        39698
+      ],
+      "gesture_round_trip_p95_ms": 92668,
+      "nodes": 4,
+      "warm_projection_ms": [
+        96,
+        87,
+        82,
+        96,
+        96,
+        131,
+        95,
+        120,
+        98,
+        92
+      ],
+      "warm_projection_p95_ms": 131
+    }
+  ]
+}

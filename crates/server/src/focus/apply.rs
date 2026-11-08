@@ -24,10 +24,44 @@ pub const REWRITE_OPERATION: &str = "hoi4.focus_rewrite";
 
 type Slot = Arc<AsyncMutex<Option<FocusSession>>>;
 
-/// The Agent Tools sessions of the focus editor, one per task.
+/// The Agent Tools sessions of the focus editor, one per task, and the last projection of each
+/// tree with the worktree fingerprint it was built from.
 #[derive(Default)]
 pub struct FocusHost {
     slots: Mutex<HashMap<TaskId, Slot>>,
+    cache: Mutex<HashMap<(TaskId, String), (String, Value)>>,
+}
+
+/// A cheap fingerprint of every file in the worktree (path, size and modification time), outside
+/// `.git`. Any edit, addition or removal changes it, including localisation files that the
+/// tool's own source hashes do not list.
+pub fn worktree_fingerprint(root: &Path) -> String {
+    fn walk(base: &Path, dir: &Path, out: &mut Vec<String>) {
+        let Ok(entries) = std::fs::read_dir(dir) else { return };
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if entry.file_name() == ".git" {
+                continue;
+            }
+            let Ok(meta) = entry.metadata() else { continue };
+            if meta.is_dir() {
+                walk(base, &path, out);
+            } else {
+                let modified = meta
+                    .modified()
+                    .ok()
+                    .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+                    .map(|d| d.as_nanos())
+                    .unwrap_or(0);
+                let rel = path.strip_prefix(base).unwrap_or(&path).to_string_lossy().replace('\\', "/");
+                out.push(format!("{rel}\0{}\0{modified}", meta.len()));
+            }
+        }
+    }
+    let mut items = Vec::new();
+    walk(root, root, &mut items);
+    items.sort();
+    super::session::sha256_hex(items.join("\n").as_bytes())
 }
 
 impl FocusHost {
@@ -38,6 +72,15 @@ impl FocusHost {
             .entry(task)
             .or_default()
             .clone()
+    }
+
+    fn cached(&self, task: TaskId, tree: &str, fingerprint: &str) -> Option<Value> {
+        let cache = self.cache.lock().unwrap_or_else(|e| e.into_inner());
+        cache.get(&(task, tree.to_owned())).filter(|(f, _)| f == fingerprint).map(|(_, p)| p.clone())
+    }
+
+    fn remember(&self, task: TaskId, tree: &str, fingerprint: String, projection: Value) {
+        self.cache.lock().unwrap_or_else(|e| e.into_inner()).insert((task, tree.to_owned()), (fingerprint, projection));
     }
 
     /// Stops the session of a task, for example before its worktree is removed.
@@ -94,9 +137,18 @@ async fn store_if_new(rt: &AgentRuntime, task: &TaskKeys, built: &Built) -> Resu
 pub async fn inspect_tree(rt: &AgentRuntime, task: &TaskKeys, root: &Path, tree_id: &str) -> Result<Value, FocusError> {
     let slot = rt.focus().slot(task.id);
     let mut guard = slot.lock().await;
+    // Nothing in the worktree changed since the last projection of this tree: serve it as is.
+    let fingerprint = {
+        let root = root.to_path_buf();
+        tokio::task::spawn_blocking(move || worktree_fingerprint(&root)).await.map_err(|e| FocusError::Internal { message: e.to_string() })?
+    };
+    if let Some(projection) = rt.focus().cached(task.id, tree_id, &fingerprint) {
+        return Ok(projection);
+    }
     let session = open(rt, task, root, &mut guard).await?;
     let built = session.inspect(tree_id).await?;
     store_if_new(rt, task, &built).await?;
+    rt.focus().remember(task.id, tree_id, fingerprint, built.projection.clone());
     Ok(built.projection)
 }
 
@@ -197,6 +249,12 @@ pub async fn apply_operations(
     // The rewrite is done. A failed re-inspection still leaves a proposal to review.
     let after = session.inspect(tree_id).await;
 
+    if let Ok(built) = &after {
+        let root = root.to_path_buf();
+        if let Ok(fingerprint) = tokio::task::spawn_blocking(move || worktree_fingerprint(&root)).await {
+            rt.focus().remember(task.id, tree_id, fingerprint, built.projection.clone());
+        }
+    }
     let mut tx = rt.tx(task.acting).await.map_err(|e| db(e.code))?;
     let (after_id, after_projection) = match &after {
         Ok(built) => (Some(store::insert_projection(&mut tx, task, built).await.map_err(db)?), built.projection.clone()),

@@ -633,3 +633,53 @@ async fn an_uncommitted_proposal_is_discarded_exactly_or_not_at_all() {
     assert_eq!(refused.status, 409, "{}", refused.text);
     assert_eq!(e.source(), edited.as_bytes(), "the later edit survives");
 }
+
+/// Gate 7: measured preview and interaction times on this machine, against the proposed budgets
+/// (SPEC-007: a useful preview within 3 s, ROADMAP Q-1: an editor round trip within 1 s p95).
+/// Ignored by default because it takes minutes; run with `--ignored`. Writes
+/// `.work/s04/measure.json`. `FACTORY_AGENT_TOOLS_FIXTURE` adds the agent-tools acceptance tree.
+#[tokio::test]
+#[ignore = "timing run, minutes long"]
+async fn measure_preview_and_interaction() {
+    let Some(e) = editor().await else { return };
+    let mut results = Vec::new();
+    let time = || std::time::Instant::now();
+
+    let t = time();
+    let cold = e.projection().await;
+    let cold_ms = t.elapsed().as_millis();
+    let mut warm = Vec::new();
+    for _ in 0..10 {
+        let t = time();
+        let _ = e.projection().await;
+        warm.push(t.elapsed().as_millis());
+    }
+    let mut hash = cold["projectionHash"].as_str().unwrap().to_owned();
+    let mut round = Vec::new();
+    for i in 0..5 {
+        let t = time();
+        let r = e.ops(&e.alice, &hash, json!([{"op": "move", "focus_id": "exp_right", "x": 6 + (i % 2) + 1, "y": 1}])).await;
+        assert_eq!(r.status, 201, "{}", r.text);
+        round.push(t.elapsed().as_millis());
+        hash = r.body["projection"]["projectionHash"].as_str().unwrap().to_owned();
+    }
+    let p95 = |v: &mut Vec<u128>| {
+        v.sort();
+        v[((v.len() as f64) * 0.95).ceil() as usize - 1]
+    };
+    results.push(json!({
+        "fixture": "F-FOCUS-SMALL", "nodes": cold["nodes"].as_array().unwrap().len(),
+        "cold_projection_ms": cold_ms, "warm_projection_ms": warm.clone(), "warm_projection_p95_ms": p95(&mut warm),
+        "gesture_round_trip_ms": round.clone(), "gesture_round_trip_p95_ms": p95(&mut round),
+    }));
+    let machine = json!({
+        "os": std::env::consts::OS, "arch": std::env::consts::ARCH,
+        "threads": std::thread::available_parallelism().map(|n| n.get()).unwrap_or(0),
+        "agent_tools": factory_hoi4_tools::profile::AGENT_TOOLS_VERSION,
+        "build": if cfg!(debug_assertions) { "debug" } else { "release" },
+    });
+    let out = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../.work/s04/measure.json");
+    std::fs::create_dir_all(out.parent().unwrap()).unwrap();
+    std::fs::write(&out, serde_json::to_vec_pretty(&json!({"machine": machine, "results": results})).unwrap()).unwrap();
+    eprintln!("{}", serde_json::to_string_pretty(&results).unwrap());
+}

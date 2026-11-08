@@ -982,3 +982,63 @@ async fn resuming_after_the_grant_expired_is_refused_without_side_effects() {
     assert_eq!(after["task"]["paused"], true, "the refused resume changed nothing");
     assert_eq!(a.replay.request_count("/v1/messages"), 1);
 }
+
+/// Issue #7: a stored inference probe decides admission. An endpoint whose probe saw a call of the
+/// probe's own tool is admitted (labelled synthetic probe turn). One that refuses tools, as
+/// Ollama answered for `smollm2:135m` in S03 (the refusal text of evidence/S03/selfhosted-profile.json),
+/// is refused with `capability_unsatisfied` and no provider request.
+#[tokio::test]
+async fn admission_follows_the_stored_probe_of_a_self_hosted_endpoint() {
+    let fixtures = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../agent/tests/fixtures");
+    let tool_turn = std::fs::read(fixtures.join("synthetic/openai-synthetic-probe-turn.sse")).unwrap();
+    let text_turn = std::fs::read(fixtures.join("synthetic/openai-synthetic-text-turn.sse")).unwrap();
+    let a = agent(Setup::default()).await;
+    let capable = ReplayServer::start(vec![
+        ("/models", Reply::json(r#"{"object":"list","data":[{"id":"deepseek-flash","object":"model"}]}"#)),
+        ("/chat/completions", Reply::sse(tool_turn, None, Fault::None)),
+    ])
+    .await;
+    let text_only = ReplayServer::start(vec![
+        ("/models", Reply::json(r#"{"object":"list","data":[{"id":"smollm2:135m","object":"model"}]}"#)),
+        (
+            "/chat/completions",
+            Reply::Sequence(vec![
+                Reply::refusal(400, r#"{"error":{"message":"registry.ollama.ai/library/smollm2:135m does not support tools","type":"api_error"}}"#),
+                Reply::sse(text_turn, None, Fault::None),
+            ]),
+        ),
+    ])
+    .await;
+    let mut outcomes = Vec::new();
+    for (label, server) in [("capable", &capable), ("text-only", &text_only)] {
+        let key = a
+            .alice
+            .client
+            .post("/api/v1/account/api-keys", json!({ "provider": "openai_compatible", "label": label, "api_key": "local-key-0001", "base_url": server.base_url }))
+            .await;
+        assert_eq!(key.status, 201, "{}", key.text);
+        let id = key.body["id"].as_str().unwrap().to_owned();
+        let probe = a
+            .alice
+            .client
+            .post(&format!("/api/v1/account/api-keys/{id}/probe"), json!({ "mode": "inference", "context_tokens": 64000 }))
+            .await;
+        assert_eq!(probe.status, 200, "{}", probe.text);
+        let task = a
+            .alice
+            .client
+            .post(&a.tasks(), json!({ "objective": "Read the mod", "mode": "read_only", "model": { "profile_id": format!("user:{id}"), "key_id": id } }))
+            .await;
+        assert_eq!(task.status, 201, "{}", task.text);
+        let before = server.request_count("/chat/completions");
+        let start = a.start(&a.alice, &task.body).await;
+        outcomes.push((label, probe.body["capabilities"]["tool_calls"].clone(), start.status, start.body["error"]["code"].clone(), before));
+        if label == "text-only" {
+            assert_eq!(server.request_count("/chat/completions"), before, "a refused admission sends nothing");
+        }
+    }
+    assert_eq!(outcomes[0].1, "supported", "{outcomes:?}");
+    assert_eq!(outcomes[0].2, 201, "{outcomes:?}");
+    assert_eq!(outcomes[1].1, "unsupported", "{outcomes:?}");
+    assert_eq!((outcomes[1].2, outcomes[1].3.clone()), (409, json!("capability_unsatisfied")), "{outcomes:?}");
+}
