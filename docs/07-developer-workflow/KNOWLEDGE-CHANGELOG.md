@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.40, 2026-11-08, gptimage for page mockups (D-52)
+
+- CLAUDE.md and `ui-design-iteration` now allow the general `gptimage` tool for HOI4 Factory page and UI mockups, one request at a time and never while hoi4-imagegen is generating, with game assets still only from hoi4-imagegen. The skill also says to pass a real game render as the reference when a page shows a game surface.
+
+Evidence: hoi4-imagegen has no family for a web page, and the maintainer allowed gptimage for mockups (D-52). Rollback: revert this commit and regenerate.
+
 ## 0.2.39, 2026-11-08, CLAUDE.md slimmed (D-42)
 
 - CLAUDE.md keeps every rule as a short line. Dated incident stories, measurements and one-time history moved to the new [engineering lessons](ENGINEERING-LESSONS.md), which says which rule each story belongs to. CLAUDE.md links to it from its opening paragraph and from the section on keeping the guidance current, which now says to put new stories there.
