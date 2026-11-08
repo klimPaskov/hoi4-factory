@@ -141,6 +141,52 @@
             "summary": "A large allowance panel on top, then model keys and account side by side."
           }
         ]
+      },
+      "several": "Two pages to decide",
+      "live": "Open this variant live",
+      "focusEditor": {
+        "title": "Focus editor",
+        "question": "How should the focus tree editor be laid out? All four edit the same tree and show the same agent proposal.",
+        "options": [
+          {
+            "name": "Canvas and inspector",
+            "summary": "The canvas fills the page with the inspector on the right. The focus list and the problems fold into a drawer below."
+          },
+          {
+            "name": "Three panes",
+            "summary": "Focus list on the left, canvas in the middle, inspector and problems on the right. Everything visible at once."
+          },
+          {
+            "name": "Floating inspector",
+            "summary": "Only the canvas and a thin bar. The inspector floats over the canvas when a focus is selected. List and problems open as dialogs."
+          },
+          {
+            "name": "Table first",
+            "summary": "A table of all focuses with the cost editable in the row, a smaller canvas above, and the inspector in a dialog."
+          }
+        ]
+      },
+      "changeCard": {
+        "title": "Change card",
+        "question": "How should the review of one proposal look before it is committed? All four show the same evidence and the same actions.",
+        "options": [
+          {
+            "name": "One page with a bottom bar",
+            "summary": "Everything in review order on one page. The approve and discard buttons stay at the bottom while you scroll."
+          },
+          {
+            "name": "Two columns",
+            "summary": "What changed and whether it is safe on the left. The preview and the diff in tabs on the right, with the buttons under them."
+          },
+          {
+            "name": "Verdict first",
+            "summary": "A decision card on top says ready or not ready and why, with expandable gates. The summary, preview and diff follow."
+          },
+          {
+            "name": "Tabs",
+            "summary": "Summary, Changes, Preview and Checks as tabs under a verdict strip. The buttons sit beside the tab row."
+          }
+        ]
       }
     },
     "toolbar": {
@@ -275,6 +321,296 @@
       "public": "Public",
       "dossierKicker": "Your files",
       "requisition": "Fill in a name to open a new file."
+    },
+    "round": {
+      "focusEditor": {
+        "variants": {
+          "a": {
+            "name": "A. Canvas and inspector"
+          },
+          "b": {
+            "name": "B. Three panes"
+          },
+          "c": {
+            "name": "C. Floating inspector"
+          },
+          "d": {
+            "name": "D. Table first"
+          }
+        },
+        "states": {
+          "pending": "Agent change pending",
+          "settled": "No pending change",
+          "refreshing": "Source changed, refreshing",
+          "readonly": "Read-only focus selected"
+        }
+      },
+      "changeCard": {
+        "variants": {
+          "a": {
+            "name": "A. One page"
+          },
+          "b": {
+            "name": "B. Two columns"
+          },
+          "c": {
+            "name": "C. Verdict first"
+          },
+          "d": {
+            "name": "D. Tabs"
+          }
+        },
+        "states": {
+          "ready": "Ready",
+          "incomplete": "Closure incomplete",
+        "failed": "A check failed",
+          "stale": "Source changed",
+          "committed": "Committed"
+        }
+      }
+    },
+    "shared": {
+      "layout": {
+        "pass": "Layout: pass",
+        "revise": "Layout: revise",
+        "blocked": "Layout: blocked",
+        "unknown": "Layout: not checked"
+      }
+    },
+    "focus": {
+      "pageTitle": "Focus tree",
+      "canvasLabel": "Focus tree canvas. Drag a focus to move it, drag from the bottom dot of one focus to the top dot of another to add a requirement.",
+      "search": {
+        "label": "Find a focus by ID or title",
+        "placeholder": "Find a focus",
+        "count": "{{shown}} of {{total}}"
+      },
+      "add": "Add focus",
+      "problemCount_one": "{{count}} problem",
+      "problemCount_other": "{{count}} problems",
+      "problems": "Problems",
+      "problemsHere": "Problems with this focus",
+      "noProblems": "No problems found.",
+      "drawer": "Focuses ({{count}}) and problems ({{problems}})",
+      "editSelected": "Edit selected",
+      "viewSource": "View source",
+      "readOnly": "Read only.",
+      "refreshing": "The source changed. Refreshing the tree before you can edit again.",
+      "none": "None",
+      "iconMissing": "Icon missing",
+      "missingText": "No text yet. The game would show the key.",
+      "tabs": {
+        "label": "Focus table and problems"
+      },
+      "view": {
+        "label": "View",
+        "zoomIn": "Zoom in",
+        "zoomOut": "Zoom out",
+        "fit": "Fit"
+      },
+      "aria": {
+        "node": "Press Enter or Space to select this focus. Use the arrow keys to move it by one grid unit.",
+        "nodeNoKeys": "Select this focus to edit it in the inspector.",
+        "moved": "Moved {{direction}} to column {{x}}, row {{y}}.",
+        "edge": "Requirement between two focuses.",
+        "handle": "Connection point"
+      },
+      "node": {
+        "added": "New",
+        "changed": "Changed",
+        "locked": "Read only",
+        "aria": "{{name}}, {{id}}, cost {{cost}}",
+        "problems_one": "{{count}} problem",
+        "problems_other": "{{count}} problems"
+      },
+      "list": {
+        "title": "Focuses",
+        "open": "Focuses ({{count}})",
+        "empty": "No focus matches your search.",
+        "problems_one": "{{count}} problem",
+        "problems_other": "{{count}} problems"
+      },
+      "table": {
+        "focus": "Focus",
+        "position": "Position",
+        "requires": "Requires",
+        "state": "State",
+        "costOf": "Cost of {{name}}"
+      },
+      "severity": {
+        "error": "Error",
+        "warning": "Warning",
+        "info": "Note"
+      },
+      "pending": {
+        "region": "Pending change from the agent",
+        "title": "The agent proposed changes.",
+        "counts": "{{added}} new, {{changed}} changed.",
+        "applyAll": "Apply all",
+        "discardAll": "Discard all",
+        "apply": "Apply this change",
+        "discard": "Discard this change",
+        "applyOne": "Apply the change to {{name}}",
+        "discardOne": "Discard the change to {{name}}",
+        "addedTitle": "New focus from the agent",
+        "changedTitle": "Changed by the agent",
+        "costChange": "Cost {{before}} to {{after}}."
+      },
+      "notice": {
+        "self": "{{id}} cannot require itself.",
+        "duplicate": "{{id}} already requires {{other}}.",
+        "cycle": "{{other}} comes after {{id}} in the tree, so requiring it would make a loop.",
+        "readonly": "{{id}} cannot be edited here. Change it in the source file.",
+        "added": "Added {{id}}.",
+        "linked": "{{id}} now requires {{other}}."
+      },
+      "inspector": {
+        "title": "Selected focus",
+        "none": "Select a focus on the canvas or in the list to edit it.",
+        "close": "Close"
+      },
+      "fields": {
+        "legend": "Focus fields",
+        "title": "Title",
+        "description": "Description",
+        "cost": "Cost",
+        "x": "Column",
+        "y": "Row",
+        "requires": "Requires",
+        "excludes": "Cannot be taken with",
+        "placed": "Position set by",
+        "icon": "Icon"
+      },
+      "placed": {
+        "absolute": "Fixed column and row",
+        "relative": "Relative position",
+        "auto": "Automatic"
+      },
+      "placedRelative": "Relative to {{to}}",
+      "noRequirements": "No requirement. This focus can be taken first.",
+      "allOf": "Required",
+      "anyOf": "Any one of",
+      "removeRequirement": "Remove the requirement {{name}}",
+      "addRequirement": "Add a requirement",
+      "chooseFocus": "Choose a focus",
+      "asPartOf": "Add it as",
+      "newGroup": "A separate requirement",
+      "alternativeTo": "An alternative to {{name}}",
+      "addRequirementButton": "Add requirement"
+    },
+    "change": {
+      "title": "Review change",
+      "by": "Proposed by {{actor}} ({{kind}})",
+      "actor": {
+        "native_agent": "Agent",
+        "coding_client": "Coding client",
+        "person": "Person"
+      },
+      "state": {
+        "pending": "Waiting for review",
+        "approved": "Approved",
+        "committed": "Committed",
+        "discarded": "Discarded",
+        "stale": "Out of date"
+      },
+      "verdicts": "Verdicts",
+      "layoutLabel": "Layout verdict:",
+      "jump": "Show {{place}} in the diff",
+      "sections": {
+        "summary": "What changed",
+        "preview": "Preview",
+        "diff": "Changes by file",
+        "findings": "Findings and closure",
+        "checks": "Checks performed",
+        "limits": "Limits and restore point",
+        "evidence": "Evidence"
+      },
+      "summary": {
+        "added": "Added ({{count}})",
+        "changed": "Changed ({{count}})",
+        "removed": "Removed ({{count}})",
+        "nothingRemoved": "Nothing was removed.",
+        "plus": "New",
+        "to": "changed to"
+      },
+      "delta": {
+        "introduced": "Introduced",
+        "worsened": "Worsened",
+        "changed": "Changed",
+        "improved": "Improved",
+        "unchanged": "Unchanged",
+        "resolved": "Resolved",
+        "short": "Findings: {{introduced}} new, {{worsened}} worse"
+      },
+      "closure": {
+        "pass": "Closure: complete",
+        "incomplete": "Closure: incomplete",
+        "fail": "Closure: failed",
+        "counts": "{{resolved}} resolved, {{unresolved}} unresolved, {{unknown}} unknown.",
+        "notAPass": "Incomplete is not a pass.",
+        "unknownMeaning": "{{count}} references could not be checked."
+      },
+      "diff": {
+        "hashes": "Hash before and after"
+      },
+      "preview": {
+        "mode": "Preview as",
+        "canvas": "Canvas",
+        "image": "Rendered image",
+        "label": "Preview of the changed focus tree",
+        "imageAlt": "Placeholder for the rendered image of the focus tree",
+        "imageNote": "The rendered image appears here when the render tool has produced one.",
+        "hint": "Select a focus to jump to its line in the diff. Source render, not a game check."
+      },
+      "checks": {
+        "passed": "Passed",
+        "failed": "Failed",
+        "unavailable": "Unavailable",
+        "skipped": "Skipped"
+      },
+      "restore": {
+        "label": "Restore point:",
+        "none": "No restore point was taken."
+      },
+      "headline": {
+        "ready": "Ready to commit",
+        "incomplete": "Not fully checked",
+        "failed": "Not ready to commit",
+        "stale": "Out of date",
+        "committed": "Committed"
+      },
+      "headlineBody": {
+        "ready": "Every check passed and every reference resolves.",
+        "incomplete": "{{unknown}} references could not be checked. You can still commit after you accept that.",
+        "failed": "A check failed. Fix it or discard the change.",
+        "stale": "The source changed after the agent made this proposal. The agent has to propose it again.",
+        "committed": "The change is in the project history. The restore point below undoes it."
+      },
+      "gates": {
+        "closure": "Reference closure",
+        "layout": "Layout",
+        "layoutNote": "The layout verdict comes from the layout check of the focus tool. Revise means the tree still has crossing lines or overlaps.",
+        "findings": "Findings",
+        "checks": "Checks",
+        "checkCount": "{{passed}} of {{total}} passed"
+      },
+      "stale": {
+        "title": "The source changed.",
+        "body": "This proposal was made against an older file. It cannot be approved. Ask the agent to propose it again."
+      },
+      "actions": {
+        "approve": "Approve and commit",
+        "discard": "Discard",
+        "push": "Push and open pull request",
+        "acknowledge": "I understand that {{count}} references were not checked.",
+        "staleReason": "This proposal is out of date.",
+        "failedReason": "A check failed, so the change cannot be committed.",
+        "doneReason": "This change is already decided.",
+        "committed": "Committed. The restore point is kept.",
+        "discarded": "Discarded. Nothing was written to the project.",
+        "pushReady": "Pushes the branch and opens a pull request.",
+        "pushNoGrant": "Pushing needs a publication grant."
+      }
     }
   }
 }

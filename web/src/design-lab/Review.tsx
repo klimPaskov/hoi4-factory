@@ -103,42 +103,63 @@ function slidesFor(decision: Decision, t: (key: string) => string, withNames: bo
 export function ReviewPage() {
   const { t } = useTranslation();
   usePageTitle(t('designLab.title'));
-  const [viewing, setViewing] = useState<number | null>(null);
-  const slides = OPEN ? slidesFor(OPEN, t, true) : [];
+  const [viewing, setViewing] = useState<{ group: number; index: number } | null>(null);
+  const groups = OPEN.map((decision) => slidesFor(decision, t, true));
+  const only = OPEN.length === 1 ? OPEN[0] : undefined;
 
   return (
     <div className="review">
       <header className="review-head">
         <p className="review-kicker">{t('designLab.review.kicker')}</p>
-        {OPEN ? (
+        {only ? (
           <>
-            <h1>{t(`designLab.review.${OPEN.id}.title`)}</h1>
-            <p className="review-question">{t(`designLab.review.${OPEN.id}.question`)}</p>
-            <p className="review-how">{t('designLab.review.how')}</p>
+            <h1>{t(`designLab.review.${only.id}.title`)}</h1>
+            <p className="review-question">{t(`designLab.review.${only.id}.question`)}</p>
           </>
+        ) : OPEN.length > 1 ? (
+          <h1>{t('designLab.review.several')}</h1>
         ) : PROVISIONAL.length > 0 ? null : (
           <h1>{t('designLab.review.nothing')}</h1>
         )}
+        {OPEN.length > 0 ? <p className="review-how">{t('designLab.review.how')}</p> : null}
       </header>
-      {OPEN ? (
-        <ul className="review-options">
-          {slides.map((slide, index) => (
-            <li key={slide.src} className="review-option">
-              <button type="button" className="review-shot" onClick={() => setViewing(index)}>
-                <img src={slide.src} alt={slide.title} />
-              </button>
-              <div className="review-text">
-                <h3>
-                  <span className="review-letter">{LETTERS[index]}</span> {slide.title.slice(3)}
-                </h3>
-                <p>{slide.summary}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
-      ) : null}
-      <Viewer slides={slides} index={viewing} onIndex={setViewing} onClose={() => setViewing(null)} />
-      {!OPEN && PROVISIONAL.length > 0 ? <Provisional /> : null}
+      {OPEN.map((decision, group) => (
+        <section key={decision.id} className="review-group" aria-labelledby={`open-${decision.id}`}>
+          {only ? null : (
+            <>
+              <h2 id={`open-${decision.id}`}>{t(`designLab.review.${decision.id}.title`)}</h2>
+              <p className="review-question">{t(`designLab.review.${decision.id}.question`)}</p>
+            </>
+          )}
+          <ul className="review-options">
+            {(groups[group] ?? []).map((slide, index) => (
+              <li key={slide.src || index} className="review-option">
+                <button type="button" className="review-shot" onClick={() => setViewing({ group, index })}>
+                  <img src={slide.src} alt={slide.title} />
+                </button>
+                <div className="review-text">
+                  <h3>
+                    <span className="review-letter">{LETTERS[index]}</span> {slide.title.slice(3)}
+                  </h3>
+                  <p>{slide.summary}</p>
+                  {decision.round ? (
+                    <p>
+                      <Link to={`round/${decision.round}/${(LETTERS[index] ?? 'A').toLowerCase()}`}>{t('designLab.review.live')}</Link>
+                    </p>
+                  ) : null}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+      <Viewer
+        slides={viewing ? (groups[viewing.group] ?? []) : []}
+        index={viewing ? viewing.index : null}
+        onIndex={(index) => setViewing((current) => (current ? { ...current, index } : current))}
+        onClose={() => setViewing(null)}
+      />
+      {OPEN.length === 0 && PROVISIONAL.length > 0 ? <Provisional /> : null}
       <nav className="review-links" aria-label={t('designLab.review.more')}>
         <Link to="history">{t('designLab.review.historyLink')}</Link>
         <Link to="components">{t('designLab.components.link')}</Link>

@@ -1,13 +1,26 @@
-// What the maintainer is asked to look at. `OPEN` is the one open decision, shown first and alone
-// on the lab's front page. `HISTORY` groups the images of every decision already made, newest
+// What the maintainer is asked to look at. `OPEN` lists the open decisions, shown first on the
+// lab's front page, one titled group each. `HISTORY` groups the images of every decision already made, newest
 // first, for the archive page. Texts live in lab.en.json under designLab.review.
 export interface Decision {
   id: string;
   /** Mockup file names (without .webp) in design-lab/mockups, one per option, in order. */
   options: string[];
+  /** The id of the round in rounds.ts. Each option then links to its live variant (a, b, c ...). */
+  round?: string;
 }
 
-export const OPEN: Decision | null = null;
+export const OPEN: Decision[] = [
+  {
+    id: 'focusEditor',
+    round: 'focusEditor',
+    options: ['80-focus-a-canvas-inspector', '81-focus-b-three-panes', '82-focus-c-floating', '83-focus-d-table'],
+  },
+  {
+    id: 'changeCard',
+    round: 'changeCard',
+    options: ['85-change-a-page', '86-change-b-split', '87-change-c-verdict', '88-change-d-tabs'],
+  },
+];
 
 /**
  * Choices made overnight while the maintainer was away (they asked that work continue without

@@ -1,0 +1,660 @@
+/* The focus editor rounds (design lab). Uses the Workbench tokens from styles.css only. */
+
+.fx-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  min-height: calc(100dvh - 3rem);
+}
+.fx-page-title {
+  margin: 0;
+  font-size: var(--text-lg);
+}
+.mono {
+  font-family: var(--mono);
+  font-size: 0.92em;
+}
+
+/* ----- Toolbar, search, banners ------------------------------------------------------- */
+
+.fx-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+.fx-search {
+  position: relative;
+  flex: 1 1 13rem;
+  max-width: 22rem;
+  min-width: 0;
+}
+.fx-search input {
+  width: 100%;
+}
+.fx-search-count {
+  position: absolute;
+  inset-inline-end: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: var(--text-xs);
+  color: var(--muted);
+  pointer-events: none;
+  background: var(--surface);
+  padding-inline-start: var(--space-1);
+}
+.fx-search input[type='search'] {
+  padding-inline-end: 5.5rem;
+}
+.fx-pending-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  background: var(--primary-soft);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius);
+}
+.fx-pending-bar p {
+  margin: 0;
+}
+.fx-pending-card {
+  padding: var(--space-3);
+  background: var(--primary-soft);
+  border: 1px dashed var(--primary);
+  border-radius: var(--radius);
+  margin-bottom: var(--space-3);
+}
+.fx-pending-card p {
+  margin: 0 0 var(--space-2);
+}
+.fx-link {
+  font: inherit;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--link);
+  text-decoration: underline;
+  cursor: pointer;
+  text-align: start;
+}
+.fx-link:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.fx-source-link {
+  font-size: var(--text-sm);
+}
+
+/* ----- Canvas -------------------------------------------------------------------------- */
+
+.fx-canvas {
+  position: relative;
+  min-height: 22rem;
+  height: 100%;
+  min-width: 0;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.fx-canvas[aria-busy='true'] .react-flow__renderer {
+  opacity: 0.55;
+}
+.fx-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+.fx-canvas .react-flow {
+  color: var(--text);
+  font-family: var(--font);
+}
+.fx-canvas .react-flow__attribution {
+  background: transparent;
+  font-size: var(--text-xs);
+}
+.fx-canvas .react-flow__attribution a {
+  color: var(--muted);
+}
+.fx-canvas .react-flow__node:focus-visible,
+.fx-canvas .react-flow__node:focus-visible .fx-node {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: var(--radius);
+}
+.fx-canvas .react-flow__node {
+  cursor: grab;
+}
+.fx-canvas .react-flow__node.dragging {
+  cursor: grabbing;
+}
+
+.fx-edge .react-flow__edge-path {
+  stroke: var(--muted);
+  stroke-width: 1.5px;
+  fill: none;
+}
+.fx-or .react-flow__edge-path {
+  stroke-dasharray: 7 5;
+}
+.fx-edge.is-active .react-flow__edge-path {
+  stroke: var(--primary);
+  stroke-width: 2.5px;
+}
+.fx-excl .react-flow__edge-path {
+  stroke: var(--danger);
+  stroke-width: 2.5px;
+}
+.fx-marker {
+  stroke: var(--danger);
+  stroke-width: 2.5px;
+  fill: none;
+}
+
+.fx-node {
+  position: relative;
+  width: 88px;
+  min-height: 78px;
+  padding: 6px;
+  background: var(--surface);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  font-size: var(--text-xs);
+  line-height: 1.25;
+}
+.fx-node.is-selected {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary);
+}
+.fx-node.is-dim {
+  opacity: 0.3;
+}
+.fx-node.is-pending {
+  border-style: dashed;
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+.fx-node.is-changed {
+  border-color: var(--warning);
+  background: var(--warning-bg);
+}
+.fx-node.is-locked {
+  background: repeating-linear-gradient(135deg, var(--surface-2) 0 6px, var(--surface-3) 6px 12px);
+}
+.fx-node-head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 3px;
+}
+.fx-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-3);
+  color: var(--text);
+  font-weight: 700;
+  font-size: var(--text-xs);
+}
+.fx-icon.is-missing {
+  background: repeating-linear-gradient(45deg, var(--warning-bg) 0 4px, var(--surface) 4px 8px);
+  color: var(--warning);
+  border: 1px dashed var(--warning);
+}
+.fx-cost {
+  margin-inline-start: auto;
+  font-family: var(--mono);
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+.fx-problem {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 700;
+}
+.fx-problem-warning {
+  background: var(--warning-bg);
+  color: var(--warning);
+  border: 1px solid var(--warning);
+}
+.fx-problem-error {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border: 1px solid var(--danger);
+}
+.fx-problem-info {
+  background: var(--info-bg);
+  color: var(--info);
+  border: 1px solid var(--info);
+}
+.fx-title {
+  margin: 0;
+  font-weight: 600;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.fx-tag {
+  position: absolute;
+  top: -10px;
+  inset-inline-start: 6px;
+  padding: 0 5px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 1.4;
+}
+.fx-tag-pending {
+  background: var(--primary);
+  color: var(--primary-text);
+}
+.fx-tag-locked {
+  background: var(--surface-3);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+}
+.fx-actions {
+  position: absolute;
+  inset-inline: 0;
+  bottom: -30px;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+.fx-mini {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  padding: 0;
+}
+.fx-mini-apply {
+  background: var(--success-bg);
+  color: var(--success);
+  border-color: var(--success);
+}
+.fx-mini-discard {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border-color: var(--danger);
+}
+.fx-mini:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.fx-canvas .react-flow__handle {
+  width: 10px;
+  height: 10px;
+  background: var(--surface);
+  border: 2px solid var(--muted);
+}
+.fx-canvas .react-flow__handle.connectionindicator {
+  cursor: crosshair;
+}
+.fx-canvas .react-flow__handle.connectingto {
+  border-color: var(--primary);
+  background: var(--primary);
+}
+.fx-canvas .fx-side-handle {
+  opacity: 0;
+  pointer-events: none;
+}
+.fx-canvas .react-flow__connection-path {
+  stroke: var(--primary);
+  stroke-width: 2px;
+}
+.fx-view {
+  display: flex;
+}
+.fx-view > div {
+  display: flex;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.fx-view-button {
+  min-width: var(--control-h-sm);
+  height: var(--control-h-sm);
+  border: 0;
+  border-inline-end: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 var(--space-3);
+}
+.fx-view-button:last-child {
+  border-inline-end: 0;
+}
+.fx-view-button:hover {
+  background: var(--surface-2);
+}
+.fx-view-button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+/* ----- List, table, diagnostics -------------------------------------------------------- */
+
+.fx-list ul,
+.fx-diags,
+.fx-groups {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.fx-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  text-align: start;
+  font: inherit;
+  color: var(--text);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+.fx-row:hover {
+  background: var(--surface-2);
+}
+.fx-row.is-selected {
+  background: var(--primary-soft);
+}
+.fx-row:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+.fx-row-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.fx-row-label {
+  font-weight: 600;
+}
+.fx-row-id {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  overflow-wrap: anywhere;
+}
+.fx-row-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  justify-content: flex-end;
+}
+.fx-table tr.is-selected > * {
+  background: var(--primary-soft);
+}
+.fx-table th[scope='row'] {
+  font-weight: 600;
+  text-align: start;
+}
+.fx-table .fx-cell-input[type='number'] {
+  width: 5rem;
+  min-height: 2rem;
+}
+.fx-diags li {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border);
+}
+.fx-diags p {
+  margin: 0;
+}
+
+/* ----- Inspector ----------------------------------------------------------------------- */
+
+.fx-inspector {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.fx-inspector-head h2 {
+  margin: 0;
+}
+.fx-inspector-head p {
+  margin: 0;
+}
+.fx-fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+.fx-fieldset > legend {
+  font-weight: 600;
+  font-size: var(--text-sm);
+  padding: 0;
+  margin-bottom: var(--space-1);
+}
+.fx-numbers {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+.fx-groups li {
+  margin-bottom: var(--space-2);
+}
+.fx-groups p {
+  margin: 0 0 var(--space-1);
+}
+.fx-facts {
+  margin: 0;
+}
+.fx-node-diags h3 {
+  margin-bottom: var(--space-1);
+}
+
+/* ----- Variant A: canvas, inspector on the right, drawer below ------------------------- */
+
+.fxa-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 21rem;
+  gap: var(--space-3);
+  height: max(32rem, calc(100dvh - 17rem));
+}
+.fxa-side {
+  overflow: auto;
+  padding: var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+.fx-drawer {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+.fx-drawer > summary {
+  padding: var(--space-3);
+  cursor: pointer;
+  font-weight: 600;
+}
+.fx-drawer > summary:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+.fxa-drawer-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: var(--space-4);
+  padding: 0 var(--space-3) var(--space-3);
+}
+
+/* ----- Variant B: three panes ---------------------------------------------------------- */
+
+.fxb-grid {
+  display: grid;
+  grid-template-columns: 16rem minmax(0, 1fr) 21rem;
+  gap: var(--space-3);
+  height: max(34rem, calc(100dvh - 9rem));
+}
+.fxb-list,
+.fxb-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  overflow: auto;
+  padding: var(--space-2);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  min-height: 0;
+}
+.fxb-list .fx-search {
+  max-width: none;
+  flex: none;
+}
+.fxb-center {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+  min-height: 0;
+}
+.fxb-center .fx-canvas {
+  flex: 1;
+}
+.fxb-diags h2 {
+  margin-top: var(--space-3);
+}
+
+/* ----- Variant C: canvas with a floating inspector ------------------------------------- */
+
+.fxc {
+  padding: var(--space-2);
+}
+.fxc-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+.fxc-stage {
+  position: relative;
+  flex: none;
+  height: calc(100dvh - 15rem);
+  min-height: 30rem;
+}
+.fxc-stage .fx-canvas {
+  height: 100%;
+}
+.fxc-float {
+  position: absolute;
+  inset-inline-end: var(--space-3);
+  top: var(--space-3);
+  z-index: 6;
+  width: 21rem;
+  max-width: calc(100% - 2 * var(--space-3));
+  max-height: calc(100% - 2 * var(--space-3));
+  overflow: auto;
+  padding: var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+.fxc-close {
+  float: inline-end;
+}
+
+/* ----- Variant D: table first ---------------------------------------------------------- */
+
+.fxd-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: var(--space-3);
+  align-items: start;
+}
+.fxd-canvas {
+  height: max(30rem, calc(100dvh - 17rem));
+}
+.fx-table th[scope='row'] .fx-row-id {
+  display: block;
+}
+
+/* ----- Narrow screens ------------------------------------------------------------------ */
+
+@media (max-width: 64rem) {
+  .fxd-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .fxd-canvas {
+    height: 24rem;
+  }
+  .fxa-main,
+  .fxb-grid {
+    grid-template-columns: minmax(0, 1fr);
+    height: auto;
+  }
+  .fxa-main .fx-canvas,
+  .fxb-center .fx-canvas {
+    height: 60dvh;
+    min-height: 20rem;
+  }
+  .fxa-side,
+  .fxb-list,
+  .fxb-side {
+    max-height: none;
+  }
+  .fxb-list {
+    max-height: 16rem;
+  }
+  .fxb-center {
+    order: -1;
+  }
+  .fxc-float {
+    inset-inline: var(--space-2);
+    top: auto;
+    bottom: var(--space-2);
+    width: auto;
+    max-height: 60%;
+  }
+}
+
+@media (max-width: 48rem), (pointer: coarse) {
+  .fx-mini {
+    width: 36px;
+    height: 36px;
+  }
+  .fx-actions {
+    bottom: -40px;
+  }
+  .fx-canvas .react-flow__handle {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.fx-table th[scope='row'] {
+  min-width: 13rem;
+}
