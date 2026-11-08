@@ -18,7 +18,7 @@ S04 runs at low priority (D-36, D-46). This note says where it stands so a resum
 ## Waiting
 
 - The maintainer's choice of the focus editor and change card designs ([maintainer questions](../maintainer-questions.md) items 14 and 15). The variants are in the design lab and `web/src/api/focus.ts` already maps the server to the lab's types.
-- The rest of M-8 in a later Agent Tools release, then one more re-pin.
+- The rest of M-8 in a later Agent Tools release, then one more re-pin. From 4.13.0 the stdio server lists only the core profile unless `HOI4_AGENT_TOOLS_PROFILES=all` is set. At that re-pin, add the variable to `agent_tools_spec` and `ENV_ALLOWLIST` (or a narrower profile list that covers every tool of `agent_tools_focus_editor`), or the profile's tools are reported missing.
 
 ## Still to do
 
