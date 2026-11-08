@@ -1,0 +1,110 @@
+# HOI4 Factory decisions
+
+The HOI4 Factory product and its stages: architecture, accounts, GitHub, game reference, memory, interface design, editors, autonomy, notes and stage status. New decisions for this project are added under Decisions. Older entries live in the history records linked from each row.
+
+## In force
+
+| ID | Since | In short | Full entry |
+|---|---|---|---|
+| **Stage status and priorities** | | | |
+| S04 authorized | 2026-11-08 | S04, the focus vertical slice, is authorized on the Windows PC. Open entry items finish during the stage: M-14, the rest of M-8, the engine binary in the image, M-6 baselines and the nightly vanilla run. 3D production is outside S04. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| D-36 | 2026-11-08 | Until about 2026-11-22 tools for other modders come first. S04 keeps one low-priority work session and never holds up a tool release. | [operations](operations.md#decisions) |
+| D-46 | 2026-11-08 | After about 2026-11-22 the main effort goes to the 3D route. S04 keeps one low-priority session until the maintainer changes that. | [operations](operations.md#decisions) |
+| S04-2 | 2026-11-06 | M-1, M-5 and M-14 finish during S04 and do not gate its start. Upstream prerequisites stay: W3, hoi4.mod_index on the engine and the closure option of hoi4.script_validate. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| S04-3 | 2026-11-06 | S03 workspace tests must pass on Windows and the worker supervisor and MCP client must kill whole process trees there, done first in its own session. Its role as a gate before a Mac move ended with D-25, and the Windows checks stand on their own. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| S04 live model checks | 2026-11-08 | S04 live model checks use the funded DeepSeek key through the OpenAI-compatible profile. Claude live checks are recorded unavailable while the Anthropic key has no balance. Results are never fabricated. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| S04-4 | 2026-11-06 | The nightly real-game benchmark may run as a Windows scheduled task. See agent-tools. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| R-3 | 2026-11-06 | No private pilot after S04. The stage order stays and there are no outside users before S08. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| D-38 | 2026-11-08 | The game-rights question for a hosted server copy is settled before S08, not before S04. The drafted question and fallbacks stay ready, and there is no public launch on silence. | [below](#decisions) |
+| D-44 | 2026-11-08 | Issues #10 (queue priority) and #11 (spend alerts) are answered before S08. Until then arrival order and logged warnings stay. | [below](#decisions) |
+| Stage plans | 2026-11-01 | Every stage plan shows the full path in the stage that uses it: Rust engine, two-way editors, Hagane harvest, Q-1 gate, agent-tools coverage. Planning only, no stage is authorized by it. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| **Architecture (ADR-001 to ADR-010)** | | | |
+| ADR-001 | Before 2026-10-24 | Reuse Mod Setup's portable planning core, adapted to server workspaces. Launcher integration is dropped. | [ADR-001 to ADR-010](../02-architecture/options-and-decisions.md) |
+| ADR-003 | Before 2026-10-24 | The host owns grants and mutation receipts. The host is now the Rust server. | [ADR-001 to ADR-010](../02-architecture/options-and-decisions.md) |
+| ADR-004 | Before 2026-10-24 | Git source plus a transactional operations database plus hashed artifacts. PostgreSQL holds operational state on the server. | [ADR-001 to ADR-010](../02-architecture/options-and-decisions.md) |
+| ADR-005 | Before 2026-10-24 | The focus tree is the first visual editor. | [ADR-001 to ADR-010](../02-architecture/options-and-decisions.md) |
+| ADR-006 | Before 2026-10-24 | Maps begin with inspection and structured import. | [ADR-001 to ADR-010](../02-architecture/options-and-decisions.md) |
+| ADR-007 | Before 2026-10-24 | One writer before parallel agents. Parallel writers come after the S06 conflict and recovery tests (A3). Human collaborators are invited earlier. | [ADR-001 to ADR-010](../02-architecture/options-and-decisions.md) |
+| ADR-008 | Before 2026-10-24 | Claude Code is the development client, with rules kept portable. | [ADR-001 to ADR-010](../02-architecture/options-and-decisions.md) |
+| ADR-009 | Before 2026-10-24 | Exact and domain retrieval before vectors. M-10 allows a measured embedding layer for agent-tools reference search only. | [ADR-001 to ADR-010](../02-architecture/options-and-decisions.md) |
+| ADR-010 | Before 2026-10-24 | No unlicensed or restricted UI or editor code reuse. Written permission for two Hagane repositories is the recorded exception (D-05). | [ADR-001 to ADR-010](../02-architecture/options-and-decisions.md) |
+| **Architecture and policy (ADR-011 to ADR-028)** | | | |
+| ADR-011 | 2026-10-24 | The model loop is native Rust in the server workspace. No Node worker. The browser UI is React with TypeScript. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| ADR-012 | 2026-10-24 | A public hosted web app with GitHub or email accounts and invited collaborators. Native mod files and Git stay the source of truth. Desktop shells are dropped. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| ADR-013 | 2026-10-24 | Docker images and Compose are the deployment unit, portable across Linux hosts. No game files, credentials or user data in images. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| ADR-014 | 2026-10-24 | Native GitHub integration through a GitHub App for sign-in, import, publication and pull requests. GitHub is the only forge at first. Extended by ADR-018. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| ADR-015 | 2026-10-24 | The server holds a read-only full game reference, never exported or baked into images. The game-rights review gates public exposure. Amended for reference images by D4 and D4a. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| ADR-016 | 2026-10-24 | Free use. Users bring their own model keys, stored encrypted, or use an operator credit allowance. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| ADR-017 | 2026-10-24 | AGPL-3.0 with section 7 terms: keep author attributions and mark modified versions as different. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| ADR-018 | 2026-10-24 | Issues, pull requests, reviews, checks and merges work fully inside the app. GitHub stays authoritative. Merges respect branch protection and are never forced. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| ADR-019 | 2026-10-24 | Anthropic and OpenAI adapters. A monthly operator allowance on any model. Stripe for credits later. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| ADR-020 | 2026-10-24 | Model-directed tools on the public service run in per-task gVisor containers, proven by EXP-07 before public launch. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| ADR-021 | 2026-10-24 | Verified email. 30-day deletion grace. Projects private by default. Public copies only under a permitting license. English with translatable strings. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| ADR-022 | 2026-10-24 | Automatic personal, project and global memory in four lanes, with verified lessons and no authority. Users can forget and switch learning off. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| ADR-023 | 2026-10-24 | The agent runs validation and lesson capture at each handoff itself. The regression-test gate for guidance changes is replaced by ADR-024. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| ADR-024 | 2026-10-24 | CLAUDE.md is canonical and AGENTS.md a generated identical copy. Agents edit guidance and skills directly but never widen authority, cost or scope. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| ADR-025 | 2026-10-25 | The interface is redone in a separate UI design track. Three or four working variants per page, the maintainer picks, then the agent implements. The track started 2026-11-02 and authorizes no stage. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| ADR-025 track basics | 2026-11-02 | System font stacks only. Workbench direction with sidebar, neutral greys and one blue accent. Minimal screens. No API additions. Page order from sign-in to account. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| ADR-025 track look | 2026-11-02 | Every visual starts as an image from the image model. Generated icon set as masks. Sawtooth factory roof logo. Brick factory mascot used only for tips, tutorials and when called up. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| ADR-025 page layouts | 2026-11-02 | Per-page layouts were chosen in the design lab. Setup, the task list and the task page were switched on 2026-11-06. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| ADR-026 | 2026-10-25 | The web app stays first priority. A later desktop app for macOS, Linux and Windows syncs with it and runs local tools. See also D-02 and C4. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| ADR-027 | 2026-10-25 | New users get queue priority first and higher plans later. Agent Tools must work fully on the server, with an optional local MCP server. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| ADR-028 | 2026-10-31 | Umbrella record of the expansion consultation. Each outcome is listed here by its own ID. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| **S02 and S03 answers** | | | |
+| S02 answers | 2026-10-25 | The GitHub App has email read permission and is installed only on the test mod repository. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| S03 inputs | 2026-10-24 | $1 monthly allowance per verified user. Default model claude-haiku-5-5. Self-hosted profile checks connection, listing and outbound policy only, and the S03 handoff answers later allowed the smallest local model for that check. OpenAI profile uses recorded responses. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| S03 handoff answers | 2026-10-25 | Agent Tools runs on the server with an optional local MCP. The self-hosted check may download and use the smallest local model, amending S03 inputs. Interrupted attempts are ended, never resumed. Agent edits stay uncommitted until S04. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| S03 defaults | 2026-10-25 | Implementing-agent defaults, open to revision and not maintainer decisions: supervised worker process, writes only in the task worktree, pinned Agent Tools with a read-only profile, $0.20 and 20-turn task defaults. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
+| **Hagane harvest and permission** | | | |
+| D-05 | 2026-10-31 | The maintainer holds written permission to use the two Hagane repositories. Reuse is judged on quality and fit, and skills are not copied wholesale. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| A1 | 2026-10-31 | Harvest only hard capabilities from Hagane Studio, then archive it once Factory imports its exports and has the editors. Narrowed by A1-1 and A1-3: no preview, export or session code is ported. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| A1-2 | 2026-11-01 | No sample exports are requested. Test exports come from running Hagane Studio locally from its GPL source. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| W8-1 | 2026-11-02 | The Hagane Studio wind-down is parked, not blocked. The harvest only reads the repositories and is unaffected. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| **Product behavior** | | | |
+| D-02 | 2026-10-31 | Plan an optional local companion linking the user's PC, game install, Live Tools and mod folder to a hosted project. ADR-012 stands. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| C4 | 2026-10-31 | Local companion v1 in Rust: pairing, game detection, mod folder sync with local edits as proposals, log upload on request and Live Tools test cards. It needs its own security review. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| D-16 | 2026-11-01 | Every visual editor from S04 shows a fast, faithful in-app game preview built on the agent-tools renderers. It never replaces in-game checks. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| FR-5 | 2026-11-01 | People and agents edit the same content visually through one operation layer saved to native mod files, so each sees the other's changes at once. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| A2 | 2026-10-31 | One job engine with autonomy levels as presets of a per-project checkpoint policy. Owners may set the merge checkpoint to auto, under branch protection and required checks. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| A3 | 2026-10-31 | Parallel writer agents in separate worktrees come after the S06 conflict and recovery tests. ADR-007 order stays. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| A4 | 2026-10-31 | Factory's agent loads the kit's text skills and lessons as versioned knowledge, and a project's own CLAUDE.md or AGENTS.md as labelled data with no authority. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| B1 | 2026-10-31 | Shared notes are Obsidian-compatible Markdown in .factory/notes/ of the project repository. Only a human sets confirmed. Never shipped in the mod. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| B2 | 2026-10-31 | A deliberately minimal jobs board linked to GitHub issues. Fields are added only when real use needs them. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| B3 | 2026-10-31 | No Drift Bot is built. P13 stays adopted on its own merits. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| C3 | 2026-10-31 | New dependencies approved: @xyflow/react after a CSP spike, @dagrejs/dagre, image_dds and CodeMirror 6 (optional, lazy-loaded). | [expansion record](../08-expansion-research/00-decision-record.md) |
+| D1 | 2026-10-31 | Agent-made focus trees: the solver places each branch lane and source uses relative_position_id anchors per branch. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| D2 | 2026-10-31 | In the focus layout verdict, blocked and revise gate the commit with a recorded override, and review is advisory. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| D4 (hosted part) | 2026-10-31 | In hosted Factory, vanilla art may be sent to image providers only as reference images, still behind the game-rights review. D4a drops the per-project opt-in, and the hosted use still waits for the game-rights review (deferred to S08 by D-38). | [expansion record](../08-expansion-research/00-decision-record.md) |
+| D-11 | 2026-10-31 | The monthly operator allowance may be spent on images alongside bring-your-own keys. Per-user and per-task budgets still apply and the plan shows cost exposure. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| **Quality bar and workflow proposals** | | | |
+| Q-1 | 2026-11-01 | Factory and hoi4-agent-tools must be decisively ahead of comparable tools, proven by head-to-head benchmarks that run in CI. See agent-tools. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| Q-1a | 2026-11-01 | Q-1 uses absolute targets, not parity with rivals. The targets are in the MCP improvement plan. See agent-tools. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| P4 | 2026-10-31 | An import preservation report per path and a visible shrinking findings baseline so checks fail only on new findings. Shared with Setup and the kit. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| P6 | 2026-10-31 | Log reading order and first-error cascade rule, offered in Factory as a Report a game problem action where the companion attaches fresh logs. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| P7 | 2026-10-31 | An optional Test in game card per finished job records user-operated game results. No chat checklist. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| P12 | 2026-10-31 | A semi-autonomous design checkpoint asks only open items in tiers and never repeats settled ones. Factory only. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| P13 | 2026-10-31 | Stable IDs and locked, derived or open origin tags on spec items, with a gap audit in both directions. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| P14 | 2026-10-31 | A feasibility check before a spec commits to a mechanic, automatic in Factory design checkpoints. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| R2 | 2026-10-31 | Platform-owned IDs and automatic prefixes are rejected. Native files keep the author's IDs. See kit. | [expansion record](../08-expansion-research/00-decision-record.md) |
+
+## Decisions
+
+New entries go here in full, oldest first.
+
+| ID | Date | Question | Decision |
+|---|---|---|---|
+| D-38 | 2026-11-08 | When is the game-rights question for a hosted server copy of HOI4 settled? | Before S08, not before S04. No outside users come before S08 (R-3), and the drafted question to Paradox and its four fallbacks stay ready in the private working notes. The S08 rights gate still reads "answer received" or "fallback chosen", and the service never launches publicly on silence. This replaces the timing in R-7. Maintainer decision |
+| D-44 | 2026-11-08 | When are hoi4-factory issues #10 (queue priority for new accounts) and #11 (operator spend alerts) answered? | Before S08. They matter only once outside users arrive. Until then work is admitted in arrival order and the server logs allowance and unknown-usage warnings, as now. Maintainer decision |
+
+## Replaced or expired
+
+| ID | Status | By or until |
+|---|---|---|
+| R-7 | Replaced | D-38 |
+| ADR-002 | Replaced | ADR-011 and ADR-012 |
+| ADR-023 (test gate for guidance) | Replaced | ADR-024 |
+| A3 (round A) | Replaced | A3 (round B) |
+| D-06 | Replaced | A1 |
+| D-03 | Expired | Phase B rounds finished |
+| D-04 | Expired | Phase B research finished |
+| S02 one-offs (agent-tools #42 merge, old S01 probe deletion) | Expired | One-off actions |

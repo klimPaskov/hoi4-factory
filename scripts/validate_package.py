@@ -61,6 +61,7 @@ SKILLS = {
     "ui-design-iteration",
     "track-issues",
     "coordinate-sessions",
+    "prepare-promotion-release",
 }
 STAGE_SECTIONS = [
     "Objective and non-goals", "Entry conditions", "Read-first sequence and reuse",

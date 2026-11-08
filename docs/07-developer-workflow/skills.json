@@ -37,6 +37,10 @@
     {
       "name": "coordinate-sessions",
       "description": "Use only when the maintainer explicitly asks a session to coordinate large work that runs as many parallel sessions across the HOI4 projects. Run one coordinator that starts, answers, resumes and archives the work sessions, keep a private status page current through an hourly check-in, and hand over to a fresh coordinator when its context grows long."
+    },
+    {
+      "name": "prepare-promotion-release",
+      "description": "Use when the maintainer names a tool or the whole modder workflow for promotion. Release every promoted tool and its installers at the latest version, clean their public text, draft the video for the maintainer's review and hand over a short list, never posting anything."
     }
   ]
 }

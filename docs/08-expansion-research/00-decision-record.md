@@ -1,5 +1,7 @@
 # Expansion research decision record
 
+**History record.** Since 2026-11-08 new decisions are recorded per project in [decisions in force](../decisions/README.md) (D-35), which also lists which entries below still hold and which were replaced or have expired. This file is kept as written.
+
 Status: **Plan approved on 2026-10-31, Phase D under way**. Started 2026-10-31. Every maintainer decision in the expansion research session is recorded here when it is made, with the date and the question it answers. Decisions that change product scope are also copied into the [maintainer decision record](../02-architecture/maintainer-decisions-2026-10-24.md). Nothing in this record authorizes implementation. Phase D starts only after the maintainer approves the consolidated plan.
 
 Choices offered for each proposal: **Adopt** (take the recommended approach), **Adapt** (keep the idea, change it for our workflow), **Defer** (save for later), **Reject** (do not take it).

@@ -27,6 +27,7 @@ EXPECTED_NAMES = {
     "ui-design-iteration",
     "track-issues",
     "coordinate-sessions",
+    "prepare-promotion-release",
 }
 CLIENTS = (".claude", ".codex", ".agents")
 # ADR-023: these workflows stay invocable only by the maintainer. The others run automatically.

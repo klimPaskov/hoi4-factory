@@ -1,5 +1,7 @@
 # Maintainer decisions, 2026-10-24
 
+**History record.** Since 2026-11-08 new decisions are recorded per project in [decisions in force](../decisions/README.md) (D-35), which also lists which entries below still hold. This file is kept as written, and its statement below that no stage is authorized is historical.
+
 Status: **Recorded maintainer decisions**. Approving owner: the project maintainer, in a Claude Code planning session on 2026-10-24. Evidence base: the v02 planning package, imported as the first commit of this repository. These are product direction decisions, not experimental results. No probe, build, container or model call was run to support them.
 
 Implementation remains deferred. The maintainer stated that the application will be developed later. No stage is authorized by this record. The planning documents were revised in the same change so a future session can begin from a consistent baseline.

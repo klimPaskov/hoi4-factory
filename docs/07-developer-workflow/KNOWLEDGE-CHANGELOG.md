@@ -2,6 +2,17 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.37, 2026-11-08, review of how the work is run
+
+- Decisions now live per project under `docs/decisions/`, each file with an in-force list, and IDs continue as one global D- sequence (D-35). CLAUDE.md's reading order and recording rule point there. The two older records carry a history banner.
+- CLAUDE.md's game rule is one standing window instead of a growing list of dated nights (D-33): Windows any night 00:00 to 06:00 through one runner, the WSL copy any time, never the Mac.
+- The coordinator line no longer says to keep about six sessions live, which contradicted D-31 (D-34). It now names the usage reserve (D-39).
+- A release rule (D-40) and the new skill `prepare-promotion-release` (D-40, D-43, D-49).
+- `coordinate-sessions` checks usage at each check-in (D-39) and slows to every three hours when all sessions are idle (D-48).
+- New brief `docs/06-agent-handoffs/GOAL-MACOS-CHECKS.md` for the macOS-only checks (D-47), and the plan `docs/09-planning/NEXT-STEPS-2026-11.md`.
+
+Evidence: a review session with the maintainer on 2026-11-08 found the game rule listing five past windows with a 09:00 and 06:00 mismatch, the session cap contradiction, about 150 decisions in two mixed tables with expired and replaced entries unmarked, and PACKAGE_STATUS still saying S04 was not authorized. The maintainer answered five rounds of questions (D-33 to D-49).
+
 ## 0.2.36, 2026-11-08, a coordinator workflow for large multi-session work
 
 - New maintainer-only skill `coordinate-sessions` (D-32): one coordinator session, an hourly check-in, a private status page fed by one JSON snapshot, messaging limits between sessions, and handovers to a fresh coordinator or restarts of running sessions at their break points.

@@ -28,9 +28,9 @@ Use this workflow only when the maintainer explicitly asks a session to coordina
 
 ### Hourly check-in
 
-Schedule one recurring check-in in the coordinator with `CronCreate`, at an off minute such as `13 * * * *`. A schedule lives only as long as its session and expires after 7 days, so a new coordinator schedules its own. Each check-in:
+Schedule one recurring check-in in the coordinator with `CronCreate`, at an off minute such as `13 * * * *`. A schedule lives only as long as its session and expires after 7 days, so a new coordinator schedules its own. Run it hourly while work sessions are live. When every session is idle, archived or waiting on the maintainer, replace it with a check-in every three hours (`13 */3 * * *`), and switch back when work resumes (D-48). Each check-in:
 
-1. Checks free disk on C: and free memory.
+1. Checks free disk on C:, free memory and usage (`get_usage`). Above about 80% of the weekly usage limit it starts no new work session, lets running sessions finish their current step and keeps the rest for the maintainer, unless the maintainer lifted the limit for this push (D-39).
 2. Reads each session's state with `list_sessions` and the end of its transcript with `list_events`. It sends one short resume message to each session a crash paused, staggering heavy jobs (Blender, the game, Rust builds) so only one runs at a time. It archives sessions that reported done.
 3. Lists open pull requests and the latest release in each project repository with `gh`.
 4. Rewrites the status snapshot, uploads it and points the page at it.
