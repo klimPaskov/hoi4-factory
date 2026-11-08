@@ -224,3 +224,45 @@ async fn work_done_outside_the_factory_is_detected_when_the_branch_comes_back() 
     let events = alice.client.get(&format!("{base}/events?after=0&limit=200")).await;
     assert!(events.body["events"].as_array().unwrap().iter().any(|e| e["type"] == "external_changes"));
 }
+
+/// Gate 8 (P4): every import gets a preservation report (one row per file: parsed, kept
+/// byte-exact or not understood) and a recorded engine baseline for its commit.
+#[tokio::test]
+async fn an_upload_gets_a_preservation_report_and_a_baseline() {
+    let h = Harness::start(Options {
+        anthropic_key: Some("sk-ant-not-used"),
+        agent: AgentOptions { worker: None, settings: None, tools: Some(None), skip_recovery: true },
+        ..Options::default()
+    })
+    .await;
+    let alice = h.verified_user("alice@example.org").await;
+    let project = h.project(&alice, "Report").await;
+    let entries = vec![
+        ZEntry::file("descriptor.mod", b"name=\"Report\"\nsupported_version=\"1.19.*\"\n".to_vec()),
+        ZEntry::file("common/national_focus/ok.txt", b"focus_tree = {\n\tid = ok_tree\n\tfocus = {\n\t\tid = OK_one\n\t\tx = 1\n\t\ty = 0\n\t\tcost = 10\n\t}\n}\n".to_vec()),
+        ZEntry::file("common/national_focus/broken.txt", b"focus_tree = {\n\tid = broken\n\tfocus = {\n".to_vec()),
+        ZEntry::file("gfx/art.dds", vec![0u8, 159, 146, 150, 1, 2, 3]),
+    ];
+    let up = alice
+        .client
+        .upload(&project, &[Part::text("kind", "zip"), Part::text("git_init_consent", "true"), Part::file("r.zip", build_zip(&entries))])
+        .await;
+    assert_eq!(up.status, 201, "{}", up.text);
+    let deadline = std::time::Instant::now() + Duration::from_secs(120);
+    let report = loop {
+        let r = alice.client.get(&format!("/api/v1/projects/{project}/import-report")).await;
+        assert_eq!(r.status, 200, "{}", r.text);
+        if r.body["state"] == "recorded" {
+            break r.body["report"].clone();
+        }
+        assert!(std::time::Instant::now() < deadline, "no report: {}", r.text);
+        tokio::time::sleep(Duration::from_millis(250)).await;
+    };
+    assert_eq!(report["engine_rev"], factory_engine_check::ENGINE_REV);
+    let rows = report["preservation"]["rows"].as_array().unwrap();
+    let status = |p: &str| rows.iter().find(|r| r["path"] == p).map(|r| r["status"].clone()).unwrap_or(Value::Null);
+    assert_eq!(status("common/national_focus/ok.txt"), "parsed", "{report:#}");
+    assert_eq!(status("common/national_focus/broken.txt"), "not_understood");
+    assert_eq!(status("gfx/art.dds"), "kept_byte_exact");
+    assert_ne!(report["verdict"], "pass", "no game reference: never a pass");
+}

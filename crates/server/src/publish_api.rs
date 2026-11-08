@@ -3,6 +3,7 @@
 //! | Method and path | Role needed | Purpose |
 //! |---|---|---|
 //! | `POST /projects/{id}/tasks/{task}/check` | member | Run the engine commit check on the task's worktree now |
+//! | `GET /projects/{id}/import-report` | member | The engine baseline and preservation report of the newest import or commit |
 //! | `POST .../tasks/{task}/commit` | `ApproveProposal` | Commit the listed proposals, bound to their hashes, after the check |
 //! | `POST .../tasks/{task}/restore` | `ApproveProposal` | Undo one factory commit, keeping later edits |
 //! | `GET .../tasks/{task}/publications` | member | Commits, pushes, pull requests and restores of the task |
@@ -43,6 +44,7 @@ pub fn router(state: &ServerState) -> Router {
     let accepted = accepted_origins(state);
     Router::new()
         .route("/projects/{id}/tasks/{task}/check", post(check))
+        .route("/projects/{id}/import-report", get(import_report))
         .route("/projects/{id}/tasks/{task}/commit", post(commit))
         .route("/projects/{id}/tasks/{task}/restore", post(restore))
         .route("/projects/{id}/tasks/{task}/publications", get(publications))
@@ -799,4 +801,22 @@ async fn sync(
             Ok(Json(json!({ "external_changes": true, "from": local.as_str(), "to": now.as_str(), "changed_paths": changed })))
         }
     }
+}
+
+/// The import preservation report and baseline (gate 8, P4). `pending` while the background
+/// check of a fresh import is still running.
+async fn import_report(
+    principal: Principal,
+    State(state): State<ServerState>,
+    Path(id): Path<String>,
+) -> Result<Json<Value>, Fail> {
+    let rt = runtime(&state)?;
+    let project = project_for(&state, &principal, &id, Permission::ReadProject).await?;
+    let mut tx = rt.tx(principal.account_id()).await?;
+    let report = publish::latest_report(&mut tx, project.id.0).await?;
+    tx.commit().await?;
+    Ok(Json(match report {
+        Some(r) => json!({ "state": "recorded", "report": r }),
+        None => json!({ "state": "pending", "report": null }),
+    }))
 }

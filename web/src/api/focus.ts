@@ -239,12 +239,15 @@ export function toChangeCard(
     actor: { kind: p.actorKind, name: actorName },
     operation: p.toolOperation,
     summary: { added: p.summary.added, changed: p.summary.changed, removed: p.summary.removed },
-    files: p.diffs.map((d) => ({
-      path: d.path,
-      beforeSha256: p.before[d.path] && p.before[d.path] !== 'absent' ? p.before[d.path] : null,
-      afterSha256: p.after[d.path] ?? '',
-      unifiedDiff: d.diff,
-    })),
+    files: p.diffs.map((d) => {
+      const before = p.before[d.path];
+      return {
+        path: d.path,
+        beforeSha256: before !== undefined && before !== 'absent' ? before : null,
+        afterSha256: p.after[d.path] ?? '',
+        unifiedDiff: d.diff,
+      };
+    }),
     sourceLinks: p.changedIds.flatMap((id) => {
       const n = nodes.get(id);
       return n ? [{ focusId: id, source: n.source }] : [];
