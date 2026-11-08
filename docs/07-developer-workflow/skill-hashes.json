@@ -62,15 +62,15 @@
     {
       "name": "coordinate-sessions",
       "source": "docs/07-developer-workflow/skill-workflows/coordinate-sessions/BODY.md",
-      "body_sha256": "9febd35d921f7f64286ce0ccfa1906b8f2314130523a9c36188ecdba7a236228",
+      "body_sha256": "d5d9955e2db5519d9effe908ba2e4c4c399bbc15070ddd1fad1a4dc3298219ba",
       "generated": [
         {
           "path": ".claude/skills/coordinate-sessions/SKILL.md",
-          "sha256": "c1ffa3cc10e05df94fd19744004f79bfec1cd985c4dc47464291c98072c00882"
+          "sha256": "31a3d6dac131b4753241a63e7e200cb5e674aab9d0d14ee3f53dbe2f1daed933"
         },
         {
           "path": ".codex/skills/coordinate-sessions/SKILL.md",
-          "sha256": "f752658d0b59437a10c96dc0a93974db41c41942ea94ecc74f5e80a9a1afaaef"
+          "sha256": "3332039ca103884b272091e65d06777d09b40310c086dcddd3e8503d58f966c0"
         },
         {
           "path": ".codex/skills/coordinate-sessions/agents/openai.yaml",
@@ -78,7 +78,7 @@
         },
         {
           "path": ".agents/skills/coordinate-sessions/SKILL.md",
-          "sha256": "f752658d0b59437a10c96dc0a93974db41c41942ea94ecc74f5e80a9a1afaaef"
+          "sha256": "3332039ca103884b272091e65d06777d09b40310c086dcddd3e8503d58f966c0"
         },
         {
           "path": ".agents/skills/coordinate-sessions/agents/openai.yaml",
