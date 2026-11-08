@@ -182,6 +182,42 @@ pub struct FocusSession {
     session: ToolSession,
     root: PathBuf,
     tool_version: String,
+    /// The tools' state folder, where they keep their artifacts.
+    state: PathBuf,
+}
+
+/// A game-view render: the PNG and its hover map (each focus's rectangle in image pixels).
+#[derive(Debug, Clone)]
+pub struct Rendered {
+    pub png: Vec<u8>,
+    pub map: Value,
+}
+
+/// Finds an artifact file by its SHA-256 under the tools' state folder and checks its bytes.
+/// Agent Tools stores each artifact in a folder named after its hash, and `resources/read` stops
+/// at 1 MiB, which a full render passes.
+fn artifact_bytes(state: &Path, name: &str, sha256: &str) -> Option<Vec<u8>> {
+    fn walk(dir: &Path, name: &str, sha256: &str, depth: usize) -> Option<Vec<u8>> {
+        if depth > 8 {
+            return None;
+        }
+        for entry in std::fs::read_dir(dir).ok()?.flatten() {
+            let path = entry.path();
+            let kind = entry.file_type().ok()?;
+            if kind.is_dir() {
+                if let Some(found) = walk(&path, name, sha256, depth + 1) {
+                    return Some(found);
+                }
+            } else if kind.is_file() && entry.file_name().to_string_lossy() == name {
+                let bytes = std::fs::read(&path).ok()?;
+                if sha256_hex(&bytes) == sha256 {
+                    return Some(bytes);
+                }
+            }
+        }
+        None
+    }
+    walk(state, name, sha256, 0)
 }
 
 impl FocusSession {
@@ -207,7 +243,7 @@ impl FocusSession {
             .as_ref()
             .map(|h| h.server_version.clone())
             .unwrap_or_default();
-        Ok(Self { session, root: root.to_path_buf(), tool_version })
+        Ok(Self { session, root: root.to_path_buf(), tool_version, state })
     }
 
     pub fn root(&self) -> &Path {
@@ -246,6 +282,46 @@ impl FocusSession {
             BuildError::NotInMod(path) => FocusError::NotInMod { path },
             BuildError::Malformed(m) => FocusError::Internal { message: m.into() },
         })
+    }
+
+    /// Draws the tree as the game draws it (`hoi4.focus_render`, view game).
+    pub async fn render(&mut self, base: &Built) -> Result<Rendered, FocusError> {
+        let deadline = Instant::now() + REWRITE_TIMEOUT;
+        let request = json!({ "relativePath": base.relative_path, "treeId": base.tree_id, "view": "game" });
+        let result = self
+            .session
+            .call(factory_hoi4_tools::profile::FOCUS_RENDER, &request, deadline)
+            .await
+            .map_err(tool_error)?;
+        let structured = result.output.structured.clone().unwrap_or(Value::Null);
+        if result.output.is_error || structured["status"] != "ok" {
+            return Err(FocusError::ToolRefused {
+                tool_code: structured["code"].as_str().unwrap_or("").to_owned(),
+                message: structured["blockers"][0]["message"].as_str().unwrap_or("focus_render failed").to_owned(),
+                blockers: structured["blockers"].clone(),
+            });
+        }
+        let artifacts = structured["artifacts"].as_array().cloned().unwrap_or_default();
+        let find = |suffix: &str| artifacts.iter().find(|a| a["name"].as_str().is_some_and(|n| n.ends_with(suffix))).cloned();
+        let (Some(png), Some(map)) = (find(".png"), find(".json")) else {
+            return Err(FocusError::Internal { message: "focus_render linked no PNG or hover map".into() });
+        };
+        let map_text = self
+            .session
+            .read_artifact(map["uri"].as_str().unwrap_or(""), deadline)
+            .await
+            .map_err(tool_error)?;
+        let map: Value = serde_json::from_str(&map_text.text).map_err(|e| FocusError::Internal { message: format!("hover map: {e}") })?;
+        let (state, name, sha) = (
+            self.state.clone(),
+            png["name"].as_str().unwrap_or("").to_owned(),
+            png["sha256"].as_str().unwrap_or("").to_owned(),
+        );
+        let png = tokio::task::spawn_blocking(move || artifact_bytes(&state, &name, &sha))
+            .await
+            .map_err(|e| FocusError::Internal { message: e.to_string() })?
+            .ok_or_else(|| FocusError::Internal { message: "the render's PNG was not found with its hash".into() })?;
+        Ok(Rendered { png, map })
     }
 
     /// The current hash of every file the projection read, or `None` when none changed.

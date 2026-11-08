@@ -683,3 +683,32 @@ async fn measure_preview_and_interaction() {
     std::fs::write(&out, serde_json::to_vec_pretty(&json!({"machine": machine, "results": results})).unwrap()).unwrap();
     eprintln!("{}", serde_json::to_string_pretty(&results).unwrap());
 }
+
+/// D-50: the live preview is the game-view render from Agent Tools, with a hover map of every
+/// focus, and it is drawn again after the source changes.
+#[tokio::test]
+async fn the_live_preview_is_the_game_render_and_follows_the_source() {
+    let Some(e) = editor().await else { return };
+    let p = e.projection().await;
+    let map = e.alice.client.get(&format!("{}/focus/trees/exp_basic_tree/preview.json", e.base())).await;
+    assert_eq!(map.status, 200, "{}", map.text);
+    let focuses = map.body["render"]["focuses"].as_array().unwrap();
+    assert_eq!(focuses.len(), 4, "{}", map.body);
+    assert!(map.body["render"]["width"].as_u64().unwrap() > 0);
+    let png = e.alice.client.get(&format!("{}/focus/trees/exp_basic_tree/preview.png", e.base())).await;
+    assert_eq!(png.status, 200);
+    assert!(png.text.as_bytes().starts_with(b"\xef\xbf\xbdPNG") || png.text.contains("PNG"), "a PNG image");
+    let x_of = |m: &Value, id: &str| m["layout"]["nodes"].as_array().unwrap().iter().find(|n| n["id"] == id).unwrap()["x"].clone();
+    assert_eq!(x_of(&map.body, "exp_right"), 6);
+
+    let r = e.ops(&e.alice, p["projectionHash"].as_str().unwrap(), json!([{"op": "move", "focus_id": "exp_right", "x": 7, "y": 1}])).await;
+    assert_eq!(r.status, 201, "{}", r.text);
+    let after = e.alice.client.get(&format!("{}/focus/trees/exp_basic_tree/preview.json", e.base())).await;
+    assert_eq!(after.status, 200, "{}", after.text);
+    assert_eq!(x_of(&after.body, "exp_right"), 7, "the preview follows the source");
+
+    // Another account cannot see it.
+    let mallory = e.h.verified_user("mallory@example.org").await;
+    let refused = mallory.client.get(&format!("{}/focus/trees/exp_basic_tree/preview.png", e.base())).await;
+    assert_eq!(refused.status, 404);
+}

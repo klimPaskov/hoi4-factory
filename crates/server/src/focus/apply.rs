@@ -30,6 +30,7 @@ type Slot = Arc<AsyncMutex<Option<FocusSession>>>;
 pub struct FocusHost {
     slots: Mutex<HashMap<TaskId, Slot>>,
     cache: Mutex<HashMap<(TaskId, String), (String, Value)>>,
+    renders: Mutex<HashMap<(TaskId, String), (String, super::session::Rendered)>>,
 }
 
 /// A cheap fingerprint of every file in the worktree (path, size and modification time), outside
@@ -463,4 +464,39 @@ pub async fn discard_proposal(rt: &AgentRuntime, task: &TaskKeys, root: &Path, a
     tx.commit().await.map_err(db)?;
     rt.notify(task.id);
     Ok(json!({"discarded": id, "restored_paths": paths}))
+}
+
+/// The tree's live preview as the game draws it (D-50): served from memory while nothing in the
+/// worktree changed, drawn again after any change.
+pub async fn render_tree(rt: &AgentRuntime, task: &TaskKeys, root: &Path, tree_id: &str) -> Result<super::session::Rendered, FocusError> {
+    let fingerprint = {
+        let root = root.to_path_buf();
+        tokio::task::spawn_blocking(move || worktree_fingerprint(&root)).await.map_err(|e| FocusError::Internal { message: e.to_string() })?
+    };
+    let key = (task.id, tree_id.to_owned());
+    if let Some((f, r)) = rt.focus().renders.lock().unwrap_or_else(|e| e.into_inner()).get(&key)
+        && *f == fingerprint
+    {
+        return Ok(r.clone());
+    }
+    let projection_known = {
+        let mut tx = rt.tx(task.acting).await.map_err(|e| db(e.code))?;
+        let l = store::latest_projection(&mut tx, task.id, tree_id).await.map_err(db)?;
+        tx.commit().await.map_err(db)?;
+        l.map(|(_, b)| b)
+    };
+    let slot = rt.focus().slot(task.id);
+    let mut guard = slot.lock().await;
+    let session = open(rt, task, root, &mut guard).await?;
+    let base = match projection_known {
+        Some(b) => b,
+        None => {
+            let built = session.inspect(tree_id).await?;
+            store_if_new(rt, task, &built).await?;
+            built
+        }
+    };
+    let rendered = session.render(&base).await?;
+    rt.focus().renders.lock().unwrap_or_else(|e| e.into_inner()).insert(key, (fingerprint, rendered.clone()));
+    Ok(rendered)
 }

@@ -495,6 +495,16 @@ pub fn agent_tools_focus_editor() -> ToolProfile {
     profile.id = "hoi4-agent-tools.focus-editor.v1".into();
     profile.mode = ProfileMode::HostGuardedWrite;
     profile.tools.push(tool(
+        "hoi4.focus_render",
+        FOCUS_RENDER,
+        "Draw one focus tree as the game draws it (game view). Host only: the editor's live preview (D-50).",
+        EffectClass::DerivedJob,
+        focus_render_host_schema(),
+        240,
+        64 * 1024,
+        FOCUS_RENDER_SCHEMA_HASH,
+    ));
+    profile.tools.push(tool(
         "hoi4.focus_rewrite",
         FOCUS_REWRITE,
         "Rewrite one focus tree from a complete plan. Host only: never offered to the model.",
@@ -505,6 +515,23 @@ pub fn agent_tools_focus_editor() -> ToolProfile {
         FOCUS_REWRITE_SCHEMA_HASH,
     ));
     profile
+}
+
+/// The host's name for `hoi4.focus_render` in [`agent_tools_focus_editor`].
+pub const FOCUS_RENDER: &str = "agent_tools_focus_render";
+
+/// A game-view render of one tree: the editor's live preview.
+fn focus_render_host_schema() -> Value {
+    json!({
+        "type": "object",
+        "properties": {
+            "relativePath": {"type": "string", "pattern": "^common/national_focus/[A-Za-z0-9_. -]+[.]txt$"},
+            "treeId": {"type": "string", "minLength": 1, "maxLength": 256},
+            "view": {"type": "string", "enum": ["game"]}
+        },
+        "required": ["relativePath", "treeId", "view"],
+        "additionalProperties": false
+    })
 }
 
 /// The host's name for `hoi4.focus_rewrite` in [`agent_tools_focus_editor`].
@@ -526,6 +553,10 @@ fn focus_rewrite_host_schema() -> Value {
         "additionalProperties": false
     })
 }
+
+/// Input-schema hash of `hoi4.focus_render` in the pinned server.
+const FOCUS_RENDER_SCHEMA_HASH: Option<&str> =
+    Some("9f30a3e06751d633eb5a9a0b9ab86e895db4c84d907e9f1c5fc63827b0431c84");
 
 /// Input-schema hash of `hoi4.focus_rewrite` in the pinned server.
 const FOCUS_REWRITE_SCHEMA_HASH: Option<&str> =

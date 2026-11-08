@@ -3,6 +3,7 @@
 //! | Method and path | Role needed | Purpose |
 //! |---|---|---|
 //! | `GET /projects/{id}/tasks/{task}/focus/trees/{tree}` | member | The tree's projection from `hoi4.focus_inspect` in the task's worktree |
+//! | `GET .../focus/trees/{tree}/preview.png`, `.../preview.json` | member | The live preview as the game draws it (D-50) and its hover map |
 //! | `POST .../focus/trees/{tree}/operations` | `CreateTask`, edit task | Apply focus operations as one C-02 proposal, with the person as actor |
 //! | `GET /projects/{id}/tasks/{task}/proposals` | member | The task's change proposals, oldest first |
 //! | `GET .../proposals/{proposal}` | member | One proposal: summary, diffs, hashes and checks |
@@ -38,6 +39,8 @@ pub fn router(state: &ServerState) -> Router {
     Router::new()
         .route("/projects/{id}/tasks/{task}/focus/trees/{tree}", get(projection))
         .route("/projects/{id}/tasks/{task}/focus/trees/{tree}/operations", post(operations))
+        .route("/projects/{id}/tasks/{task}/focus/trees/{tree}/preview.png", get(preview_png))
+        .route("/projects/{id}/tasks/{task}/focus/trees/{tree}/preview.json", get(preview_map))
         .route("/projects/{id}/tasks/{task}/proposals", get(proposals))
         .route("/projects/{id}/tasks/{task}/proposals/{proposal}", get(proposal))
         .route("/projects/{id}/tasks/{task}/proposals/{proposal}/discard", post(discard))
@@ -199,4 +202,36 @@ async fn discard(
         .await
         .map_err(focus_fail)?;
     Ok(Json(done))
+}
+
+async fn rendered(state: &ServerState, principal: &Principal, id: &str, task: &str, tree: &str) -> Result<crate::focus::session::Rendered, Fail> {
+    let rt = runtime(state)?;
+    let project = project_for(state, principal, id, Permission::ReadProject).await?;
+    let task = load_task(rt, principal, &project, task).await?;
+    if !valid_tree_id(tree) {
+        return Err(ApiError::not_found().into());
+    }
+    let (root, _) = ensure_worktree(state, &project, task.id).await?;
+    crate::focus::apply::render_tree(rt, &TaskKeys::of(&task, principal.account_id()), &root, tree)
+        .await
+        .map_err(focus_fail)
+}
+
+async fn preview_png(
+    principal: Principal,
+    State(state): State<ServerState>,
+    Path((id, task, tree)): Path<(String, String, String)>,
+) -> Result<axum::response::Response, Fail> {
+    use axum::response::IntoResponse;
+    let r = rendered(&state, &principal, &id, &task, &tree).await?;
+    Ok(([(axum::http::header::CONTENT_TYPE, "image/png"), (axum::http::header::CACHE_CONTROL, "no-store")], r.png).into_response())
+}
+
+async fn preview_map(
+    principal: Principal,
+    State(state): State<ServerState>,
+    Path((id, task, tree)): Path<(String, String, String)>,
+) -> Result<Json<Value>, Fail> {
+    let r = rendered(&state, &principal, &id, &task, &tree).await?;
+    Ok(Json(json!({ "render": r.map["render"], "layout": r.map["layout"] })))
 }
