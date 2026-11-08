@@ -383,3 +383,86 @@ async fn junk_on_stdin_is_a_protocol_violation_not_a_frame() {
         .unwrap();
     assert!(!status.success());
 }
+
+/// Reads the helper pid the worker logged to stderr (`grandchild <pid>`).
+async fn grandchild_pid(w: &WorkerProcess) -> u32 {
+    for _ in 0..100 {
+        if let Some(pid) = w
+            .stderr_tail()
+            .lines()
+            .find_map(|l| l.split("grandchild ").nth(1))
+            .and_then(|p| p.trim().parse().ok())
+        {
+            return pid;
+        }
+        tokio::time::sleep(Duration::from_millis(50)).await;
+    }
+    panic!("the worker never logged a grandchild: {}", w.stderr_tail());
+}
+
+/// Whether `pid` is a live process (a zombie or an exited process counts as gone).
+fn process_alive(pid: u32) -> bool {
+    #[cfg(windows)]
+    {
+        let out = std::process::Command::new("tasklist")
+            .args(["/FI", &format!("PID eq {pid}"), "/NH", "/FO", "CSV"])
+            .output()
+            .expect("tasklist");
+        String::from_utf8_lossy(&out.stdout).contains(&format!("\",\"{pid}\",\""))
+    }
+    #[cfg(unix)]
+    {
+        // SAFETY: signal 0 only checks that the process exists.
+        let exists = unsafe { libc::kill(pid as libc::pid_t, 0) } == 0;
+        let zombie = std::fs::read_to_string(format!("/proc/{pid}/stat"))
+            .ok()
+            .and_then(|s| {
+                s.rsplit_once(')')
+                    .map(|(_, rest)| rest.trim_start().starts_with('Z'))
+            })
+            .unwrap_or(false);
+        exists && !zombie
+    }
+}
+
+async fn assert_gone(pid: u32, what: &str) {
+    for _ in 0..50 {
+        if !process_alive(pid) {
+            return;
+        }
+        tokio::time::sleep(Duration::from_millis(100)).await;
+    }
+    panic!("{what} (pid {pid}) is still running");
+}
+
+#[tokio::test]
+async fn cancel_kills_the_workers_whole_process_tree() {
+    let server = tool_server(true).await;
+    let mut w = spawn(1, Some("ignore_cancel_grandchild")).await;
+    let worker = w.pid().expect("worker pid");
+    let helper = grandchild_pid(&w).await;
+    assert!(process_alive(helper), "the helper starts alive");
+    let p = payload(&server.base_url);
+    let _ = tokio::time::timeout(
+        Duration::from_millis(500),
+        w.run_turn("req-t", "att-t", &p, Duration::from_secs(30)),
+    )
+    .await;
+    assert!(matches!(
+        w.cancel(Duration::from_millis(400)).await,
+        CancelOutcome::Killed { .. }
+    ));
+    assert_gone(worker, "the worker").await;
+    assert_gone(helper, "the worker's helper process").await;
+}
+
+#[tokio::test]
+async fn shutdown_leaves_no_helper_process_behind() {
+    let mut w = spawn(1, Some("grandchild")).await;
+    let helper = grandchild_pid(&w).await;
+    assert!(process_alive(helper), "the helper starts alive");
+    let worker = w.pid().expect("worker pid");
+    w.shutdown().await;
+    assert_gone(worker, "the worker").await;
+    assert_gone(helper, "the worker's helper process").await;
+}

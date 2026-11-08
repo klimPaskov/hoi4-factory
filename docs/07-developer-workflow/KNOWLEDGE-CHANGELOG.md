@@ -2,6 +2,31 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.30, 2026-11-06, stop only your own processes
+
+- CLAUDE.md's clean-up rule now says to stop only processes you started, matched by PID or your own session folder, never by a broad command-line pattern.
+
+Evidence: the trailer session stopped its own render by matching any `blender.exe` whose command line contained "scratchpad", and also stopped two other sessions' background Blender jobs. Rollback: revert this commit and regenerate.
+
+## 0.2.29, 2026-11-06, a Live Tools game window and development stays on Windows
+
+- CLAUDE.md's in-game exceptions now include D-24: one runner session may start the game from 00:00 to 09:00 local on 2026-11-07 for the HOI4 Live Tools checklist, under the same limits as the earlier nights.
+- The decision record adds D-25: HOI4 Factory development, S04 included, stays on the Windows PC and does not move to the Mac.
+
+Evidence: the Live Tools session merged its DLC prepare step, launch fixes and four check tools, all tested offline only, with ten in-game checks left. The maintainer chose tonight for them and said S04 starts on Windows. Rollback: revert this commit and regenerate.
+
+## 0.2.28, 2026-11-06, merges and pushes need no asking
+
+- CLAUDE.md's routine-steps rule now records D-23. Agents merge and push without asking the maintainer, in every repository the work touches, mods included, and also for configuration changes a recorded decision approved. The D-18 limits stay.
+
+Evidence: a Chaos Redux session left a decision-approved configuration PR for the maintainer to merge, and the maintainer said not to ask again for merges or pushes. Rollback: revert this commit and regenerate.
+
+## 0.2.27, 2026-11-06, kit changes can break every Setup install
+
+- CLAUDE.md now says that HOI4 Mod Setup installs from kit `main`, so a kit PR that moves or rewrites files with Setup component markers, or changes the package manifest, must pass Setup's offline acceptance or the kit's Setup-reading test before it merges.
+
+Evidence: kit #82 (context budget) left `hoi4-project-rules` references `mcp-usage.md` and `skill-routing.md` ending with an unterminated optional block for `workflow.live_tools` and `workflow.live_testing`. Setup's component adapter refused them, so every install of kit `main` failed, the released Setup 0.9.2 included. The kit's own CI passed. Kit #85 removed the dangling markers and added a test that reads every tracked file the way Setup does. Rollback: revert this commit and regenerate.
+
 ## 0.2.26, 2026-11-06, provisional design choices and opening the lab
 
 - The `ui-design-iteration` skill now covers provisional picks when the maintainer asks that work go on without approval, and says to list them in chat in the lab's order with the lab's letters.

@@ -26,6 +26,9 @@ pub mod sse;
 pub mod transport;
 pub mod types;
 
+#[cfg(windows)]
+pub(crate) mod job_windows;
+
 #[cfg(feature = "anthropic")]
 pub mod anthropic;
 #[cfg(feature = "anthropic")]

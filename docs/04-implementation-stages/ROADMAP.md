@@ -1,6 +1,6 @@
 # Implementation roadmap
 
-Status: **In implementation**. S01 to S03 are complete. The UI design track is next, then S04. Each stage still needs its own authorization. [MASTER_GOAL](../MASTER_GOAL.md) defines the product, the [maintainer decisions](../02-architecture/maintainer-decisions-2026-10-24.md) of 2026-10-24 set the hosted web, Rust runtime, Docker, GitHub and licensing direction, and each stage below defines a separately reviewable unit of work.
+Status: **In implementation**. S01 to S03 and the UI design track are complete. S04 is next, once its entry items are done (see [package status](../PACKAGE_STATUS.md#s04-readiness-checked-on-2026-11-06)). Each stage still needs its own authorization. [MASTER_GOAL](../MASTER_GOAL.md) defines the product, the [maintainer decisions](../02-architecture/maintainer-decisions-2026-10-24.md) of 2026-10-24 set the hosted web, Rust runtime, Docker, GitHub and licensing direction, and each stage below defines a separately reviewable unit of work.
 
 On 2026-11-01 the maintainer asked for every stage plan to be updated at once, so the whole path is planned before the next authorization. The stage files now say how each stage uses the shared Rust engine, the visual editors with two-way editing (FR-5), the narrowed Hagane harvest (A1, A1-1), the MCP tools and the tool quality bar (Q-1). The cross-stage plan is in [engine, editors and tools across stages](#engine-editors-and-tools-across-stages). This update authorizes no stage.
 
@@ -181,11 +181,11 @@ The maintainer's MCP decisions of 2026-11-01 are recorded in the [expansion deci
 
 | Decision | Lands in | HOI4 Factory stage that relies on it | Done when |
 |---|---|---|---|
-| M-1 skills served by the MCP | `hoi4.skill` tool and MCP resources | S04 entry (one tool profile), S05 (the native loop reads the same pinned skills) | The served text matches the pinned kit version and hash, and a drift check fails otherwise |
+| M-1 skills served by the MCP | `hoi4.skill` tool and MCP resources | S04, finished during S04 (decision S04-2), S05 (the native loop reads the same pinned skills) | The served text matches the pinned kit version and hash, and a drift check fails otherwise |
 | M-2 approved rules at kit and mod level | Kit and mod repositories, served by the MCP | S05 (rules in the context bundle), S06 (mod rules per project) | A proposed rule takes effect only after approval and carries reason, evidence and a regression test. `LESSONS.md` is converted |
 | M-3 recurring error signatures | `hoi4.error_log` | S06 (log upload review), the companion stage | Fixture logs from several launches group into counted signatures linked to documentation and rules |
 | M-4 no redundant guards, drift guards kept | All rewrite tools | S04 onward (FR-5 concurrency) | No edit-size guard or similar is added. The stale-base refusal and expected hashes stay and are covered by T-EDIT-01 |
-| M-5 generated tool documentation | agent-tools docs and CI | S04 entry (pinned tool profile) | Docs are generated from the definitions, and CI fails on drift, duplicates or an undocumented tool |
+| M-5 generated tool documentation | agent-tools docs and CI | S04, finished during S04 (decision S04-2) | Docs are generated from the definitions, and CI fails on drift, duplicates or an undocumented tool |
 | M-6 benchmark mods | T-BENCH-01 fixture set | S04 entry baseline, every later exit gate | Vanilla, Chaos Redux, ZIN, Ireland Total Overhaul and two or three large Workshop mods pinned at fixed versions, run locally |
 | M-7 HOI4-MCP measured once | Isolated container run | S04 entry baseline | One recorded head-to-head result. Later runs compare with our own baselines |
 | M-8 Rust move order | Engine route moves | S04 to S08, see the engine table above | The TypeScript index is retired |
@@ -194,7 +194,7 @@ The maintainer's MCP decisions of 2026-11-01 are recorded in the [expansion deci
 | M-11 writers with their editors | Event, decision and technology rewrite tools | S06 (event, decision), S07 (technology) | Each writer ships with its editor and passes T-EDIT-01 |
 | M-12 nightly real-game benchmark | A maintainer machine with the game | Every exit gate from S04 | Nightly results are stored locally with hashes, and a regression is flagged |
 | M-13 macOS arm64 CI | agent-tools Node CI | S04 entry | The job runs on every pull request |
-| M-14 Chaos Redux tools in a private plugin | agent-tools plugin loading | S04 entry (public tool profile) | The public package has no `chaosx.*` tools, and the server loads the plugin only when it is present |
+| M-14 Chaos Redux tools in a private plugin | agent-tools plugin loading, with the plugin in the private `chaos-redux-vault` repository | S04, finished during S04 (decisions S04-1 and S04-2) | The public package has no `chaosx.*` tools, and the server loads the plugin only when it is present |
 | M-15 HOI4-MCP licensing | None | None | No action |
 
 ### Coding-agent integration

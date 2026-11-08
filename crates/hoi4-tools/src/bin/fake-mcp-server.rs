@@ -57,8 +57,18 @@ fn main() {
     let mut keys: Vec<String> = std::env::vars().map(|(k, _)| k).collect();
     keys.sort();
     log(&format!("env {}", keys.join(",")));
+    if mode == "idle" {
+        std::thread::sleep(std::time::Duration::from_secs(300));
+        return;
+    }
     if mode == "stubborn"
-        && let Ok(child) = std::process::Command::new("sleep").arg("300").spawn()
+        && let Ok(exe) = std::env::current_exe()
+        && let Ok(child) = std::process::Command::new(exe)
+            .arg("idle")
+            .stdin(std::process::Stdio::null())
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .spawn()
     {
         log(&format!("helper {}", child.id()));
     }

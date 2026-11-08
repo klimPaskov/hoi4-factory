@@ -1,6 +1,6 @@
 # Package status and continuation
 
-Version: v02, revised 2026-10-25. Phase: **implementation, S01 to S03 complete, the UI design track next, then S04**.
+Version: v02, revised 2026-11-06. Phase: **implementation, S01 to S03 and the UI design track complete, S04 waiting on its entry items and on the maintainer's authorization**.
 
 ## Current state
 
@@ -9,12 +9,48 @@ Version: v02, revised 2026-10-25. Phase: **implementation, S01 to S03 complete, 
 | S01 bootstrap and architecture probes | Complete and accepted. Rust host and native Rust agent loop selected, Setup binding proven, GitHub App and memory decisions recorded | [S01 handoff](../evidence/S01/handoff.md) |
 | S02 accounts, server workspaces, Mod Setup and GitHub import | Complete. Email and GitHub sign-in, per-account workspaces with row-level security, ZIP and folder upload, GitHub import, the full Setup flow over HTTP against merged HOI4-Mod-Setup `c28198b`, and the browser Setup wizard. Gates G1 to G4 pass. G5 passes with the limitation recorded in the handoff | [S02 handoff](../evidence/S02/handoff.md), [checks](../evidence/S02/checks.json) |
 | S03 native agent and durability | Complete. The native Rust agent runs in a supervised worker of the server binary. Every step is behind a C-08 grant and a workspace lease. Each attempt consumes an immutable C-06 bundle, and every tool call is a C-04 intent followed by a receipt. Tools are the built-in file tools in the task's own worktree plus a read-only HOI4 Agent Tools profile. Users can bring their own API key, and usage is metered apart from the $1 allowance, with budget stops. The stage also adds the event stream, pause, interrupt, revocation and restart recovery, and minimal task and key screens. G1 to G5 pass. G6 is partial: OpenAI is tested against recorded and refused responses only, and the self-hosted profile is checked by connection and listing only | [S03 handoff](../evidence/S03/handoff.md), [checks](../evidence/S03/checks.json) |
-| UI design track (ADR-025) | Next. Runs before S04. The maintainer chooses each page from live variants | [goal prompt](06-agent-handoffs/GOAL-UI.md) |
+| UI design track (ADR-025) | Complete on 2026-11-06. The maintainer chose every page from live variants: sign-in and account pages, project list and page, Setup wizard, task list and task page. The design system is in `web/src/styles.css` and `web/src/components/ui.tsx`. Later pages follow the `ui-design-iteration` skill | Handoff commit `257a180`, [design decisions](design/DESIGN-DECISIONS.md#handoff-2026-11-06), [goal prompt](06-agent-handoffs/GOAL-UI.md) |
 | Expansion research (ADR-028) | Research, consultation and plan complete and approved on 2026-10-31. Phase D started with W1, the kit synchronization work. The first phase covers workflow updates in the kit, hoi4-agent-tools, a new image MCP and Chaos Redux, not HOI4 Factory stages | [package](08-expansion-research/README.md) |
-| S04 focus vertical slice | Not authorized. Its goal prompt is ready | [goal prompt](06-agent-handoffs/GOAL-S04.md) |
+| S04 focus vertical slice | Not authorized. Its goal prompt is ready. Entry readiness was checked on 2026-11-06 and is not complete, see the next section | [goal prompt](06-agent-handoffs/GOAL-S04.md), [readiness](#s04-readiness-checked-on-2026-11-06) |
 | S05 to S08 | Not authorized | [roadmap](04-implementation-stages/ROADMAP.md) |
 
 A new machine is set up with the [developer setup guide](07-developer-workflow/DEVELOPER-SETUP.md). Open questions for the maintainer are in [maintainer questions](../evidence/maintainer-questions.md). Under ADR-024, CLAUDE.md and the skills are maintained by the implementing agent, and AGENTS.md is generated from CLAUDE.md.
+
+## S04 readiness (checked on 2026-11-06)
+
+S04 is not authorized and is not ready to start. The rows below are the S04 entry conditions from the [roadmap](04-implementation-stages/ROADMAP.md#engine-editors-and-tools-across-stages), the [S04 packet](04-implementation-stages/stage-04-focus-vertical-slice.md#entry-conditions) and the [S04 goal prompt](06-agent-handoffs/GOAL-S04.md), each checked against code, CI runs and releases on 2026-11-06. The checks looked at HOI4 Factory, hoi4-agent-tools, the Agentic HOI4 Modding Kit and HOI4 Mod Setup. Decision D-13a (see the [expansion decision record](08-expansion-research/00-decision-record.md)) keeps all tool work on Windows and moves development to the Mac only when everything is done and S04 is about to start. The maintainer answered four questions on 2026-11-06, recorded as S04-1 to S04-4 in the same record: the home of the private Chaos Redux plugin, that M-1, M-5 and M-14 finish during S04, that the Windows check of S03 comes first, and that the nightly benchmark may run as a scheduled task.
+
+| Entry item | State | Evidence | Owner or next step |
+|---|---|---|---|
+| S03 accepted | Done | [S03 handoff](../evidence/S03/handoff.md) | None |
+| UI design track | Done | Handoff commit `257a180`, [design decisions](design/DESIGN-DECISIONS.md#handoff-2026-11-06) | None |
+| W3 layout verdict and W7 Rust layout solver | Done | hoi4-agent-tools [#53](https://github.com/klimPaskov/hoi4-agent-tools/pull/53) and [#80](https://github.com/klimPaskov/hoi4-agent-tools/pull/80), shipped in 4.7.0 | None |
+| Engine binaries for Windows x64, macOS arm64 and Linux x64 and arm64 | Done in the tool package, not yet in the Factory image | [#86](https://github.com/klimPaskov/hoi4-agent-tools/pull/86) in release 4.8.0 bundles all four with a checksum manifest. `docker/server.Dockerfile` still pins 4.6.1 (`fbc5144`) | Re-pin the Factory image once, after the last tool release (S04 gate 11) |
+| Engine client that reports the engine as unavailable | Done | `src/hoi4_agent_tools/core/engine-client.ts` and `tests/unit/engine-client.test.ts` in hoi4-agent-tools | S04 adds the T-ENG-01 image without the binary |
+| `hoi4.mod_index`, `hoi4.source_lookup` and the closure option of `hoi4.script_validate` on the engine (M-8) | Missing | `reference/mod-index.ts` and `reference/source-lookup.ts` still scan through the TypeScript core, and `script_validate` has no closure option | ZIN MCP worker (WP-5), which is also the release owner under M-16. Tracked in [#107](https://github.com/klimPaskov/hoi4-agent-tools/issues/107) and [#69](https://github.com/klimPaskov/hoi4-agent-tools/issues/69) |
+| M-1 `hoi4.skill` | Missing, finishes during S04 (S04-2) | No tool, branch or pull request exists | MCP accuracy session (WP-6), tracked in [#108](https://github.com/klimPaskov/hoi4-agent-tools/issues/108) |
+| M-5 generated tool documentation with a CI drift check | Missing, finishes during S04 (S04-2) | `docs/tools.md` is written by hand. Only a tool-list smoke test and a schema check of tool examples exist | MCP accuracy session (WP-3), tracked in [#109](https://github.com/klimPaskov/hoi4-agent-tools/issues/109) |
+| M-6 benchmark mods | Partial | `bench/corpus.json` pins vanilla, Chaos Redux, ZIN, Ireland Total Overhaul, Atlantis, Kaiserreich 1.7 and Old World Blues 5.1.12 by content hash and Workshop manifest. Only the first baseline from 2026-11-02 exists, and 21 of its 54 cases were failing then | MCP accuracy session records a new baseline after its fixes, tracked in [#111](https://github.com/klimPaskov/hoi4-agent-tools/issues/111) |
+| M-7 HOI4-MCP measured once | Partial | The isolated container run happened on 2026-11-01 and its driver is `scripts/bench/hoi4-mcp/` in hoi4-agent-tools. The result table exists only in a session note, not in a repository | MCP accuracy session commits the result as evidence, tracked in [#111](https://github.com/klimPaskov/hoi4-agent-tools/issues/111) |
+| M-13 macOS arm64 CI | Done | The `test (macos-latest, 22)` and `(24)` jobs run on every pull request. [Run 42198261412](https://github.com/klimPaskov/hoi4-agent-tools/actions/runs/42198261412) used image `macos-26-arm64` and passed | None |
+| M-14 Chaos Redux tools in a private plugin | Missing, finishes during S04 (S04-2) | `src/hoi4_agent_tools/mcp/tools/chaosx.ts` still ships in the public package and no plugin pull request exists | MCP accuracy session (WP-9), tracked in [#110](https://github.com/klimPaskov/hoi4-agent-tools/issues/110). The plugin lives in the private `chaos-redux-vault` repository (S04-1) |
+| Vanilla job on a runner with a licensed game | Missing | `scripts/bench/nightly.sh` and the vanilla cases exist, but no scheduled run is registered on the Windows machine and no CI runner holds the game | The nightly run as a Windows scheduled task is approved (S04-4). The MCP accuracy session registers it after recording a fresh baseline (M-12), tracked in [#111](https://github.com/klimPaskov/hoi4-agent-tools/issues/111) |
+| Q-1 baseline (S04 gate 12) | Partial | The harness, a synthetic baseline in CI and a local real baseline exist. The real baseline predates the accuracy fixes, and cold lookups were 14 s for `mod_index` and 54 s for the first `source_lookup` against targets of 2 s and 3 s | MCP accuracy session after the rows above, then S04 records it with hardware and comparator pins |
+
+Windows work still open before the move to the Mac (D-13a):
+
+- hoi4-agent-tools release 4.9.0 is publishing, and pull requests [#98](https://github.com/klimPaskov/hoi4-agent-tools/pull/98), [#102](https://github.com/klimPaskov/hoi4-agent-tools/pull/102), [#103](https://github.com/klimPaskov/hoi4-agent-tools/pull/103) and [#106](https://github.com/klimPaskov/hoi4-agent-tools/pull/106) wait for CI.
+- The lean `hoi4_wiki` pass is running on the kit branch `claude/lean-wiki` and the agent-tools branch `claude/lean-wiki-index`.
+- The 3D route overhaul runs in the Chaos Redux and ZIN 3D sessions. Kit pull request [#76](https://github.com/klimPaskov/Agentic-HOI4-Modding/pull/76) and Setup pull request [#165](https://github.com/klimPaskov/HOI4-Mod-Setup/pull/165) are open, and the Meshy model comparison is due on 2026-11-08.
+- hoi4-imagegen is deriving style packs from a mod and preparing the third gallery style, The Fire Rises.
+- HOI4 Live Tools pull request [#11](https://github.com/klimPaskov/HOI4-Live-Tools/pull/11) is open.
+- A kit package release must follow the last agent-tools release, so the coding-client profile that Setup installs names the same tool version as the Factory image.
+- [Issue #3](https://github.com/klimPaskov/hoi4-factory/issues/3) asks for the S03 tests to run on Windows and for process-tree kills there. It blocks the move to the Mac (S04-3) and is being fixed first, in its own session on this PC.
+
+Checks recorded for the move, because they only run on macOS:
+
+- The real macOS Keychain sign-in of `hoi4-imagegen-mcp` (its layer L6, unexercised).
+- The Mac setup of Factory itself: the `.env` file, the Anthropic key in `~/.zshrc`, the GitHub App key and Docker Desktop, as listed in [maintainer questions](../evidence/maintainer-questions.md) item 5.
 
 The sections below describe the planning baseline. Statements in them that implementation has not started are historical.
 
@@ -77,6 +113,6 @@ These are future stage gates, not missing planning sections. Their owners and ex
 
 On a new machine, follow the [developer setup guide](07-developer-workflow/DEVELOPER-SETUP.md) to its readiness checklist.
 
-Then run the UI design track: launch Claude Code from the repository root and give it the [GOAL-UI](06-agent-handoffs/GOAL-UI.md) prompt. The track is interactive and needs no stage command. After that, run `/start-implementation-stage S04` with the [S04 goal prompt](06-agent-handoffs/GOAL-S04.md).
+The UI design track is finished. When the [S04 readiness](#s04-readiness-checked-on-2026-11-06) rows are done (M-1, M-5 and M-14 may finish during S04, decision S04-2) and development has moved to the Mac, run `/start-implementation-stage S04` with the [S04 goal prompt](06-agent-handoffs/GOAL-S04.md). Running that command is the authorization.
 
 Open S03 questions are items 7 to 10 in [maintainer questions](../evidence/maintainer-questions.md). Do not begin S04 automatically. The package stands alone without any earlier conversation.

@@ -96,15 +96,33 @@ fn soon() -> Instant {
 fn is_zombie(pid: i32) -> bool {
     std::fs::read_to_string(format!("/proc/{pid}/stat"))
         .ok()
-        .and_then(|s| s.rsplit_once(')').map(|(_, rest)| rest.trim_start().starts_with('Z')))
+        .and_then(|s| {
+            s.rsplit_once(')')
+                .map(|(_, rest)| rest.trim_start().starts_with('Z'))
+        })
         .unwrap_or(false)
+}
+
+#[cfg(windows)]
+fn pid_alive(pid: i32) -> bool {
+    let out = std::process::Command::new("tasklist")
+        .args(["/FI", &format!("PID eq {pid}"), "/NH", "/FO", "CSV"])
+        .output()
+        .expect("tasklist");
+    String::from_utf8_lossy(&out.stdout).contains(&format!("\",\"{pid}\",\""))
 }
 
 fn pid_gone(pid: i32) -> bool {
     for _ in 0..40 {
-        // SAFETY: signal 0 only checks that the process exists.
-        let alive = unsafe { libc::kill(pid, 0) } == 0;
-        if !alive || is_zombie(pid) {
+        #[cfg(unix)]
+        let gone = {
+            // SAFETY: signal 0 only checks that the process exists.
+            let alive = unsafe { libc::kill(pid, 0) } == 0;
+            !alive || is_zombie(pid)
+        };
+        #[cfg(windows)]
+        let gone = !pid_alive(pid);
+        if gone {
             return true;
         }
         std::thread::sleep(Duration::from_millis(100));
@@ -427,7 +445,6 @@ async fn garbage_stdout_ends_the_session() {
     assert!(matches!(again, McpError::Protocol { .. }));
     // Shutdown reaps the killed process; until then it is a zombie that still answers kill(0).
     client.shutdown().await;
-    #[cfg(unix)]
     assert!(pid_gone(pid as i32), "the violating server was killed");
 }
 
@@ -495,7 +512,6 @@ async fn server_requests_are_answered_or_refused_without_confusing_results() {
     client.shutdown().await;
 }
 
-#[cfg(unix)]
 #[tokio::test]
 async fn shutdown_kills_the_whole_process_group() {
     let fx = Fixture::new();

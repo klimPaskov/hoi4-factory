@@ -161,6 +161,8 @@ struct Shared {
     stderr: StdMutex<VecDeque<u8>>,
     root_uri: String,
     pid: Option<u32>,
+    #[cfg(windows)]
+    job: Option<crate::job_windows::KillJob>,
     unknown_responses: AtomicU64,
     notifications: AtomicU64,
 }
@@ -389,7 +391,7 @@ async fn reader_task(shared: Arc<Shared>, stdout: tokio::process::ChildStdout, m
 }
 
 fn protocol_violation(shared: &Shared, message: String) {
-    kill_group(shared.pid);
+    kill_group(shared);
     shared.end(McpError::Protocol { message });
 }
 
@@ -447,8 +449,8 @@ async fn handle_message(shared: &Arc<Shared>, message: Value) {
 }
 
 #[cfg(unix)]
-fn kill_group(pid: Option<u32>) {
-    if let Some(pid) = pid.and_then(|p| i32::try_from(p).ok()) {
+fn kill_group(shared: &Shared) {
+    if let Some(pid) = shared.pid.and_then(|p| i32::try_from(p).ok()) {
         // SAFETY: killpg only sends a signal; the group id is the pid of a child we created with
         // process_group(0), and a group that is already gone yields ESRCH, which we ignore.
         unsafe {
@@ -457,8 +459,12 @@ fn kill_group(pid: Option<u32>) {
     }
 }
 
-#[cfg(not(unix))]
-fn kill_group(_pid: Option<u32>) {}
+#[cfg(windows)]
+fn kill_group(shared: &Shared) {
+    if let Some(job) = &shared.job {
+        job.kill();
+    }
+}
 
 impl McpClient {
     /// Spawns the server and completes the `initialize` handshake.
@@ -485,6 +491,10 @@ impl McpClient {
                 message: "child stdio was not piped".into(),
             });
         };
+        #[cfg(windows)]
+        let job = child
+            .raw_handle()
+            .and_then(crate::job_windows::KillJob::adopt);
         let shared = Arc::new(Shared {
             state: StdMutex::new(State {
                 pending: HashMap::new(),
@@ -492,6 +502,8 @@ impl McpClient {
             }),
             stdin: Mutex::new(Some(stdin)),
             pid: child.id(),
+            #[cfg(windows)]
+            job,
             child: Mutex::new(Some(child)),
             stderr: StdMutex::new(VecDeque::new()),
             root_uri: file_uri(&spec.cwd),
@@ -736,14 +748,14 @@ impl McpClient {
                 Ok(Ok(status)) => exit_status = status.code(),
                 _ => {
                     killed = true;
-                    kill_group(self.shared.pid);
+                    kill_group(&self.shared);
                     let _ = child.start_kill();
                     exit_status = child.wait().await.ok().and_then(|s| s.code());
                 }
             }
         }
         // The leader may be gone while helpers it spawned still run in its group.
-        kill_group(self.shared.pid);
+        kill_group(&self.shared);
         self.shared.end(McpError::Transport {
             message: "client shut down".into(),
         });
@@ -756,7 +768,7 @@ impl McpClient {
 
 impl Drop for McpClient {
     fn drop(&mut self) {
-        kill_group(self.shared.pid);
+        kill_group(&self.shared);
     }
 }
 
