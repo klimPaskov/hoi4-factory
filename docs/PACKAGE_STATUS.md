@@ -1,6 +1,6 @@
 # Package status and continuation
 
-Version: v02, revised 2026-11-06. Phase: **implementation, S01 to S03 and the UI design track complete, S04 waiting on its entry items and on the maintainer's authorization**.
+Version: v02, revised 2026-11-08. Phase: **implementation, S01 to S03 and the UI design track complete, S04 authorized on 2026-11-08 and in progress**.
 
 ## Current state
 
@@ -11,7 +11,7 @@ Version: v02, revised 2026-11-06. Phase: **implementation, S01 to S03 and the UI
 | S03 native agent and durability | Complete. The native Rust agent runs in a supervised worker of the server binary. Every step is behind a C-08 grant and a workspace lease. Each attempt consumes an immutable C-06 bundle, and every tool call is a C-04 intent followed by a receipt. Tools are the built-in file tools in the task's own worktree plus a read-only HOI4 Agent Tools profile. Users can bring their own API key, and usage is metered apart from the $1 allowance, with budget stops. The stage also adds the event stream, pause, interrupt, revocation and restart recovery, and minimal task and key screens. G1 to G5 pass. G6 is partial: OpenAI is tested against recorded and refused responses only, and the self-hosted profile is checked by connection and listing only | [S03 handoff](../evidence/S03/handoff.md), [checks](../evidence/S03/checks.json) |
 | UI design track (ADR-025) | Complete on 2026-11-06. The maintainer chose every page from live variants: sign-in and account pages, project list and page, Setup wizard, task list and task page. The design system is in `web/src/styles.css` and `web/src/components/ui.tsx`. Later pages follow the `ui-design-iteration` skill | Handoff commit `257a180`, [design decisions](design/DESIGN-DECISIONS.md#handoff-2026-11-06), [goal prompt](06-agent-handoffs/GOAL-UI.md) |
 | Expansion research (ADR-028) | Research, consultation and plan complete and approved on 2026-10-31. Phase D started with W1, the kit synchronization work. The first phase covers workflow updates in the kit, hoi4-agent-tools, a new image MCP and Chaos Redux, not HOI4 Factory stages | [package](08-expansion-research/README.md) |
-| S04 focus vertical slice | Not authorized. Its goal prompt is ready. Entry readiness was checked on 2026-11-06 and is not complete, see the next section | [goal prompt](06-agent-handoffs/GOAL-S04.md), [readiness](#s04-readiness-checked-on-2026-11-06) |
+| S04 focus vertical slice | Authorized by the maintainer on 2026-11-08 and in progress. Entry items still open on that date finish during the stage, see the next section | [goal prompt](06-agent-handoffs/GOAL-S04.md), [readiness](#s04-readiness-checked-on-2026-11-06) |
 | S05 to S08 | Not authorized | [roadmap](04-implementation-stages/ROADMAP.md) |
 
 A new machine is set up with the [developer setup guide](07-developer-workflow/DEVELOPER-SETUP.md). Open questions for the maintainer are in [maintainer questions](../evidence/maintainer-questions.md). Under ADR-024, CLAUDE.md and the skills are maintained by the implementing agent, and AGENTS.md is generated from CLAUDE.md.
