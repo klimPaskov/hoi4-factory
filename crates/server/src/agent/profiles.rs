@@ -41,6 +41,24 @@ impl OperatorKeys {
     }
 }
 
+/// The profile of a user's probed OpenAI-compatible key (issue #7): `user:<key id>`, the model
+/// the inference probe used, and only the capabilities it observed. `None` before a probe.
+pub fn user_endpoint_profile(record: &factory_broker::KeyRecord) -> Option<ModelProfile> {
+    if record.provider != KeyProvider::OpenaiCompatible || record.revoked_at.is_some() {
+        return None;
+    }
+    let model = record.probe_model.as_deref()?;
+    let observed: Capabilities = serde_json::from_value(record.probe_capabilities.clone()?).ok()?;
+    let mut profile = ModelProfile::openai_compatible(record.base_url.as_deref()?, model);
+    profile.id = user_profile_id(record.id);
+    profile.observed = Some(observed);
+    Some(profile)
+}
+
+pub fn user_profile_id(key: factory_broker::UserKeyId) -> String {
+    format!("user:{}", key.0)
+}
+
 /// The default profile when the user picks none (S03 inputs).
 pub const DEFAULT_PROFILE: &str = "anthropic:claude-haiku-5-5";
 

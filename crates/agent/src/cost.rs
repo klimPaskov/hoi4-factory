@@ -33,6 +33,16 @@ pub const PRICES: &[Price] = &[
         source: "https://platform.claude.com/docs/en/about-claude/pricing (Claude Haiku 5.5, prompts up to 100,000 tokens)",
         retrieved: "2026-10-24",
     },
+    Price {
+        // The peak rate, a safe upper bound: off-peak is half (S03 G6 evidence, D-21). Reasoning
+        // tokens count as output.
+        model_prefix: "deepseek-flash",
+        input_per_mtok: 0.30,
+        cached_input_per_mtok: 0.006,
+        output_per_mtok: 1.20,
+        source: "https://api-docs.deepseek.com/quick_start/pricing (deepseek-flash, peak rate)",
+        retrieved: "2026-11-02",
+    },
 ];
 
 #[derive(Debug, Clone, Serialize)]

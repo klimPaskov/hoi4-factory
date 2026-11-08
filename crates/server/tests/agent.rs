@@ -909,6 +909,30 @@ async fn an_inference_probe_is_opt_in_and_records_what_it_observed() {
     assert_eq!(inference.body["capabilities"]["text"], "supported", "{:#}", inference.body);
     let bad = a.alice.client.post(&format!("/api/v1/account/api-keys/{id}/probe"), json!({ "mode": "everything" })).await;
     assert_eq!(bad.status, 400, "{}", bad.text);
+
+    // Issue #7: the probed endpoint is now a profile of its owner, with the observed capabilities
+    // only, and a task may choose it with its own key.
+    let listed = a.alice.client.get("/api/v1/model-profiles").await;
+    let own = listed.body["profiles"].as_array().unwrap().iter().find(|p| p["id"] == format!("user:{id}")).cloned();
+    let own = own.unwrap_or_else(|| panic!("no user endpoint profile: {:#}", listed.body));
+    assert_eq!(own["model"], "tiny-model");
+    assert_eq!(own["operator_allowance"], false);
+    assert_eq!(own["capabilities"]["text"], inference.body["capabilities"]["text"]);
+    assert_eq!(own["capabilities"]["tool_calls"], inference.body["capabilities"]["tool_calls"]);
+    let task = a
+        .alice
+        .client
+        .post(&a.tasks(), json!({ "objective": "Use my endpoint", "mode": "read_only", "model": { "profile_id": format!("user:{id}"), "key_id": id } }))
+        .await;
+    assert_eq!(task.status, 201, "{}", task.text);
+    // Another account cannot name it.
+    let bob = a.h.verified_user("bob@example.org").await;
+    let other = a.h.project(&bob, "Bob").await;
+    let refused = bob
+        .client
+        .post(&format!("/api/v1/projects/{other}/tasks"), json!({ "objective": "x", "mode": "read_only", "model": { "profile_id": format!("user:{id}") } }))
+        .await;
+    assert_eq!(refused.status, 400, "{}", refused.text);
 }
 
 #[tokio::test]

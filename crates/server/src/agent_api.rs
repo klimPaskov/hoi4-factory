@@ -105,8 +105,19 @@ fn parse<T: FromStr>(raw: &str) -> Result<T, Fail> {
 
 async fn model_profiles(principal: Principal, State(state): State<ServerState>) -> Result<Json<Value>, Fail> {
     let rt = runtime(&state)?;
-    let _ = principal;
-    let profiles: Vec<Value> = rt
+    // The caller's probed OpenAI-compatible keys are profiles too, paid by that key only.
+    let mut own = Vec::new();
+    if let Some(keys) = rt.inner.keys.as_ref() {
+        let mut tx = rt.tx(principal.account_id()).await?;
+        let list = keys.list(&mut tx, principal.account_id()).await.map_err(key_error)?;
+        tx.commit().await?;
+        for record in &list {
+            if let Some(p) = profiles::user_endpoint_profile(record) {
+                own.push((p, record.id));
+            }
+        }
+    }
+    let mut profiles: Vec<Value> = rt
         .inner
         .operator_keys
         .profiles()
@@ -125,6 +136,20 @@ async fn model_profiles(principal: Principal, State(state): State<ServerState>) 
             })
         })
         .collect();
+    for (p, key) in own {
+        let (caps, evidence) = profiles::capability_summary(&p.starting_capabilities());
+        profiles.push(json!({
+            "id": p.id,
+            "label": profiles::label(&p),
+            "provider": profiles::provider_name(p.provider),
+            "model": p.model,
+            "default": false,
+            "operator_allowance": false,
+            "key_id": key.0,
+            "capabilities": caps,
+            "capability_evidence": evidence,
+        }));
+    }
     Ok(Json(json!({ "profiles": profiles, "user_keys_available": rt.keys_available() })))
 }
 
@@ -334,6 +359,14 @@ async fn probe_key(
     }
     let report = probe(&profile, key(), rt.policy(), mode).await;
     let (caps, evidence) = profiles::capability_summary(&report.capabilities);
+    // An inference probe of a self-hosted endpoint makes it an agent profile with exactly what it
+    // observed (issue #7). A listing probe changes nothing.
+    if mode == ProbeMode::Inference && record.provider == KeyProvider::OpenaiCompatible && report.error.is_none() {
+        let observed = serde_json::to_value(&report.capabilities).unwrap_or(Value::Null);
+        let mut tx = rt.tx(principal.account_id()).await?;
+        keys.record_probe(&mut tx, principal.account_id(), id, &profile.model, &observed).await.map_err(key_error)?;
+        tx.commit().await?;
+    }
     Ok(Json(json!({
         "profile_id": report.profile_id,
         "provider": record.provider.as_str(),
@@ -476,12 +509,47 @@ struct CreateTask {
 }
 
 /// The profile and funding a model choice names, for `account`.
+/// A user's probed OpenAI-compatible endpoint: its own key pays, and the profile carries only
+/// the capabilities the probe observed (issue #7).
+async fn resolve_user_endpoint(
+    rt: &AgentRuntime,
+    account: AccountId,
+    profile_id: &str,
+    choice: &Value,
+) -> Result<(ModelProfile, MeterFunding), Fail> {
+    let Some(keys) = rt.inner.keys.as_ref() else {
+        return Err(keys_unavailable());
+    };
+    let unknown = || Fail::from(ApiError::invalid_request("Unknown model profile.").with_id("field", "model"));
+    let mut tx = rt.tx(account).await?;
+    let list = keys.list(&mut tx, account).await.map_err(key_error)?;
+    tx.commit().await?;
+    let record = list.iter().find(|k| profiles::user_profile_id(k.id) == profile_id).ok_or_else(unknown)?;
+    if let Some(raw) = choice["key_id"].as_str()
+        && raw != record.id.0.to_string()
+    {
+        return Err(ApiError::invalid_request("That key is for a different profile.").with_id("field", "model").into());
+    }
+    let profile = profiles::user_endpoint_profile(record).ok_or_else(|| {
+        Fail::from(ApiError::new(
+            StatusCode::CONFLICT,
+            "capability_unsatisfied",
+            "Run an inference probe on this endpoint first, so its capabilities are known.",
+            RetryClass::RefreshPreconditions,
+        ))
+    })?;
+    Ok((profile, MeterFunding::UserKey { key_id: record.id }))
+}
+
 async fn resolve_choice(
     rt: &AgentRuntime,
     account: AccountId,
     choice: &Value,
 ) -> Result<(ModelProfile, MeterFunding), Fail> {
     let profile_id = choice["profile_id"].as_str().unwrap_or(profiles::DEFAULT_PROFILE);
+    if profile_id.starts_with("user:") {
+        return resolve_user_endpoint(rt, account, profile_id, choice).await;
+    }
     let profile = rt.inner.operator_keys.find(profile_id)
         .ok_or_else(|| Fail::from(ApiError::invalid_request("Unknown model profile.").with_id("field", "model")))?;
     match choice["key_id"].as_str() {

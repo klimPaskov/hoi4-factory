@@ -31,6 +31,11 @@ pub struct ModelProfile {
     pub context_tokens: u32,
     pub max_output_tokens: u32,
     pub timeout_secs: u32,
+    /// What an inference probe of this exact endpoint and model observed (issue #7). Only an
+    /// OpenAI-compatible profile uses it: its capabilities start unknown and become supported
+    /// only where a probe saw them.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub observed: Option<Capabilities>,
 }
 
 impl ModelProfile {
@@ -43,6 +48,7 @@ impl ModelProfile {
             context_tokens: 100_000,
             max_output_tokens: 4096,
             timeout_secs: 120,
+            observed: None,
         }
     }
 
@@ -55,6 +61,7 @@ impl ModelProfile {
             context_tokens: 100_000,
             max_output_tokens: 4096,
             timeout_secs: 120,
+            observed: None,
         }
     }
 
@@ -69,11 +76,15 @@ impl ModelProfile {
             context_tokens: 8192,
             max_output_tokens: 2048,
             timeout_secs: 120,
+            observed: None,
         }
     }
 
     pub fn starting_capabilities(&self) -> Capabilities {
-        Capabilities::starting(self.provider)
+        match (&self.observed, self.provider) {
+            (Some(observed), ProviderKind::OpenAiCompatible) => observed.clone(),
+            _ => Capabilities::starting(self.provider),
+        }
     }
 }
 

@@ -78,6 +78,10 @@ pub struct KeyRecord {
     pub created_at: DateTime<Utc>,
     pub last_used_at: Option<DateTime<Utc>>,
     pub revoked_at: Option<DateTime<Utc>>,
+    /// The model and capabilities an inference probe observed on an OpenAI-compatible key.
+    pub probe_model: Option<String>,
+    pub probe_capabilities: Option<serde_json::Value>,
+    pub probe_observed_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -97,7 +101,7 @@ pub enum KeyError {
 }
 
 const COLUMNS: &str =
-    "id, account_id, provider, label, base_url, key_hint, created_at, last_used_at, revoked_at";
+    "id, account_id, provider, label, base_url, key_hint, created_at, last_used_at, revoked_at, probe_model, probe_capabilities, probe_observed_at";
 
 fn map_record(row: &PgRow) -> Result<KeyRecord, sqlx::Error> {
     let provider: String = row.try_get("provider")?;
@@ -112,6 +116,9 @@ fn map_record(row: &PgRow) -> Result<KeyRecord, sqlx::Error> {
         created_at: row.try_get("created_at")?,
         last_used_at: row.try_get("last_used_at")?,
         revoked_at: row.try_get("revoked_at")?,
+        probe_model: row.try_get("probe_model")?,
+        probe_capabilities: row.try_get("probe_capabilities")?,
+        probe_observed_at: row.try_get("probe_observed_at")?,
     })
 }
 
@@ -225,6 +232,31 @@ impl KeyStore {
             .fetch_all(&mut *conn)
             .await?;
         Ok(rows.iter().map(map_record).collect::<Result<_, _>>()?)
+    }
+
+    /// Records what an inference probe observed on the owner's key (issue #7).
+    pub async fn record_probe(
+        &self,
+        conn: &mut PgConnection,
+        account: AccountId,
+        key: UserKeyId,
+        model: &str,
+        capabilities: &serde_json::Value,
+    ) -> Result<(), KeyError> {
+        let done = sqlx::query(
+            "UPDATE user_api_keys SET probe_model = $3, probe_capabilities = $4, probe_observed_at = now()
+             WHERE id = $1 AND account_id = $2 AND revoked_at IS NULL",
+        )
+        .bind(key.0)
+        .bind(account.0)
+        .bind(model)
+        .bind(capabilities)
+        .execute(&mut *conn)
+        .await?;
+        if done.rows_affected() == 0 {
+            return Err(KeyError::NotFound);
+        }
+        Ok(())
     }
 
     /// Marks the key revoked. It stays listed but can no longer be opened.
