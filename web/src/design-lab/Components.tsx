@@ -361,7 +361,7 @@ export function ComponentsPage() {
           <h2 id="dc-cards" className="section-title">
             {c('cards')}
           </h2>
-          <Card title={t('workspace.title')} actions={<Button size="sm">{c('refresh')}</Button>}>
+          <Card title={t('project.sourceTitle')} actions={<Button size="sm">{c('refresh')}</Button>}>
             <Facts
               items={[
                 { label: t('workspace.origin'), value: t('workspace.origins.github') },

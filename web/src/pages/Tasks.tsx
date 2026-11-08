@@ -12,8 +12,8 @@ import {
   type Task,
   type TaskMode,
 } from '../api/tasks';
-import { EmptyState, ErrorMessage, Field, Loading, NotAvailableYet } from '../components/ui';
-import { formatMicros } from '../format';
+import { Badge, Button, ErrorMessage, Field, Loading, NotAvailableYet, PageHeader, type Tone } from '../components/ui';
+import { formatMicros, formatNumber } from '../format';
 import { useAsync, useFocusOnError, usePageTitle } from '../hooks';
 
 export function TasksPage() {
@@ -21,17 +21,47 @@ export function TasksPage() {
   return <TasksView key={id} projectId={id} />;
 }
 
+// The task list follows docs/design/mockups/50-tasks-a-panel (the maintainer's choice B): one
+// table of every task, and the new task form in a panel beside it.
+
+function stateTone(task: Task): Tone {
+  if (task.paused) return 'warning';
+  switch (task.state) {
+    case 'running':
+      return 'accent';
+    case 'waiting_for_input':
+      return 'warning';
+    case 'in_review':
+      return 'info';
+    case 'completed':
+      return 'success';
+    case 'blocked':
+      return 'danger';
+    default:
+      return 'neutral';
+  }
+}
+
 function TasksView({ projectId }: { projectId: string }) {
   const { t } = useTranslation();
   usePageTitle(t('tasks.title'));
   const state = useAsync((signal) => listTasks(projectId, signal));
+  const [formOpen, setFormOpen] = useState(false);
+  const hasTasks = state.status === 'ready' && state.data.length > 0;
 
   return (
     <>
-      <p className="breadcrumb">
-        <Link to={`/projects/${encodeURIComponent(projectId)}`}>{t('tasks.back')}</Link>
-      </p>
-      <h1>{t('tasks.title')}</h1>
+      <PageHeader
+        title={t('tasks.title')}
+        back={{ to: `/projects/${encodeURIComponent(projectId)}`, label: t('tasks.back') }}
+        actions={
+          hasTasks && !formOpen ? (
+            <Button variant="primary" icon="plus" onClick={() => setFormOpen(true)}>
+              {t('tasks.newTitle')}
+            </Button>
+          ) : undefined
+        }
+      />
       {state.status === 'loading' ? <Loading label={t('tasks.loading')} /> : null}
       {state.status === 'error' ? (
         state.error instanceof ApiError && state.error.isUnavailable ? (
@@ -40,52 +70,75 @@ function TasksView({ projectId }: { projectId: string }) {
           <ErrorMessage error={state.error} onRetry={state.reload} />
         )
       ) : null}
-      {state.status === 'ready' ? <TaskList projectId={projectId} tasks={state.data} /> : null}
-      {state.status === 'ready' ? <NewTaskForm projectId={projectId} /> : null}
+      {state.status === 'ready' && !hasTasks ? <NewTaskForm projectId={projectId} /> : null}
+      {state.status === 'ready' && hasTasks ? (
+        <div className={formOpen ? 'tasks-layout with-panel' : 'tasks-layout'}>
+          <TaskTable projectId={projectId} tasks={state.data} />
+          {formOpen ? <NewTaskForm projectId={projectId} onCancel={() => setFormOpen(false)} /> : null}
+        </div>
+      ) : null}
     </>
   );
 }
 
-function TaskList({ projectId, tasks }: { projectId: string; tasks: Task[] }) {
+function TaskTable({ projectId, tasks }: { projectId: string; tasks: Task[] }) {
   const { t } = useTranslation();
   return (
-    <section className="card" aria-labelledby="task-list-title">
-      <h2 id="task-list-title">{t('tasks.listTitle')}</h2>
-      {tasks.length === 0 ? (
-        <EmptyState title={t('tasks.emptyTitle')}>{t('tasks.emptyBody')}</EmptyState>
-      ) : (
-        <ul className="project-list">
+    <div className="table-wrap">
+      <table className="data-table task-table">
+        <caption className="sr-only">{t('tasks.listLabel', { count: tasks.length, n: formatNumber(tasks.length) })}</caption>
+        <thead>
+          <tr>
+            <th scope="col">{t('tasks.columns.objective')}</th>
+            <th scope="col">{t('tasks.columns.mode')}</th>
+            <th scope="col">{t('tasks.columns.state')}</th>
+            <th scope="col">{t('tasks.columns.spend')}</th>
+            <th scope="col">{t('tasks.columns.model')}</th>
+          </tr>
+        </thead>
+        <tbody>
           {tasks.map((task) => (
-            <li key={task.id} className="card">
-              <div className="project-item">
-                <div>
-                  <h3>
-                    <Link to={`/projects/${encodeURIComponent(projectId)}/tasks/${encodeURIComponent(task.id)}`}>
-                      <bdi dir="auto">{task.objective}</bdi>
-                    </Link>
-                  </h3>
-                  <p className="muted small">
-                    {t(`tasks.modes.${task.mode}`)} {'· '}
-                    {t(`tasks.states.${task.state}`)}
-                    {task.paused ? ` · ${t('tasks.paused')}` : ''} {'· '}
-                    {t('tasks.spent', {
-                      amount: formatMicros(task.spent_micros),
-                      budget: formatMicros(task.budget_micros),
-                    })}
-                  </p>
-                </div>
-              </div>
-            </li>
+            <tr key={task.id}>
+              <th scope="row" className="task-objective">
+                <Link to={`/projects/${encodeURIComponent(projectId)}/tasks/${encodeURIComponent(task.id)}`}>
+                  <bdi dir="auto">{task.objective}</bdi>
+                </Link>
+              </th>
+              <td className="cell-nowrap">{t(`tasks.modes.${task.mode}`)}</td>
+              <td className="cell-nowrap">
+                <Badge tone={stateTone(task)} live={task.state === 'running' && !task.paused}>
+                  {task.paused ? t('tasks.paused') : t(`tasks.states.${task.state}`)}
+                </Badge>
+              </td>
+              <td className="task-spend">
+                <span className="sr-only">
+                  {t('tasks.spent', { amount: formatMicros(task.spent_micros), budget: formatMicros(task.budget_micros) })}
+                </span>
+                <span aria-hidden="true">
+                  {t('tasks.spentOf', { amount: formatMicros(task.spent_micros), budget: formatMicros(task.budget_micros) })}
+                </span>
+                <meter
+                  className="meter-bar"
+                  min={0}
+                  max={task.budget_micros}
+                  value={Math.min(task.spent_micros, task.budget_micros)}
+                  aria-hidden="true"
+                />
+              </td>
+              <td className="cell-nowrap">
+                <bdi dir="ltr">{task.model.profile_id}</bdi>
+              </td>
+            </tr>
           ))}
-        </ul>
-      )}
-    </section>
+        </tbody>
+      </table>
+    </div>
   );
 }
 
 const ALLOWANCE = 'allowance';
 
-function NewTaskForm({ projectId }: { projectId: string }) {
+function NewTaskForm({ projectId, onCancel }: { projectId: string; onCancel?: () => void }) {
   const { t } = useTranslation();
   const profiles = useAsync((signal) => getModelProfiles(signal));
   // The saved keys are optional: a server without them still offers the free allowance.
@@ -100,8 +153,9 @@ function NewTaskForm({ projectId }: { projectId: string }) {
   });
 
   return (
-    <section className="card" aria-labelledby="new-task-title">
+    <section className={onCancel ? 'card new-task task-panel' : 'card new-task'} aria-labelledby="new-task-title">
       <h2 id="new-task-title">{t('tasks.newTitle')}</h2>
+      {onCancel ? null : <p className="muted">{t('tasks.emptyBody')}</p>}
       {profiles.status === 'loading' || keys.status === 'loading' ? <Loading /> : null}
       {profiles.status === 'error' ? (
         profiles.error instanceof ApiError && profiles.error.isUnavailable ? (
@@ -114,7 +168,7 @@ function NewTaskForm({ projectId }: { projectId: string }) {
         profiles.data.profiles.length === 0 ? (
           <p className="muted">{t('tasks.modelsUnavailable')}</p>
         ) : (
-          <Form projectId={projectId} profiles={profiles.data.profiles} keys={keys.data} />
+          <Form projectId={projectId} profiles={profiles.data.profiles} keys={keys.data} onCancel={onCancel} />
         )
       ) : null}
     </section>
@@ -125,10 +179,12 @@ function Form({
   projectId,
   profiles,
   keys,
+  onCancel,
 }: {
   projectId: string;
   profiles: ModelProfile[];
   keys: ApiKeyRecord[];
+  onCancel?: () => void;
 }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -209,14 +265,13 @@ function Form({
       />
       <fieldset className="plain-fieldset">
         <legend>{t('tasks.mode')}</legend>
-        <label>
-          <input type="radio" name="task-mode" checked={mode === 'read_only'} onChange={() => setMode('read_only')} />{' '}
-          {t('tasks.modeReadOnly')}
+        <label className="choice">
+          <input type="radio" name="task-mode" checked={mode === 'read_only'} onChange={() => setMode('read_only')} />
+          <span>{t('tasks.modeReadOnly')}</span>
         </label>
-        <br />
-        <label>
-          <input type="radio" name="task-mode" checked={mode === 'edit'} onChange={() => setMode('edit')} />{' '}
-          {t('tasks.modeEdit')}
+        <label className="choice">
+          <input type="radio" name="task-mode" checked={mode === 'edit'} onChange={() => setMode('edit')} />
+          <span>{t('tasks.modeEdit')}</span>
         </label>
       </fieldset>
       {mode === 'edit' ? (
@@ -263,9 +318,16 @@ function Form({
           ))}
         </select>
       </div>
-      <button type="submit" className="button primary" disabled={busy}>
-        {busy ? t('tasks.creating') : t('tasks.create')}
-      </button>
+      <div className="button-row">
+        <button type="submit" className="button primary" disabled={busy}>
+          {busy ? t('tasks.creating') : t('tasks.create')}
+        </button>
+        {onCancel ? (
+          <button type="button" className="button secondary" onClick={onCancel}>
+            {t('common.cancel')}
+          </button>
+        ) : null}
+      </div>
     </form>
   );
 }

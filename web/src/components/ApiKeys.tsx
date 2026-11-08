@@ -48,7 +48,7 @@ function KeysBody({ keys, onChanged }: { keys: ApiKeyRecord[]; onChanged: () => 
       {keys.length === 0 ? (
         <EmptyState title={t('apiKeys.empty')} />
       ) : (
-        <ul className="project-list" aria-label={t('apiKeys.listLabel')}>
+        <ul className="key-rows" aria-label={t('apiKeys.listLabel')}>
           {keys.map((key) => (
             <KeyItem key={key.id} apiKey={key} onChanged={onChanged} />
           ))}
@@ -78,8 +78,8 @@ function KeyItem({ apiKey, onChanged }: { apiKey: ApiKeyRecord; onChanged: () =>
   }
 
   return (
-    <li className="card">
-      <div className="project-item">
+    <li className="key-row">
+      <div className="key-row-main">
         <div>
           <h3>
             <bdi dir="auto">{apiKey.label}</bdi>
@@ -99,7 +99,7 @@ function KeyItem({ apiKey, onChanged }: { apiKey: ApiKeyRecord; onChanged: () =>
           ) : null}
         </div>
         {confirming ? null : (
-          <button type="button" className="button danger-outline" onClick={() => setConfirming(true)}>
+          <button type="button" className="button ghost small-button danger-text" onClick={() => setConfirming(true)}>
             {t('apiKeys.delete')}
           </button>
         )}

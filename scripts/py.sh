@@ -7,8 +7,16 @@
 # new enough, then `uv run --python 3.13` (uv downloads a managed Python on first use).
 #
 # Usage: scripts/py.sh scripts/validate_package.py --root . --working-tree
+#
+# It refuses to start an interactive interpreter. Python 3.13's REPL started without a console
+# prints the same traceback forever, and one background task filled C: with a 50 GB log that way.
 set -eu
 export PYTHONUTF8=1
+export PYTHON_BASIC_REPL=1
+if [ "$#" -eq 0 ]; then
+  echo "scripts/py.sh: give a script, -c or -m. It does not start an interactive interpreter." >&2
+  exit 2
+fi
 if command -v py >/dev/null 2>&1 && py -3.13 -c '' >/dev/null 2>&1; then exec py -3.13 "$@"; fi
 for p in python3.13 python3.12 python3.11 python3 python; do
   if command -v "$p" >/dev/null 2>&1 \

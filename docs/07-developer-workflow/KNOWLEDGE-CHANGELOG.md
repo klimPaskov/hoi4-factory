@@ -2,6 +2,39 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.26, 2026-11-06, provisional design choices and opening the lab
+
+- The `ui-design-iteration` skill now covers provisional picks when the maintainer asks that work go on without approval, and says to list them in chat in the lab's order with the lab's letters.
+- It also says to start the dev server and confirm the page before sending the maintainer to the lab. The Docker npm script runs only from Git Bash or zsh, and a lagging shared checkout is served from a worktree at `origin/main`.
+
+Evidence: on 2026-11-06 the maintainer ran the dev server command in PowerShell and nothing opened. The shared checkout was 18 commits behind `origin/main` and lacked the lab work, and the chat summary listed the four provisional pages in the reverse of the lab's order. Rollback: revert this commit and regenerate.
+
+## 0.2.25, 2026-11-06, look at visual work before calling it done
+
+- CLAUDE.md now says visual work is finished only after it has been rendered at the viewer's size and in close-up, looked at, and reviewed by a fresh-context reviewer that sees only the images and the quality bar. Passing numeric checks is not evidence that it looks right.
+
+Evidence: on 2026-11-06 the 3D units trailer's first cut showed seven ZIN units that had passed every geometry check with 0 errors, next to existing Chaos Redux units. The maintainer saw holes in the meshes and deformed animations in both at first glance, and said the models are nowhere near acceptable. Rollback: revert this commit and regenerate.
+
+## 0.2.24, 2026-11-06, no bare Python REPL
+
+- CLAUDE.md now says never to start Python without a script, `-c` or `-m`, and to look for large task output files under the Claude temp folder first when C: suddenly fills.
+- `scripts/py.sh` refuses to run with no arguments and sets `PYTHON_BASIC_REPL=1`.
+
+Evidence: at 07:39 on 2026-11-06 a background task's Python 3.13 REPL, started without a console, looped one `_pyrepl` WinError traceback into a 50 GB output file and left C: with 2.2 GB free. The 3D session found it when its writes were about to fail. Deleting the file brought C: back to 52 GB. Rollback: revert this commit and regenerate.
+
+## 0.2.23, 2026-11-06, one decision at a time in the design lab
+
+- The skill's image step now paces generation: one image at a time, 10 to 20 seconds apart, a longer wait after an error, and a stop when the account is signed out (W5-5).
+- The `ui-design-iteration` skill now has a review step: the lab's front page shows only the one open decision as large lettered options, a full-screen in-page viewer switches options with the arrow keys, and decided questions move to an archive page.
+
+Evidence: the maintainer found the mixed page of every generated image confusing and asked for a simple review with arrow-key switching, 2026-11-05.
+
+## 0.2.22, 2026-11-05, the maintainer's ratings stay private
+
+- CLAUDE.md now says the maintainer's own ratings and review verdicts stay in private notes. Public repositories, docs, test fixtures, release notes and videos state the resulting rule instead of quoting, citing or attributing them.
+
+Evidence: on 2026-11-05 the maintainer said their gallery ratings must not appear in public-facing docs. The same day a public hoi4-imagegen pull request carried a test fixture labelled with their verdicts and a private notes path, and the trailer's sources doc described their ratings. Rollback: revert this commit and regenerate.
+
 ## 0.2.20, 2026-11-05, clean up after yourself
 
 - CLAUDE.md now says every session and agent cleans up before it reports a task done: merged worktrees and their Rust build copies, renders, probe output, logs, archives, test containers and one-off Docker images, and its own clones and builds inside WSL. It notes that space freed inside WSL or Docker returns to C: only after a compaction, and that shared Docker images, build cache and volumes need the maintainer.

@@ -53,4 +53,49 @@ One master image fixes the character, and every pose was generated with it as th
 - Tests: the empty state test now checks the single field, and a new test covers the header form and the filter.
 - Before: `projects-*` in [screenshots/before](screenshots/before/). After: `projects-*` in [screenshots/after](screenshots/after/).
 
-Next: the project page round.
+### Project page (2026-11-05)
+
+- Offered: three generated layouts ([A overview cards](mockups/30-project-a-overview.webp), [B tabs](mockups/31-project-b-tabs.webp), [C guided next step](mockups/32-project-c-guided.webp)).
+- Chosen by the maintainer: C.
+- Built: the header holds the title with its visibility badge and quiet Open tasks, Rename and Delete. Under it a three-step line (bring in the mod, set it up, give the agent tasks) and only the current step as a card. Finished steps stay reachable in collapsed Mod source and Setup sections. A refresh of the workspace after a Setup step keeps the wizard mounted, so its messages stay. Data and API calls are unchanged.
+- Before: `project-*` and `setup-*` in [screenshots/before](screenshots/before/). After: the same names in [screenshots/after](screenshots/after/).
+
+### Setup wizard (2026-11-06)
+
+- Offered: three generated layouts ([A horizontal stepper](mockups/40-setup-a-horizontal.webp), [B vertical steps](mockups/41-setup-b-vertical.webp), [C one question at a time](mockups/42-setup-c-focused.webp)).
+- Provisional overnight: A, because it matched the project page's step line. Chosen by the maintainer on review: B.
+- Built: the Setup card shows the six steps as a column on the left (done steps checked, the current one highlighted) and the current step and the one just finished on the right. On a phone the column turns back into a row of numbered circles. `StepIndicator` takes a `vertical` flag for this. Earlier finished steps open with "Show the earlier steps". All steps stay in one list, so none loses its state or message as the wizard moves on. One test now picks the visible "Scan again" button, because step 1 is folded away.
+- After: `setup-*` in [screenshots/after](screenshots/after/).
+
+### Task list (2026-11-06)
+
+- Offered: three generated layouts ([table and side panel](mockups/50-tasks-a-panel.webp), [ask first](mockups/51-tasks-b-composer.webp), [grouped by state](mockups/52-tasks-c-grouped.webp)).
+- Provisional overnight: grouped by state. Chosen by the maintainer on review: the table with a side panel.
+- Built: one table of every task with the objective, mode, state badge, spend with a small meter, and model. New task in the header opens the form in a panel beside the table, and Cancel closes it. On narrow screens the panel moves above the table, and on phones the table rows become cards. A project with no tasks shows the form straight away. The form keeps its fields and behavior. A test covers the table, the panel and Cancel.
+- Before: `tasks-*` in [screenshots/before](screenshots/before/). After: `tasks-*` in [screenshots/after](screenshots/after/).
+
+### Task page (2026-11-06)
+
+- Offered: three generated layouts ([two columns](mockups/60-task-a-columns.webp), [single-column story](mockups/61-task-b-story.webp), [tabs](mockups/62-task-c-tabs.webp)).
+- Provisional overnight: the single-column story. Chosen by the maintainer on review: C, tabs.
+- Built: the title with the state badge, the spend meter, then Activity, Attempts, Permission and Settings tabs with Start, Pause or Resume, Interrupt and Revoke grant at the end of the tab row. A new `Tabs` component follows the ARIA tab pattern (arrow keys, Home and End) and keeps every panel mounted, so the live activity stream keeps running on another tab. A task that needs review, is blocked or waits for input opens on Attempts. Permission shows the newest attempt's grant. Unknown effects stay visible above the tabs. The activity log shows each event's summary first, with its type, number and time, a live or polling status line, and the raw payload behind Details. A test covers the tabs and the arrow keys. Behavior and API calls are unchanged.
+- Before: `task-*` in [screenshots/before](screenshots/before/). After: `task-*` in [screenshots/after](screenshots/after/).
+
+### Account (2026-11-06)
+
+- Offered: three generated layouts ([stacked cards](mockups/70-account-a-cards.webp), [settings list](mockups/71-account-b-settings.webp), [usage first](mockups/72-account-c-usage.webp)).
+- Provisional overnight: stacked cards. Confirmed by the maintainer on review.
+- Built: one narrow column of cards. Your details show the email and GitHub states as badges. Usage shows the allowance left as one line and a meter of what was used this month, with the unknown-cost note and the spend with your own keys. Model keys are quiet rows with Delete as a text button and the same confirmation. Sessions are unchanged. Behavior and API calls are unchanged.
+- Before: `account-*` in [screenshots/before](screenshots/before/). After: `account-*` in [screenshots/after](screenshots/after/).
+
+All pages in the default order follow the design, and every choice is the maintainer's.
+
+## Handoff (2026-11-06)
+
+The maintainer declared the design done on 2026-11-06.
+
+- **System.** The Workbench direction: system font stacks, neutral greys with one blue accent, light and dark themes through `light-dark()` tokens in `web/src/styles.css`. Shared components live in `web/src/components/ui.tsx`. They include buttons, fields, badges, cards, a stepper (horizontal or vertical), a native meter, chips, a segmented control, tabs, a native dialog and flag avatars. Icons are generated alpha masks colored by the text color. The logo is the factory roof in a rounded outline that follows the theme's text color. The brick factory mascot appears only for tips and tutorials, and on the sign-in panel.
+- **Pages done.** Sign-in and the other auth pages, the project list, the project page, the Setup wizard, the task list, the task page and the account page. Each section above lists what was offered, what was chosen and its before and after screenshots.
+- **Left for later.** No page in the current client is left. Pages that later stages add follow the `ui-design-iteration` skill and reuse these components. The mascot's tutorial phase (guiding a new user through the features) has poses and CSS motion ready but no tutorial flow yet, because that needs a product decision about when it starts.
+- **Design lab.** It stays in the development build only, with the component gallery, the screens on sample data and the decision history. The production build contains no lab code.
+- **README.** It has no screenshots, so nothing changed there.

@@ -310,8 +310,9 @@ describe('the analysis step', () => {
     const user = userEvent.setup();
     await user.click(await screen.findByRole('button', { name: 'Analyze with Claude' }));
     expect(await screen.findByText(/excerpts were not approved on the server/)).toBeInTheDocument();
-    // The first "Scan again" belongs to step 1; the one beside the error restarts too.
-    const [, restart] = screen.getAllByRole('button', { name: 'Scan again' });
+    // Step 1 is folded away as an earlier step, so the visible "Scan again" is the one beside
+    // the error, which restarts the session.
+    const restart = screen.getAllByRole('button', { name: 'Scan again' }).at(-1);
     await user.click(restart!);
     expect(
       await screen.findByRole('button', { name: 'Approve these 2 excerpts and send them to the model' }),

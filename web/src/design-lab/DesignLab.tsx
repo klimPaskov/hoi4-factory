@@ -8,7 +8,7 @@ import i18n from '../i18n';
 import { usePageTitle } from '../hooks';
 import { ComponentsPage } from './Components';
 import labStrings from './lab.en.json';
-import { MockupsPage } from './Mockups';
+import { HistoryPage, ReviewPage } from './Review';
 import { ROUNDS } from './rounds';
 import { SCENARIO_GROUPS, SCENARIOS } from './scenarios';
 import { useLabTheme } from './shared';
@@ -19,47 +19,6 @@ i18n.addResourceBundle('en', 'translation', labStrings, true, false);
 
 const WIDTHS = ['full', 'phone', 'both'] as const;
 type Width = (typeof WIDTHS)[number];
-
-function LabIndex() {
-  const { t } = useTranslation();
-  usePageTitle(t('designLab.title'));
-  return (
-    <div className="lab-page">
-      <h1>{t('designLab.title')}</h1>
-      <p className="lab-note">{t('designLab.devOnly')}</p>
-      <ul className="lab-links">
-        <li>
-          <Link to="mockups">{t('designLab.mockups.link')}</Link>
-        </li>
-        <li>
-          <Link to="components">{t('designLab.components.link')}</Link>
-        </li>
-        <li>
-          <Link to="screens">{t('designLab.screens.link')}</Link>
-        </li>
-      </ul>
-      <h2>{t('designLab.openRounds')}</h2>
-      {ROUNDS.length === 0 ? <p className="muted">{t('designLab.noRounds')}</p> : null}
-      {ROUNDS.map((round) => (
-        <section key={round.id} className="lab-round" aria-labelledby={`lab-round-${round.id}`}>
-          <h3 id={`lab-round-${round.id}`}>{t(`designLab.round.${round.id}.title`)}</h3>
-          <p>{t(`designLab.round.${round.id}.body`)}</p>
-          <ul className="lab-cards">
-            {round.variants.map(({ id }) => (
-              <li key={id} className="lab-card">
-                <h4>{t(`designLab.round.${round.id}.variants.${id}.name`)}</h4>
-                <p>{t(`designLab.round.${round.id}.variants.${id}.summary`)}</p>
-                <Link to={`round/${round.id}/${id}`} className="lab-button">
-                  {t('designLab.openVariant', { name: t(`designLab.round.${round.id}.variants.${id}.name`) })}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ))}
-    </div>
-  );
-}
 
 function Screens() {
   const { t } = useTranslation();
@@ -208,12 +167,12 @@ function VariantPage() {
 export default function DesignLab() {
   return (
     <Routes>
-      <Route index element={<LabIndex />} />
+      <Route index element={<ReviewPage />} />
       <Route path="components" element={<ComponentsPage />} />
-      <Route path="mockups" element={<MockupsPage />} />
+      <Route path="history" element={<HistoryPage />} />
       <Route path="screens" element={<Screens />} />
       <Route path="round/:round/:variant" element={<VariantPage />} />
-      <Route path="*" element={<LabIndex />} />
+      <Route path="*" element={<ReviewPage />} />
     </Routes>
   );
 }

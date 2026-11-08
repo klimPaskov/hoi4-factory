@@ -2,10 +2,147 @@
   "designLab": {
     "title": "Design lab",
     "devOnly": "Development only. Nothing here reaches the production build, and nothing you do here is saved. All data is sample data.",
-    "openRounds": "Open choices",
-    "noRounds": "No open choices right now. The next page round appears here.",
-    "openVariant": "Open {{name}}",
     "gone": "There is no such variant. It may have been removed after a choice.",
+    "review": {
+      "kicker": "Your decision",
+      "how": "Click a picture to view it full screen. Use the left and right arrow keys to switch between the options, and Escape to close. Then answer in the chat with the letter.",
+      "nothing": "Nothing to decide right now",
+      "more": "More in the design lab",
+      "historyLink": "Earlier decisions",
+      "historyTitle": "Earlier decisions",
+      "back": "Back to the current decision",
+      "projectPage": {
+        "title": "Project page",
+        "question": "Which layout should the page of one project use? All three use only data the server already has.",
+        "outcome": "Chosen: C, the guided next step (first picture).",
+        "options": [
+          {
+            "name": "Guided next step",
+            "summary": "A three-step line and only the current step as one card. A new project sees 'Bring in your mod'."
+          },
+          {
+            "name": "Overview cards",
+            "summary": "Three small cards side by side: the mod source, the Setup status and a button to the tasks."
+          },
+          {
+            "name": "Tabs",
+            "summary": "Overview, Mod source, Setup and Tasks tabs. Only one area shows at a time."
+          }
+        ]
+      },
+      "projectList": {
+        "title": "Project list",
+        "outcome": "Chosen: A, the minimal table, with a one-field empty state and no mascot."
+      },
+      "signIn": {
+        "title": "Sign in",
+        "outcome": "Chosen: C, revised to the cinematic blue panel with the mascot leaning in from the edge (first picture)."
+      },
+      "mascot": {
+        "title": "Mascot",
+        "outcome": "Chosen: the original brick factory (first picture), with real eyes. It appears only for tips, tutorials and when called up."
+      },
+      "assets": {
+        "title": "Icons and logo",
+        "outcome": "The icon set is used. The logo is the factory roof in an outline that follows the theme's text color."
+      },
+      "targets": {
+        "title": "Target look for every page",
+        "outcome": "Approved as the target look. Each page round starts from these."
+      },
+      "count": "{{n}} of {{total}}",
+      "close": "Close",
+      "previous": "Previous option",
+      "next": "Next option",
+      "keys": "Left and right arrows switch options. Escape closes.",
+      "provisional": {
+        "kicker": "Picked overnight, waiting for your OK",
+        "title": "Choices made while you were away",
+        "body": "You asked that work go on without waiting. For each page below I picked the option I recommend, built it and marked it provisional. Look through the options and tell me any page and letter you want instead, and I will switch it.",
+        "picked": "Picked for now",
+        "why": "Why"
+      },
+      "setup": {
+        "title": "Setup wizard",
+        "question": "How should the Setup wizard show its six steps?",
+        "why": "The maintainer chose vertical steps over the overnight horizontal pick.",
+        "outcome": "Chosen by the maintainer: vertical steps.",
+        "options": [
+          {
+            "name": "Vertical steps",
+            "summary": "A narrow list of the six steps on the left and the current step on the right."
+          },
+          {
+            "name": "Horizontal stepper",
+            "summary": "Numbered circles across the top of the Setup card, the current step below, earlier steps folded away."
+          },
+          {
+            "name": "One question at a time",
+            "summary": "A narrow centered card with a progress bar and \"step 4 of 6\", nothing else."
+          }
+        ]
+      },
+      "tasks": {
+        "title": "Task list",
+        "question": "How should a project's task list look?",
+        "why": "The maintainer chose the table over the overnight grouped pick.",
+        "outcome": "Chosen by the maintainer: the table with a side panel.",
+        "options": [
+          {
+            "name": "Table and side panel",
+            "summary": "A full table with mode, state, spend and model, and the new task form in a panel on the right."
+          },
+          {
+            "name": "Grouped by state",
+            "summary": "\"Needs you\" first, then \"Working\", with finished tasks folded away. New task opens a form under the title."
+          },
+          {
+            "name": "Ask first",
+            "summary": "A large composer box at the top, like a chat, and a one-line list of tasks below it."
+          }
+        ]
+      },
+      "taskPage": {
+        "title": "Task page",
+        "question": "How should one task's page look while the agent works and after it finishes?",
+        "why": "The maintainer chose tabs over the overnight single-column pick.",
+        "outcome": "Chosen by the maintainer: tabs.",
+        "options": [
+          {
+            "name": "Tabs",
+            "summary": "Activity, Attempts, Permission and Settings tabs under the title."
+          },
+          {
+            "name": "Single-column story",
+            "summary": "A status card with the state, a spend meter and the controls, then the live activity. Attempts and settings fold away."
+          },
+          {
+            "name": "Two columns",
+            "summary": "The live activity timeline on the left, permission and settings cards on the right."
+          }
+        ]
+      },
+      "account": {
+        "title": "Account",
+        "question": "How should the account page look?",
+        "why": "The maintainer kept the overnight pick.",
+        "outcome": "Chosen by the maintainer: stacked cards.",
+        "options": [
+          {
+            "name": "Stacked cards",
+            "summary": "Your details, usage with a meter, model keys as quiet rows, and sessions, one card each in one column."
+          },
+          {
+            "name": "Settings list",
+            "summary": "A small section menu on the left and plain settings rows on the right, no cards."
+          },
+          {
+            "name": "Usage first",
+            "summary": "A large allowance panel on top, then model keys and account side by side."
+          }
+        ]
+      }
+    },
     "toolbar": {
       "label": "Design lab controls",
       "home": "Design lab",
@@ -138,37 +275,6 @@
       "public": "Public",
       "dossierKicker": "Your files",
       "requisition": "Fill in a name to open a new file."
-    },
-    "mockups": {
-      "title": "Reference mockups",
-      "link": "Reference mockups made with the image model",
-      "body": "Generated with the image model before any page is built. They set the target look for every page round. Project avatars are abstract tricolors, never real national flags. Some mockups show data the API does not return yet, such as each project's source and Setup state in the list. Those parts need a small API addition, and I ask before building any.",
-      "items": {
-        "01-projects-desktop-light": "Project list, desktop, light",
-        "02-project-page-desktop-light": "Project page, desktop, light",
-        "03-setup-wizard-desktop-light": "Setup wizard, confirm step, desktop, light",
-        "04-tasks-desktop-light": "Task list with the new task panel, desktop, light",
-        "05-task-page-desktop-dark": "Running task page, desktop, dark",
-        "06-sign-in-desktop-light": "Sign in, desktop, light",
-        "07-account-desktop-light": "Account, desktop, light",
-        "08-phone-light": "Project list, menu and task page on phones",
-        "09-projects-empty-desktop-dark": "Empty project list with the unverified banner, desktop, dark",
-        "icon-sheet": "Generated icon set",
-        "mascot-3": "Mascot 3: the brick factory you picked",
-        "mascot-3a": "Mascot 3A: interwar industrial, riveted roof, production gauge, blueprint, conveyor-belt shoes",
-        "mascot-3b": "Mascot 3B: foreman cap, campaign map, steam whistle, scarf and toolbelt",
-        "mascot-3c": "Mascot 3C: simpler and rounder, production dial, smoke as a map arrow",
-        "logo-factory-sheet": "Factory logos 1 to 6, left to right, top row then bottom row",
-        "10-signin-a-minimal": "Sign in A: minimal centered card",
-        "11-signin-b-mascot": "Sign in B: the mascot welcomes you beside the form",
-        "12-signin-c-split": "Sign in C: split, a calm brand panel with the mascot peeking",
-        "13-signin-d-onestep-dark": "Sign in D: one step at a time (email first), shown in dark",
-        "14-signin-c-cinematic": "Sign in C, revised: cinematic panel, mascot leaning in from the edge",
-        "20-projects-a-table": "Project list A: minimal table",
-        "21-projects-b-cards": "Project list B: cards with flag banners",
-        "22-projects-c-list": "Project list C: quiet list, inline create, actions on hover",
-        "23-projects-empty-mascot": "Project list, empty: the mascot points at the first project field (goes with any variant)"
-      }
     }
   }
 }

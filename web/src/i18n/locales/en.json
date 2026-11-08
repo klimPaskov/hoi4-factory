@@ -254,13 +254,19 @@
       "private": "Private",
       "public": "Public"
     },
-    "tasksTitle": "Tasks",
     "tasksBody": "Give the agent a job to do on this mod, watch what it does, and review the result.",
-    "tasksLink": "Open tasks"
+    "tasksLink": "Open tasks",
+    "steps": {
+      "label": "Project progress",
+      "bring": "Bring in the mod",
+      "setup": "Set it up",
+      "tasks": "Give the agent tasks"
+    },
+    "sourceTitle": "Mod source",
+    "nextTitle": "Give the agent tasks",
+    "nextButton": "Give the agent a task"
   },
   "workspace": {
-    "emptyBody": "Bring a mod in with one of the options below.",
-    "emptyTitle": "No mod in this project yet",
     "files": "Files",
     "loading": "Checking the workspace…",
     "origin": "Came from",
@@ -285,7 +291,6 @@
       "planned": "Plan ready",
       "scanned": "Scanned"
     },
-    "title": "Workspace",
     "what": "Workspace status"
   },
   "bring": {
@@ -584,7 +589,10 @@
       },
       "rescan": "Scan the mod again",
       "dismiss": "Close this message"
-    }
+    },
+    "showEarlier_one": "Show the earlier step",
+    "showEarlier_other": "Show the {{count}} earlier steps",
+    "hideEarlier": "Hide the earlier steps"
   },
   "tasks": {
     "title": "Tasks",
@@ -595,8 +603,7 @@
     "loadingOne": "Loading the task…",
     "errorTitle": "Could not open this task",
     "listTitle": "Your tasks",
-    "emptyTitle": "No tasks yet",
-    "emptyBody": "Create a task below to give the agent a job on this mod.",
+    "emptyBody": "Give the agent a job on this mod. It works on its own branch and nothing reaches your main files until you review it.",
     "paused": "Paused",
     "spent": "Spent {{amount}} of {{budget}}",
     "spentUnknown": "Some spend is not known yet and is counted at its reserved amount.",
@@ -694,11 +701,26 @@
     "pendingTitle": "Actions with an unknown outcome",
     "pendingBody": "The agent started these actions, but the server does not know whether they finished. They must be checked before a new attempt can start, so that nothing is done twice or lost.",
     "pendingItem": "{{tool}} ({{status}}), operation {{id}}",
-    "eventsTitle": "Event log",
+    "eventsTitle": "Activity",
     "eventsEmpty": "No events yet.",
     "eventsLive": "Live updates are on.",
     "eventsPolling": "Live updates are not available, so the log is checked every few seconds.",
-    "eventsDetails": "Details"
+    "eventsDetails": "Details",
+    "settingsTitle": "Task settings",
+    "spentOf": "{{amount}} of {{budget}}",
+    "grantState": "State",
+    "columns": {
+      "objective": "Objective",
+      "mode": "Mode",
+      "state": "State",
+      "spend": "Spend",
+      "model": "Model"
+    },
+    "listLabel_one": "{{n}} task",
+    "listLabel_other": "{{n}} tasks",
+    "tabsLabel": "Task details",
+    "permissionTab": "Permission",
+    "settingsTab": "Settings"
   },
   "apiKeys": {
     "title": "Model API keys",
@@ -744,6 +766,7 @@
     "notVerified": "Verify your email address to use the free monthly allowance.",
     "unknown_one": "{{count}} use is not known yet and is counted at its reserved amount.",
     "unknown_other": "{{count}} uses are not known yet and are counted at their reserved amount.",
-    "userKey": "Spent with your own keys: {{amount}}"
+    "userKey": "Spent with your own keys: {{amount}}",
+    "used": "Used this month"
   }
 }
