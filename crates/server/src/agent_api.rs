@@ -82,7 +82,7 @@ pub fn router(state: &ServerState) -> Router {
         .with_state(state.clone())
 }
 
-fn runtime(state: &ServerState) -> Result<&AgentRuntime, Fail> {
+pub(crate) fn runtime(state: &ServerState) -> Result<&AgentRuntime, Fail> {
     state.agent.as_ref().ok_or_else(|| {
         Fail::from(ApiError::new(
             StatusCode::SERVICE_UNAVAILABLE,
@@ -600,7 +600,7 @@ async fn create_task(
     Ok((StatusCode::CREATED, Json(body)).into_response())
 }
 
-async fn load_task(rt: &AgentRuntime, principal: &Principal, project: &Project, raw: &str) -> Result<Task, Fail> {
+pub(crate) async fn load_task(rt: &AgentRuntime, principal: &Principal, project: &Project, raw: &str) -> Result<Task, Fail> {
     let id = TaskId(parse(raw)?);
     let mut tx = rt.tx(principal.account_id()).await?;
     let task = factory_tasks::get_task(&mut tx, id).await.map_err(task_error)?;
@@ -649,7 +649,7 @@ struct Expected {
 }
 
 /// Opens (or reopens) the task's own worktree on its owned branch.
-async fn ensure_worktree(state: &ServerState, project: &Project, task: TaskId) -> Result<(PathBuf, String), Fail> {
+pub(crate) async fn ensure_worktree(state: &ServerState, project: &Project, task: TaskId) -> Result<(PathBuf, String), Fail> {
     let workspace = open_workspace(state, project)?;
     tokio::task::spawn_blocking(move || {
         let not_ready = || {

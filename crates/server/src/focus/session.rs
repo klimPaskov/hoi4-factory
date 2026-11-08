@@ -70,6 +70,22 @@ pub struct Rewritten {
     pub after: BTreeMap<String, String>,
     pub changed_paths: Vec<String>,
     pub change: PlanChange,
+    /// One unified diff per changed path (`path`, `diff`), for the review card.
+    pub diffs: Vec<(String, String)>,
+}
+
+/// A unified diff of two file versions, with lossy text for non-UTF-8 bytes.
+pub fn unified_diff(path: &str, before: Option<&[u8]>, after: Option<&[u8]>) -> String {
+    let old = before.map(String::from_utf8_lossy).unwrap_or_default();
+    let new = after.map(String::from_utf8_lossy).unwrap_or_default();
+    similar::TextDiff::from_lines(old.as_ref(), new.as_ref())
+        .unified_diff()
+        .context_radius(3)
+        .header(
+            &if before.is_some() { format!("a/{path}") } else { "/dev/null".to_owned() },
+            &if after.is_some() { format!("b/{path}") } else { "/dev/null".to_owned() },
+        )
+        .to_string()
 }
 
 pub fn sha256_hex(bytes: &[u8]) -> String {
@@ -277,6 +293,8 @@ impl FocusSession {
             touched.push(loc.clone());
         }
         let before: BTreeMap<String, String> = touched.iter().map(|p| (p.clone(), hash_file(&self.root, p))).collect();
+        let before_bytes: BTreeMap<String, Option<Vec<u8>>> =
+            touched.iter().map(|p| (p.clone(), std::fs::read(self.root.join(p)).ok())).collect();
         let dirty_before = dirty_paths(&self.root)?;
 
         let deadline = Instant::now() + REWRITE_TIMEOUT;
@@ -318,8 +336,15 @@ impl FocusSession {
             append_localisation(&self.root, &loc, &change.localisation)?;
         }
         let after: BTreeMap<String, String> = touched.iter().map(|p| (p.clone(), hash_file(&self.root, p))).collect();
-        let changed_paths = touched.iter().filter(|p| before[*p] != after[*p]).cloned().collect();
-        Ok(Rewritten { request_sha256, before, after, changed_paths, change })
+        let changed_paths: Vec<String> = touched.iter().filter(|p| before[*p] != after[*p]).cloned().collect();
+        let diffs = changed_paths
+            .iter()
+            .map(|p| {
+                let now = std::fs::read(self.root.join(p)).ok();
+                (p.clone(), unified_diff(p, before_bytes[p].as_deref(), now.as_deref()))
+            })
+            .collect();
+        Ok(Rewritten { request_sha256, before, after, changed_paths, change, diffs })
     }
 
     pub async fn shutdown(self) {

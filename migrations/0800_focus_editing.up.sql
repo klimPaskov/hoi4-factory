@@ -56,6 +56,10 @@ CREATE TABLE change_proposals (
     after_hashes         jsonb NOT NULL,
     changed_paths        text[] NOT NULL DEFAULT '{}',
     changed_ids          text[] NOT NULL DEFAULT '{}',
+    -- Focuses added and fields changed with before and after values, for the review card.
+    semantic_summary     jsonb NOT NULL DEFAULT '{}'::jsonb,
+    -- [{path, diff}] unified diffs of the changed paths.
+    diffs                jsonb NOT NULL DEFAULT '[]'::jsonb,
     -- SHA-256 of the canonical proposal (operations, base, hashes, paths). Approval binds to it.
     proposal_hash        text NOT NULL CHECK (proposal_hash ~ '^[0-9a-f]{64}$'),
     state                text NOT NULL CHECK (state IN ('applied', 'committed', 'discarded', 'reverted')),

@@ -130,6 +130,8 @@ pub(crate) struct Inner {
     pub notifier: broadcast::Sender<TaskId>,
     pub slots: Arc<Semaphore>,
     pub limiter: InMemoryRateLimiter,
+    /// The focus editor's Agent Tools sessions, one per task (S04).
+    pub focus: crate::focus::apply::FocusHost,
 }
 
 /// A runner of this process.
@@ -156,6 +158,8 @@ fn rate_limits() -> RateLimitConfig {
             (LIMIT_ATTEMPT_START, rule(20, 90)),
             (LIMIT_KEY_WRITE, rule(10, 60)),
             (LIMIT_PROBE, rule(10, 60)),
+            // A drag fires one operation; allow a steady editing pace.
+            (crate::focus_api::LIMIT_FOCUS_OPERATION, rule(120, 1)),
         ]
         .into_iter()
         .map(|(k, v)| (k.to_owned(), v))
@@ -213,6 +217,7 @@ impl AgentRuntime {
                 notifier,
                 slots: Arc::new(Semaphore::new(parts.max_running.max(1))),
                 limiter,
+                focus: Default::default(),
             }),
         })
     }
@@ -232,6 +237,14 @@ impl AgentRuntime {
 
     pub fn agent_tools_installed(&self) -> bool {
         self.inner.agent_tools.is_some()
+    }
+
+    pub fn agent_tools_settings(&self) -> Option<&AgentToolsSettings> {
+        self.inner.agent_tools.as_ref()
+    }
+
+    pub fn focus(&self) -> &crate::focus::apply::FocusHost {
+        &self.inner.focus
     }
 
     /// The bundled engine's state, `None` when Agent Tools are not installed.

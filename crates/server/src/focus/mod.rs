@@ -5,6 +5,8 @@
 //! task's worktree with hash guards ([`session::FocusSession::rewrite`]). Each applied batch is a
 //! C-02 change proposal.
 
+pub mod apply;
 pub mod ops;
 pub mod projection;
 pub mod session;
+pub mod store;
