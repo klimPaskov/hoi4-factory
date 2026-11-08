@@ -93,6 +93,29 @@ CREATE TABLE publications (
 );
 CREATE INDEX publications_project_idx ON publications (project_id, owner_account_id);
 
+-- engine_baselines: the findings baseline (hoi4-engine-baseline/1) of a project at one commit,
+-- with the check report it came from. A commit check compares the worktree against it, so only
+-- new findings block (S04 gate 8). Imports record one for the imported commit.
+CREATE TABLE engine_baselines (
+    id               uuid PRIMARY KEY,
+    project_id       uuid NOT NULL,
+    owner_account_id uuid NOT NULL,
+    commit_oid       text NOT NULL CHECK (commit_oid ~ '^[0-9a-f]{40}([0-9a-f]{24})?$'),
+    engine_version   text NOT NULL CHECK (char_length(engine_version) <= 64),
+    engine_rev       text NOT NULL CHECK (char_length(engine_rev) <= 64),
+    baseline         jsonb NOT NULL,
+    report_summary   jsonb NOT NULL,
+    created_at       timestamptz NOT NULL DEFAULT clock_timestamp(),
+    FOREIGN KEY (project_id, owner_account_id) REFERENCES projects (id, owner_account_id) ON DELETE CASCADE,
+    CONSTRAINT engine_baselines_commit UNIQUE (project_id, commit_oid, engine_rev)
+);
+
+ALTER TABLE engine_baselines ENABLE ROW LEVEL SECURITY;
+ALTER TABLE engine_baselines FORCE ROW LEVEL SECURITY;
+CREATE POLICY engine_baselines_select ON engine_baselines FOR SELECT USING (tasks_can_see_project(project_id, owner_account_id));
+CREATE POLICY engine_baselines_insert ON engine_baselines FOR INSERT WITH CHECK (tasks_can_see_project(project_id, owner_account_id));
+GRANT SELECT, INSERT ON engine_baselines TO factory_app;
+
 ALTER TABLE focus_projections ENABLE ROW LEVEL SECURITY;
 ALTER TABLE focus_projections FORCE ROW LEVEL SECURITY;
 ALTER TABLE change_proposals ENABLE ROW LEVEL SECURITY;

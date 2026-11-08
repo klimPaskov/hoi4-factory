@@ -48,10 +48,15 @@ pub fn user_endpoint_profile(record: &factory_broker::KeyRecord) -> Option<Model
         return None;
     }
     let model = record.probe_model.as_deref()?;
-    let observed: Capabilities = serde_json::from_value(record.probe_capabilities.clone()?).ok()?;
+    let stored = record.probe_capabilities.as_ref()?;
+    let observed: Capabilities = serde_json::from_value(stored["capabilities"].clone()).ok()?;
     let mut profile = ModelProfile::openai_compatible(record.base_url.as_deref()?, model);
     profile.id = user_profile_id(record.id);
     profile.observed = Some(observed);
+    // A probe cannot observe the context window: the key owner declares it with the probe.
+    if let Some(tokens) = stored["context_tokens"].as_u64().and_then(|t| u32::try_from(t).ok()) {
+        profile.context_tokens = tokens;
+    }
     Some(profile)
 }
 

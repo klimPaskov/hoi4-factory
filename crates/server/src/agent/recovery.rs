@@ -116,7 +116,24 @@ async fn recover_one(rt: &AgentRuntime, item: &RecoveryItem) -> Result<bool, Str
             .await
             .map_err(|e| e.to_string())?;
         }
-        let (decision, observation, observed) = if intent.effect_class == EffectClass::IdempotentWrite {
+        let (decision, observation, observed) = if intent.reconciliation_method == "observe_focus_proposal" {
+            // A focus edit records its change proposal in the same step that settles it. A
+            // proposal of this attempt after the intent means it applied. Without one, the rewrite
+            // may still have touched files, so it is a conflict for a person to review, never a
+            // silent rerun.
+            let found: Option<uuid::Uuid> = sqlx::query_scalar(
+                "SELECT id FROM change_proposals WHERE attempt_id = $1 AND created_at >= $2 ORDER BY created_at LIMIT 1",
+            )
+            .bind(attempt.id.0)
+            .bind(intent.created_at)
+            .fetch_optional(&mut *tx)
+            .await
+            .map_err(|e| e.to_string())?;
+            match found {
+                Some(p) => (ReconciliationDecision::Applied, json!({ "proposal_id": p }), None),
+                None => (ReconciliationDecision::Conflict, json!({ "reason": "no change proposal was recorded" }), None),
+            }
+        } else if intent.effect_class == EffectClass::IdempotentWrite {
             let path = intent.observation_inputs["path"].as_str().unwrap_or("").to_owned();
             let expected = intent.observation_inputs["expected_before"].as_str().unwrap_or("").to_owned();
             let intended = intent.observation_inputs["intended_after"].as_str().unwrap_or("").to_owned();

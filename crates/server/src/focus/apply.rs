@@ -9,14 +9,14 @@ use std::collections::{BTreeMap, HashMap};
 use std::path::Path;
 use std::sync::{Arc, Mutex};
 
-use factory_tasks::{Actor, Task, TaskId};
+use factory_tasks::{Actor, TaskId};
 use serde_json::{Value, json};
 use tokio::sync::Mutex as AsyncMutex;
 
 use super::ops::FocusOp;
 use super::projection::Built;
 use super::session::{FocusError, FocusSession};
-use super::store::{self, ActorKind, NewProposal};
+use super::store::{self, ActorKind, NewProposal, TaskKeys};
 use crate::agent::AgentRuntime;
 use crate::agent::runner::event;
 
@@ -51,7 +51,7 @@ impl FocusHost {
     }
 }
 
-async fn open<'a>(rt: &AgentRuntime, task: &Task, root: &Path, guard: &'a mut Option<FocusSession>) -> Result<&'a mut FocusSession, FocusError> {
+async fn open<'a>(rt: &AgentRuntime, task: &TaskKeys, root: &Path, guard: &'a mut Option<FocusSession>) -> Result<&'a mut FocusSession, FocusError> {
     let stale = guard.as_ref().is_some_and(|s| s.root() != root);
     if stale && let Some(old) = guard.take() {
         old.shutdown().await;
@@ -60,7 +60,13 @@ async fn open<'a>(rt: &AgentRuntime, task: &Task, root: &Path, guard: &'a mut Op
         let settings = rt
             .agent_tools_settings()
             .ok_or_else(|| FocusError::ToolsUnavailable { message: "HOI4 Agent Tools are not installed on this server".into() })?;
-        let state = crate::agent::recovery::tool_state_dir(rt, task).join("focus-editor");
+        let state = rt
+            .storage()
+            .data_root()
+            .join("tool-state")
+            .join(task.owner_account_id.to_string())
+            .join(task.project_id.to_string())
+            .join("focus-editor");
         *guard = Some(FocusSession::start(settings, root, &state).await?);
     }
     Ok(guard.as_mut().expect("session started"))
@@ -70,8 +76,8 @@ fn db(e: impl std::fmt::Display) -> FocusError {
     FocusError::Internal { message: format!("database: {e}") }
 }
 
-async fn store_if_new(rt: &AgentRuntime, task: &Task, built: &Built) -> Result<uuid::Uuid, FocusError> {
-    let mut tx = rt.tx(task.owner_account_id).await.map_err(|e| db(e.code))?;
+async fn store_if_new(rt: &AgentRuntime, task: &TaskKeys, built: &Built) -> Result<uuid::Uuid, FocusError> {
+    let mut tx = rt.tx(task.acting).await.map_err(|e| db(e.code))?;
     if let Some((id, latest)) = store::latest_projection(&mut tx, task.id, &built.tree_id).await.map_err(db)?
         && latest.projection_hash == built.projection_hash
         && latest.source_hashes == built.source_hashes
@@ -85,7 +91,7 @@ async fn store_if_new(rt: &AgentRuntime, task: &Task, built: &Built) -> Result<u
 }
 
 /// Inspects a tree in the task's worktree and records its projection.
-pub async fn inspect_tree(rt: &AgentRuntime, task: &Task, root: &Path, tree_id: &str) -> Result<Value, FocusError> {
+pub async fn inspect_tree(rt: &AgentRuntime, task: &TaskKeys, root: &Path, tree_id: &str) -> Result<Value, FocusError> {
     let slot = rt.focus().slot(task.id);
     let mut guard = slot.lock().await;
     let session = open(rt, task, root, &mut guard).await?;
@@ -138,7 +144,7 @@ pub struct Applied {
 /// `stale_base` with the current state.
 pub async fn apply_operations(
     rt: &AgentRuntime,
-    task: &Task,
+    task: &TaskKeys,
     root: &Path,
     actor: ActorKind,
     tree_id: &str,
@@ -150,7 +156,7 @@ pub async fn apply_operations(
     let session = open(rt, task, root, &mut guard).await?;
 
     let latest = {
-        let mut tx = rt.tx(task.owner_account_id).await.map_err(|e| db(e.code))?;
+        let mut tx = rt.tx(task.acting).await.map_err(|e| db(e.code))?;
         let l = store::latest_projection(&mut tx, task.id, tree_id).await.map_err(db)?;
         tx.commit().await.map_err(db)?;
         l.map(|(_, b)| b)
@@ -191,7 +197,7 @@ pub async fn apply_operations(
     // The rewrite is done. A failed re-inspection still leaves a proposal to review.
     let after = session.inspect(tree_id).await;
 
-    let mut tx = rt.tx(task.owner_account_id).await.map_err(|e| db(e.code))?;
+    let mut tx = rt.tx(task.acting).await.map_err(|e| db(e.code))?;
     let (after_id, after_projection) = match &after {
         Ok(built) => (Some(store::insert_projection(&mut tx, task, built).await.map_err(db)?), built.projection.clone()),
         Err(_) => (None, Value::Null),

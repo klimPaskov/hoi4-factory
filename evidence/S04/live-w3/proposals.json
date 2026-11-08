@@ -1,0 +1,106 @@
+{
+  "proposals": [
+    {
+      "actorAccountId": null,
+      "actorKind": "native_agent",
+      "after": {
+        "common/national_focus/exp_basic.focus-plan.json": "absent",
+        "common/national_focus/exp_basic.txt": "31334a0dfd6be9851e58c5fe8c1605355f45f7f2cebce0bb2e823377e6f50f32",
+        "localisation/english/exp_basic_tree_l_english.yml": "2640f89092f13912a46e77260ff4febbe679e4b7ac8bd1ecb7670228af05bc86"
+      },
+      "afterProjectionId": "0b53bbb0-5172-406b-bc4b-6511afae2c2e",
+      "attemptId": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "baseProjectionHash": "481c564852325586a07a34c8c256e5333aaf6be8ca971b45594739a2cb2b7523",
+      "before": {
+        "common/national_focus/exp_basic.focus-plan.json": "absent",
+        "common/national_focus/exp_basic.txt": "68bd406d428bcc8add0a35b616904611bded565fe9e987d7bb0287fdfd15fcf9",
+        "localisation/english/exp_basic_tree_l_english.yml": "absent"
+      },
+      "changedIds": [
+        "exp_reform_a",
+        "exp_reform_b",
+        "exp_reform_c"
+      ],
+      "changedPaths": [
+        "common/national_focus/exp_basic.txt",
+        "localisation/english/exp_basic_tree_l_english.yml"
+      ],
+      "createdAt": "2026-11-08T18:05:58.069490Z",
+      "diffs": [
+        {
+          "diff": "--- a/common/national_focus/exp_basic.txt\n+++ b/common/national_focus/exp_basic.txt\n@@ -55,4 +55,37 @@\n \t\tai_will_do = { factor = 1 }\n \t\tcompletion_reward = { add_political_power = 50 }\n \t}\n+\n+\tfocus = {\n+\t\tid = exp_reform_a\n+\t\ticon = GFX_exp_icon_join\n+\t\tprerequisite = { focus = exp_join }\n+\t\tx = 3\n+\t\ty = 3\n+\t\tcost = 5\n+\t\tai_will_do = { factor = 1 }\n+\t\tcompletion_reward = { add_political_power = 25 }\n+\t}\n+\n+\tfocus = {\n+\t\tid = exp_reform_b\n+\t\ticon = GFX_exp_icon_join\n+\t\tprerequisite = { focus = exp_join }\n+\t\tx = 5\n+\t\ty = 3\n+\t\tcost = 5\n+\t\tai_will_do = { factor = 1 }\n+\t\tcompletion_reward = { add_political_power = 25 }\n+\t}\n+\n+\tfocus = {\n+\t\tid = exp_reform_c\n+\t\ticon = GFX_exp_icon_join\n+\t\tprerequisite = { focus = exp_reform_a focus = exp_reform_b }\n+\t\tx = 4\n+\t\ty = 4\n+\t\tcost = 5\n+\t\tai_will_do = { factor = 1 }\n+\t\tcompletion_reward = { add_political_power = 25 }\n+\t}\n }\n",
+          "path": "common/national_focus/exp_basic.txt"
+        },
+        {
+          "diff": "--- /dev/null\n+++ b/localisation/english/exp_basic_tree_l_english.yml\n@@ -0,0 +1,7 @@\n+﻿l_english:\n+ exp_reform_a:0 \"Reform the Bureaucracy\"\n+ exp_reform_a_desc:0 \"Streamline the ministries and cut the red tape.\"\n+ exp_reform_b:0 \"Reform the Economy\"\n+ exp_reform_b_desc:0 \"Modernise our industry for the years ahead.\"\n+ exp_reform_c:0 \"Complete the Reforms\"\n+ exp_reform_c_desc:0 \"Our programme of reform is finally complete.\"\n",
+          "path": "localisation/english/exp_basic_tree_l_english.yml"
+        }
+      ],
+      "engineReport": null,
+      "findingDelta": null,
+      "id": "b24c4321-0041-4f8f-84a8-4ca304218b69",
+      "operations": [
+        {
+          "cost": 5.0,
+          "description": "Streamline the ministries and cut the red tape.",
+          "focus_id": "exp_reform_a",
+          "icon": "GFX_exp_icon_join",
+          "op": "create",
+          "prerequisites": [
+            "exp_join"
+          ],
+          "reward": "add_political_power = 25",
+          "title": "Reform the Bureaucracy",
+          "x": 3,
+          "y": 3
+        },
+        {
+          "cost": 5.0,
+          "description": "Modernise our industry for the years ahead.",
+          "focus_id": "exp_reform_b",
+          "icon": "GFX_exp_icon_join",
+          "op": "create",
+          "prerequisites": [
+            "exp_join"
+          ],
+          "reward": "add_political_power = 25",
+          "title": "Reform the Economy",
+          "x": 5,
+          "y": 3
+        },
+        {
+          "cost": 5.0,
+          "description": "Our programme of reform is finally complete.",
+          "focus_id": "exp_reform_c",
+          "icon": "GFX_exp_icon_join",
+          "op": "create",
+          "prerequisites": [
+            "exp_reform_a",
+            "exp_reform_b"
+          ],
+          "reward": "add_political_power = 25",
+          "title": "Complete the Reforms",
+          "x": 4,
+          "y": 4
+        }
+      ],
+      "proposalHash": "a7184ade3248f812f60212a7f89a3dd8bee186575c4e45d61cc4aadb6b679165",
+      "requestSha256": "9fbff693ec0f5665d18e135cb5f7f4032ea7bd7afdbca25bbe78647d55a01c45",
+      "state": "applied",
+      "summary": {
+        "added": [
+          "exp_reform_a",
+          "exp_reform_b",
+          "exp_reform_c"
+        ],
+        "changed": [],
+        "removed": []
+      },
+      "taskId": "47ba765a-6a5a-41a9-a2a2-ab47d16d4c78",
+      "toolOperation": "hoi4.focus_rewrite",
+      "toolVersion": "4.11.0",
+      "treeId": "exp_basic_tree",
+      "updatedAt": "2026-11-08T18:05:58.069490Z"
+    }
+  ]
+}

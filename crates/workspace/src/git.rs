@@ -460,6 +460,67 @@ impl GitRepo {
 
     // ---- inspection ----
 
+    /// The bytes of `path` at commit `rev`, `None` when the commit has no such file. The path is
+    /// checked with the workspace path rules first.
+    pub fn read_at(&self, rev: &Oid, path: &str) -> Result<Option<Vec<u8>>, WorkspaceError> {
+        crate::paths::validate_relative(path)?;
+        let spec = format!("{rev}:{path}");
+        let output = self.exec(["cat-file", "-e", spec.as_str()], &[])?;
+        if !output.status.success() {
+            return Ok(None);
+        }
+        Ok(Some(self.run(["cat-file", "blob", spec.as_str()])?))
+    }
+
+    /// The files and their blob ids at commit `rev`, sorted. Gitlinks and links are skipped.
+    pub fn files_at(&self, rev: &Oid) -> Result<Vec<(String, String)>, GitError> {
+        let raw = self.run(["ls-tree", "-r", "-z", "--full-tree", rev.as_str()])?;
+        let mut files = Vec::new();
+        for record in raw.split(|b| *b == 0).filter(|r| !r.is_empty()) {
+            let text = String::from_utf8_lossy(record);
+            let Some((meta, path)) = text.split_once('\t') else {
+                return Err(GitError::Parse("ls-tree record".into()));
+            };
+            let mut parts = meta.split(' ');
+            let (mode, kind, blob) = (parts.next(), parts.next(), parts.next());
+            if kind == Some("blob") && matches!(mode, Some("100644") | Some("100755")) {
+                files.push((path.to_owned(), blob.unwrap_or_default().to_owned()));
+            }
+        }
+        files.sort();
+        Ok(files)
+    }
+
+    /// Writes the regular files of commit `rev` under `dest` (which must be empty or missing), for
+    /// a check of the committed state. Byte-exact: no line-ending or filter conversion.
+    pub fn export_commit(&self, rev: &Oid, dest: &Path) -> Result<usize, WorkspaceError> {
+        let files = self.files_at(rev)?;
+        fs::create_dir_all(dest).map_err(|source| WorkspaceError::Io { operation: "export a commit", source })?;
+        for (path, blob) in &files {
+            crate::paths::validate_relative(path)?;
+            let bytes = self.run(["cat-file", "blob", blob.as_str()])?;
+            let target = dest.join(path);
+            if let Some(parent) = target.parent() {
+                fs::create_dir_all(parent).map_err(|source| WorkspaceError::Io { operation: "export a commit", source })?;
+            }
+            fs::write(&target, bytes).map_err(|source| WorkspaceError::Io { operation: "export a commit", source })?;
+        }
+        Ok(files.len())
+    }
+
+    /// The newest commit reachable from `rev` whose message contains `line` exactly as a line,
+    /// for reconciling a commit whose reply was lost (its message carries a unique trailer).
+    pub fn find_commit_with_line(&self, rev: &Oid, line: &str) -> Result<Option<Oid>, GitError> {
+        let text = self.run_text(["log", "--format=%H%x00%B%x1e", rev.as_str()])?;
+        for record in text.split('\u{1e}') {
+            let Some((oid, body)) = record.trim_start_matches('\n').split_once('\0') else { continue };
+            if body.lines().any(|l| l == line) {
+                return Ok(Some(Oid::new(oid)?));
+            }
+        }
+        Ok(None)
+    }
+
     /// Current commit, `None` when the repository has no commits.
     pub fn head(&self) -> Result<Option<Oid>, GitError> {
         let output = self.exec(["rev-parse", "--verify", "--quiet", "HEAD^{commit}"], &[])?;

@@ -305,6 +305,10 @@ struct ProbeRequest {
     /// The model an inference probe uses on a self-hosted endpoint. Default: the first listed.
     #[serde(default)]
     model: Option<String>,
+    /// The model's context window in tokens, declared by the key owner (a probe cannot observe
+    /// it). Used only for a self-hosted endpoint's agent profile. Default 8,192.
+    #[serde(default)]
+    context_tokens: Option<u32>,
 }
 
 async fn probe_key(
@@ -361,8 +365,17 @@ async fn probe_key(
     let (caps, evidence) = profiles::capability_summary(&report.capabilities);
     // An inference probe of a self-hosted endpoint makes it an agent profile with exactly what it
     // observed (issue #7). A listing probe changes nothing.
+    if let Some(t) = request.context_tokens
+        && !(4_096..=2_000_000).contains(&t)
+    {
+        return Err(ApiError::invalid_request("The context window is 4,096 to 2,000,000 tokens.").with_id("field", "context_tokens").into());
+    }
     if mode == ProbeMode::Inference && record.provider == KeyProvider::OpenaiCompatible && report.error.is_none() {
-        let observed = serde_json::to_value(&report.capabilities).unwrap_or(Value::Null);
+        let observed = json!({
+            "capabilities": report.capabilities,
+            "context_tokens": request.context_tokens.unwrap_or(profile.context_tokens),
+            "context_basis": if request.context_tokens.is_some() { "declared by the key owner" } else { "default for an unknown endpoint" },
+        });
         let mut tx = rt.tx(principal.account_id()).await?;
         keys.record_probe(&mut tx, principal.account_id(), id, &profile.model, &observed).await.map_err(key_error)?;
         tx.commit().await?;

@@ -231,6 +231,24 @@ These are not maintainer decisions. The maintainer authorized S03 to proceed wit
 | User key encryption | The accounts crate's AES-256-GCM store with a master key file, bound to owner, key and provider |
 | Task defaults | $0.20 budget, 20 model turns, `claude-haiku-5-5` on the allowance |
 
+### S04 implementation defaults (implementing agent, 2026-11-08, open to revision)
+
+These are not maintainer decisions. They follow the S04 authorization of 2026-11-08 and the goal prompt's rule to pick sensible technical defaults. The page designs are the maintainer's choice and are asked in [maintainer questions](../../evidence/maintainer-questions.md) items 14 and 15.
+
+| Topic | Default used |
+|---|---|
+| Agent Tools in the image | The image installs the released tarball (4.11.0 at the start of S04) by its SHA-256, with dependencies from the tarball's own shrinkwrap, and keeps only the engine binary for its architecture after checking it against the bundle manifest. The server links `hoi4-engine` from the same commit as a Cargo git dependency |
+| One operation vocabulary | People and the agent send the same focus operations (move, set cost, link, create). The host turns them into one `hoi4.focus_rewrite` request. `focus_rewrite` is in a host-only profile and is never offered to the model, which uses `focus_projection` and `focus_edit` instead |
+| Editing sessions | A visual editing session is an ordinary edit task, so a person's gestures, the agent's edits, the commit and the restore share one worktree, one event stream and one proposal list. One lock per task serializes every focus operation |
+| Hash guards | A rewrite runs only when every mod file the projection read still has its hash. Otherwise the answer is `stale_base` and nothing is written. The host also refuses a rewrite that wrote outside the tree's file |
+| The tool's plan file | `hoi4.focus_rewrite` writes a `.focus-plan.json` beside the source. The host removes it when the rewrite created it, because the source file is the truth and the next inspect rebuilds the plan |
+| Localisation of new focuses | Appended to `localisation/english/<tree>_l_english.yml`, created with a BOM when missing. A key that already exists is refused |
+| Commit check | Every commit runs the linked engine against the project baseline at the worktree's HEAD, computed once per commit from the committed files. New findings at the error level block a commit that holds agent work. An `incomplete` verdict never counts as a pass and needs the person's explicit acceptance |
+| Commit author | The person's display name and an address under `users.hoi4-factory.invalid`, so no personal email reaches a pushed repository |
+| Restore | Undoes one factory commit path by path. A path someone changed since the commit is kept and reported |
+| Self-hosted endpoints (issue #7) | An inference probe records the model and the observed capabilities. The key owner declares the context window with the probe, because a probe cannot observe it. The endpoint becomes the owner's profile `user:<key id>` |
+| DeepSeek price | `deepseek-flash` at the peak rate, the safe upper bound |
+
 ### ADR-025: a separate UI design track chosen from live previews (2026-10-25)
 
 **Decision.** The browser client built in S02 is functional and temporary. Its visual design is redone in a separate, interactive UI design track, run as its own session after S03 and before S04. For each page the agent builds three or four working variants and shows them side by side in a development-only "design lab" page of the running app, with realistic data. The maintainer picks one, or asks for changes, and the agent implements the choice before moving to the next page. The track starts with an overall visual direction and a shared component set, then goes page by page until the maintainer is satisfied.

@@ -243,6 +243,10 @@ impl AgentRuntime {
         self.inner.agent_tools.as_ref()
     }
 
+    pub fn storage(&self) -> &StorageRoot {
+        &self.inner.storage
+    }
+
     pub fn focus(&self) -> &crate::focus::apply::FocusHost {
         &self.inner.focus
     }

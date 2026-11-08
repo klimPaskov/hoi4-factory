@@ -1,0 +1,866 @@
+{
+  "events": [
+    {
+      "actor": "user:578513c5-ff63-4b68-b6ef-d15da58f2214",
+      "attempt_id": null,
+      "created_at": "2026-11-08T18:04:53.587739Z",
+      "event_id": "71531d3a-6c78-434a-8b66-f7366a2b3c6d",
+      "payload": {
+        "allowed_paths": [
+          "common/national_focus",
+          "localisation"
+        ],
+        "budget_micros": 500000,
+        "max_turns": 20,
+        "mode": "edit",
+        "objective": "In the national focus tree exp_basic_tree, add a short branch of three new focuses below exp_join. Read the tree with focus_projection first, then add them with one focus_edit call: exp_reform_a at x 3 y 3 requiring exp_join, exp_reform_b at x 5 y 3 requiring exp_join, and exp_reform_c at x 4 y 4 requiring exp_reform_a or exp_reform_b. Give each a cost of 5, the icon GFX_exp_icon_join, a short English title and description, and a small reward such as add_political_power = 25. Then finish.",
+        "requirement_ids": []
+      },
+      "payload_sha256": "e89fcbe7ac8c6b5b8382c16c215525772e645f7bcbbb8fa8945585646671b709",
+      "seq": 1,
+      "summary": "Task created",
+      "type": "task_created"
+    },
+    {
+      "actor": "user:578513c5-ff63-4b68-b6ef-d15da58f2214",
+      "attempt_id": null,
+      "created_at": "2026-11-08T18:04:53.587739Z",
+      "event_id": "d2f67cc4-3926-4bd8-ac9d-1f810b4d81a9",
+      "payload": {
+        "detail": {
+          "summary": "Task created and ready"
+        },
+        "from": "planned",
+        "to": "ready"
+      },
+      "payload_sha256": "cedce4211ac4f498d953ef880d00e747d86983cffdd2fb9e16d0b8ad9d6b75e1",
+      "seq": 2,
+      "summary": "task ready",
+      "type": "task_ready"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:04:54.011442Z",
+      "event_id": "dbfeb456-0453-46ac-809e-fff1c3d8e099",
+      "payload": {
+        "attempt_no": 1,
+        "bundle_id": "078317f7-f3a5-4c43-9e11-c67920ad5134",
+        "fencing_generation": 1,
+        "funding": "user_key",
+        "grant_epoch": 1,
+        "grant_id": "4b345f54-9d44-4375-b2d6-fa5aed50cca9",
+        "task_state_from": "ready"
+      },
+      "payload_sha256": "e6c79e33d737c7049045454d5d3e0a64be91b6e3172d9bdb8f621861ecfda15b",
+      "seq": 3,
+      "summary": "Attempt admitted",
+      "type": "attempt_admitted"
+    },
+    {
+      "actor": "user:578513c5-ff63-4b68-b6ef-d15da58f2214",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:04:54.011442Z",
+      "event_id": "ae4c7919-67c0-480c-a48a-271cfa1f6a62",
+      "payload": {
+        "budget": {
+          "available": 41952,
+          "context_tokens": 64000,
+          "mandatory_tokens": 426,
+          "optional_tokens": 169,
+          "remaining": 41357,
+          "reserved_output": 2048,
+          "reserved_tools": 20000
+        },
+        "bundle_id": "078317f7-f3a5-4c43-9e11-c67920ad5134",
+        "generation": 1,
+        "grant_epoch": 1,
+        "grant_id": "4b345f54-9d44-4375-b2d6-fa5aed50cca9",
+        "manifest_sha256": "8d98d3de60c3d3a7d494d2970a7836db155153f1a3d83cc0433731a6c28bb7e1",
+        "omissions": 0,
+        "summary": "Context bundle built and attached"
+      },
+      "payload_sha256": "3a8a1e095c120f98b5200507e80b52334ed4be20b126aded4492c1d8b67b4d0e",
+      "seq": 4,
+      "summary": "Context bundle built and attached",
+      "type": "context_bundle_attached"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:04:54.127819Z",
+      "event_id": "b80ea6b3-eccd-45b3-836e-271b978c5244",
+      "payload": {
+        "attempt_no": 1,
+        "error_code": null,
+        "from": "admitted",
+        "outcome_sha256": null,
+        "to": "running"
+      },
+      "payload_sha256": "ba225efce940e7863ba895067f5ef25507c2537194afb2e43e066ad3e8e952e2",
+      "seq": 5,
+      "summary": "Attempt running",
+      "type": "attempt_running"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:04:57.786210Z",
+      "event_id": "9bea044f-c7ed-4cd4-8107-8b96ba84ceb8",
+      "payload": {
+        "inventory": {
+          "agent_tools": {
+            "discovered_at": "2026-11-08T18:04:57.732747Z",
+            "health": {
+              "startup_ms": 3546,
+              "status": "healthy"
+            },
+            "ignored_tool_count": 25,
+            "profile_id": "hoi4-agent-tools.read-only.v1",
+            "server": {
+              "capabilities": {
+                "logging": {},
+                "prompts": {
+                  "listChanged": true
+                },
+                "resources": {
+                  "listChanged": true
+                },
+                "tasks": {
+                  "cancel": {},
+                  "list": {},
+                  "requests": {
+                    "tools": {
+                      "call": {}
+                    }
+                  }
+                },
+                "tools": {
+                  "listChanged": true
+                }
+              },
+              "instructions_sha256": "54a9c447a5dfbcd85a8ea93d45564c698e8299b1684fb0e32f5dafd8db561037",
+              "protocol_version": "2025-06-18",
+              "server_name": "hoi4-agent-tools",
+              "server_version": "4.11.0"
+            },
+            "tools": [
+              {
+                "exposed_name": "agent_tools_source_lookup",
+                "mcp_name": "hoi4.source_lookup",
+                "present": true,
+                "schema_sha256": "939462b1642f19d2753b6b192e5458be0745a41ffc38056047e613a58afb0a7c",
+                "state": {
+                  "state": "available"
+                }
+              },
+              {
+                "exposed_name": "agent_tools_mod_index",
+                "mcp_name": "hoi4.mod_index",
+                "present": true,
+                "schema_sha256": "ae6435313935a25847456a6fd057bbabe373150fbd8433012d22210affd20287",
+                "state": {
+                  "state": "available"
+                }
+              },
+              {
+                "exposed_name": "agent_tools_script_validate",
+                "mcp_name": "hoi4.script_validate",
+                "present": true,
+                "schema_sha256": "077ffc26f39c6510fbed9700a4885c05e8b4b6b79f6a038b4b8b9b5a38c2ae61",
+                "state": {
+                  "state": "available"
+                }
+              },
+              {
+                "exposed_name": "agent_tools_reference_search",
+                "mcp_name": "hoi4.reference_search",
+                "present": true,
+                "schema_sha256": "d86e10b44856dae435eb5b67a900c7e13218e52faedccb80c9a073630f3096ec",
+                "state": {
+                  "state": "available"
+                }
+              },
+              {
+                "exposed_name": "agent_tools_reference_read",
+                "mcp_name": "hoi4.reference_read",
+                "present": true,
+                "schema_sha256": "38b573180961cb6288d3a674f090d59da47d4b10c1e9c31c508d4561ab21b207",
+                "state": {
+                  "state": "available"
+                }
+              },
+              {
+                "exposed_name": "agent_tools_reference_context",
+                "mcp_name": "hoi4.reference_context",
+                "present": true,
+                "schema_sha256": "5159991d7d1b98d3f274530ebe8ca4bcb5b77122d9580f5dcff7fd99ff97a7d8",
+                "state": {
+                  "state": "available"
+                }
+              },
+              {
+                "exposed_name": "agent_tools_focus_inspect",
+                "mcp_name": "hoi4.focus_inspect",
+                "present": true,
+                "schema_sha256": "b0abf49e379a42e76060b17190330e3483320f3f2cddf054de681b5b3b7200d9",
+                "state": {
+                  "state": "available"
+                }
+              },
+              {
+                "exposed_name": "agent_tools_event_inspect",
+                "mcp_name": "hoi4.event_inspect",
+                "present": true,
+                "schema_sha256": "3f93693404b4e038cb91472437e7d6865c4b51c74001606f7815121088527b81",
+                "state": {
+                  "state": "available"
+                }
+              },
+              {
+                "exposed_name": "agent_tools_decision_inspect",
+                "mcp_name": "hoi4.decision_inspect",
+                "present": true,
+                "schema_sha256": "b2135ab776f8fb9de86dd9d96d01799dba999f88c5010d5a89ce53f62f59ea04",
+                "state": {
+                  "state": "available"
+                }
+              }
+            ],
+            "version_matches": true
+          }
+        },
+        "summary": "16 tools available",
+        "tools": [
+          "list_files",
+          "read_file",
+          "write_file",
+          "finish",
+          "agent_tools_source_lookup",
+          "agent_tools_mod_index",
+          "agent_tools_script_validate",
+          "agent_tools_reference_search",
+          "agent_tools_reference_read",
+          "agent_tools_reference_context",
+          "agent_tools_focus_inspect",
+          "agent_tools_event_inspect",
+          "agent_tools_decision_inspect",
+          "agent_tools_read_artifact",
+          "focus_projection",
+          "focus_edit"
+        ]
+      },
+      "payload_sha256": "0f06b00f18c124c1964c1616142a74fb9f0257f93b1a6bcce0555f3f04d978b4",
+      "seq": 6,
+      "summary": "16 tools available",
+      "type": "tools_ready"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:04:57.967023Z",
+      "event_id": "b210d1d2-e83e-4b58-b55f-64a2dde49408",
+      "payload": {
+        "input_tokens_bound": 4192,
+        "reservation_id": "3da4d249-fc6a-4f67-a111-b068deac8f0a",
+        "summary": "Model turn 1 requested",
+        "turn": 1
+      },
+      "payload_sha256": "9b0efb51d6a5dbc9287c314c1ce61b75e898ec93478b3f72c4af8fd42ecae037",
+      "seq": 7,
+      "summary": "Model turn 1 requested",
+      "type": "model_request"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:04:58.828067Z",
+      "event_id": "0b9144b3-e917-4d18-8727-9625e7164b98",
+      "payload": {
+        "generation": 1001,
+        "pid": 23148,
+        "summary": "Model worker started"
+      },
+      "payload_sha256": "4d07de84e46861c6a4ec6649471112134b5bb2c8062bcb01a1ff01fc086b7a57",
+      "seq": 8,
+      "summary": "Model worker started",
+      "type": "worker_started"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:00.102865Z",
+      "event_id": "6fa14314-1413-4b38-900f-bab14ea8e3b0",
+      "payload": {
+        "finish_reason": "tool_calls",
+        "model": "deepseek-flash",
+        "response_id": "8e272bf5-c2e2-4a67-a520-475ca183d1f0",
+        "summary": "The model called focus_projection",
+        "text": "I'll start by reading the focus tree as the editor projects it.",
+        "tool_calls": [
+          "focus_projection"
+        ],
+        "turn": 1,
+        "usage": {
+          "cached_input_tokens": 0,
+          "input_tokens": 5418,
+          "output_tokens": 56,
+          "reasoning_tokens": 0
+        }
+      },
+      "payload_sha256": "fdc6adfd991e7f39aa3611709b4fc171c451f468c5b03649575a748d8daedd61",
+      "seq": 9,
+      "summary": "The model called focus_projection",
+      "type": "model_turn"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:00.133537Z",
+      "event_id": "31112b65-0376-4c85-8781-6f4066587ae0",
+      "payload": {
+        "args_sha256": "fd6d9cd858ce97038f51feace1b9d685951a3bd0f268b13ca6020d2c83cbfe22",
+        "effect_class": "pure_read",
+        "fencing_generation": 1,
+        "grant_epoch": 1,
+        "grant_id": "4b345f54-9d44-4375-b2d6-fa5aed50cca9",
+        "idempotency_key": "26ee049b-26f2-4535-a04b-cd5fe941c808:call_00_ET_ZWHMWZm14MO9KYlGfDo36146",
+        "operation_id": "77ee7820-b623-4838-9b86-ae2f9ec226a7",
+        "tool": "focus_projection",
+        "tool_version": "factory-workspace-tools/1"
+      },
+      "payload_sha256": "1d562d1624cc6947ef7ab12f19e643a7d6cb8a1dd2129c5bb6b756bc5f7cfa6d",
+      "seq": 10,
+      "summary": "focus_projection requested (pure_read)",
+      "type": "tool_intent"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:00.156187Z",
+      "event_id": "177fa327-b579-4943-a5e3-1af5c66e5254",
+      "payload": {
+        "operation_id": "77ee7820-b623-4838-9b86-ae2f9ec226a7"
+      },
+      "payload_sha256": "4dd7c1e63950458da1ac75c38a79f6bb310fc209a8f37b93fe1935b179e09e60",
+      "seq": 11,
+      "summary": "Tool call started",
+      "type": "tool_started"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:21.458607Z",
+      "event_id": "29f48775-9a23-4618-90ad-5d5a48103716",
+      "payload": {
+        "after_sha256": null,
+        "before_sha256": null,
+        "operation_id": "77ee7820-b623-4838-9b86-ae2f9ec226a7",
+        "partial": false,
+        "result_sha256": "f96bce025ed700369a568383f47547582ebb4e34543f9ae6626d69da6c3b6c3b",
+        "status": "succeeded"
+      },
+      "payload_sha256": "dc677beb4e2804f30d16ee3a500ff1f408470b25a130587f92874f02c1124d63",
+      "seq": 12,
+      "summary": "Tool call succeeded",
+      "type": "tool_settled"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:21.521593Z",
+      "event_id": "85786f01-f21f-47dd-b331-e374541a6056",
+      "payload": {
+        "input_tokens_bound": 4805,
+        "reservation_id": "abd66009-320b-4339-8eb2-0187799399ff",
+        "summary": "Model turn 2 requested",
+        "turn": 2
+      },
+      "payload_sha256": "4b283cd6dd3ff998993234e46f0f95168c28c1f5724bc49cffc02735cbeafe8c",
+      "seq": 13,
+      "summary": "Model turn 2 requested",
+      "type": "model_request"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:24.451280Z",
+      "event_id": "7149370a-94da-4f5e-ab69-919355556f57",
+      "payload": {
+        "finish_reason": "tool_calls",
+        "model": "deepseek-flash",
+        "response_id": "7c47b0e7-aeec-45bf-8e5c-0ef46cab3727",
+        "summary": "The model called read_file, read_file",
+        "text": "Let me verify the icon sprite exists before using it.",
+        "tool_calls": [
+          "read_file",
+          "read_file"
+        ],
+        "turn": 2,
+        "usage": {
+          "cached_input_tokens": 5376,
+          "input_tokens": 6041,
+          "output_tokens": 351,
+          "reasoning_tokens": 259
+        }
+      },
+      "payload_sha256": "a3218c8e3b391ddb902d75b9c2a9260d516b6b4bb14087fe616b00a9c31cc674",
+      "seq": 14,
+      "summary": "The model called read_file, read_file",
+      "type": "model_turn"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:24.475930Z",
+      "event_id": "d3adac67-b878-4377-815d-7c18f6ff1d95",
+      "payload": {
+        "args_sha256": "9c62dad3771d0b3cfbc6e08b136f8f06bfa39abbe74bf0a0dc2ca9e3c2a9fc08",
+        "effect_class": "pure_read",
+        "fencing_generation": 1,
+        "grant_epoch": 1,
+        "grant_id": "4b345f54-9d44-4375-b2d6-fa5aed50cca9",
+        "idempotency_key": "26ee049b-26f2-4535-a04b-cd5fe941c808:call_00_Cuni6QQhNGiSp9jhmleo7012",
+        "operation_id": "2bf8bc2b-5ac0-4819-8f1e-3cb1d133ce04",
+        "tool": "read_file",
+        "tool_version": "factory-workspace-tools/1"
+      },
+      "payload_sha256": "7d2ce9d9597d456aa59e34403524fae3f38678701ee01af1afe2763730ecbc26",
+      "seq": 15,
+      "summary": "read_file requested (pure_read)",
+      "type": "tool_intent"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:24.521561Z",
+      "event_id": "7b4719d0-e52b-4bb4-a6b2-996b2257d685",
+      "payload": {
+        "operation_id": "2bf8bc2b-5ac0-4819-8f1e-3cb1d133ce04"
+      },
+      "payload_sha256": "afc01826e37c39a21e094da6f6ac8e48d2e4c8458d0675ad9b2d8a2ce6b21a43",
+      "seq": 16,
+      "summary": "Tool call started",
+      "type": "tool_started"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:24.533215Z",
+      "event_id": "59ad7017-8c5b-4c8f-9291-0f53c9ec4ae2",
+      "payload": {
+        "after_sha256": "5f9b021526ce55dc6799134d8f46bf271d7f411e37db5f3c0a64a68083f6e107",
+        "before_sha256": "5f9b021526ce55dc6799134d8f46bf271d7f411e37db5f3c0a64a68083f6e107",
+        "operation_id": "2bf8bc2b-5ac0-4819-8f1e-3cb1d133ce04",
+        "partial": false,
+        "result_sha256": "f2fce2281d06c0e08ab7a345b59a1dae46e41d0905f435cfa193b0b08deff537",
+        "status": "succeeded"
+      },
+      "payload_sha256": "b408a167d3115e3c78aa4b3f205e0510df642c8937b07be1ace781ff21d516fc",
+      "seq": 17,
+      "summary": "Tool call succeeded",
+      "type": "tool_settled"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:24.542174Z",
+      "event_id": "2413fef6-e5a6-4778-b277-2bb53b2218bb",
+      "payload": {
+        "args_sha256": "1a14393f13805645e59f1f3ad78a4685d7b22826823269888c99497a223a7de5",
+        "effect_class": "pure_read",
+        "fencing_generation": 1,
+        "grant_epoch": 1,
+        "grant_id": "4b345f54-9d44-4375-b2d6-fa5aed50cca9",
+        "idempotency_key": "26ee049b-26f2-4535-a04b-cd5fe941c808:call_01_06RWEIGCALJiSPpiBqpb1949",
+        "operation_id": "b360cd64-fe0a-42ec-a322-f861f79d46ef",
+        "tool": "read_file",
+        "tool_version": "factory-workspace-tools/1"
+      },
+      "payload_sha256": "fbc00383e626559e69a39c182ae5d92d2ef4de6a77670a2abc7f8f163b1d31d0",
+      "seq": 18,
+      "summary": "read_file requested (pure_read)",
+      "type": "tool_intent"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:24.571034Z",
+      "event_id": "ca5b2e0e-d62b-4290-bc3d-1fc4b38b0c5e",
+      "payload": {
+        "operation_id": "b360cd64-fe0a-42ec-a322-f861f79d46ef"
+      },
+      "payload_sha256": "f70f92dfdeca4db2fd7c7346ac0502d0964781dbdc1b27264514920442a02ea3",
+      "seq": 19,
+      "summary": "Tool call started",
+      "type": "tool_started"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:24.580202Z",
+      "event_id": "71ebfa38-b404-4889-b4fb-f313a34f9d49",
+      "payload": {
+        "after_sha256": "68bd406d428bcc8add0a35b616904611bded565fe9e987d7bb0287fdfd15fcf9",
+        "before_sha256": "68bd406d428bcc8add0a35b616904611bded565fe9e987d7bb0287fdfd15fcf9",
+        "operation_id": "b360cd64-fe0a-42ec-a322-f861f79d46ef",
+        "partial": false,
+        "result_sha256": "b501a7e2ca3761b69a87a6ee139782cf037226330819749795eb6790c1bec89f",
+        "status": "succeeded"
+      },
+      "payload_sha256": "ef359ba1734ef493d06ed2cd3a28ac673408bd6f79416057034a7abb90be5621",
+      "seq": 20,
+      "summary": "Tool call succeeded",
+      "type": "tool_settled"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:24.638040Z",
+      "event_id": "276dbfb1-82f7-4e5d-9e42-b55f6fcd756a",
+      "payload": {
+        "input_tokens_bound": 6473,
+        "reservation_id": "4bb13750-4aa0-4949-bb75-5108d42a66dd",
+        "summary": "Model turn 3 requested",
+        "turn": 3
+      },
+      "payload_sha256": "32e8992d2e1cdf161d48d529c2823c945f32e08f4fab411b158303f51194faef",
+      "seq": 21,
+      "summary": "Model turn 3 requested",
+      "type": "model_request"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:28.288561Z",
+      "event_id": "30d7538c-e10b-46b0-8159-948209f6ce6a",
+      "payload": {
+        "finish_reason": "tool_calls",
+        "model": "deepseek-flash",
+        "response_id": "7dca4ea2-fa25-48d1-addc-cab6322b3ef0",
+        "summary": "The model called focus_edit",
+        "text": "Icon `GFX_exp_icon_join` is defined. Now adding the three focuses in a single edit call.",
+        "tool_calls": [
+          "focus_edit"
+        ],
+        "turn": 3,
+        "usage": {
+          "cached_input_tokens": 6272,
+          "input_tokens": 8488,
+          "output_tokens": 621,
+          "reasoning_tokens": 205
+        }
+      },
+      "payload_sha256": "0d92206d63440b1ee9a6a72696fe06c240a16819bd9a69a5b96bf75ac57a33dc",
+      "seq": 22,
+      "summary": "The model called focus_edit",
+      "type": "model_turn"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:28.374293Z",
+      "event_id": "704cace3-5c48-4c03-9211-cff8edff2f9b",
+      "payload": {
+        "args_sha256": "b1547242c3667754981c64fe6f94a36167b74b7e97f3529d4cdd55aae6774558",
+        "effect_class": "idempotent_write",
+        "fencing_generation": 1,
+        "grant_epoch": 1,
+        "grant_id": "4b345f54-9d44-4375-b2d6-fa5aed50cca9",
+        "idempotency_key": "26ee049b-26f2-4535-a04b-cd5fe941c808:call_00_KavgrUKWuIxYmVzZ1Keb7015",
+        "operation_id": "b8312b85-e9f6-465f-8b45-16d7f4b8447e",
+        "tool": "focus_edit",
+        "tool_version": "factory-workspace-tools/1"
+      },
+      "payload_sha256": "c990952d45f459ac69fd7fc32ebed210724d20071dfec076009fbfaca9246001",
+      "seq": 23,
+      "summary": "focus_edit requested (idempotent_write)",
+      "type": "tool_intent"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:28.442553Z",
+      "event_id": "d60cbf76-1ff0-4042-a899-519092eb950b",
+      "payload": {
+        "operation_id": "b8312b85-e9f6-465f-8b45-16d7f4b8447e"
+      },
+      "payload_sha256": "1258d19f49c89e228d8e368f6f6d860cb857d7ed4afd2caa93025e348ce3a5fa",
+      "seq": 24,
+      "summary": "Tool call started",
+      "type": "tool_started"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:58.029527Z",
+      "event_id": "092133e2-89bb-4827-98b9-a9eff5dc9526",
+      "payload": {
+        "actor_kind": "native_agent",
+        "changed_ids": [
+          "exp_reform_a",
+          "exp_reform_b",
+          "exp_reform_c"
+        ],
+        "file_hashes": {
+          "common/national_focus/exp_basic.focus-plan.json": "absent",
+          "common/national_focus/exp_basic.txt": "31334a0dfd6be9851e58c5fe8c1605355f45f7f2cebce0bb2e823377e6f50f32",
+          "localisation/english/exp_basic_tree_l_english.yml": "2640f89092f13912a46e77260ff4febbe679e4b7ac8bd1ecb7670228af05bc86"
+        },
+        "projection_hash": "efe5428df4b00e8fc445fbf5e8841c71faa767bc87690b05c18cb18934102f99",
+        "proposal_id": "b24c4321-0041-4f8f-84a8-4ca304218b69",
+        "summary": "Focus tree changed",
+        "tree_id": "exp_basic_tree"
+      },
+      "payload_sha256": "5952c2095a5ec5231fa30d3b84fe28929e9453a97aa0e243c98cc1ed8b1feed9",
+      "seq": 25,
+      "summary": "Focus tree changed",
+      "type": "source_changed"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:58.090504Z",
+      "event_id": "ba2c8347-069b-490d-844b-a8e2742bf14d",
+      "payload": {
+        "after_sha256": "31334a0dfd6be9851e58c5fe8c1605355f45f7f2cebce0bb2e823377e6f50f32",
+        "before_sha256": "68bd406d428bcc8add0a35b616904611bded565fe9e987d7bb0287fdfd15fcf9",
+        "operation_id": "b8312b85-e9f6-465f-8b45-16d7f4b8447e",
+        "partial": false,
+        "result_sha256": "d311e3449de5a4baf73ef35626de6f79bc2ae96ca16394b474c686b410b9bede",
+        "status": "succeeded"
+      },
+      "payload_sha256": "721ef1f10789e547e918b08bceeae302bc5b1e7d587afed7de73bbeda6061b78",
+      "seq": 26,
+      "summary": "Tool call succeeded",
+      "type": "tool_settled"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:58.126750Z",
+      "event_id": "f23a0029-60c4-47b1-a92a-5a0c382c0fd8",
+      "payload": {
+        "input_tokens_bound": 7828,
+        "reservation_id": "ff742367-a332-4da2-8793-162ef178f175",
+        "summary": "Model turn 4 requested",
+        "turn": 4
+      },
+      "payload_sha256": "88e422c205aae1189c72f3b9a41cd5559acc5f6bbf747c19926b0cc6bec17813",
+      "seq": 27,
+      "summary": "Model turn 4 requested",
+      "type": "model_request"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:59.466549Z",
+      "event_id": "b362dfba-b826-48cc-aebf-6b438874c739",
+      "payload": {
+        "finish_reason": "tool_calls",
+        "model": "deepseek-flash",
+        "response_id": "797aa7b9-b315-4a98-af71-192d49109540",
+        "summary": "The model called read_file, read_file",
+        "text": "The edit succeeded. Let me verify the resulting file and localisation.",
+        "tool_calls": [
+          "read_file",
+          "read_file"
+        ],
+        "turn": 4,
+        "usage": {
+          "cached_input_tokens": 8576,
+          "input_tokens": 10231,
+          "output_tokens": 114,
+          "reasoning_tokens": 14
+        }
+      },
+      "payload_sha256": "97c8ec60103c664cc4e2c9375f936b67cca15c4a14264e395f314ea6cda73cf2",
+      "seq": 28,
+      "summary": "The model called read_file, read_file",
+      "type": "model_turn"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:59.495920Z",
+      "event_id": "3e25eced-db32-4708-901a-42c65a56bd1b",
+      "payload": {
+        "args_sha256": "1a14393f13805645e59f1f3ad78a4685d7b22826823269888c99497a223a7de5",
+        "effect_class": "pure_read",
+        "fencing_generation": 1,
+        "grant_epoch": 1,
+        "grant_id": "4b345f54-9d44-4375-b2d6-fa5aed50cca9",
+        "idempotency_key": "26ee049b-26f2-4535-a04b-cd5fe941c808:call_00_1L2u0zj8AZp7eKT4quUO7906",
+        "operation_id": "07adad64-cb58-4111-a484-2954b42011ba",
+        "tool": "read_file",
+        "tool_version": "factory-workspace-tools/1"
+      },
+      "payload_sha256": "72b5a6897a10f49b44ca395b11f1e18a3fed33801873ddab2fdd0ca18cf350d6",
+      "seq": 29,
+      "summary": "read_file requested (pure_read)",
+      "type": "tool_intent"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:59.505380Z",
+      "event_id": "ab4cac29-6b51-4ae5-b6c6-44c8882fc484",
+      "payload": {
+        "operation_id": "07adad64-cb58-4111-a484-2954b42011ba"
+      },
+      "payload_sha256": "c7c6ba14dbfb50685eb3a46c356c470e61a420024f42851a1a3f7509bcf4529b",
+      "seq": 30,
+      "summary": "Tool call started",
+      "type": "tool_started"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:59.518162Z",
+      "event_id": "e8dabef5-0187-449d-af7a-56998c287d89",
+      "payload": {
+        "after_sha256": "31334a0dfd6be9851e58c5fe8c1605355f45f7f2cebce0bb2e823377e6f50f32",
+        "before_sha256": "31334a0dfd6be9851e58c5fe8c1605355f45f7f2cebce0bb2e823377e6f50f32",
+        "operation_id": "07adad64-cb58-4111-a484-2954b42011ba",
+        "partial": false,
+        "result_sha256": "995dd7dbdca1400f69924925824120bf6563cdf95590b5e5d577c6b9cd917aea",
+        "status": "succeeded"
+      },
+      "payload_sha256": "f1207a9f957a32f61ccc587d8331a92f961cb9c22eec79ff46f648766dd68b53",
+      "seq": 31,
+      "summary": "Tool call succeeded",
+      "type": "tool_settled"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:59.526394Z",
+      "event_id": "654db7bb-f088-4980-9426-98e8c6254dc0",
+      "payload": {
+        "args_sha256": "25729832953da806dfdcb8ebfdfaf98d74be17943e423e09454c635776cd48e4",
+        "effect_class": "pure_read",
+        "fencing_generation": 1,
+        "grant_epoch": 1,
+        "grant_id": "4b345f54-9d44-4375-b2d6-fa5aed50cca9",
+        "idempotency_key": "26ee049b-26f2-4535-a04b-cd5fe941c808:call_01_7QdFq6CUENsaKSaRLe787631",
+        "operation_id": "7a0619d9-8762-46d5-9db2-87bb4ffa7984",
+        "tool": "read_file",
+        "tool_version": "factory-workspace-tools/1"
+      },
+      "payload_sha256": "9d83273c0ace93fdd382cb870bcc51e2679ee2f415d59d539bdc6e0420cc16ef",
+      "seq": 32,
+      "summary": "read_file requested (pure_read)",
+      "type": "tool_intent"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:59.540165Z",
+      "event_id": "372c248f-b602-417b-afd8-0e31efacc2cf",
+      "payload": {
+        "operation_id": "7a0619d9-8762-46d5-9db2-87bb4ffa7984"
+      },
+      "payload_sha256": "9eac86bcc2c21cfc5e15ada345bd07f409cb3a1856ca5cf30339eb4b9d9e6033",
+      "seq": 33,
+      "summary": "Tool call started",
+      "type": "tool_started"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:59.549559Z",
+      "event_id": "597bc802-df1b-4908-be7a-c0c25a114709",
+      "payload": {
+        "after_sha256": "2640f89092f13912a46e77260ff4febbe679e4b7ac8bd1ecb7670228af05bc86",
+        "before_sha256": "2640f89092f13912a46e77260ff4febbe679e4b7ac8bd1ecb7670228af05bc86",
+        "operation_id": "7a0619d9-8762-46d5-9db2-87bb4ffa7984",
+        "partial": false,
+        "result_sha256": "20a81644a70de45fb016f54711036a816876b94da9f9a88b8c325c5a76153386",
+        "status": "succeeded"
+      },
+      "payload_sha256": "c9561313ba53a76d6b2d9605789d8d97935ef7e62bdb79f19c4ffef7c4ec75bc",
+      "seq": 34,
+      "summary": "Tool call succeeded",
+      "type": "tool_settled"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:05:59.600385Z",
+      "event_id": "d2db6bee-aeae-47d4-9bac-45ad40f8b7de",
+      "payload": {
+        "input_tokens_bound": 8776,
+        "reservation_id": "06bb17ee-24f2-4713-9547-c6aa043a3209",
+        "summary": "Model turn 5 requested",
+        "turn": 5
+      },
+      "payload_sha256": "2a6931b9477f7731e666545381c6a93c57a1fce3ac0e23120fcff54c3dcdddd2",
+      "seq": 35,
+      "summary": "Model turn 5 requested",
+      "type": "model_request"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:06:05.058366Z",
+      "event_id": "bbfd35ba-441d-4132-b555-b712de749bdb",
+      "payload": {
+        "finish_reason": "tool_calls",
+        "model": "deepseek-flash",
+        "response_id": "720b95ee-4eea-4b34-8415-7e546cb1b162",
+        "summary": "The model called finish",
+        "text": "",
+        "tool_calls": [
+          "finish"
+        ],
+        "turn": 5,
+        "usage": {
+          "cached_input_tokens": 10240,
+          "input_tokens": 11444,
+          "output_tokens": 850,
+          "reasoning_tokens": 151
+        }
+      },
+      "payload_sha256": "7c44c2b1d8176c767c4dba221e7dc338769decb5ea1b24564522be09194de5cc",
+      "seq": 36,
+      "summary": "The model called finish",
+      "type": "model_turn"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:06:05.281040Z",
+      "event_id": "da36aa50-3e1d-4356-8007-0521f2dacfd4",
+      "payload": {
+        "attempt_no": 1,
+        "error_code": null,
+        "from": "running",
+        "outcome_sha256": "e6119c8fc3ce197faf2dc859848d4d90d1d2ad5896f0559a00f1d2db7bc564a8",
+        "to": "succeeded"
+      },
+      "payload_sha256": "129e8b9e601516064478aed31f0fa481ee0e99b9fedf3a010e7e1850aa37aa87",
+      "seq": 37,
+      "summary": "Attempt succeeded",
+      "type": "attempt_succeeded"
+    },
+    {
+      "actor": "host",
+      "attempt_id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "created_at": "2026-11-08T18:06:05.281040Z",
+      "event_id": "f0ad1dde-9666-4790-8507-0db3c04b0f00",
+      "payload": {
+        "detail": {
+          "code": null,
+          "summary": "The attempt finished; its proposal is ready for review"
+        },
+        "from": "running",
+        "to": "in_review"
+      },
+      "payload_sha256": "539a60feda534684f48e016537d83597e57da281960f5c313c7ef5bd9ab88d0a",
+      "seq": 38,
+      "summary": "task in review",
+      "type": "task_in_review"
+    }
+  ],
+  "last_seq": 38
+}

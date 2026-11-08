@@ -219,3 +219,129 @@ async fn stale_unsupported_and_foreign_requests_write_nothing() {
     let r = mallory.client.get(&format!("{}/proposals", e.base())).await;
     assert_eq!(r.status, 404, "{}", r.text);
 }
+
+/// S04-W3, live: the native agent adds a small branch through focus_projection and focus_edit,
+/// with no browser connected, on the maintainer's DeepSeek key through a probed OpenAI-compatible
+/// profile (D-21, D-31). Real calls with real spend: run explicitly with `--ignored` and
+/// `DEEPSEEK_API_KEY` set. The key is read from the environment and never printed.
+#[tokio::test]
+#[ignore = "live DeepSeek calls with real spend"]
+async fn live_deepseek_agent_adds_a_branch_through_the_editor_path() {
+    let Ok(key) = std::env::var("DEEPSEEK_API_KEY") else {
+        eprintln!("SKIPPED: DEEPSEEK_API_KEY is not set");
+        return;
+    };
+    let Some(install) = factory_hoi4_tools::AgentToolsInstall::from_env() else {
+        eprintln!("SKIPPED: FACTORY_AGENT_TOOLS_NODE / FACTORY_AGENT_TOOLS_ENTRY are not set");
+        return;
+    };
+    let key_dir = tempfile::tempdir().unwrap();
+    let key_file = key_dir.path().join("secret.key");
+    std::fs::write(&key_file, "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=").unwrap();
+    let h = Harness::start(Options {
+        extra_vars: vec![("FACTORY_SECRET_KEY_FILE", key_file.to_string_lossy().into_owned())],
+        agent: AgentOptions {
+            worker: Some(factory_server::agent::WorkerLauncher {
+                program: PathBuf::from(env!("CARGO_BIN_EXE_factory-server")),
+                args: vec!["agent-worker".into()],
+                env: Default::default(),
+            }),
+            settings: Some(factory_server::agent::RunnerSettings {
+                lease_ttl: Duration::from_secs(30),
+                turn_timeout: Duration::from_secs(180),
+                cancel_grace: Duration::from_secs(5),
+                handshake_timeout: Duration::from_secs(20),
+                safe_retries: 0,
+            }),
+            tools: Some(Some(factory_server::agent::AgentToolsSettings { install, game_root: None })),
+            skip_recovery: true,
+        },
+        ..Options::default()
+    })
+    .await;
+    let alice = h.verified_user("alice@example.org").await;
+    let project = h.project(&alice, "Focus live").await;
+    let up = alice
+        .client
+        .upload(&project, &[Part::text("kind", "zip"), Part::text("git_init_consent", "true"), Part::file("f.zip", build_zip(&fixture_entries()))])
+        .await;
+    assert_eq!(up.status, 201, "{}", up.text);
+
+    let saved = alice
+        .client
+        .post("/api/v1/account/api-keys", json!({ "provider": "openai_compatible", "label": "DeepSeek", "api_key": key, "base_url": "https://api.deepseek.com" }))
+        .await;
+    assert_eq!(saved.status, 201, "{}", saved.text);
+    let key_id = saved.body["id"].as_str().unwrap().to_owned();
+    let probe = alice
+        .client
+        .post(&format!("/api/v1/account/api-keys/{key_id}/probe"), json!({ "mode": "inference", "model": "deepseek-flash", "context_tokens": 64000 }))
+        .await;
+    assert_eq!(probe.status, 200, "{}", probe.text);
+    eprintln!("probe capabilities: {}", probe.body["capabilities"]);
+
+    let objective = "In the national focus tree exp_basic_tree, add a short branch of three new focuses below exp_join. \
+        Read the tree with focus_projection first, then add them with one focus_edit call: exp_reform_a at x 3 y 3 requiring exp_join, \
+        exp_reform_b at x 5 y 3 requiring exp_join, and exp_reform_c at x 4 y 4 requiring exp_reform_a or exp_reform_b. \
+        Give each a cost of 5, the icon GFX_exp_icon_join, a short English title and description, and a small reward such as add_political_power = 25. \
+        Then finish.";
+    let t = alice
+        .client
+        .post(
+            &format!("/api/v1/projects/{project}/tasks"),
+            json!({ "objective": objective, "mode": "edit", "allowed_paths": ["common/national_focus", "localisation"],
+                    "budget_usd": 0.5, "model": { "profile_id": format!("user:{key_id}"), "key_id": key_id } }),
+        )
+        .await;
+    assert_eq!(t.status, 201, "{}", t.text);
+    let task = t.body["id"].as_str().unwrap().to_owned();
+    let tasks = format!("/api/v1/projects/{project}/tasks");
+    let start = alice.client.post(&format!("{tasks}/{task}/attempts"), json!({ "expected_version": t.body["version"] })).await;
+    assert_eq!(start.status, 201, "{}", start.text);
+
+    // No browser is connected: only the server drives the attempt.
+    let started = std::time::Instant::now();
+    let detail = loop {
+        let d = alice.client.get(&format!("{tasks}/{task}")).await;
+        let state = d.body["attempts"][0]["state"].as_str().unwrap_or("").to_owned();
+        if matches!(state.as_str(), "succeeded" | "failed" | "cancelled" | "unknown_effect") {
+            break d.body;
+        }
+        assert!(started.elapsed() < Duration::from_secs(900), "the attempt did not end: {:#}", d.body);
+        tokio::time::sleep(Duration::from_secs(2)).await;
+    };
+    let events = alice.client.get(&format!("{tasks}/{task}/events?after=0&limit=1000")).await;
+    let evidence_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../.work/s04/live-w3");
+    std::fs::create_dir_all(&evidence_dir).unwrap();
+    std::fs::write(evidence_dir.join("detail.json"), serde_json::to_vec_pretty(&detail).unwrap()).unwrap();
+    std::fs::write(evidence_dir.join("events.json"), serde_json::to_vec_pretty(&events.body).unwrap()).unwrap();
+    let proposals = alice.client.get(&format!("{tasks}/{task}/proposals")).await;
+    std::fs::write(evidence_dir.join("proposals.json"), serde_json::to_vec_pretty(&proposals.body).unwrap()).unwrap();
+    let usage = alice.client.get("/api/v1/account/usage").await;
+    std::fs::write(evidence_dir.join("usage.json"), serde_json::to_vec_pretty(&usage.body).unwrap()).unwrap();
+    eprintln!("attempt: {}", detail["attempts"][0]["state"]);
+    eprintln!("elapsed: {:?}", started.elapsed());
+
+    assert_eq!(detail["attempts"][0]["state"], "succeeded", "{detail:#}");
+    let list = proposals.body["proposals"].as_array().unwrap();
+    let agent_props: Vec<&Value> = list.iter().filter(|p| p["actorKind"] == "native_agent").collect();
+    assert!(!agent_props.is_empty(), "the agent made no focus proposal: {:#}", proposals.body);
+    let created: Vec<String> = agent_props
+        .iter()
+        .flat_map(|p| p["summary"]["added"].as_array().cloned().unwrap_or_default())
+        .filter_map(|v| v.as_str().map(str::to_owned))
+        .collect();
+    assert!((3..=5).contains(&created.len()), "created {created:?}");
+    let worktree = h.data_dir.path().join("workspaces").join(&alice.id).join(&project).join("tasks").join(&task);
+    let source = std::fs::read_to_string(worktree.join(SOURCE)).unwrap();
+    for id in &created {
+        assert!(source.contains(&format!("id = {id}\n")), "{id} missing from the source");
+    }
+    let loc = std::fs::read_to_string(worktree.join("localisation/english/exp_basic_tree_l_english.yml")).unwrap();
+    for id in &created {
+        assert!(loc.contains(&format!(" {id}:0 \"")) && loc.contains(&format!(" {id}_desc:0 \"")), "{id} has no localisation");
+    }
+    // The original focuses are untouched: the old bytes are a prefix up to the closing brace.
+    let original = std::fs::read_to_string(Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/focus-small").join(SOURCE)).unwrap();
+    assert!(source.starts_with(&original[..original.len() - 2]), "untouched bytes changed");
+}

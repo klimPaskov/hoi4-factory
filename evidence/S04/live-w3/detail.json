@@ -1,0 +1,85 @@
+{
+  "attempts": [
+    {
+      "admitted_at": "2026-11-08T18:04:54.011442Z",
+      "attempt_no": 1,
+      "bundle": {
+        "id": "078317f7-f3a5-4c43-9e11-c67920ad5134",
+        "manifest_sha256": "8d98d3de60c3d3a7d494d2970a7836db155153f1a3d83cc0433731a6c28bb7e1"
+      },
+      "error_code": null,
+      "fencing_generation": 1,
+      "finished_at": "2026-11-08T18:06:05.281040Z",
+      "funding": "user_key",
+      "grant": {
+        "allowed_roots": [
+          "common/national_focus",
+          "localisation"
+        ],
+        "expires_at": "2026-11-08T20:04:54.025581Z",
+        "id": "4b345f54-9d44-4375-b2d6-fa5aed50cca9",
+        "max_cost_micros": 500000,
+        "operation_classes": [
+          "model_inference",
+          "read_source",
+          "run_read_only_tool",
+          "write_task_worktree"
+        ],
+        "provider_destinations": [
+          "openai_compatible:https://api.deepseek.com"
+        ],
+        "revocation_epoch": 1,
+        "revoked": false
+      },
+      "id": "26ee049b-26f2-4535-a04b-cd5fe941c808",
+      "outcome": {
+        "branch": "hoi4factory/47ba765a-6a5a-41a9-a2a2-ab47d16d4c78",
+        "changed_files": [
+          "common/national_focus/exp_basic.txt",
+          "localisation/english/exp_basic_tree_l_english.yml"
+        ],
+        "commit": null,
+        "open_questions": [
+          "The task asked for a 'small reward such as add_political_power = 25' on all three focuses; this produces a FOCUS_REPEATED_GENERIC_REWARD warning. If distinct rewards are preferred (e.g. add_stability / add_war_support on the two branches), that is a one-call follow-up.",
+          "The pre-existing FOCUS_ICON_TEXTURE_MISSING errors come from the missing gfx/interface/goals/exp02_placeholder.dds in the mod; that path is outside this task's allowed paths, so it was not touched.",
+          "The editor wrote localisation to localisation/english/exp_basic_tree_l_english.yml; the older localisation/english/exp_basic_l_english.yml was left untouched — worth confirming no duplicate/conflicting keys are needed there."
+        ],
+        "reported_changed_files": [
+          "common/national_focus/exp_basic.txt",
+          "localisation/english/exp_basic_tree_l_english.yml"
+        ],
+        "summary": "Added a three-focus branch under exp_join in the exp_basic_tree national focus tree, using focus_projection first and a single focus_edit call (3 create operations, applied together).\n\nResulting branch:\n- exp_reform_a — x 3, y 3, cost 5, prerequisite exp_join (\"Reform the Bureaucracy\")\n- exp_reform_b — x 5, y 3, cost 5, prerequisite exp_join (\"Reform the Economy\")\n- exp_reform_c — x 4, y 4, cost 5, prerequisite exp_reform_a OR exp_reform_b (written as one OR group: prerequisite = { focus = exp_reform_a focus = exp_reform_b })\n\nAll three use the icon GFX_exp_icon_join, which I confirmed is declared in interface/exp02_icons.gfx, and each has completion_reward = { add_political_power = 25 }. Titles and descriptions were written to English localisation by the editor path.\n\nVerification: re-read common/national_focus/exp_basic.txt — the original text, comments and formatting (including the tree-id trailing comment and the \"ten weeks\" comment) are preserved byte-for-byte; only the three new focus blocks were appended. Localisation keys exp_reform_a/_b/_c and their _desc entries are present. New projection layout_verdict is \"pass\"; the projection shows the requested coordinates and prerequisite groups.\n\nPre-existing, not caused by this change: the tree's focuses still report FOCUS_ICON_TEXTURE_MISSING for gfx/interface/goals/exp02_placeholder.dds (the placeholder texture itself is not present in the mod) and FOCUS_FILTER_MISSING warnings for focuses without search_filters. The new focuses also trigger FOCUS_REPEATED_GENERIC_REWARD warnings because they share the add_political_power = 25 pattern with exp_root — that is the reward the task requested, so I left it as is."
+      },
+      "started_at": "2026-11-08T18:04:54.127819Z",
+      "state": "succeeded",
+      "version": 13
+    }
+  ],
+  "pending_effects": [],
+  "task": {
+    "allowed_paths": [
+      "common/national_focus",
+      "localisation"
+    ],
+    "budget_micros": 500000,
+    "created_at": "2026-11-08T18:04:53.587739Z",
+    "id": "47ba765a-6a5a-41a9-a2a2-ab47d16d4c78",
+    "last_seq": 38,
+    "max_turns": 20,
+    "mode": "edit",
+    "model": {
+      "funding": "user_key",
+      "key_id": "60e96ae6-5ac2-40f6-ab21-6bb96800954b",
+      "profile_id": "user:60e96ae6-5ac2-40f6-ab21-6bb96800954b"
+    },
+    "objective": "In the national focus tree exp_basic_tree, add a short branch of three new focuses below exp_join. Read the tree with focus_projection first, then add them with one focus_edit call: exp_reform_a at x 3 y 3 requiring exp_join, exp_reform_b at x 5 y 3 requiring exp_join, and exp_reform_c at x 4 y 4 requiring exp_reform_a or exp_reform_b. Give each a cost of 5, the icon GFX_exp_icon_join, a short English title and description, and a small reward such as add_political_power = 25. Then finish.",
+    "pause_reason": null,
+    "paused": false,
+    "project_id": "b00ddc75-ba1c-4eb1-b3fd-d76d4fa62608",
+    "spend_unknown": false,
+    "spent_micros": 6045,
+    "state": "in_review",
+    "updated_at": "2026-11-08T18:06:05.281040Z",
+    "version": 4
+  }
+}

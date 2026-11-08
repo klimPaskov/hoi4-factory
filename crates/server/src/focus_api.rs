@@ -26,7 +26,7 @@ use crate::api_error::Fail;
 use crate::focus::apply::{apply_operations, inspect_tree};
 use crate::focus::ops::{FocusOp, MAX_OPS};
 use crate::focus::session::{FocusError, localisation_path};
-use crate::focus::store::{self, ActorKind};
+use crate::focus::store::{self, ActorKind, TaskKeys};
 use crate::intake_api::{accepted_origins, origin_guard};
 use crate::state::ServerState;
 
@@ -99,7 +99,7 @@ async fn projection(
         return Err(ApiError::not_found().into());
     }
     let (root, _) = ensure_worktree(&state, &project, task.id).await?;
-    let projection = inspect_tree(rt, &task, &root, &tree).await.map_err(focus_fail)?;
+    let projection = inspect_tree(rt, &TaskKeys::of(&task, principal.account_id()), &root, &tree).await.map_err(focus_fail)?;
     Ok(Json(projection))
 }
 
@@ -142,7 +142,7 @@ async fn operations(
     edit_allowed(&task, &relative_path, &tree)?;
     let applied = apply_operations(
         rt,
-        &task,
+        &TaskKeys::of(&task, principal.account_id()),
         &root,
         ActorKind::Person(principal.account_id()),
         &tree,

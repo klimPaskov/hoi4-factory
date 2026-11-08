@@ -34,6 +34,26 @@ pub enum ToolKind {
     Finish,
     /// A HOI4 Agent Tools tool, by its exposed name.
     AgentTools,
+    /// Reads an artifact an Agent Tools result linked (issue #5).
+    ReadArtifact,
+    /// The focus editor's projection of one tree (S04).
+    FocusProjection,
+    /// Focus operations through the same path as the editor's gestures (S04, FR-5).
+    FocusEdit,
+}
+
+pub const READ_ARTIFACT: &str = "agent_tools_read_artifact";
+pub const FOCUS_PROJECTION: &str = "focus_projection";
+pub const FOCUS_EDIT: &str = "focus_edit";
+const ARTIFACT_CHUNK: usize = 40_000;
+
+/// What the focus tools need: the runtime, the task and the attempt that acts.
+pub struct FocusContext {
+    pub rt: super::AgentRuntime,
+    pub keys: crate::focus::store::TaskKeys,
+    pub attempt: factory_tasks::AttemptId,
+    /// When the agent last read a focus tree: person edits after it are reported to the agent.
+    pub last_read: chrono::DateTime<chrono::Utc>,
 }
 
 pub struct ToolSet {
@@ -43,6 +63,7 @@ pub struct ToolSet {
     pub session: Option<ToolSession>,
     /// What discovery found, for the attempt's events and the C-06 capability profile.
     pub inventory: Value,
+    pub focus: Option<FocusContext>,
 }
 
 /// What a tool call produced, before the receipt is written.
@@ -163,13 +184,74 @@ impl ToolSet {
                 }
             }
         };
-        ToolSet {
+        let mut set = ToolSet {
             registry,
             kinds,
             specs,
             session,
             inventory,
+            focus: None,
+        };
+        if set.session.is_some() {
+            set.add(
+                READ_ARTIFACT,
+                ToolKind::ReadArtifact,
+                "Read an artifact (hoi4-agent:// URI) that an agent_tools_* result linked, in chunks of up to 40,000 characters.",
+                json!({
+                    "type": "object",
+                    "properties": {
+                        "uri": {"type": "string", "pattern": "^hoi4-agent://[A-Za-z0-9_./:%-]{1,600}$"},
+                        "offset": {"type": "integer", "minimum": 0, "maximum": 100_000_000}
+                    },
+                    "required": ["uri"],
+                    "additionalProperties": false
+                }),
+                EffectClass::PureRead,
+                OperationClass::RunReadOnlyTool,
+            );
         }
+        set
+    }
+
+    fn add(&mut self, name: &str, kind: ToolKind, description: &str, schema: Value, effect: EffectClass, class: OperationClass) {
+        let _ = self.registry.register(RegisteredTool {
+            name: name.to_owned(),
+            version: TOOL_VERSION.to_owned(),
+            effect_class: effect,
+            operation_class: class,
+            input: closed(&schema),
+            output: None,
+            max_output_bytes: MAX_RESULT_CHARS,
+            path_fields: vec![],
+        });
+        self.kinds.insert(name.to_owned(), kind);
+        self.specs.push(ToolSpec { name: name.to_owned(), description: description.to_owned(), input_schema: schema });
+    }
+
+    /// Adds the focus tools for an edit task on a server with Agent Tools (S04).
+    pub fn enable_focus(&mut self, context: FocusContext) {
+        self.add(
+            FOCUS_PROJECTION,
+            ToolKind::FocusProjection,
+            "Show one national focus tree of this mod as the editor sees it: every focus with its id, title, grid x and y, cost, prerequisite groups (AND of OR groups), whether it can be edited, the diagnostics and the projection hash. Read it before focus_edit.",
+            json!({
+                "type": "object",
+                "properties": {"tree_id": {"type": "string", "pattern": "^[A-Za-z0-9_.-]{1,256}$"}},
+                "required": ["tree_id"],
+                "additionalProperties": false
+            }),
+            EffectClass::PureRead,
+            OperationClass::ReadSource,
+        );
+        self.add(
+            FOCUS_EDIT,
+            ToolKind::FocusEdit,
+            "Change a national focus tree with up to 20 operations, applied together or not at all, exactly like the editor: move {focus_id, x, y}, set_cost {focus_id, cost}, link {focus_id, prerequisites: [ids, any one of them]}, create {focus_id, x, y, cost, prerequisites, icon (a GFX_ sprite), title, description, reward (effect lines such as add_political_power = 25)}. Pass expected_projection_hash from focus_projection. Only focuses with a literal x and y can move or link. The tool writes the focus file and the English localisation, and returns the new projection.",
+            crate::focus::ops::ops_schema(),
+            EffectClass::IdempotentWrite,
+            OperationClass::WriteTaskWorktree,
+        );
+        self.focus = Some(context);
     }
 
     pub fn kind(&self, name: &str) -> Option<&ToolKind> {
@@ -302,6 +384,42 @@ impl ToolSet {
                     }
                 }
             }
+            Some(ToolKind::ReadArtifact) => {
+                let Some(session) = self.session.as_mut() else {
+                    return refused("tool_unavailable", "HOI4 Agent Tools are not running");
+                };
+                let uri = args["uri"].as_str().unwrap_or("");
+                let offset = usize::try_from(args["offset"].as_u64().unwrap_or(0)).unwrap_or(0);
+                match session.read_artifact(uri, Instant::now() + Duration::from_secs(120)).await {
+                    Ok(a) => {
+                        let chars: Vec<char> = a.text.chars().skip(offset).take(ARTIFACT_CHUNK + 1).collect();
+                        let more = chars.len() > ARTIFACT_CHUNK;
+                        let chunk: String = chars.into_iter().take(ARTIFACT_CHUNK).collect();
+                        let next = more.then(|| offset + ARTIFACT_CHUNK);
+                        let body = json!({"uri": a.uri, "mime_type": a.mime_type, "offset": offset, "next_offset": next, "text": chunk});
+                        let (content, partial) = bounded(&body);
+                        Executed {
+                            content,
+                            is_error: false,
+                            status: factory_tasks::ReceiptStatus::Succeeded,
+                            before: None,
+                            after: None,
+                            artifact: json!({"uri": uri, "offset": offset, "result_sha256": ws::sha256_hex(body.to_string().as_bytes())}),
+                            partial,
+                        }
+                    }
+                    Err(factory_hoi4_tools::ToolError::UnknownArtifact(_)) => {
+                        refused("unknown_artifact", "No agent_tools_* result of this attempt linked that URI.")
+                    }
+                    Err(e) => failed(&e.to_string()),
+                }
+            }
+            Some(ToolKind::FocusProjection) | Some(ToolKind::FocusEdit) => {
+                let Some(ctx) = self.focus.as_mut() else {
+                    return refused("tool_unavailable", "the focus tools are not enabled for this task");
+                };
+                focus_call(ctx, name == FOCUS_EDIT, args, worktree).await
+            }
             Some(ToolKind::Finish) | None => refused("unknown_tool", "this tool does not run"),
         }
     }
@@ -309,6 +427,129 @@ impl ToolSet {
     pub async fn shutdown(&mut self) {
         if let Some(session) = self.session.take() {
             let _ = session.shutdown().await;
+        }
+    }
+}
+
+/// The projection as the model sees it: the facts it needs to plan an edit, without source maps.
+fn compact_projection(p: &Value) -> Value {
+    let nodes: Vec<Value> = p["nodes"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .map(|n| {
+            let mut o = json!({
+                "id": n["id"], "title": n["label"], "x": n["x"], "y": n["y"], "cost": n["cost"],
+                "prerequisites": n["prerequisiteGroups"], "mutually_exclusive": n["mutuallyExclusive"],
+                "editable": n["editable"],
+            });
+            if n["editable"] == false {
+                o["not_editable_reason"] = n["notEditableReason"].clone();
+            }
+            o
+        })
+        .collect();
+    let diagnostics: Vec<Value> = p["diagnostics"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .take(30)
+        .map(|d| json!({"code": d["code"], "severity": d["severity"], "focus_id": d["focusId"], "message": d["message"]}))
+        .collect();
+    json!({
+        "tree_id": p["treeId"], "source_path": p["sourcePath"], "projection_hash": p["projectionHash"],
+        "layout_verdict": p["layoutVerdict"], "focuses": nodes, "diagnostics": diagnostics,
+    })
+}
+
+type FocusOk = (Value, Option<String>, Option<String>, Value);
+
+async fn focus_call(ctx: &mut FocusContext, edit: bool, args: &Value, worktree: &Path) -> Executed {
+    use crate::focus::session::FocusError;
+    let tree = args["tree_id"].as_str().unwrap_or("").to_owned();
+    // Person edits since the agent's last read (C-03 addition), reported with every result.
+    let since = ctx.last_read;
+    let person_changes = match ctx.rt.tx(ctx.keys.acting).await {
+        Ok(mut tx) => {
+            let found = crate::focus::store::person_changes_since(&mut tx, ctx.keys.id, since).await.unwrap_or_default();
+            let _ = tx.commit().await;
+            found
+        }
+        Err(_) => Vec::new(),
+    };
+    ctx.last_read = ctx.rt.inner.clock.now();
+    let notes: Vec<Value> = person_changes.iter().map(|(t, ids)| json!({"tree_id": t, "changed_ids": ids})).collect();
+    let result: Result<FocusOk, FocusError> = if edit {
+        let ops: Vec<crate::focus::ops::FocusOp> = match serde_json::from_value(args["operations"].clone()) {
+            Ok(o) => o,
+            Err(e) => return refused("invalid_operations", &e.to_string()),
+        };
+        crate::focus::apply::apply_operations(
+            &ctx.rt,
+            &ctx.keys,
+            worktree,
+            crate::focus::store::ActorKind::NativeAgent(ctx.attempt),
+            &tree,
+            args["expected_projection_hash"].as_str(),
+            ops,
+        )
+        .await
+        .map(|a| {
+            let path = a.proposal["changedPaths"][0].as_str().map(str::to_owned);
+            let before = path.as_ref().and_then(|p| a.proposal["before"][p].as_str()).map(str::to_owned);
+            let after = path.as_ref().and_then(|p| a.proposal["after"][p].as_str()).map(str::to_owned);
+            (
+                json!({
+                    "proposal_id": a.proposal["id"], "changed_ids": a.proposal["changedIds"],
+                    "changed_paths": a.proposal["changedPaths"], "summary": a.proposal["summary"],
+                    "projection": compact_projection(&a.projection),
+                }),
+                before,
+                after,
+                json!({"proposal_id": a.proposal["id"], "proposal_hash": a.proposal["proposalHash"], "changed_paths": a.proposal["changedPaths"]}),
+            )
+        })
+    } else {
+        crate::focus::apply::inspect_tree(&ctx.rt, &ctx.keys, worktree, &tree)
+            .await
+            .map(|p| (compact_projection(&p), None, None, json!({"projection_hash": p["projectionHash"]})))
+    };
+    let status_of = |e: &FocusError| match e {
+        FocusError::UnknownEffect { .. } | FocusError::UnexpectedWrite { .. } => factory_tasks::ReceiptStatus::UnknownEffect,
+        FocusError::Internal { .. } | FocusError::ToolsUnavailable { .. } => factory_tasks::ReceiptStatus::Failed,
+        _ => factory_tasks::ReceiptStatus::Refused,
+    };
+    match result {
+        Ok((mut body, before, after, artifact)) => {
+            if !notes.is_empty() {
+                body["changed_by_a_person_since_your_last_read"] = json!(notes);
+            }
+            let (content, partial) = bounded(&body);
+            Executed {
+                content,
+                is_error: false,
+                status: factory_tasks::ReceiptStatus::Succeeded,
+                before,
+                after,
+                artifact,
+                partial,
+            }
+        }
+        Err(e) => {
+            let mut body = json!({"error": e.code(), "detail": serde_json::to_value(&e).unwrap_or(Value::Null)});
+            if !notes.is_empty() {
+                body["changed_by_a_person_since_your_last_read"] = json!(notes);
+            }
+            let status = status_of(&e);
+            Executed {
+                content: body.to_string(),
+                is_error: true,
+                partial: status == factory_tasks::ReceiptStatus::UnknownEffect,
+                status,
+                before: None,
+                after: None,
+                artifact: json!({"error": e.code()}),
+            }
         }
     }
 }

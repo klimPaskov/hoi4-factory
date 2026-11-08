@@ -2,6 +2,7 @@
 
 use std::collections::BTreeMap;
 
+use factory_accounts::{AccountId, ProjectId};
 use factory_tasks::{AttemptId, Task, TaskId};
 use serde_json::{Value, json};
 use sqlx::{PgConnection, Row};
@@ -9,7 +10,23 @@ use uuid::Uuid;
 
 use super::projection::Built;
 
-pub async fn insert_projection(conn: &mut PgConnection, task: &Task, built: &Built) -> Result<Uuid, sqlx::Error> {
+/// The task a focus operation belongs to, and the account whose row-level security scope its
+/// transactions use (the person, or the account that started the agent's attempt).
+#[derive(Debug, Clone, Copy)]
+pub struct TaskKeys {
+    pub id: TaskId,
+    pub project_id: ProjectId,
+    pub owner_account_id: AccountId,
+    pub acting: AccountId,
+}
+
+impl TaskKeys {
+    pub fn of(task: &Task, acting: AccountId) -> Self {
+        Self { id: task.id, project_id: task.project_id, owner_account_id: task.owner_account_id, acting }
+    }
+}
+
+pub async fn insert_projection(conn: &mut PgConnection, task: &TaskKeys, built: &Built) -> Result<Uuid, sqlx::Error> {
     let id = Uuid::new_v4();
     sqlx::query(
         "INSERT INTO focus_projections (id, task_id, project_id, owner_account_id, tree_id, relative_path,
@@ -77,7 +94,7 @@ impl ActorKind {
 }
 
 pub struct NewProposal<'a> {
-    pub task: &'a Task,
+    pub task: &'a TaskKeys,
     pub actor: ActorKind,
     pub tree_id: &'a str,
     pub tool_operation: &'a str,
