@@ -362,6 +362,9 @@ impl WorkerProcess {
     pub async fn shutdown(&mut self) -> (Option<i32>, Option<i32>) {
         let _ = self.send("shutdown", "-", Body::Shutdown).await;
         self.stdin = None;
+        // tokio forgets the id once `wait` has reaped the worker, so read it first.
+        #[cfg(unix)]
+        let group = self.child.id();
         match tokio::time::timeout(Duration::from_secs(2), self.child.wait()).await {
             Ok(Ok(status)) => {
                 self.exited = true;
@@ -371,7 +374,7 @@ impl WorkerProcess {
                     job.kill();
                 }
                 #[cfg(unix)]
-                if let Some(pid) = self.child.id() {
+                if let Some(pid) = group {
                     // SAFETY: killpg only signals the group the worker led; ESRCH is ignored.
                     unsafe {
                         libc::killpg(pid as libc::pid_t, libc::SIGKILL);
