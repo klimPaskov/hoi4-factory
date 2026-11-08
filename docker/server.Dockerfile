@@ -21,28 +21,36 @@ RUN npm ci --no-audit --no-fund
 COPY web ./
 RUN npm run build
 
-# HOI4 Agent Tools, the MCP server behind the agent's read-only HOI4 tools (S03). Built from the
-# exact upstream commit; `git rev-parse` must equal the pin, so the commit hash is the content
-# check. It needs Node 22 or 24, while Setup needs Debian's own /usr/bin/node (18), so the tools
-# get this image's Node at /opt/node22 and Setup keeps its own. Raise AGENT_TOOLS_REV deliberately
-# and rerun the hoi4-tools integration tests: crates/hoi4-tools/src/profile.rs pins the same
-# commit and package version (AGENT_TOOLS_REV, AGENT_TOOLS_VERSION).
+# HOI4 Agent Tools, the MCP server behind the agent's HOI4 tools, and its bundled hoi4-engine
+# binary (T-ENG-01). The stage installs the exact release tarball, checked against the SHA-256
+# that the release's release-identity.json records, with dependencies from the tarball's own
+# npm-shrinkwrap.json. The tarball carries the engine binaries and engine/bin/manifest.json; the
+# engine binary for this image's architecture must match the manifest, and the others are removed.
+# It needs Node 22 or 24, while Setup needs Debian's own /usr/bin/node (18), so the tools get this
+# image's Node at /opt/node22 and Setup keeps its own. Raise the release deliberately, together
+# with crates/hoi4-tools/src/profile.rs (AGENT_TOOLS_REV, AGENT_TOOLS_VERSION, the schema hashes)
+# and the hoi4-engine git revision in Cargo.toml, and rerun the hoi4-tools integration tests.
+# ENGINE_BINARY=omit builds the T-ENG-01 test image without the engine binary.
 FROM node:22-bookworm-slim@sha256:de170b39439eb0e5a3444ad7d60b015614a381e10fecae2e30ec9e735122f38d AS agent-tools
-ARG AGENT_TOOLS_REV=fbc514407155e572fe95fa1e263b7e1552d4d6fc
-RUN apt-get update \
- && apt-get install -y --no-install-recommends git ca-certificates \
- && rm -rf /var/lib/apt/lists/*
+ARG AGENT_TOOLS_VERSION=4.11.0
+ARG AGENT_TOOLS_SHA256=f34576b5755941b47f87ed636d164a09efaa3a6de8f0076f005dfe8b6ec710ef
+ARG ENGINE_BINARY=include
+ARG TARGETARCH
+ADD --checksum=sha256:${AGENT_TOOLS_SHA256} \
+    https://github.com/klimPaskov/hoi4-agent-tools/releases/download/v${AGENT_TOOLS_VERSION}/hoi4-agent-tools-${AGENT_TOOLS_VERSION}.tgz \
+    /tmp/hoi4-agent-tools.tgz
 WORKDIR /opt/hoi4-agent-tools
-RUN git -c core.autocrlf=false init -q . \
- && git -c core.autocrlf=false fetch -q --depth 1 https://github.com/klimPaskov/hoi4-agent-tools.git "${AGENT_TOOLS_REV}" \
- && git -c core.autocrlf=false checkout -q FETCH_HEAD \
- && test "$(git rev-parse HEAD)" = "${AGENT_TOOLS_REV}" \
- && rm -rf .git
-RUN npm ci --no-audit --no-fund \
- && npm run build \
- && npm prune --omit=dev --no-audit --no-fund \
- && rm -rf src tests fixtures examples scripts \
- && node -e "const p=require('./package.json'); if (p.version !== '4.6.1') { throw new Error('unexpected Agent Tools version ' + p.version) }"
+RUN tar -xzf /tmp/hoi4-agent-tools.tgz --strip-components=1 \
+ && rm /tmp/hoi4-agent-tools.tgz \
+ && npm ci --omit=dev --ignore-scripts --no-audit --no-fund \
+ && node -e "const p=require('./package.json'); if (p.version !== process.argv[1]) { throw new Error('unexpected Agent Tools version ' + p.version) }" "${AGENT_TOOLS_VERSION}"
+RUN case "${TARGETARCH}" in amd64) key=linux-x64 ;; arm64) key=linux-arm64 ;; *) echo "unsupported arch ${TARGETARCH}" >&2; exit 1 ;; esac \
+ && want="$(node -e "const m=require('./engine/bin/manifest.json'); const e=m.binaries[process.argv[1]]; if (!e) { throw new Error('no engine for ' + process.argv[1]) } console.log(e.sha256)" "$key")" \
+ && echo "${want}  engine/bin/${key}/hoi4-engine" | sha256sum -c - \
+ && find engine/bin -mindepth 1 -maxdepth 1 -type d ! -name "${key}" -exec rm -rf {} + \
+ && chmod 0755 "engine/bin/${key}/hoi4-engine" \
+ && if [ "${ENGINE_BINARY}" = "omit" ]; then rm -f "engine/bin/${key}/hoi4-engine"; \
+    elif [ "${ENGINE_BINARY}" != "include" ]; then echo "ENGINE_BINARY must be include or omit" >&2; exit 1; fi
 
 FROM debian:bookworm-slim@sha256:7ff6ba31527b9e336162fa061746c366c4b2032f4d2cff2078bea43f78efe3f8
 # git: the workspace crate drives the git CLI. ca-certificates: TLS to GitHub and mail relays.

@@ -7,6 +7,7 @@
 //! HOI4 Agent Tools with an environment allowlist.
 
 pub mod agent_tools;
+pub mod engine;
 pub mod inventory;
 pub mod mcp;
 pub mod profile;
@@ -16,6 +17,7 @@ pub mod session;
 mod job_windows;
 
 pub use agent_tools::{AgentToolsInstall, agent_tools_spec, prepare_state_dir};
+pub use engine::{EngineStatus, bundled_engine_status};
 pub use inventory::{Health, Inventory, InventoryTool, ToolState, discover};
 pub use mcp::{
     DiscoveredTool, Handshake, McpClient, McpError, McpServerSpec, ShutdownReport, ToolOutput,

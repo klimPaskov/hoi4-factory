@@ -229,8 +229,8 @@ fn reference_read_schema() -> Value {
     json!({
         "type": "object",
         "properties": {
-            "id": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
-            "revision": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+            "id": {"type": "string", "pattern": "^[a-f0-9]{16,64}$"},
+            "revision": {"type": "string", "pattern": "^[a-f0-9]{12,64}$"},
             "source": {"type": "string", "enum": ["game_doc", "wiki", "script_doc"]},
             "startLine": {"type": "integer", "minimum": 1},
             "startColumn": {"type": "integer", "minimum": 1},
@@ -310,7 +310,6 @@ fn event_inspect_schema() -> Value {
     })
 }
 
-
 /// Scenario inputs are left out: they are keyed maps (`state`, `eventTargets`), which the
 /// host's closed-schema rule does not accept, and inventory or inspection without them is the
 /// read-only use S03 needs.
@@ -374,8 +373,8 @@ fn tool(
 /// The pinned HOI4 Agent Tools: its commit (also `AGENT_TOOLS_REV` in `docker/server.Dockerfile`)
 /// and package version. Move both together, then refresh [`SCHEMA_HASHES`] from the real server
 /// (the `real_agent_tools` test prints them) and rerun that test.
-pub const AGENT_TOOLS_REV: &str = "fbc514407155e572fe95fa1e263b7e1552d4d6fc";
-pub const AGENT_TOOLS_VERSION: &str = "4.6.1";
+pub const AGENT_TOOLS_REV: &str = "be00dfb3d0e3fde76c59f3b5da487d4f57b89948";
+pub const AGENT_TOOLS_VERSION: &str = "4.11.0";
 
 /// The S03 profile: nine read tools of the pinned HOI4 Agent Tools, nothing that writes mod source.
 pub fn agent_tools_read_only() -> ToolProfile {
@@ -394,7 +393,9 @@ pub fn agent_tools_read_only() -> ToolProfile {
                 "Find where a script symbol is defined and used in the game, DLC and this mod.",
                 PureRead,
                 source_lookup_schema(),
-                60,
+                // A cold lookup still scans through the TypeScript core until M-8 moves it onto
+                // the engine: 54 s on a quiet machine on 2026-11-06, over 60 s under load.
+                120,
                 64 * 1024,
                 SCHEMA_HASHES[0],
             ),
@@ -488,7 +489,7 @@ const SCHEMA_HASHES: [Option<&str>; 9] = [
     Some("ae6435313935a25847456a6fd057bbabe373150fbd8433012d22210affd20287"),
     Some("077ffc26f39c6510fbed9700a4885c05e8b4b6b79f6a038b4b8b9b5a38c2ae61"),
     Some("d86e10b44856dae435eb5b67a900c7e13218e52faedccb80c9a073630f3096ec"),
-    Some("6b51bfb51884acc7bac95b3a77e750f059459b752c6758d8583385756e86fbed"),
+    Some("38b573180961cb6288d3a674f090d59da47d4b10c1e9c31c508d4561ab21b207"),
     Some("5159991d7d1b98d3f274530ebe8ca4bcb5b77122d9580f5dcff7fd99ff97a7d8"),
     Some("b0abf49e379a42e76060b17190330e3483320f3f2cddf054de681b5b3b7200d9"),
     Some("3f93693404b4e038cb91472437e7d6865c4b51c74001606f7815121088527b81"),

@@ -25,6 +25,7 @@ factory-agent = { path = "../agent", default-features = false, features = ["anth
 factory-tasks = { path = "../tasks" }
 factory-broker = { path = "../broker" }
 factory-hoi4-tools = { path = "../hoi4-tools" }
+factory-engine-check = { path = "../engine-check" }
 futures-util = { version = "0.3", default-features = false, features = ["std"] }
 axum = { workspace = true, features = ["multipart"] }
 async-trait.workspace = true

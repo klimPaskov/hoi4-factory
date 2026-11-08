@@ -129,6 +129,9 @@ async fn readyz(State(state): State<ServerState>) -> Response {
                     "available": true,
                     "user_keys": agent.keys_available(),
                     "agent_tools": agent.agent_tools_installed(),
+                    // T-ENG-01: a missing or changed engine binary is reported, never replaced.
+                    "engine": agent.engine_status(),
+                    "engine_linked": { "version": factory_engine_check::ENGINE_VERSION, "rev": factory_engine_check::ENGINE_REV },
                     "operator_allowance": agent.operator_allowance_available(),
                 }),
                 None => json!({ "available": false }),

@@ -1,0 +1,17 @@
+[package]
+name = "factory-engine-check"
+description = "HOI4 Factory engine check: links hoi4-engine for closure, lints, override audit and the findings baseline before commits"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+hoi4-engine.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

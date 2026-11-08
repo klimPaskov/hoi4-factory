@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "recorded": "2026-11-08",
+  "stage": "S04",
+  "repository": {
+    "remote": "https://github.com/klimPaskov/hoi4-factory",
+    "branch": "main",
+    "base_revision": "feea335",
+    "dirty_at_start": [],
+    "worktrees_at_start": ["main checkout only"]
+  },
+  "host": {
+    "os": "Windows 11 Pro 10.0.26200",
+    "uname": "MINGW64_NT-10.0-26200",
+    "arch": "x86_64",
+    "shells": "Git Bash and Windows PowerShell 5.1",
+    "disk_free_at_start": "52 GiB of 931 GiB on C:",
+    "memory_free_at_start": "2.7 GiB of 31.6 GiB (other sessions running)"
+  },
+  "clients": {
+    "claude_code": {
+      "entrypoint": "claude-desktop (Code tab), session started by the coordinating session",
+      "model": "claude-opus-5-5"
+    },
+    "project_mcp_servers": "disabled (.mcp.json rejected by default). A user-scope hoi4_agent_tools server is connected in the session and is not used for stage evidence"
+  },
+  "toolchains": {
+    "rust": "rustc 1.97.1 (8bab26f4f 2026-07-14), cargo 1.97.1, pinned by rust-toolchain.toml",
+    "python": "3.13.5 through scripts/py.sh",
+    "node_host": "v24.15.0",
+    "git": "2.54.0.windows.1",
+    "docker": "Docker Desktop, engine 28.5.2 on WSL2"
+  },
+  "upstream_pins_at_start": {
+    "hoi4_agent_tools_image_pin": "4.6.1 (fbc514407155e572fe95fa1e263b7e1552d4d6fc)",
+    "hoi4_agent_tools_latest_release": "4.11.0 (be00dfb3d0e3fde76c59f3b5da487d4f57b89948), tarball SHA-256 f34576b5755941b47f87ed636d164a09efaa3a6de8f0076f005dfe8b6ec710ef, engine 0.1.0 with linux-x64, linux-arm64, darwin-arm64 and win32-x64 binaries"
+  }
+}

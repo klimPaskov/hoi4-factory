@@ -122,6 +122,8 @@ pub(crate) struct Inner {
     pub allowance_micros: i64,
     pub operator_keys: profiles::OperatorKeys,
     pub agent_tools: Option<AgentToolsSettings>,
+    /// The bundled hoi4-engine of the installed Agent Tools, checked once at startup (T-ENG-01).
+    pub engine: Option<factory_hoi4_tools::EngineStatus>,
     pub worker: Option<WorkerLauncher>,
     pub settings: RunnerSettings,
     pub running: Mutex<HashMap<AttemptId, Running>>,
@@ -144,7 +146,10 @@ pub const LIMIT_KEY_WRITE: &str = "agent_key_write";
 pub const LIMIT_PROBE: &str = "agent_probe";
 
 fn rate_limits() -> RateLimitConfig {
-    let rule = |capacity, secs| Rule { capacity, refill_every: Duration::from_secs(secs) };
+    let rule = |capacity, secs| Rule {
+        capacity,
+        refill_every: Duration::from_secs(secs),
+    };
     RateLimitConfig {
         rules: [
             (LIMIT_TASK_CREATE, rule(30, 120)),
@@ -192,6 +197,15 @@ impl AgentRuntime {
                 policy: parts.policy,
                 allowance_micros: parts.allowance_micros,
                 operator_keys: parts.operator_keys,
+                engine: parts.agent_tools.as_ref().map(|t| {
+                    match factory_hoi4_tools::engine::package_root(&t.install.entry) {
+                        Some(root) => factory_hoi4_tools::bundled_engine_status(&root),
+                        None => factory_hoi4_tools::EngineStatus::Unavailable {
+                            reason: "binary_not_found",
+                            message: "the Agent Tools entry point has no package folder".into(),
+                        },
+                    }
+                }),
                 agent_tools: parts.agent_tools,
                 worker: parts.worker,
                 settings: parts.settings,
@@ -220,6 +234,11 @@ impl AgentRuntime {
         self.inner.agent_tools.is_some()
     }
 
+    /// The bundled engine's state, `None` when Agent Tools are not installed.
+    pub fn engine_status(&self) -> Option<&factory_hoi4_tools::EngineStatus> {
+        self.inner.engine.as_ref()
+    }
+
     pub fn policy(&self) -> &DestinationPolicy {
         &self.inner.policy
     }
@@ -235,7 +254,10 @@ impl AgentRuntime {
 
     /// A read-only transaction scoped to `account` that sees one snapshot for all its
     /// statements (REPEATABLE READ), for answers that combine several tables.
-    pub async fn snapshot(&self, account: AccountId) -> Result<Transaction<'static, Postgres>, ApiError> {
+    pub async fn snapshot(
+        &self,
+        account: AccountId,
+    ) -> Result<Transaction<'static, Postgres>, ApiError> {
         let mut tx = self.inner.db.pool().begin().await?;
         sqlx::query("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY")
             .execute(&mut *tx)
