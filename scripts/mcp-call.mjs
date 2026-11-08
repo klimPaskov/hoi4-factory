@@ -62,6 +62,24 @@ child.stdin.write(JSON.stringify({ jsonrpc: '2.0', method: 'notifications/initia
 let failed = false;
 const results = [];
 for (const call of calls) {
+  if (call.saveArtifactsOf !== undefined) {
+    // {"saveArtifactsOf": <index>, "dir": "<folder>"}: write every artifact of that result to disk.
+    const { mkdirSync, writeFileSync } = await import('node:fs');
+    mkdirSync(call.dir, { recursive: true });
+    for (const a of results[call.saveArtifactsOf]?.structuredContent?.artifacts ?? []) {
+      const res = await request('resources/read', { uri: a.uri });
+      const c = res.result?.contents?.[0];
+      if (!c) {
+        failed = true;
+        continue;
+      }
+      const bytes = c.blob !== undefined ? Buffer.from(c.blob, 'base64') : Buffer.from(c.text ?? '', 'utf8');
+      writeFileSync(`${call.dir}/${a.name}`, bytes);
+      console.log(JSON.stringify({ saved: a.name, bytes: bytes.length }));
+    }
+    results.push(null);
+    continue;
+  }
   if (call.readArtifactOf !== undefined) {
     // {"readArtifactOf": <index of an earlier call>}: read that result's first artifact.
     const uri = results[call.readArtifactOf]?.structuredContent?.artifacts?.[0]?.uri;
