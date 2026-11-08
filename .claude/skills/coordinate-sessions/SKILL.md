@@ -16,7 +16,7 @@ Use this workflow only when the maintainer explicitly asks a session to coordina
 
 - **The coordinator** is one session that starts, briefs, answers, resumes and archives every work session. It does no long work itself and keeps its own context small. It runs long work as separate sessions, never as background subagents in its own process.
 - **Work sessions** each own one task and one set of files. Start each one from the coordinator with `start_session`, so it nests under the coordinator in the sidebar and its turn reports reach the coordinator automatically. File every HOI4 session in one sidebar group for the coordinator.
-- **Model and effort.** A work session never inherits the coordinator's model and effort. Pass them on every start: Sonnet at medium or high effort for most work, Opus at medium effort only for design-heavy work or a new subsystem. When the app's "New session" card starts the session without them, set them right after with `set_session_model` and `set_session_effort`.
+- **Model and effort.** A work session never inherits the coordinator's model and effort. Pass them on every start: Sonnet at medium or high effort for most work, Opus at medium effort only for design-heavy work or a new subsystem. Never above high effort (D-53). When the app's "New session" card starts the session without them, set them right after with `set_session_model` and `set_session_effort`, and lower any session found above high at a check-in. The coordinator cannot change its own effort, so ask the maintainer to set it in the model menu if it is above high.
 - **The maintainer** answers only true blockers: sign-ins and credentials, money, access rights, in-game checks and choices that are theirs. Ask them in batches.
 
 ### Status page (D-31)

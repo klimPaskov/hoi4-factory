@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.41, 2026-11-09, effort stays at high or below (D-53)
+
+- CLAUDE.md and `coordinate-sessions` now say no session or worker runs above high effort, and a coordinator lowers any it finds above high.
+
+Evidence: the maintainer asked that work not start on Opus at extra high effort and that each session use a fitting model and effort (D-53). Rollback: revert this commit and regenerate.
+
 ## 0.2.40, 2026-11-08, gptimage for page mockups (D-52)
 
 - CLAUDE.md and `ui-design-iteration` now allow the general `gptimage` tool for HOI4 Factory page and UI mockups, one request at a time and never while hoi4-imagegen is generating, with game assets still only from hoi4-imagegen. The skill also says to pass a real game render as the reference when a page shows a game surface.
