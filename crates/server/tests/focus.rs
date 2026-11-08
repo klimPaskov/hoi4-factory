@@ -345,3 +345,180 @@ async fn live_deepseek_agent_adds_a_branch_through_the_editor_path() {
     let original = std::fs::read_to_string(Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/focus-small").join(SOURCE)).unwrap();
     assert!(source.starts_with(&original[..original.len() - 2]), "untouched bytes changed");
 }
+
+fn git(dir: &Path, args: &[&str]) -> String {
+    let out = std::process::Command::new("git").args(["-c", "core.autocrlf=false"]).args(args).current_dir(dir).output().unwrap();
+    assert!(out.status.success(), "git {args:?}: {}", String::from_utf8_lossy(&out.stderr));
+    String::from_utf8(out.stdout).unwrap()
+}
+
+/// S04-W5 and gate 5, locally: a reviewed proposal is committed under the expected HEAD with only
+/// its own paths, unrelated work in the worktree survives, a repeated request does not commit
+/// twice, and restore undoes the commit while keeping other files as they are.
+#[tokio::test]
+async fn commit_binds_to_reviewed_proposals_and_restore_keeps_later_edits() {
+    let Some(e) = editor().await else { return };
+    let p = e.projection().await;
+    let r = e.ops(&e.alice, p["projectionHash"].as_str().unwrap(), json!([{"op": "set_cost", "focus_id": "exp_left", "cost": 9}])).await;
+    assert_eq!(r.status, 201, "{}", r.text);
+    let proposal = r.body["proposal"].clone();
+    let wt = e.worktree();
+    let head_before = git(&wt, &["rev-parse", "HEAD"]).trim().to_owned();
+    // Unrelated work in the worktree that no proposal names.
+    std::fs::write(wt.join("notes-unrelated.txt"), "keep me\n").unwrap();
+
+    let check = e.alice.client.post(&format!("{}/check", e.base()), json!({})).await;
+    assert_eq!(check.status, 200, "{}", check.text);
+    assert_eq!(check.body["check"]["engine_rev"], factory_engine_check::ENGINE_REV);
+    let verdict = check.body["check"]["verdict"].as_str().unwrap().to_owned();
+    assert_ne!(verdict, "fail", "{:#}", check.body);
+
+    let body = |hash: &str, key: &str, accept: bool| {
+        json!({ "proposals": [{"id": proposal["id"], "proposal_hash": hash}], "message": "Make the left road longer", "idempotency_key": key, "accept_incomplete": accept })
+    };
+    // Approval is bound to the reviewed hash.
+    let wrong = e.alice.client.post(&format!("{}/commit", e.base()), body(&"0".repeat(64), "c-1", true)).await;
+    assert_eq!(wrong.status, 409, "{}", wrong.text);
+    assert_eq!(wrong.body["error"]["code"], "proposal_changed");
+    let hash = proposal["proposalHash"].as_str().unwrap();
+    if verdict == "incomplete" {
+        // Incomplete is not a pass: it needs the person's explicit acceptance.
+        let r = e.alice.client.post(&format!("{}/commit", e.base()), body(hash, "c-0", false)).await;
+        assert_eq!(r.status, 409, "{}", r.text);
+        assert_eq!(r.body["error"]["code"], "check_incomplete");
+    }
+    let c = e.alice.client.post(&format!("{}/commit", e.base()), body(hash, "c-1", true)).await;
+    assert_eq!(c.status, 201, "{}", c.text);
+    let commit = c.body["result"]["commit"].as_str().unwrap().to_owned();
+    assert_eq!(git(&wt, &["rev-parse", "HEAD"]).trim(), commit);
+    assert_eq!(git(&wt, &["rev-parse", "HEAD^"]).trim(), head_before);
+    let files = git(&wt, &["show", "--name-only", "--format=", "HEAD"]);
+    assert_eq!(files.trim(), "common/national_focus/exp_basic.txt", "only the proposal's path");
+    let message = git(&wt, &["log", "-1", "--format=%B"]);
+    assert!(message.contains(&format!("Factory-Publication: {}", c.body["publication_id"].as_str().unwrap())), "{message}");
+    let author = git(&wt, &["log", "-1", "--format=%ae"]);
+    assert!(author.trim().ends_with("@users.hoi4-factory.invalid"), "{author}");
+    assert_eq!(std::fs::read_to_string(wt.join("notes-unrelated.txt")).unwrap(), "keep me\n");
+    assert!(git(&wt, &["status", "--porcelain"]).contains("notes-unrelated.txt"), "the unrelated file stays uncommitted");
+
+    // The same request again is a replay: one commit, the same answer.
+    let again = e.alice.client.post(&format!("{}/commit", e.base()), body(hash, "c-1", true)).await;
+    assert_eq!(again.status, 200, "{}", again.text);
+    assert_eq!(again.body["result"]["commit"], json!(commit));
+    assert_eq!(git(&wt, &["rev-parse", "HEAD"]).trim(), commit);
+    let list = e.alice.client.get(&format!("{}/proposals", e.base())).await;
+    assert_eq!(list.body["proposals"][0]["state"], "committed");
+
+    // Restore puts the focus file back and keeps every other file as it is.
+    let source_committed = std::fs::read(wt.join(SOURCE)).unwrap();
+    let rs = e
+        .alice
+        .client
+        .post(&format!("{}/restore", e.base()), json!({ "publication_id": c.body["publication_id"], "idempotency_key": "r-1" }))
+        .await;
+    assert_eq!(rs.status, 201, "{}", rs.text);
+    assert_eq!(rs.body["result"]["restored"], json!([SOURCE]));
+    let restored = std::fs::read(wt.join(SOURCE)).unwrap();
+    assert_ne!(restored, source_committed);
+    assert_eq!(git(&wt, &["show", &format!("{head_before}:{SOURCE}")]).as_bytes(), restored.as_slice());
+    assert_eq!(std::fs::read_to_string(wt.join("notes-unrelated.txt")).unwrap(), "keep me\n");
+    let pubs = e.alice.client.get(&format!("{}/publications", e.base())).await;
+    assert_eq!(pubs.body["publications"].as_array().unwrap().len(), 2);
+}
+
+/// Gate 8 and T-ENG-01: a commit that holds agent work with a new finding is blocked. Needs the
+/// game folder for the engine's vocabulary (`HOI4_GAME_ROOT_FOR_TEST`).
+#[tokio::test]
+async fn a_new_engine_finding_blocks_an_agent_commit() {
+    let Some(game) = std::env::var_os("HOI4_GAME_ROOT_FOR_TEST").map(PathBuf::from).filter(|p| p.is_dir()) else {
+        eprintln!("SKIPPED: HOI4_GAME_ROOT_FOR_TEST is not set");
+        return;
+    };
+    let Some(install) = factory_hoi4_tools::AgentToolsInstall::from_env() else { return };
+    let h = Harness::start(Options {
+        anthropic_key: Some("sk-ant-not-used"),
+        agent: AgentOptions {
+            worker: None,
+            settings: None,
+            tools: Some(Some(factory_server::agent::AgentToolsSettings { install, game_root: Some(game) })),
+            skip_recovery: true,
+        },
+        ..Options::default()
+    })
+    .await;
+    let alice = h.verified_user("alice@example.org").await;
+    let project = h.project(&alice, "Engine gate").await;
+    let up = alice
+        .client
+        .upload(&project, &[Part::text("kind", "zip"), Part::text("git_init_consent", "true"), Part::file("f.zip", build_zip(&fixture_entries()))])
+        .await;
+    assert_eq!(up.status, 201, "{}", up.text);
+    let t = alice
+        .client
+        .post(&format!("/api/v1/projects/{project}/tasks"), json!({ "objective": "Engine gate", "mode": "edit", "allowed_paths": ["common/national_focus", "localisation"] }))
+        .await;
+    let task_id = t.body["id"].as_str().unwrap().to_owned();
+    let base = format!("/api/v1/projects/{project}/tasks/{task_id}");
+    let p = alice.client.get(&format!("{base}/focus/trees/exp_basic_tree")).await;
+    assert_eq!(p.status, 200, "{}", p.text);
+
+    // Agent work through the guarded focus path: Agent Tools refuses a reward that calls a helper
+    // nothing defines, and nothing is written.
+    let rt = h.state.agent.clone().unwrap();
+    let account = factory_accounts::AccountId(alice.id.parse().unwrap());
+    let mut tx = rt.tx(account).await.unwrap();
+    let task = factory_tasks::get_task(&mut tx, factory_tasks::TaskId(task_id.parse().unwrap())).await.unwrap();
+    tx.commit().await.unwrap();
+    let keys = factory_server::focus::store::TaskKeys::of(&task, account);
+    let wt = h.data_dir.path().join("workspaces").join(&alice.id).join(&project).join("tasks").join(&task_id);
+    let before = std::fs::read(wt.join(SOURCE)).unwrap();
+    let refused = factory_server::focus::apply::apply_operations(
+        &rt,
+        &keys,
+        &wt,
+        factory_server::focus::store::ActorKind::CodingClient,
+        "exp_basic_tree",
+        None,
+        serde_json::from_value(json!([{"op": "create", "focus_id": "exp_bad", "x": 4, "y": 3, "cost": 5, "prerequisites": ["exp_join"],
+            "title": "Bad", "description": "Calls an unknown effect.", "reward": "ecf_unknown_scripted_effect = yes"}]))
+        .unwrap(),
+    )
+    .await;
+    match refused {
+        Err(e) => assert_eq!(e.code(), "tool_refused", "{e:?}"),
+        Ok(a) => panic!("the guarded rewrite applied: {:#}", a.proposal),
+    }
+    assert_eq!(std::fs::read(wt.join(SOURCE)).unwrap(), before, "nothing was written");
+    assert!(!wt.join("localisation/english/exp_basic_tree_l_english.yml").exists(), "no localisation for a refused focus");
+
+    // Agent work written directly with write_file becomes a file proposal at the end of the
+    // attempt. This one adds a tree whose focus requires an undefined scripted trigger.
+    std::fs::write(
+        wt.join("common/national_focus/agent_extra.txt"),
+        "focus_tree = {\n\tid = agent_extra_tree\n\tcountry = { factor = 0 }\n\tfocus = {\n\t\tid = AGX_one\n\t\tx = 1\n\t\ty = 0\n\t\tcost = 10\n\t\tavailable = { agx_unknown_trigger = yes }\n\t\tcompletion_reward = { add_political_power = 10 }\n\t}\n}\n",
+    )
+    .unwrap();
+    let applied = factory_server::focus::apply::record_file_proposal(
+        &rt,
+        &keys,
+        &wt,
+        factory_server::focus::store::ActorKind::CodingClient,
+        &["common/national_focus/agent_extra.txt".to_owned()],
+    )
+    .await
+    .unwrap()
+    .expect("a file proposal");
+    assert_eq!(applied["toolOperation"], "write_file");
+    let hash = applied["proposalHash"].as_str().unwrap();
+    let id = applied["id"].clone();
+    let head = git(&wt, &["rev-parse", "HEAD"]);
+    let c = alice
+        .client
+        .post(&format!("{base}/commit"), json!({ "proposals": [{"id": id, "proposal_hash": hash}], "message": "Agent branch", "idempotency_key": "a-1", "accept_incomplete": true }))
+        .await;
+    assert_eq!(c.status, 409, "{}", c.text);
+    assert_eq!(c.body["error"]["code"], "commit_blocked", "{:#}", c.body);
+    let findings = c.body["error"]["details"]["findings"].to_string();
+    assert!(findings.contains("REF_UNKNOWN_TRIGGER") && findings.contains("agx_unknown_trigger"), "{findings}");
+    assert_eq!(git(&wt, &["rev-parse", "HEAD"]), head, "nothing was committed");
+}

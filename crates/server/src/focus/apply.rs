@@ -258,3 +258,98 @@ pub async fn apply_operations(
     }
     Ok(Applied { proposal, projection: after_projection })
 }
+
+fn git_head_bytes(root: &Path, args: &[&str]) -> Option<Vec<u8>> {
+    let out = std::process::Command::new("git")
+        .args(["-c", "core.autocrlf=false"])
+        .args(args)
+        .current_dir(root)
+        .output()
+        .ok()?;
+    out.status.success().then_some(out.stdout)
+}
+
+/// Records files an agent wrote with `write_file` as one reviewable C-02 proposal, compared with
+/// the worktree's HEAD, so every agent change goes through the same review, commit check and
+/// commit as a focus edit. Returns `None` when none of the files differs from HEAD.
+pub async fn record_file_proposal(
+    rt: &AgentRuntime,
+    task: &TaskKeys,
+    root: &Path,
+    actor: ActorKind,
+    paths: &[String],
+) -> Result<Option<Value>, FocusError> {
+    let root_buf = root.to_path_buf();
+    let wanted = paths.to_vec();
+    let (head, files) = tokio::task::spawn_blocking(move || {
+        let head = git_head_bytes(&root_buf, &["rev-parse", "HEAD"]).map(|b| String::from_utf8_lossy(&b).trim().to_owned());
+        let mut files = Vec::new();
+        for path in wanted {
+            if factory_workspace::validate_relative(&path).is_err() {
+                continue;
+            }
+            let before = git_head_bytes(&root_buf, &["cat-file", "blob", &format!("HEAD:{path}")]);
+            let after = std::fs::read(root_buf.join(&path)).ok();
+            if before != after {
+                files.push((path, before, after));
+            }
+        }
+        (head, files)
+    })
+    .await
+    .map_err(|e| FocusError::Internal { message: e.to_string() })?;
+    if files.is_empty() {
+        return Ok(None);
+    }
+    let hash = |b: &Option<Vec<u8>>| b.as_deref().map(super::session::sha256_hex).unwrap_or_else(|| super::session::ABSENT.to_owned());
+    let before: BTreeMap<String, String> = files.iter().map(|(p, b, _)| (p.clone(), hash(b))).collect();
+    let after: BTreeMap<String, String> = files.iter().map(|(p, _, a)| (p.clone(), hash(a))).collect();
+    let changed_paths: Vec<String> = files.iter().map(|(p, _, _)| p.clone()).collect();
+    let diffs: Vec<Value> = files
+        .iter()
+        .map(|(p, b, a)| json!({"path": p, "diff": super::session::unified_diff(p, b.as_deref(), a.as_deref())}))
+        .collect();
+    let operations = json!(changed_paths.iter().map(|p| json!({"op": "write_file", "path": p, "after_sha256": after[p]})).collect::<Vec<_>>());
+    let base = super::session::sha256_hex(head.unwrap_or_default().as_bytes());
+    let request_sha256 = factory_hoi4_tools::mcp::canonical_sha256(&operations);
+    let mut tx = rt.tx(task.acting).await.map_err(|e| db(e.code))?;
+    let proposal = store::insert_proposal(
+        &mut tx,
+        &NewProposal {
+            task,
+            actor,
+            tree_id: "files",
+            tool_operation: "write_file",
+            tool_version: crate::agent::workspace_tools::TOOL_VERSION,
+            base_projection_hash: &base,
+            operations,
+            request_sha256: &request_sha256,
+            before: &before,
+            after: &after,
+            changed_paths: &changed_paths,
+            changed_ids: &[],
+            semantic_summary: json!({"added": [], "changed": [], "removed": [], "files": changed_paths}),
+            diffs: json!(diffs),
+            after_projection_id: None,
+        },
+    )
+    .await
+    .map_err(db)?;
+    let mut draft = event(
+        None,
+        match actor {
+            ActorKind::Person(a) => Actor::user(a),
+            _ => Actor::Host,
+        },
+        "source_changed",
+        "Files changed",
+        json!({"proposal_id": proposal["id"], "actor_kind": actor.as_str(), "changed_paths": changed_paths, "file_hashes": after}),
+    );
+    if let ActorKind::NativeAgent(attempt) = actor {
+        draft = draft.for_attempt(attempt);
+    }
+    factory_tasks::append_event(&mut tx, task.id, draft).await.map_err(|e| db(e.to_string()))?;
+    tx.commit().await.map_err(db)?;
+    rt.notify(task.id);
+    Ok(Some(proposal))
+}

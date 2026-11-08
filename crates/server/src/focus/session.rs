@@ -304,8 +304,11 @@ impl FocusSession {
             Err(e) => return Err(tool_error(e)),
         };
         let structured = result.output.structured.clone().unwrap_or(Value::Null);
-        if result.output.is_error {
-            let source_now = hash_file(&self.root, &base.relative_path);
+        // The tool can block a rewrite without marking the result an error (its own guards, such
+        // as a reference to a missing helper, answer status "blocked"). Only "ok" applied.
+        let applied = !result.output.is_error && structured["status"] == "ok";
+        let source_now = hash_file(&self.root, &base.relative_path);
+        if !applied || source_now == before[&base.relative_path] {
             if source_now != before[&base.relative_path] {
                 return Err(FocusError::UnknownEffect {
                     message: "the tool refused the rewrite but the source file changed".into(),
@@ -314,10 +317,26 @@ impl FocusSession {
             if before[&sidecar] == ABSENT {
                 let _ = std::fs::remove_file(self.root.join(&sidecar));
             }
+            // Blocking diagnostics explain a guard; show the errors first.
+            let mut reasons: Vec<Value> = structured["blockers"].as_array().cloned().unwrap_or_default();
+            reasons.extend(
+                structured["diagnostics"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .filter(|d| d["severity"] == "error")
+                    .take(10)
+                    .cloned(),
+            );
+            let message = reasons
+                .first()
+                .and_then(|r| r["message"].as_str())
+                .unwrap_or(if applied { "the rewrite changed nothing" } else { "focus_rewrite refused" })
+                .to_owned();
             return Err(FocusError::ToolRefused {
-                tool_code: structured["code"].as_str().unwrap_or("").to_owned(),
-                message: structured["blockers"][0]["message"].as_str().unwrap_or("focus_rewrite refused").to_owned(),
-                blockers: structured["blockers"].clone(),
+                tool_code: structured["code"].as_str().unwrap_or(if applied { "NO_SOURCE_CHANGE" } else { "" }).to_owned(),
+                message,
+                blockers: Value::Array(reasons),
             });
         }
         if before[&sidecar] == ABSENT {

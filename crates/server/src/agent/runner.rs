@@ -399,6 +399,8 @@ struct Runner {
     worker_generation: u64,
     tools: Option<ToolSet>,
     changed_files: Vec<String>,
+    /// Files written with write_file: recorded as one file proposal when the attempt ends (S04).
+    written_files: Vec<String>,
 }
 
 impl Runner {
@@ -412,6 +414,7 @@ impl Runner {
             worker_generation: 0,
             tools: None,
             changed_files: Vec::new(),
+            written_files: Vec::new(),
         }
     }
 
@@ -1113,6 +1116,13 @@ impl Runner {
         {
             self.changed_files.push(path.to_owned());
         }
+        if is_write
+            && matches!(executed.status, ReceiptStatus::Succeeded)
+            && let Some(path) = prepared.normalized_arguments["path"].as_str()
+            && !self.written_files.iter().any(|p| p == path)
+        {
+            self.written_files.push(path.to_owned());
+        }
         if is_focus_edit && executed.status == ReceiptStatus::Succeeded {
             for path in executed.artifact["changed_paths"].as_array().into_iter().flatten().filter_map(Value::as_str) {
                 if !self.changed_files.iter().any(|p| p == path) {
@@ -1162,6 +1172,20 @@ impl Runner {
             Err(_) => false,
         };
         let _ = self.reload_attempt().await;
+        // Files the agent wrote directly become one reviewable proposal (S04), unless the attempt
+        // is only suspended and will continue.
+        if !matches!(end, End::Suspended) && !self.written_files.is_empty() {
+            let keys = crate::focus::store::TaskKeys {
+                id: self.plan.task,
+                project_id: self.plan.project,
+                owner_account_id: self.plan.owner,
+                acting: self.plan.account,
+            };
+            let actor = crate::focus::store::ActorKind::NativeAgent(self.plan.attempt);
+            if let Err(e) = crate::focus::apply::record_file_proposal(&self.rt, &keys, &self.plan.worktree, actor, &self.written_files).await {
+                tracing::error!(error = ?e, "could not record the agent's file proposal");
+            }
+        }
         let (attempt_to, task_to, outcome, code, summary): (Option<AttemptState>, Option<TaskState>, Option<Value>, Option<String>, String) = match end {
             End::Suspended => {
                 self.emit("attempt_suspended", "Paused: the attempt is suspended and keeps its conversation", json!({})).await;
