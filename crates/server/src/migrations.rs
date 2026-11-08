@@ -12,6 +12,8 @@ use sqlx::migrate::Migrator;
 /// Versions 0300 to 0399: the intake tables (0300 to 0302) and the foreign keys that join them to
 /// accounts and projects (0303, owned by the server because it is the one place that sees both).
 const INTAKE_VERSIONS: std::ops::RangeInclusive<i64> = 300..=399;
+/// Versions 0800 to 0899: S04 focus projections, change proposals and publications.
+const FOCUS_VERSIONS: std::ops::RangeInclusive<i64> = 800..=899;
 
 /// A migrator limited to `range`, with `ignore_missing` set because the shared
 /// `_sqlx_migrations` table also records the other components' versions (see
@@ -65,6 +67,11 @@ pub fn components() -> Vec<Component> {
             name: "broker",
             migrator: factory_broker::migrator(),
             probe_table: "agent_grants",
+        },
+        Component {
+            name: "focus",
+            migrator: range_migrator(FOCUS_VERSIONS),
+            probe_table: "change_proposals",
         },
     ]
 }

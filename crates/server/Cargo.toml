@@ -40,6 +40,7 @@ chrono.workspace = true
 uuid.workspace = true
 thiserror.workspace = true
 tempfile.workspace = true
+jsonschema = { version = "=0.60.1", default-features = false }
 tower = { version = "0.5", features = ["util"] }
 tower-http = { version = "0.6", default-features = false, features = ["cors", "fs", "catch-panic"] }
 tracing-subscriber = { version = "0.3", default-features = false, features = ["std", "registry", "env-filter", "fmt"] }

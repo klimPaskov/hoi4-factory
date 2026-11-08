@@ -17,6 +17,7 @@ pub mod agent;
 pub mod agent_api;
 pub mod api_error;
 pub mod config;
+pub mod focus;
 pub mod game_reference;
 pub mod github;
 pub mod hardening;

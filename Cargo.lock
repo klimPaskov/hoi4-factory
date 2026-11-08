@@ -1175,6 +1175,7 @@ dependencies = [
  "futures-util",
  "hoi4-mod-setup",
  "http-body-util",
+ "jsonschema 0.60.1",
  "jsonwebtoken",
  "rand 0.8.8",
  "reqwest 0.12.28",

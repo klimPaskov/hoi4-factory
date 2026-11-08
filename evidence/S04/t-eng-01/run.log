@@ -1,0 +1,9 @@
+ok: hoi4-factory-server_latest.engine-status.json has "state":"available"
+ok: hoi4-factory-server_latest.engine-status.json has exit=0
+ok: hoi4-factory-server_latest.rewrite.jsonl has "code":"FOCUS_CHANGES_APPLIED"
+ok: hoi4f-t-eng-01_omit.engine-status.json has "reason":"binary_not_found"
+ok: hoi4f-t-eng-01_omit.engine-status.json has exit=1
+ok: hoi4f-t-eng-01_omit.rewrite.jsonl has FOCUS_ENGINE_UNAVAILABLE
+ok: hoi4f-t-eng-01_omit.rewrite.jsonl has "source_unchanged": true
+ok: the no-engine rewrite wrote nothing
+done 0
