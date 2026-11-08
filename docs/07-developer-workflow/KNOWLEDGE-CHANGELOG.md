@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.33, 2026-11-08, one session at a time on the ChatGPT image sign-in
+
+- CLAUDE.md now says image generation through the ChatGPT sign-in runs from one session at a time, never mixes hoi4-imagegen with the `gptimage` MCP, and stays to what the work needs.
+
+Evidence: OpenAI revoked the sign-in at 15:29 UTC on 2026-11-08 while several sessions generated images. Rollback: revert this commit and regenerate.
+
 ## 0.2.32, 2026-11-08, a ZIN static-model check window
 
 - CLAUDE.md's in-game exceptions now include D-29: from 2026-11-08 to 2026-11-09 one named session may start the isolated WSL Linux copy with ZIN loaded to check three ZIN static models, never the Windows game.
