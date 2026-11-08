@@ -8,6 +8,7 @@
 // Original text, no game content. Icons name vanilla sprites, which the render resolves from the
 // installed game. GFX_focus_swe_air_force is undefined on purpose (the missing-icon case), and
 // SWE_arms_export has no localisation (the missing-text case).
+/* global process, console */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 

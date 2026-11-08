@@ -1,8 +1,11 @@
 // Local state behind the focus editor variants. Gestures change only this state: in the lab no
 // request leaves the page. A real page would turn each action into one focus_rewrite request.
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Diagnostic, FocusNode, LayoutVerdict } from '../../focus/types';
 import { DIAGNOSTICS, FOCUS_TEXT, NODES, PENDING_BEFORE, PROJECTION, type FocusText } from './fixtures';
+
+/** Which of the two real renders the preview shows. */
+export type RenderName = 'base' | 'proposed';
 
 export type FocusScenario = 'pending' | 'settled' | 'refreshing' | 'readonly';
 
@@ -12,7 +15,12 @@ export interface FocusModel {
   nodes: FocusNode[];
   diagnostics: Diagnostic[];
   layoutVerdict: LayoutVerdict;
+  /** The source changed under the editor (a scenario): editing is paused until the redraw lands. */
   refreshing: boolean;
+  /** A render is being redrawn, after the source changed or after an edit. The old picture stays, dimmed. */
+  redrawing: boolean;
+  /** The render the preview shows now. It swaps to the other one when a redraw ends. */
+  render: RenderName;
   selectedId: string | null;
   selected: FocusNode | undefined;
   select: (id: string | null) => void;
@@ -20,7 +28,7 @@ export interface FocusModel {
   query: string;
   setQuery: (query: string) => void;
   matches: FocusNode[];
-  /** Counts up whenever the canvas should bring the selected node into view. */
+  /** Counts up whenever the preview should bring the selected focus into view. */
   revealTick: number;
   reveal: (id: string) => void;
   notice: Notice;
@@ -59,6 +67,24 @@ export function useFocusModel(scenario: FocusScenario): FocusModel {
   const [query, setQuery] = useState('');
   const [revealTick, setRevealTick] = useState(0);
   const [notice, setNotice] = useState<Notice>(null);
+  const [busy, setBusy] = useState(false);
+  const timer = useRef<number | undefined>(undefined);
+  const wants: RenderName = nodes.some((n) => n.id === 'SWE_nordic_trade_pact') ? 'proposed' : 'base';
+  const [render, setRender] = useState<RenderName>(wants);
+
+  // A real page asks the render tool again after every source change and swaps the picture in
+  // when it arrives. The lab fakes the wait.
+  const redraw = useCallback(() => {
+    setBusy(true);
+    window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => setBusy(false), 1100);
+  }, []);
+  useEffect(() => {
+    if (wants === render) return;
+    const id = window.setTimeout(() => setRender(wants), 1000);
+    return () => window.clearTimeout(id);
+  }, [wants, render]);
+  useEffect(() => () => window.clearTimeout(timer.current), []);
 
   const update = (id: string, change: (node: FocusNode) => FocusNode) =>
     setNodes((list) => list.map((n) => (n.id === id && n.editable ? change(n) : n)));
@@ -76,6 +102,8 @@ export function useFocusModel(scenario: FocusScenario): FocusModel {
     diagnostics,
     layoutVerdict: PROJECTION.layoutVerdict,
     refreshing: scenario === 'refreshing',
+    redrawing: scenario === 'refreshing' || busy || wants !== render,
+    render,
     selectedId,
     selected: nodes.find((n) => n.id === selectedId),
     select: (id) => {
@@ -95,6 +123,7 @@ export function useFocusModel(scenario: FocusScenario): FocusModel {
     move: (id, x, y) => {
       if (!writable(id)) return;
       update(id, (n) => ({ ...n, x, y, declared: { mode: 'absolute', x, y } }));
+      redraw();
     },
     link: (prerequisite, target, group) => {
       const targetNode = nodes.find((n) => n.id === target);
@@ -110,13 +139,19 @@ export function useFocusModel(scenario: FocusScenario): FocusModel {
         return { ...n, prerequisiteGroups: groups };
       });
       setNotice({ key: 'linked', id: target, other: prerequisite });
+      redraw();
     },
-    unlink: (target, prerequisite) =>
+    unlink: (target, prerequisite) => {
       update(target, (n) => ({
         ...n,
         prerequisiteGroups: n.prerequisiteGroups.map((g) => g.filter((id) => id !== prerequisite)).filter((g) => g.length > 0),
-      })),
-    setCost: (id, cost) => update(id, (n) => ({ ...n, cost })),
+      }));
+      redraw();
+    },
+    setCost: (id, cost) => {
+      update(id, (n) => ({ ...n, cost }));
+      redraw();
+    },
     setText: (id, field, value) => {
       if (!writable(id)) return;
       setTexts((all) => ({ ...all, [id]: { title: '', description: '', ...all[id], [field]: value } }));
@@ -147,6 +182,7 @@ export function useFocusModel(scenario: FocusScenario): FocusModel {
       setSelectedId(id);
       setRevealTick((t) => t + 1);
       setNotice({ key: 'added', id });
+      redraw();
     },
     apply: (id) => setNodes((list) => list.map((node) => (node.id === id ? settle(node) : node))),
     discard: (id) => {

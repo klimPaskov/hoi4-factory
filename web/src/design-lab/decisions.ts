@@ -13,12 +13,12 @@ export const OPEN: Decision[] = [
   {
     id: 'focusEditor',
     round: 'focusEditor',
-    options: ['80-focus-a-canvas-inspector', '81-focus-b-three-panes', '82-focus-c-floating', '83-focus-d-table'],
+    options: ['90-focus-a-render-inspector', '91-focus-b-three-panes', '92-focus-c-floating', '93-focus-d-table'],
   },
   {
     id: 'changeCard',
     round: 'changeCard',
-    options: ['85-change-a-page', '86-change-b-split', '87-change-c-verdict', '88-change-d-tabs'],
+    options: ['95-change-a-side-by-side', '96-change-b-toggle', '97-change-c-slider', '98-change-d-tabs'],
   },
 ];
 
