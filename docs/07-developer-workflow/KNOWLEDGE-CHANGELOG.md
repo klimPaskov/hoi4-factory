@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.42, 2026-11-09, explicit repository for pull requests in a fork
+
+- CLAUDE.md now says to pass `--repo` and `--base` to `gh pr create` in a forked repository such as hoi4-imagegen-mcp.
+
+Evidence: on 2026-11-09 a PR meant for hoi4-imagegen-mcp was opened on its upstream parent and closed at once. Rollback: revert this commit and regenerate.
+
 ## 0.2.41, 2026-11-09, effort stays at high or below (D-53)
 
 - CLAUDE.md and `coordinate-sessions` now say no session or worker runs above high effort, and a coordinator lowers any it finds above high.

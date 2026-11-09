@@ -68,6 +68,10 @@ CLAUDE.md rule: commit empty crate skeletons and their workspace members on main
 
 CLAUDE.md rule: make every HOI4 image with hoi4-imagegen, never the general `gptimage` MCP. hoi4-imagegen paces its ChatGPT sign-in requests across all its processes on the machine, while `gptimage` uses the same Codex sign-in outside that limit. On 2026-11-08 both ran at once and OpenAI revoked the sign-in at 15:29 UTC.
 
+### A pull request opened on the upstream of a fork (2026-11-09)
+
+CLAUDE.md rule: pass `--repo` and `--base` to `gh pr create` in a forked repository. In hoi4-imagegen-mcp, a fork, `gh pr create` without them opened the colour PR on the upstream parent project. The session closed it within a minute and reopened it on our repository, but the closed PR stays visible there.
+
 ### Kit push that broke `main` on the quality ratchet
 
 CLAUDE.md rule: before an approved push to another repository, run that repository's own CI steps locally, not a hand-picked subset. A wiki push once broke the kit's `main` on the quality ratchet, which only the full list runs.
