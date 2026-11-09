@@ -46,7 +46,7 @@ Schedule one recurring check-in in the coordinator with `CronCreate`, at an off 
 A coordinator's context grows with every report. When each message starts to cost too much, or the desktop app struggles, hand over:
 
 1. Write `.work/coordinator-handoff-<date>.md` with how the maintainer wants the work done, the new coordinator's first tasks, a table of every session (ID, what it is doing, what comes next), credit limits, approved game windows, items waiting on the maintainer and the file locations.
-2. Start the new coordinator from that note. It reads the note and CLAUDE.md, takes over the status page, schedules its own check-in and confirms the takeover to the old coordinator, which then archives itself.
+2. Start the new coordinator from that note. It reads the note and CLAUDE.md, takes over the status page, schedules its own check-in and confirms the takeover to the old coordinator, which then archives itself. Before the old coordinator archives itself, it detaches its side sessions with `detach_session`, because archiving a session also archives its finished side sessions.
 3. The app cannot move a running session under a new parent. Either keep those sessions reporting by message, or restart each one at its next natural stopping point. To restart, the session commits and pushes its work, writes a handover note in the coordinator's shared notes folder and reports "handover ready". The coordinator starts a replacement from that note and archives the old session. A session that has a scheduled wake-up, such as an approved game window later that night, keeps running until that work is done.
 
 ## Outputs and evidence

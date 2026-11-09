@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.44, 2026-11-09, detach side sessions before a coordinator archives itself
+
+- `coordinate-sessions` now says the old coordinator detaches its side sessions with `detach_session` before it archives itself, because archiving a session also archives its finished side sessions.
+
+Evidence: the 2026-11-09 handover to a new coordinator. Rollback: revert this commit and regenerate.
+
 ## 0.2.43, 2026-11-09, hoi4-imagegen-mcp is no longer a fork (D-54)
 
 - CLAUDE.md's pull request rule now applies to every repository and records that hoi4-imagegen-mcp was recreated as a non-fork with renumbered issues and PRs.
