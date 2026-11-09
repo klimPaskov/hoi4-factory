@@ -508,6 +508,28 @@ impl GitRepo {
         Ok(files.len())
     }
 
+    /// A ZIP archive of the files of commit `rev`, byte-exact (no filters or line-ending changes).
+    pub fn archive_zip(&self, rev: &Oid) -> Result<Vec<u8>, GitError> {
+        self.run(["-c", "core.autocrlf=false", "archive", "--format=zip", rev.as_str()])
+    }
+
+    /// Paths that differ between two commits, sorted.
+    pub fn changed_between(&self, from: &Oid, to: &Oid) -> Result<Vec<String>, GitError> {
+        let raw = self.run(["diff", "--name-only", "-z", "--no-renames", from.as_str(), to.as_str()])?;
+        let mut paths: Vec<String> = raw
+            .split(|b| *b == 0)
+            .filter(|p| !p.is_empty())
+            .map(|p| String::from_utf8_lossy(p).into_owned())
+            .collect();
+        paths.sort();
+        Ok(paths)
+    }
+
+    /// True when `ancestor` is an ancestor of (or equal to) `descendant`.
+    pub fn is_ancestor(&self, ancestor: &Oid, descendant: &Oid) -> Result<bool, GitError> {
+        self.run_bool(["merge-base", "--is-ancestor", ancestor.as_str(), descendant.as_str()])
+    }
+
     /// The newest commit reachable from `rev` whose message contains `line` exactly as a line,
     /// for reconciling a commit whose reply was lost (its message carries a unique trailer).
     pub fn find_commit_with_line(&self, rev: &Oid, line: &str) -> Result<Option<Oid>, GitError> {
@@ -1143,6 +1165,20 @@ impl TaskWorktree {
         }
         points.sort_by(|a, b| a.ref_name.cmp(&b.ref_name));
         Ok(points)
+    }
+
+    /// Moves the task branch forward to `to`, which must already be in the repository (fetched)
+    /// and descend from the expected HEAD. Uncommitted work stays: Git refuses the move when it
+    /// would overwrite a changed file. Updates the expected HEAD.
+    pub fn fast_forward(&mut self, to: &Oid) -> Result<Oid, GitError> {
+        let head = self.verify_head()?;
+        if !self.repo.is_ancestor(&head, to)? {
+            return Err(GitError::Parse("the new commit does not descend from the task branch".into()));
+        }
+        self.repo.run(["merge", "--ff-only", "--no-edit", "--quiet", to.as_str()])?;
+        let now = self.repo.head()?.ok_or(GitError::UnbornHead)?;
+        self.expected_head = now.clone();
+        Ok(now)
     }
 
     /// Stage exactly `paths` and commit them. Every path is checked with the workspace

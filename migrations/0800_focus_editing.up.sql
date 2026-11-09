@@ -60,6 +60,9 @@ CREATE TABLE change_proposals (
     semantic_summary     jsonb NOT NULL DEFAULT '{}'::jsonb,
     -- [{path, diff}] unified diffs of the changed paths.
     diffs                jsonb NOT NULL DEFAULT '[]'::jsonb,
+    -- Path -> base64 of the bytes before the change (null for a file that did not exist), so an
+    -- uncommitted proposal can be discarded exactly.
+    before_contents      jsonb NOT NULL DEFAULT '{}'::jsonb,
     -- SHA-256 of the canonical proposal (operations, base, hashes, paths). Approval binds to it.
     proposal_hash        text NOT NULL CHECK (proposal_hash ~ '^[0-9a-f]{64}$'),
     state                text NOT NULL CHECK (state IN ('applied', 'committed', 'discarded', 'reverted')),

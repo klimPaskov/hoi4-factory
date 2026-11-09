@@ -1,0 +1,403 @@
+/* The live game preview (D-50). The picture is always dark, so markers on it use fixed colors
+   with their own backgrounds. The chrome around it uses the Workbench tokens. */
+
+.gp {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+}
+.gp-frame {
+  position: relative;
+  flex: 1;
+  min-height: 18rem;
+  overflow: hidden;
+  background: #101114;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.gp-frame:active {
+  cursor: grabbing;
+}
+.gp-frame:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.gp-world {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+}
+.gp-img {
+  display: block;
+  max-width: none;
+  pointer-events: none;
+  transition: opacity 0.25s, filter 0.25s;
+}
+.gp-before {
+  position: absolute;
+  inset: 0;
+}
+.gp-before .gp-img {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.is-redrawing .gp-img {
+  opacity: 0.4;
+  filter: grayscale(0.6) blur(1px);
+}
+.gp-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.gp-slot {
+  position: absolute;
+  pointer-events: none;
+}
+.gp-hit {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: none;
+}
+.gp-hit:hover {
+  box-shadow: inset 0 0 0 2px rgb(255 255 255 / 0.55);
+}
+.gp-hit:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px #2d58cc;
+}
+.gp-hit.is-selected {
+  box-shadow: 0 0 0 3px #ffffff, 0 0 0 7px #2d58cc, 0 0 18px 8px rgb(45 88 204 / 0.55);
+  background: rgb(132 162 255 / 0.12);
+}
+.gp-hit.is-dim {
+  background: rgb(8 9 12 / 0.72);
+}
+.gp-hit.is-pending.is-added {
+  box-shadow: 0 0 0 3px #3ddc84;
+  background: rgb(61 220 132 / 0.1);
+}
+.gp-hit.is-pending.is-changed {
+  box-shadow: 0 0 0 3px #ffb020;
+  background: rgb(255 176 32 / 0.1);
+}
+.gp-hit.is-pending.is-selected {
+  box-shadow: 0 0 0 3px #ffffff, 0 0 0 7px #2d58cc;
+}
+.gp-hit.is-moved,
+.gp-hit.is-undrawn {
+  border: 3px dashed #ffffff;
+  background: rgb(16 17 20 / 0.82);
+}
+.gp-hit.is-dragging {
+  opacity: 0.35;
+}
+.gp-hit.is-locked:not(.is-selected):not(.is-pending) {
+  box-shadow: inset 0 0 0 2px rgb(255 255 255 / 0.28);
+}
+.gp-ghost {
+  position: absolute;
+  border: 3px dashed #84a2ff;
+  border-radius: 10px;
+  background: rgb(132 162 255 / 0.18);
+  pointer-events: none;
+}
+.gp-ghost-cell {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(var(--gp-inv));
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #101114;
+  color: #ffffff;
+  font-family: var(--mono);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* Badges and markers keep close to their screen size at every zoom. The apply and discard buttons show for the selected, hovered or focused focus. */
+.gp-tags {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  gap: 4px;
+  transform: translateY(-100%) scale(var(--gp-inv));
+  transform-origin: left bottom;
+  padding-bottom: 3px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.gp-tag {
+  padding: 1px 7px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: #101114;
+  background: #e8eaee;
+}
+.gp-tag-added {
+  background: #3ddc84;
+}
+.gp-tag-changed {
+  background: #ffb020;
+}
+.gp-tag-locked {
+  background: #c9ced8;
+}
+.gp-tag-stale {
+  background: #ffffff;
+}
+.gp-mark {
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 1;
+  transform: translate(35%, -35%) scale(var(--gp-inv));
+  transform-origin: center;
+  pointer-events: none;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.6);
+}
+.gp-mark-warning {
+  background: #ffb020;
+  color: #101114;
+}
+.gp-mark-error {
+  background: #ff5a5a;
+  color: #101114;
+}
+.gp-mark-info {
+  background: #6cb4ff;
+  color: #101114;
+}
+.gp-acts {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  display: flex;
+  gap: 8px;
+  padding-top: 4px;
+  transform: translateX(-50%) scale(var(--gp-inv));
+  transform-origin: top center;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 3;
+}
+.gp-slot:hover .gp-acts,
+.gp-slot:focus-within .gp-acts,
+.gp-hit.is-selected ~ .gp-acts {
+  opacity: 1;
+}
+.gp-act {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  pointer-events: none;
+  color: #101114;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.6);
+}
+.gp-act-apply {
+  background: #3ddc84;
+}
+.gp-act-discard {
+  background: #ff8a8a;
+}
+.gp-slot:hover .gp-act,
+.gp-slot:focus-within .gp-act,
+.gp-hit.is-selected ~ .gp-acts .gp-act {
+  pointer-events: auto;
+}
+.gp-act:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.gp-act:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px #2d58cc;
+}
+
+/* Before and after divider */
+.gp-divider {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 24px;
+  margin-left: -12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: ew-resize;
+  touch-action: none;
+  z-index: 4;
+}
+.gp-divider::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: calc(3px * var(--gp-inv));
+  margin-left: calc(-1.5px * var(--gp-inv));
+  background: #ffffff;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.5);
+}
+.gp-divider-grip {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #101114;
+  font-size: 20px;
+  font-weight: 700;
+  transform: translate(-50%, -50%) scale(var(--gp-inv));
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.6);
+}
+.gp-divider:focus-visible .gp-divider-grip {
+  outline: 3px solid #2d58cc;
+  outline-offset: 3px;
+}
+.gp-side {
+  position: absolute;
+  top: var(--space-2);
+  padding: 2px 10px;
+  border-radius: var(--radius);
+  background: rgb(16 17 20 / 0.85);
+  color: #ffffff;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  pointer-events: none;
+  z-index: 5;
+}
+.gp-side-before {
+  left: calc(var(--space-2) + 12rem);
+}
+.gp-side-after {
+  right: var(--space-2);
+}
+
+/* Controls and notes */
+.gp-controls {
+  position: absolute;
+  left: var(--space-2);
+  top: var(--space-2);
+  z-index: 6;
+  display: flex;
+  align-items: stretch;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  cursor: default;
+}
+.gp-controls button {
+  min-width: var(--control-h-sm);
+  height: var(--control-h-sm);
+  border: 0;
+  border-inline-end: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  padding: 0 var(--space-3);
+  cursor: pointer;
+}
+.gp-controls button:hover {
+  background: var(--surface-2);
+}
+.gp-controls button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+.gp-zoom {
+  display: grid;
+  place-items: center;
+  padding: 0 var(--space-3);
+  font-family: var(--mono);
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+.gp-note {
+  position: absolute;
+  left: 50%;
+  bottom: var(--space-3);
+  transform: translateX(-50%);
+  z-index: 6;
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  font-size: var(--text-sm);
+  max-width: calc(100% - 2 * var(--space-3));
+}
+.gp-caption {
+  margin: 0;
+}
+
+@media (max-width: 48rem), (pointer: coarse) {
+  .gp-act {
+    width: 40px;
+    height: 40px;
+  }
+  .gp-side-before {
+    left: var(--space-2);
+    top: 3.5rem;
+  }
+  .gp-side-after {
+    top: 3.5rem;
+  }
+}
+
+/* On a phone the frame follows the picture's shape instead of filling a tall box. */
+@media (max-width: 48rem) {
+  .gp {
+    height: auto !important;
+  }
+  .gp-frame {
+    flex: none;
+    aspect-ratio: 1.1;
+    min-height: 16rem;
+  }
+}

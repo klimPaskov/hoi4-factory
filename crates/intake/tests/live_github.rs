@@ -145,3 +145,43 @@ fn now() -> i64 {
         .unwrap()
         .as_secs() as i64
 }
+
+/// S04-W5: whether the App installation on the test account may publish (push an owned branch
+/// and open a pull request). Read-only: one `GET /app/installations`. Prints the permission map
+/// and the repository selection, never a credential.
+#[tokio::test]
+#[ignore = "contacts github.com and needs HOI4_FACTORY_GITHUB_APP_JSON"]
+async fn live_installation_permissions_for_publication() {
+    let path = std::env::var("HOI4_FACTORY_GITHUB_APP_JSON")
+        .expect("set HOI4_FACTORY_GITHUB_APP_JSON to the path of the App credentials file");
+    let app: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(path).expect("read the credentials file")).unwrap();
+    let app_id = match &app["id"] {
+        serde_json::Value::String(s) => s.clone(),
+        other => other.to_string(),
+    };
+    let pem = app["pem"].as_str().expect("pem").to_owned();
+    let jwt = app_jwt(&app_id, &SecretString::new(pem), now()).unwrap();
+    let installations: serde_json::Value = reqwest::Client::new()
+        .get("https://api.github.com/app/installations")
+        .bearer_auth(jwt.expose())
+        .header("Accept", "application/vnd.github+json")
+        .header("User-Agent", "hoi4-factory-intake-live-test")
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    let installation = installations
+        .as_array()
+        .and_then(|all| all.iter().find(|i| i["account"]["login"] == OWNER))
+        .expect("the App is installed on the test account");
+    eprintln!("repository_selection: {}", installation["repository_selection"]);
+    eprintln!("permissions: {}", installation["permissions"]);
+    let p = &installation["permissions"];
+    eprintln!(
+        "publication: contents={} pull_requests={}",
+        p["contents"], p["pull_requests"]
+    );
+}

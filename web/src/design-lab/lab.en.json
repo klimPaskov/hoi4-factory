@@ -146,45 +146,45 @@
       "live": "Open this variant live",
       "focusEditor": {
         "title": "Focus editor",
-        "question": "How should the focus tree editor be laid out? All four edit the same tree and show the same agent proposal.",
+        "question": "How should the focus tree editor be laid out around the live game render? All four edit the same tree and show the same agent proposal.",
         "options": [
           {
-            "name": "Canvas and inspector",
-            "summary": "The canvas fills the page with the inspector on the right. The focus list and the problems fold into a drawer below."
+            "name": "Render and inspector",
+            "summary": "The game render fills the page with the inspector on the right. The focus list and the problems fold into a drawer below."
           },
           {
             "name": "Three panes",
-            "summary": "Focus list on the left, canvas in the middle, inspector and problems on the right. Everything visible at once."
+            "summary": "Focus list on the left, the game render in the middle, inspector and problems on the right. Everything visible at once."
           },
           {
-            "name": "Floating inspector",
-            "summary": "Only the canvas and a thin bar. The inspector floats over the canvas when a focus is selected. List and problems open as dialogs."
+            "name": "Full render, floating inspector",
+            "summary": "Only the game render and a thin bar. The inspector floats over the render when a focus is selected. List and problems open as dialogs."
           },
           {
-            "name": "Table first",
-            "summary": "A table of all focuses with the cost editable in the row, a smaller canvas above, and the inspector in a dialog."
+            "name": "Table beside the render",
+            "summary": "The game render stays in view on the left. A table of all focuses with the cost editable in the row sits beside it, and the inspector opens in a dialog."
           }
         ]
       },
       "changeCard": {
         "title": "Change card",
-        "question": "How should the review of one proposal look before it is committed? All four show the same evidence and the same actions.",
+        "question": "How should the review of one proposal show the game render before it is committed? All four show the same evidence and the same actions.",
         "options": [
           {
-            "name": "One page with a bottom bar",
-            "summary": "Everything in review order on one page. The approve and discard buttons stay at the bottom while you scroll."
+            "name": "Before and after side by side",
+            "summary": "One page in review order. The before and after renders sit side by side at the top, the buttons stay at the bottom while you scroll."
           },
           {
-            "name": "Two columns",
-            "summary": "What changed and whether it is safe on the left. The preview and the diff in tabs on the right, with the buttons under them."
+            "name": "Two columns with a toggle",
+            "summary": "What changed and whether it is safe on the left. On the right one render with an After and Before toggle, then the diff."
           },
           {
-            "name": "Verdict first",
-            "summary": "A decision card on top says ready or not ready and why, with expandable gates. The summary, preview and diff follow."
+            "name": "Verdict first with a slider",
+            "summary": "A decision card says ready or not ready and why. Under it one render with a divider you drag to compare before and after."
           },
           {
-            "name": "Tabs",
-            "summary": "Summary, Changes, Preview and Checks as tabs under a verdict strip. The buttons sit beside the tab row."
+            "name": "Render on top with tabs",
+            "summary": "The render with an After and Before toggle stays on top. Summary, Changes and Checks are tabs under it, the buttons beside the tab row."
           }
         ]
       }
@@ -326,16 +326,16 @@
       "focusEditor": {
         "variants": {
           "a": {
-            "name": "A. Canvas and inspector"
+            "name": "A. Render and inspector"
           },
           "b": {
             "name": "B. Three panes"
           },
           "c": {
-            "name": "C. Floating inspector"
+            "name": "C. Full render, floating inspector"
           },
           "d": {
-            "name": "D. Table first"
+            "name": "D. Table beside the render"
           }
         },
         "states": {
@@ -348,22 +348,22 @@
       "changeCard": {
         "variants": {
           "a": {
-            "name": "A. One page"
+            "name": "A. Before and after side by side"
           },
           "b": {
-            "name": "B. Two columns"
+            "name": "B. Two columns, toggle"
           },
           "c": {
-            "name": "C. Verdict first"
+            "name": "C. Verdict first, slider"
           },
           "d": {
-            "name": "D. Tabs"
+            "name": "D. Render on top, tabs"
           }
         },
         "states": {
           "ready": "Ready",
           "incomplete": "Closure incomplete",
-        "failed": "A check failed",
+          "failed": "A check failed",
           "stale": "Source changed",
           "committed": "Committed"
         }
@@ -379,7 +379,6 @@
     },
     "focus": {
       "pageTitle": "Focus tree",
-      "canvasLabel": "Focus tree canvas. Drag a focus to move it, drag from the bottom dot of one focus to the top dot of another to add a requirement.",
       "search": {
         "label": "Find a focus by ID or title",
         "placeholder": "Find a focus",
@@ -407,13 +406,6 @@
         "zoomIn": "Zoom in",
         "zoomOut": "Zoom out",
         "fit": "Fit"
-      },
-      "aria": {
-        "node": "Press Enter or Space to select this focus. Use the arrow keys to move it by one grid unit.",
-        "nodeNoKeys": "Select this focus to edit it in the inspector.",
-        "moved": "Moved {{direction}} to column {{x}}, row {{y}}.",
-        "edge": "Requirement between two focuses.",
-        "handle": "Connection point"
       },
       "node": {
         "added": "New",
@@ -466,7 +458,7 @@
       },
       "inspector": {
         "title": "Selected focus",
-        "none": "Select a focus on the canvas or in the list to edit it.",
+        "none": "Select a focus on the picture or in the list to edit it.",
         "close": "Close"
       },
       "fields": {
@@ -496,7 +488,15 @@
       "asPartOf": "Add it as",
       "newGroup": "A separate requirement",
       "alternativeTo": "An alternative to {{name}}",
-      "addRequirementButton": "Add requirement"
+      "addRequirementButton": "Add requirement",
+      "previewLabel": "The focus tree as the game draws it. Click a focus to select it, drag it to move it on the grid, or use the arrow keys on a selected focus. Press plus, minus or zero to zoom or fit.",
+      "render": {
+        "alt": "The focus tree as the game draws it, from the render tool.",
+        "redrawing": "Redrawing the tree from the changed source.",
+        "moved": "Moved, not redrawn yet",
+        "undrawn": "Not drawn yet",
+        "caption": "Drawn from the source by the game view of the render tool, not by the running game. Hold Ctrl and scroll to zoom, drag the background to pan."
+      }
     },
     "change": {
       "title": "Review change",
@@ -554,13 +554,14 @@
         "hashes": "Hash before and after"
       },
       "preview": {
-        "mode": "Preview as",
-        "canvas": "Canvas",
-        "image": "Rendered image",
-        "label": "Preview of the changed focus tree",
-        "imageAlt": "Placeholder for the rendered image of the focus tree",
-        "imageNote": "The rendered image appears here when the render tool has produced one.",
-        "hint": "Select a focus to jump to its line in the diff. Source render, not a game check."
+        "show": "Show",
+        "changedList": "Focuses this change adds or changes",
+        "labelBefore": "The focus tree before the change, as the game draws it",
+        "labelAfter": "The focus tree with the change, as the game draws it",
+        "labelSlider": "The focus tree before and after the change, as the game draws it, with a divider to drag",
+        "legendAdded": "New focus",
+        "legendChanged": "Changed focus",
+        "hint": "Select a focus to jump to its line in the diff. Drawn from the source, not from the running game."
       },
       "checks": {
         "passed": "Passed",
@@ -610,6 +611,12 @@
         "discarded": "Discarded. Nothing was written to the project.",
         "pushReady": "Pushes the branch and opens a pull request.",
         "pushNoGrant": "Pushing needs a publication grant."
+      },
+      "compare": {
+        "before": "Before",
+        "after": "After",
+        "slider": "Divider between the before and after pictures",
+        "value": "{{percent}} percent of the width shows the before picture"
       }
     }
   }

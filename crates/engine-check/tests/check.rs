@@ -152,3 +152,15 @@ fn the_linked_engine_matches_the_image_and_the_tool_profile() {
         "the image installs another Agent Tools release than the profile"
     );
 }
+
+#[test]
+fn every_file_the_engine_reads_gets_a_preservation_row() {
+    let dir = tempfile::tempdir().unwrap();
+    focus_mod(dir.path(), &["ecf_trigger"]);
+    write(dir.path(), "common/national_focus/broken.txt", "focus_tree = {\n\tid = broken\n\tfocus = {\n");
+    let report = run_check(&CheckRequest::new(dir.path(), None)).unwrap();
+    let row = |p: &str| report.preservation.iter().find(|r| r.path == p).unwrap_or_else(|| panic!("no row for {p}: {:?}", report.preservation)).clone();
+    assert_eq!(row("common/national_focus/ecf.txt").status, factory_engine_check::Preservation::Parsed);
+    assert_eq!(row("common/national_focus/broken.txt").status, factory_engine_check::Preservation::NotUnderstood);
+    // Files the engine does not read get their row from the host, which knows every committed file.
+}

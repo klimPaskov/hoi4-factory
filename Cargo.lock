@@ -1599,7 +1599,7 @@ dependencies = [
 [[package]]
 name = "hoi4-engine"
 version = "0.1.0"
-source = "git+https://github.com/klimPaskov/hoi4-agent-tools?rev=be00dfb3d0e3fde76c59f3b5da487d4f57b89948#be00dfb3d0e3fde76c59f3b5da487d4f57b89948"
+source = "git+https://github.com/klimPaskov/hoi4-agent-tools?rev=73a5d7199ab7d1e4e3aeca74598d946512e23f3d#73a5d7199ab7d1e4e3aeca74598d946512e23f3d"
 dependencies = [
  "hoi4-syntax",
  "memchr",
@@ -1665,7 +1665,7 @@ dependencies = [
 [[package]]
 name = "hoi4-syntax"
 version = "0.1.0"
-source = "git+https://github.com/klimPaskov/hoi4-agent-tools?rev=be00dfb3d0e3fde76c59f3b5da487d4f57b89948#be00dfb3d0e3fde76c59f3b5da487d4f57b89948"
+source = "git+https://github.com/klimPaskov/hoi4-agent-tools?rev=73a5d7199ab7d1e4e3aeca74598d946512e23f3d#73a5d7199ab7d1e4e3aeca74598d946512e23f3d"
 dependencies = [
  "serde",
 ]

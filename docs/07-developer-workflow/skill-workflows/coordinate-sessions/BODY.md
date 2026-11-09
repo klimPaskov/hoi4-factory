@@ -10,7 +10,7 @@ Use this workflow only when the maintainer explicitly asks a session to coordina
 
 - **The coordinator** is one session that starts, briefs, answers, resumes and archives every work session. It does no long work itself and keeps its own context small. It runs long work as separate sessions, never as background subagents in its own process.
 - **Work sessions** each own one task and one set of files. Start each one from the coordinator with `start_session`, so it nests under the coordinator in the sidebar and its turn reports reach the coordinator automatically. File every HOI4 session in one sidebar group for the coordinator.
-- **Model and effort.** A work session never inherits the coordinator's model and effort. Pass them on every start: Sonnet at medium or high effort for most work, Opus at medium effort only for design-heavy work or a new subsystem. When the app's "New session" card starts the session without them, set them right after with `set_session_model` and `set_session_effort`.
+- **Model and effort.** A work session never inherits the coordinator's model and effort. Pass them on every start: Sonnet at medium or high effort for most work, Opus at medium effort only for design-heavy work or a new subsystem. Never above high effort (D-53). When the app's "New session" card starts the session without them, set them right after with `set_session_model` and `set_session_effort`, and lower any session found above high at a check-in. The coordinator cannot change its own effort, so ask the maintainer to set it in the model menu if it is above high.
 - **The maintainer** answers only true blockers: sign-ins and credentials, money, access rights, in-game checks and choices that are theirs. Ask them in batches.
 
 ### Status page (D-31)
@@ -41,7 +41,7 @@ Schedule one recurring check-in in the coordinator with `CronCreate`, at an off 
 A coordinator's context grows with every report. When each message starts to cost too much, or the desktop app struggles, hand over:
 
 1. Write `.work/coordinator-handoff-<date>.md` with how the maintainer wants the work done, the new coordinator's first tasks, a table of every session (ID, what it is doing, what comes next), credit limits, approved game windows, items waiting on the maintainer and the file locations.
-2. Start the new coordinator from that note. It reads the note and CLAUDE.md, takes over the status page, schedules its own check-in and confirms the takeover to the old coordinator, which then archives itself.
+2. Start the new coordinator from that note. It reads the note and CLAUDE.md, takes over the status page, schedules its own check-in and confirms the takeover to the old coordinator, which then archives itself. Before the old coordinator archives itself, it detaches its side sessions with `detach_session`, because archiving a session also archives its finished side sessions.
 3. The app cannot move a running session under a new parent. Either keep those sessions reporting by message, or restart each one at its next natural stopping point. To restart, the session commits and pushes its work, writes a handover note in the coordinator's shared notes folder and reports "handover ready". The coordinator starts a replacement from that note and archives the old session. A session that has a scheduled wake-up, such as an approved game window later that night, keeps running until that work is done.
 
 ## Outputs and evidence

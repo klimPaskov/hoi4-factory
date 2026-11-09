@@ -3,9 +3,11 @@
 //! | Method and path | Role needed | Purpose |
 //! |---|---|---|
 //! | `GET /projects/{id}/tasks/{task}/focus/trees/{tree}` | member | The tree's projection from `hoi4.focus_inspect` in the task's worktree |
+//! | `GET .../focus/trees/{tree}/preview.png`, `.../preview.json` | member | The live preview as the game draws it (D-50) and its hover map |
 //! | `POST .../focus/trees/{tree}/operations` | `CreateTask`, edit task | Apply focus operations as one C-02 proposal, with the person as actor |
 //! | `GET /projects/{id}/tasks/{task}/proposals` | member | The task's change proposals, oldest first |
 //! | `GET .../proposals/{proposal}` | member | One proposal: summary, diffs, hashes and checks |
+//! | `POST .../proposals/{proposal}/discard` | `CreateTask` | Put an uncommitted proposal's files back, if nothing changed them since |
 //!
 //! An editor session is an ordinary edit task, so a person's gestures, the agent's edits and a
 //! later commit share one worktree, one event stream and one proposal list.
@@ -37,8 +39,11 @@ pub fn router(state: &ServerState) -> Router {
     Router::new()
         .route("/projects/{id}/tasks/{task}/focus/trees/{tree}", get(projection))
         .route("/projects/{id}/tasks/{task}/focus/trees/{tree}/operations", post(operations))
+        .route("/projects/{id}/tasks/{task}/focus/trees/{tree}/preview.png", get(preview_png))
+        .route("/projects/{id}/tasks/{task}/focus/trees/{tree}/preview.json", get(preview_map))
         .route("/projects/{id}/tasks/{task}/proposals", get(proposals))
         .route("/projects/{id}/tasks/{task}/proposals/{proposal}", get(proposal))
+        .route("/projects/{id}/tasks/{task}/proposals/{proposal}/discard", post(discard))
         .layer(middleware::from_fn_with_state(accepted, origin_guard))
         .with_state(state.clone())
 }
@@ -181,4 +186,52 @@ async fn proposal(
     let found = store::get_proposal(&mut tx, task.id, pid).await?;
     tx.commit().await?;
     found.map(Json).ok_or_else(|| ApiError::not_found().into())
+}
+
+async fn discard(
+    principal: Principal,
+    State(state): State<ServerState>,
+    Path((id, task, proposal)): Path<(String, String, String)>,
+) -> Result<Json<Value>, Fail> {
+    let rt = runtime(&state)?;
+    let project = active_project_for(&state, &principal, &id, Permission::CreateTask).await?;
+    let task = load_task(rt, &principal, &project, &task).await?;
+    let pid: uuid::Uuid = proposal.parse().map_err(|_| Fail::from(ApiError::not_found()))?;
+    let (root, _) = ensure_worktree(&state, &project, task.id).await?;
+    let done = crate::focus::apply::discard_proposal(rt, &TaskKeys::of(&task, principal.account_id()), &root, ActorKind::Person(principal.account_id()), pid)
+        .await
+        .map_err(focus_fail)?;
+    Ok(Json(done))
+}
+
+async fn rendered(state: &ServerState, principal: &Principal, id: &str, task: &str, tree: &str) -> Result<crate::focus::session::Rendered, Fail> {
+    let rt = runtime(state)?;
+    let project = project_for(state, principal, id, Permission::ReadProject).await?;
+    let task = load_task(rt, principal, &project, task).await?;
+    if !valid_tree_id(tree) {
+        return Err(ApiError::not_found().into());
+    }
+    let (root, _) = ensure_worktree(state, &project, task.id).await?;
+    crate::focus::apply::render_tree(rt, &TaskKeys::of(&task, principal.account_id()), &root, tree)
+        .await
+        .map_err(focus_fail)
+}
+
+async fn preview_png(
+    principal: Principal,
+    State(state): State<ServerState>,
+    Path((id, task, tree)): Path<(String, String, String)>,
+) -> Result<axum::response::Response, Fail> {
+    use axum::response::IntoResponse;
+    let r = rendered(&state, &principal, &id, &task, &tree).await?;
+    Ok(([(axum::http::header::CONTENT_TYPE, "image/png"), (axum::http::header::CACHE_CONTROL, "no-store")], r.png).into_response())
+}
+
+async fn preview_map(
+    principal: Principal,
+    State(state): State<ServerState>,
+    Path((id, task, tree)): Path<(String, String, String)>,
+) -> Result<Json<Value>, Fail> {
+    let r = rendered(&state, &principal, &id, &task, &tree).await?;
+    Ok(Json(json!({ "render": r.map["render"], "layout": r.map["layout"] })))
 }

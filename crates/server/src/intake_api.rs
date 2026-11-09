@@ -383,6 +383,8 @@ async fn upload(
         &outcome.inventory.content_hash,
         git_summary(&outcome.git),
     );
+    // S04: the preservation report and engine baseline of the imported commit.
+    crate::publish::spawn_import_report(&state, &project, principal.account_id());
     Ok((
         StatusCode::CREATED,
         Json(json!({ "upload": outcome, "workspace": workspace })),
@@ -653,6 +655,7 @@ async fn import(
             return Err(intake_error(&error).with_id("project_id", project.id));
         }
     };
+    crate::publish::spawn_import_report(&state, &project, principal.account_id());
     let workspace: WorkspaceSummary = summary(
         &project,
         outcome.inventory.entries,

@@ -24,10 +24,45 @@ pub const REWRITE_OPERATION: &str = "hoi4.focus_rewrite";
 
 type Slot = Arc<AsyncMutex<Option<FocusSession>>>;
 
-/// The Agent Tools sessions of the focus editor, one per task.
+/// The Agent Tools sessions of the focus editor, one per task, and the last projection of each
+/// tree with the worktree fingerprint it was built from.
 #[derive(Default)]
 pub struct FocusHost {
     slots: Mutex<HashMap<TaskId, Slot>>,
+    cache: Mutex<HashMap<(TaskId, String), (String, Value)>>,
+    renders: Mutex<HashMap<(TaskId, String), (String, super::session::Rendered)>>,
+}
+
+/// A cheap fingerprint of every file in the worktree (path, size and modification time), outside
+/// `.git`. Any edit, addition or removal changes it, including localisation files that the
+/// tool's own source hashes do not list.
+pub fn worktree_fingerprint(root: &Path) -> String {
+    fn walk(base: &Path, dir: &Path, out: &mut Vec<String>) {
+        let Ok(entries) = std::fs::read_dir(dir) else { return };
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if entry.file_name() == ".git" {
+                continue;
+            }
+            let Ok(meta) = entry.metadata() else { continue };
+            if meta.is_dir() {
+                walk(base, &path, out);
+            } else {
+                let modified = meta
+                    .modified()
+                    .ok()
+                    .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+                    .map(|d| d.as_nanos())
+                    .unwrap_or(0);
+                let rel = path.strip_prefix(base).unwrap_or(&path).to_string_lossy().replace('\\', "/");
+                out.push(format!("{rel}\0{}\0{modified}", meta.len()));
+            }
+        }
+    }
+    let mut items = Vec::new();
+    walk(root, root, &mut items);
+    items.sort();
+    super::session::sha256_hex(items.join("\n").as_bytes())
 }
 
 impl FocusHost {
@@ -38,6 +73,15 @@ impl FocusHost {
             .entry(task)
             .or_default()
             .clone()
+    }
+
+    fn cached(&self, task: TaskId, tree: &str, fingerprint: &str) -> Option<Value> {
+        let cache = self.cache.lock().unwrap_or_else(|e| e.into_inner());
+        cache.get(&(task, tree.to_owned())).filter(|(f, _)| f == fingerprint).map(|(_, p)| p.clone())
+    }
+
+    fn remember(&self, task: TaskId, tree: &str, fingerprint: String, projection: Value) {
+        self.cache.lock().unwrap_or_else(|e| e.into_inner()).insert((task, tree.to_owned()), (fingerprint, projection));
     }
 
     /// Stops the session of a task, for example before its worktree is removed.
@@ -94,9 +138,18 @@ async fn store_if_new(rt: &AgentRuntime, task: &TaskKeys, built: &Built) -> Resu
 pub async fn inspect_tree(rt: &AgentRuntime, task: &TaskKeys, root: &Path, tree_id: &str) -> Result<Value, FocusError> {
     let slot = rt.focus().slot(task.id);
     let mut guard = slot.lock().await;
+    // Nothing in the worktree changed since the last projection of this tree: serve it as is.
+    let fingerprint = {
+        let root = root.to_path_buf();
+        tokio::task::spawn_blocking(move || worktree_fingerprint(&root)).await.map_err(|e| FocusError::Internal { message: e.to_string() })?
+    };
+    if let Some(projection) = rt.focus().cached(task.id, tree_id, &fingerprint) {
+        return Ok(projection);
+    }
     let session = open(rt, task, root, &mut guard).await?;
     let built = session.inspect(tree_id).await?;
     store_if_new(rt, task, &built).await?;
+    rt.focus().remember(task.id, tree_id, fingerprint, built.projection.clone());
     Ok(built.projection)
 }
 
@@ -197,6 +250,12 @@ pub async fn apply_operations(
     // The rewrite is done. A failed re-inspection still leaves a proposal to review.
     let after = session.inspect(tree_id).await;
 
+    if let Ok(built) = &after {
+        let root = root.to_path_buf();
+        if let Ok(fingerprint) = tokio::task::spawn_blocking(move || worktree_fingerprint(&root)).await {
+            rt.focus().remember(task.id, tree_id, fingerprint, built.projection.clone());
+        }
+    }
     let mut tx = rt.tx(task.acting).await.map_err(|e| db(e.code))?;
     let (after_id, after_projection) = match &after {
         Ok(built) => (Some(store::insert_projection(&mut tx, task, built).await.map_err(db)?), built.projection.clone()),
@@ -222,6 +281,7 @@ pub async fn apply_operations(
             semantic_summary: summary,
             diffs: json!(diffs),
             after_projection_id: after_id,
+            before_contents: &rewritten.before_contents,
         },
     )
     .await
@@ -305,6 +365,7 @@ pub async fn record_file_proposal(
     let before: BTreeMap<String, String> = files.iter().map(|(p, b, _)| (p.clone(), hash(b))).collect();
     let after: BTreeMap<String, String> = files.iter().map(|(p, _, a)| (p.clone(), hash(a))).collect();
     let changed_paths: Vec<String> = files.iter().map(|(p, _, _)| p.clone()).collect();
+    let before_contents: BTreeMap<String, Option<Vec<u8>>> = files.iter().map(|(p, b, _)| (p.clone(), b.clone())).collect();
     let diffs: Vec<Value> = files
         .iter()
         .map(|(p, b, a)| json!({"path": p, "diff": super::session::unified_diff(p, b.as_deref(), a.as_deref())}))
@@ -331,6 +392,7 @@ pub async fn record_file_proposal(
             semantic_summary: json!({"added": [], "changed": [], "removed": [], "files": changed_paths}),
             diffs: json!(diffs),
             after_projection_id: None,
+            before_contents: &before_contents,
         },
     )
     .await
@@ -352,4 +414,89 @@ pub async fn record_file_proposal(
     tx.commit().await.map_err(db)?;
     rt.notify(task.id);
     Ok(Some(proposal))
+}
+
+/// Discards an uncommitted proposal: each of its files goes back to the bytes it had before the
+/// proposal, but only while the file still holds what the proposal wrote. A file changed since
+/// (by a person, the agent or a later proposal) refuses the whole discard and nothing is written.
+pub async fn discard_proposal(rt: &AgentRuntime, task: &TaskKeys, root: &Path, actor: ActorKind, id: uuid::Uuid) -> Result<Value, FocusError> {
+    let slot = rt.focus().slot(task.id);
+    let _guard = slot.lock().await;
+    let mut tx = rt.tx(task.acting).await.map_err(|e| db(e.code))?;
+    let proposal = store::get_proposal(&mut tx, task.id, id).await.map_err(db)?.ok_or(FocusError::Internal { message: "no such proposal".into() })?;
+    let contents = store::before_contents(&mut tx, task.id, id).await.map_err(db)?;
+    tx.commit().await.map_err(db)?;
+    if proposal["state"] != "applied" {
+        return Err(FocusError::OperationRefused {
+            error: super::ops::OpError { code: "not_open", focus_id: String::new(), message: "Only an uncommitted proposal can be discarded.".into() },
+        });
+    }
+    let paths: Vec<String> = proposal["changedPaths"].as_array().into_iter().flatten().filter_map(|v| v.as_str().map(str::to_owned)).collect();
+    let mut changed_since = BTreeMap::new();
+    for p in &paths {
+        let now = std::fs::read(root.join(p)).ok().map(|b| super::session::sha256_hex(&b)).unwrap_or_else(|| super::session::ABSENT.to_owned());
+        if Some(now.as_str()) != proposal["after"][p].as_str() {
+            changed_since.insert(p.clone(), now);
+        }
+    }
+    if !changed_since.is_empty() || paths.iter().any(|p| !contents.contains_key(p)) {
+        return Err(FocusError::StaleBase { current: changed_since });
+    }
+    for p in &paths {
+        match &contents[p] {
+            Some(bytes) => std::fs::write(root.join(p), bytes).map_err(|e| FocusError::Internal { message: e.to_string() })?,
+            None => std::fs::remove_file(root.join(p)).map_err(|e| FocusError::Internal { message: e.to_string() })?,
+        }
+    }
+    let mut tx = rt.tx(task.acting).await.map_err(|e| db(e.code))?;
+    store::set_state(&mut tx, task.id, &[id], "applied", "discarded").await.map_err(db)?;
+    let draft = event(
+        None,
+        match actor {
+            ActorKind::Person(a) => Actor::user(a),
+            _ => Actor::Host,
+        },
+        "source_changed",
+        "A proposal was discarded",
+        json!({"discarded_proposal_id": id, "actor_kind": actor.as_str(), "tree_id": proposal["treeId"], "changed_ids": proposal["changedIds"], "changed_paths": paths, "file_hashes": proposal["before"]}),
+    );
+    factory_tasks::append_event(&mut tx, task.id, draft).await.map_err(|e| db(e.to_string()))?;
+    tx.commit().await.map_err(db)?;
+    rt.notify(task.id);
+    Ok(json!({"discarded": id, "restored_paths": paths}))
+}
+
+/// The tree's live preview as the game draws it (D-50): served from memory while nothing in the
+/// worktree changed, drawn again after any change.
+pub async fn render_tree(rt: &AgentRuntime, task: &TaskKeys, root: &Path, tree_id: &str) -> Result<super::session::Rendered, FocusError> {
+    let fingerprint = {
+        let root = root.to_path_buf();
+        tokio::task::spawn_blocking(move || worktree_fingerprint(&root)).await.map_err(|e| FocusError::Internal { message: e.to_string() })?
+    };
+    let key = (task.id, tree_id.to_owned());
+    if let Some((f, r)) = rt.focus().renders.lock().unwrap_or_else(|e| e.into_inner()).get(&key)
+        && *f == fingerprint
+    {
+        return Ok(r.clone());
+    }
+    let projection_known = {
+        let mut tx = rt.tx(task.acting).await.map_err(|e| db(e.code))?;
+        let l = store::latest_projection(&mut tx, task.id, tree_id).await.map_err(db)?;
+        tx.commit().await.map_err(db)?;
+        l.map(|(_, b)| b)
+    };
+    let slot = rt.focus().slot(task.id);
+    let mut guard = slot.lock().await;
+    let session = open(rt, task, root, &mut guard).await?;
+    let base = match projection_known {
+        Some(b) => b,
+        None => {
+            let built = session.inspect(tree_id).await?;
+            store_if_new(rt, task, &built).await?;
+            built
+        }
+    };
+    let rendered = session.render(&base).await?;
+    rt.focus().renders.lock().unwrap_or_else(|e| e.into_inner()).insert(key, (fingerprint, rendered.clone()));
+    Ok(rendered)
 }

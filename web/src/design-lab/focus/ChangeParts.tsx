@@ -1,13 +1,12 @@
 // The sections of the change card. The variants arrange the same sections differently: where
 // the verdicts sit, where the diff lives and where the actions are.
-import { useId, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Badge, Button, CheckboxField, SegmentedControl, type Tone } from '../../components/ui';
 import type { ChangeCard, CheckRow, SourceRef, Verdict } from '../../focus/types';
-import { FocusCanvas } from './Canvas';
-import { makeCard, type CardScenario } from './fixtures';
+import { GamePreview } from './GamePreview';
+import { makeCard, NODES, type CardScenario } from './fixtures';
 import { LayoutBadge } from './Panels';
-import { useFocusModel } from './useFocusModel';
 import './change.css';
 
 export const short = (hash: string | null): string => (hash ? hash.replace('sha256:', '').slice(0, 8) : '-');
@@ -258,44 +257,86 @@ export function DiffSection({ card, open = true }: { card: ChangeCard; open?: bo
 
 // ----- Preview ----------------------------------------------------------------------------
 
-export function PreviewSection({ card, onJump }: { card: ChangeCard; onJump: (source: SourceRef) => void }) {
+/** How the before and after renders sit together: next to each other, one at a time, or under a divider. */
+export type PreviewMode = 'side' | 'toggle' | 'slider';
+
+const AFTER_NODES = NODES;
+// The before render does not draw the focuses the agent added.
+const BEFORE_NODES = NODES.filter((node) => node.pending?.change !== 'added');
+
+/** The before and after game renders of the proposal, the changed focuses outlined on both. */
+export function PreviewSection({ card, onJump, mode, className }: { card: ChangeCard; onJump: (source: SourceRef) => void; mode: PreviewMode; className?: string }) {
   const { t } = useTranslation();
-  const [mode, setMode] = useState('canvas');
-  const model = useFocusModel('pending');
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [tick, setTick] = useState(0);
+  const [which, setWhich] = useState('after');
+  const [pos, setPos] = useState(0.5);
+  const changed = useMemo(() => NODES.filter((node) => node.pending), []);
+
+  const select = (id: string | null) => {
+    setSelectedId(id);
+    const source = card.sourceLinks.find((l) => l.focusId === id)?.source;
+    if (source) onJump(source);
+  };
+  const reveal = (id: string) => {
+    select(id);
+    setTick((n) => n + 1);
+  };
+  const common = { diagnostics: [], selectedId, onSelect: select, readOnly: true, revealTick: tick, revealId: selectedId };
+
   return (
-    <div className="fc-preview">
-      <SegmentedControl
-        legend={t('designLab.change.preview.mode')}
-        value={mode}
-        onChange={setMode}
-        options={[
-          { value: 'canvas', label: t('designLab.change.preview.canvas') },
-          { value: 'image', label: t('designLab.change.preview.image') },
-        ]}
-      />
-      {mode === 'canvas' ? (
-        <FocusCanvas
-          model={model}
-          readOnly
-          label={t('designLab.change.preview.label')}
-          className="fc-canvas"
-          onActivate={(node) => {
-            const source = card.sourceLinks.find((l) => l.focusId === node.id)?.source;
-            if (source) onJump(source);
-          }}
-        />
-      ) : (
-        <div className="fc-image" role="img" aria-label={t('designLab.change.preview.imageAlt')}>
-          <p>{t('designLab.change.preview.imageNote')}</p>
+    <div className={`fc-preview fc-preview-${mode}${className ? ` ${className}` : ''}`}>
+      <div className="fc-preview-bar">
+        {mode === 'toggle' ? (
+          <SegmentedControl
+            legend={t('designLab.change.preview.show')}
+            value={which}
+            onChange={setWhich}
+            options={[
+              { value: 'after', label: t('designLab.change.compare.after') },
+              { value: 'before', label: t('designLab.change.compare.before') },
+            ]}
+          />
+        ) : null}
+        <ul className="fc-chips" aria-label={t('designLab.change.preview.changedList')}>
+          {changed.map((node) => (
+            <li key={node.id}>
+              <button type="button" className={`fc-chip is-${node.pending?.change}${node.id === selectedId ? ' is-selected' : ''}`} aria-pressed={node.id === selectedId} onClick={() => reveal(node.id)}>
+                <span className="fc-chip-kind">{t(`designLab.focus.node.${node.pending?.change}`)}</span> {node.label}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+      {mode === 'side' ? (
+        <div className="fc-sides">
+          <figure>
+            <figcaption>{t('designLab.change.compare.before')}</figcaption>
+            <GamePreview {...common} image="base" nodes={BEFORE_NODES} label={t('designLab.change.preview.labelBefore')} />
+          </figure>
+          <figure>
+            <figcaption>{t('designLab.change.compare.after')}</figcaption>
+            <GamePreview {...common} image="proposed" nodes={AFTER_NODES} label={t('designLab.change.preview.labelAfter')} />
+          </figure>
         </div>
-      )}
-      <p className="small muted">{t('designLab.change.preview.hint')}</p>
-      <ul className="fc-links">
-        {card.sourceLinks.map((l) => (
-          <li key={l.focusId}>
-            <span className="mono">{l.focusId}</span> <SourceButton source={l.source} onJump={onJump} />
-          </li>
-        ))}
+      ) : null}
+      {mode === 'toggle' ? (
+        <GamePreview
+          {...common}
+          image={which === 'before' ? 'base' : 'proposed'}
+          nodes={which === 'before' ? BEFORE_NODES : AFTER_NODES}
+          label={t(which === 'before' ? 'designLab.change.preview.labelBefore' : 'designLab.change.preview.labelAfter')}
+        />
+      ) : null}
+      {mode === 'slider' ? <GamePreview {...common} image="proposed" nodes={AFTER_NODES} compare={{ pos, onChange: setPos }} label={t('designLab.change.preview.labelSlider')} /> : null}
+      <ul className="fc-legend small">
+        <li>
+          <span className="fc-swatch is-added" aria-hidden="true" /> {t('designLab.change.preview.legendAdded')}
+        </li>
+        <li>
+          <span className="fc-swatch is-changed" aria-hidden="true" /> {t('designLab.change.preview.legendChanged')}
+        </li>
+        <li className="muted">{t('designLab.change.preview.hint')}</li>
       </ul>
     </div>
   );

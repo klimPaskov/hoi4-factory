@@ -39,10 +39,24 @@ async fn blocking<T: Send + 'static>(f: impl FnOnce() -> Result<T, String> + Sen
     tokio::task::spawn_blocking(f).await.map_err(|e| e.to_string())?
 }
 
+/// The project a baseline belongs to, and the account whose row-level security scope is used.
+#[derive(Debug, Clone, Copy)]
+pub struct ProjectKeys {
+    pub project_id: factory_accounts::ProjectId,
+    pub owner_account_id: factory_accounts::AccountId,
+    pub acting: factory_accounts::AccountId,
+}
+
+impl From<&TaskKeys> for ProjectKeys {
+    fn from(k: &TaskKeys) -> Self {
+        Self { project_id: k.project_id, owner_account_id: k.owner_account_id, acting: k.acting }
+    }
+}
+
 /// The project's baseline at `head`: stored, or computed now from the committed files.
 async fn baseline_at(
     rt: &AgentRuntime,
-    keys: &TaskKeys,
+    keys: &ProjectKeys,
     repo: &GitRepo,
     head: &Oid,
 ) -> Result<(Baseline, Vec<Finding>), String> {
@@ -71,18 +85,39 @@ async fn baseline_at(
         repo2.export_commit(&head2, &dir2).map_err(|e| e.to_string())?;
         let report = run_check(&CheckRequest::new(&dir2, game)).map_err(|e| e.to_string());
         let _ = std::fs::remove_dir_all(&dir2);
-        report
+        let mut report = report?;
+        // One row per committed file: the engine lists the files it read, and every other file
+        // is stored and served with its exact bytes.
+        let read: std::collections::BTreeSet<String> = report.preservation.iter().map(|r| r.path.clone()).collect();
+        for (path, _) in repo2.files_at(&head2).map_err(|e| e.to_string())? {
+            if !read.contains(&path) {
+                report.preservation.push(factory_engine_check::PreservationRow {
+                    path,
+                    status: factory_engine_check::Preservation::KeptByteExact,
+                    detail: None,
+                });
+            }
+        }
+        report.preservation.sort_by(|a, b| a.path.cmp(&b.path));
+        Ok(report)
     })
     .await;
     let _ = std::fs::remove_dir_all(&dir);
     let report = report?;
     let baseline = factory_engine_check::baseline_from(&report.findings);
     let baseline_json: Value = serde_json::from_str(&baseline.to_json()).map_err(|e| e.to_string())?;
+    let count = |s: factory_engine_check::Preservation| report.preservation.iter().filter(|r| r.status == s).count();
     let summary = json!({
         "verdict": report.verdict,
         "unknown": report.unknown,
         "findings": report.findings,
         "game_version": report.game_version,
+        "preservation": {
+            "parsed": count(factory_engine_check::Preservation::Parsed),
+            "kept_byte_exact": count(factory_engine_check::Preservation::KeptByteExact),
+            "not_understood": count(factory_engine_check::Preservation::NotUnderstood),
+            "rows": report.preservation,
+        },
     });
     let mut tx = rt.tx(keys.acting).await.map_err(|e| e.code.to_owned())?;
     sqlx::query(
@@ -106,7 +141,7 @@ async fn baseline_at(
 
 /// Runs the commit check on the task's worktree.
 pub async fn check_worktree(rt: &AgentRuntime, keys: &TaskKeys, repo: &GitRepo, worktree: &Path, head: &Oid) -> Result<Checked, String> {
-    let (baseline, before) = baseline_at(rt, keys, repo, head).await?;
+    let (baseline, before) = baseline_at(rt, &ProjectKeys::from(keys), repo, head).await?;
     let game = rt.agent_tools_settings().and_then(|s| s.game_root.clone());
     let root = worktree.to_path_buf();
     let report = blocking(move || {
@@ -249,4 +284,51 @@ pub fn restore_files(repo: &GitRepo, worktree: &Path, commit: &Oid, parent: &Oid
         plan.restore.push(path.clone());
     }
     Ok(plan)
+}
+
+/// After an upload or a GitHub import: records the engine baseline and the preservation report of
+/// the imported commit in the background (S04 gate 8, P4). A mod without a commit gets none.
+pub fn spawn_import_report(state: &crate::state::ServerState, project: &factory_accounts::Project, acting: factory_accounts::AccountId) {
+    let Some(rt) = state.agent.clone() else { return };
+    let Ok(workspace) = crate::workspace_api::open_workspace(state, project) else { return };
+    let keys = ProjectKeys { project_id: project.id, owner_account_id: project.owner_account_id, acting };
+    tokio::spawn(async move {
+        let found = tokio::task::spawn_blocking(move || {
+            let repo = workspace.git().ok()??;
+            let head = repo.head().ok()??;
+            Some((repo, head))
+        })
+        .await;
+        let Ok(Some((repo, head))) = found else { return };
+        if let Err(e) = baseline_at(&rt, &keys, &repo, &head).await {
+            tracing::warn!(error = %e, "the import baseline could not be recorded");
+        }
+    });
+}
+
+/// The newest import or commit baseline of a project, with its preservation report.
+pub async fn latest_report(conn: &mut PgConnection, project: uuid::Uuid) -> Result<Option<Value>, sqlx::Error> {
+    let row = sqlx::query(
+        "SELECT commit_oid, engine_version, engine_rev, report_summary, created_at FROM engine_baselines
+         WHERE project_id = $1 ORDER BY created_at DESC LIMIT 1",
+    )
+    .bind(project)
+    .fetch_optional(&mut *conn)
+    .await?;
+    row.map(|r| {
+        let summary: Value = r.try_get("report_summary")?;
+        let created: chrono::DateTime<chrono::Utc> = r.try_get("created_at")?;
+        Ok(json!({
+            "commit": r.try_get::<String, _>("commit_oid")?,
+            "engine_version": r.try_get::<String, _>("engine_version")?,
+            "engine_rev": r.try_get::<String, _>("engine_rev")?,
+            "verdict": summary["verdict"],
+            "unknown": summary["unknown"],
+            "game_version": summary["game_version"],
+            "baseline_findings": summary["findings"].as_array().map(Vec::len).unwrap_or(0),
+            "preservation": summary["preservation"],
+            "recorded_at": created,
+        }))
+    })
+    .transpose()
 }

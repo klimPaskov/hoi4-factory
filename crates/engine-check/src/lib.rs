@@ -31,7 +31,7 @@ use serde::{Deserialize, Serialize};
 pub const ENGINE_VERSION: &str = hoi4_engine::VERSION;
 /// The hoi4-agent-tools commit the engine is linked from. It must equal the `rev` of the
 /// `hoi4-engine` dependency in the root `Cargo.toml` and the image's Agent Tools release commit.
-pub const ENGINE_REV: &str = "be00dfb3d0e3fde76c59f3b5da487d4f57b89948";
+pub const ENGINE_REV: &str = "73a5d7199ab7d1e4e3aeca74598d946512e23f3d";
 pub const REPORT_SCHEMA: &str = report::SCHEMA;
 pub const BASELINE_SCHEMA: &str = hoi4_engine::baseline::SCHEMA;
 
@@ -122,6 +122,30 @@ pub struct CheckReport {
     /// The engine's full `hoi4-engine-report/1` document.
     pub report: serde_json::Value,
     pub elapsed_ms: u64,
+    /// One row per file of the checked mod: parsed, kept byte-exact or not understood (the
+    /// import preservation report of C-05).
+    pub preservation: Vec<PreservationRow>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Preservation {
+    /// A script or localisation file the engine parsed without a syntax problem.
+    Parsed,
+    /// A file the engine does not parse (art, sound, interface data): stored and served with its
+    /// exact bytes.
+    KeptByteExact,
+    /// A file the engine read and could not fully understand (a syntax problem or unreadable
+    /// text). It is still stored byte-exact, and edits to it need a person.
+    NotUnderstood,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PreservationRow {
+    pub path: String,
+    pub status: Preservation,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub detail: Option<String>,
 }
 
 #[derive(Debug)]
@@ -189,6 +213,24 @@ pub fn run_check(req: &CheckRequest) -> Result<CheckReport, CheckError> {
         .collect();
     let baselined_count = analysis.findings.iter().filter(|f| baselined(f)).count();
 
+    let mut preservation: Vec<PreservationRow> = Vec::new();
+    if let Some(target) = analysis.target_layer() {
+        let parsed: BTreeMap<usize, &hoi4_engine::analysis::Parsed> = analysis.parsed.iter().map(|p| (p.file, p)).collect();
+        for (i, file) in analysis.workspace.files.iter().enumerate() {
+            if file.layer != target {
+                continue;
+            }
+            let (status, detail) = match parsed.get(&i) {
+                Some(p) if p.unreadable => (Preservation::NotUnderstood, Some("unreadable text".to_owned())),
+                Some(p) if !p.syntax.is_empty() => (Preservation::NotUnderstood, Some(p.syntax[0].0.to_owned())),
+                Some(_) => (Preservation::Parsed, None),
+                None => (Preservation::KeptByteExact, None),
+            };
+            preservation.push(PreservationRow { path: file.relative.clone(), status, detail });
+        }
+        preservation.sort_by(|a, b| a.path.cmp(&b.path));
+    }
+
     let c = &analysis.coverage;
     let mut unknown = UnknownCounts {
         commands_resolved: c.effect_commands.resolved + c.trigger_commands.resolved,
@@ -218,6 +260,7 @@ pub fn run_check(req: &CheckRequest) -> Result<CheckReport, CheckError> {
         unknown,
         report: value,
         elapsed_ms: started.elapsed().as_millis() as u64,
+        preservation,
     })
 }
 

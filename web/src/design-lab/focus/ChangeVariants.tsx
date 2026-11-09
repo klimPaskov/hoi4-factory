@@ -32,7 +32,7 @@ function useJump(ctl: CardControl) {
   return (source: SourceRef) => jump(source.path, source.line, ctl.card.files);
 }
 
-/** A. One scrolling page in review order, with the actions in a bar that stays at the bottom. */
+/** A. One scrolling page in review order. The before and after renders sit side by side at the top, and the actions stay in a bar at the bottom. */
 export function ChangeA({ state }: VariantProps) {
   const { t } = useTranslation();
   const ctl = useScenario(state);
@@ -43,11 +43,11 @@ export function ChangeA({ state }: VariantProps) {
       <CardHeader ctl={ctl} />
       <StaleBanner ctl={ctl} />
       <VerdictStrip ctl={ctl} />
+      <Card title={t('designLab.change.sections.preview')}>
+        <PreviewSection card={card} onJump={onJump} mode="side" />
+      </Card>
       <Card title={t('designLab.change.sections.summary')}>
         <SummarySection card={card} onJump={onJump} />
-      </Card>
-      <Card title={t('designLab.change.sections.preview')}>
-        <PreviewSection card={card} onJump={onJump} />
       </Card>
       <Card title={t('designLab.change.sections.diff')}>
         <DiffSection card={card} />
@@ -73,12 +73,11 @@ export function ChangeA({ state }: VariantProps) {
   );
 }
 
-/** B. Two columns: what changed and whether it is safe on the left, the evidence on the right. */
+/** B. Two columns: what changed and whether it is safe on the left, the render with a before and after toggle and the diff on the right. */
 export function ChangeB({ state }: VariantProps) {
   const { t } = useTranslation();
   const ctl = useScenario(state);
   const onJump = useJump(ctl);
-  const [tab, setTab] = useState('preview');
   const { card } = ctl;
   return (
     <div className="fc-page fcb">
@@ -108,22 +107,19 @@ export function ChangeB({ state }: VariantProps) {
           <div className="fcb-actions">
             <Actions ctl={ctl} />
           </div>
-          <Tabs
-            label={t('designLab.change.sections.evidence')}
-            value={tab}
-            onChange={setTab}
-            tabs={[
-              { id: 'preview', label: t('designLab.change.sections.preview'), panel: <PreviewSection card={card} onJump={onJump} /> },
-              { id: 'diff', label: t('designLab.change.sections.diff'), panel: <DiffSection card={card} /> },
-            ]}
-          />
+          <Card title={t('designLab.change.sections.preview')}>
+            <PreviewSection card={card} onJump={onJump} mode="toggle" />
+          </Card>
+          <Card title={t('designLab.change.sections.diff')}>
+            <DiffSection card={card} />
+          </Card>
         </div>
       </div>
     </div>
   );
 }
 
-/** C. The decision first: can this be committed, and if not, why. The evidence sits below it. */
+/** C. The decision first: can this be committed, and if not, why. The render with a before and after slider follows. */
 export function ChangeC({ state }: VariantProps) {
   const { t } = useTranslation();
   const ctl = useScenario(state);
@@ -170,7 +166,7 @@ export function ChangeC({ state }: VariantProps) {
             </details>
           </li>
           <li>
-            <details open={failed + unavailable > 0}>
+            <details>
               <summary>
                 <span>{t('designLab.change.gates.checks')}</span>
                 <Badge tone={failed ? 'danger' : unavailable ? 'warning' : 'success'}>
@@ -183,11 +179,11 @@ export function ChangeC({ state }: VariantProps) {
         </ul>
         <Actions ctl={ctl} />
       </section>
+      <Card title={t('designLab.change.sections.preview')}>
+        <PreviewSection card={card} onJump={onJump} mode="slider" />
+      </Card>
       <Card title={t('designLab.change.sections.summary')}>
         <SummarySection card={card} onJump={onJump} />
-      </Card>
-      <Card title={t('designLab.change.sections.preview')}>
-        <PreviewSection card={card} onJump={onJump} />
       </Card>
       <Card title={t('designLab.change.sections.diff')}>
         <DiffSection card={card} open={false} />
@@ -200,7 +196,7 @@ export function ChangeC({ state }: VariantProps) {
   );
 }
 
-/** D. Tabs: Summary, Changes, Preview and Checks, with the actions beside the tab row. */
+/** D. The render with a before and after toggle on top, always in view. Summary, Changes and Checks are tabs under it, with the actions beside the tab row. */
 export function ChangeD({ state }: VariantProps) {
   const { t } = useTranslation();
   const ctl = useScenario(state);
@@ -215,6 +211,7 @@ export function ChangeD({ state }: VariantProps) {
       <CardHeader ctl={ctl} />
       <StaleBanner ctl={ctl} />
       <VerdictStrip ctl={ctl} />
+      <PreviewSection card={card} onJump={onJump} mode="toggle" className="fcd-preview" />
       <Tabs
         label={t('designLab.change.sections.evidence')}
         value={tab}
@@ -236,7 +233,6 @@ export function ChangeD({ state }: VariantProps) {
             ),
           },
           { id: 'changes', label: t('designLab.change.sections.diff'), panel: <DiffSection card={card} /> },
-          { id: 'preview', label: t('designLab.change.sections.preview'), panel: <PreviewSection card={card} onJump={onJump} /> },
           {
             id: 'checks',
             label: t('designLab.change.sections.checks'),

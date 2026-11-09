@@ -3,9 +3,6 @@
 // (src/focus/types.ts). Nothing here is read from a real project.
 import type { ChangeCard, CheckRow, Diagnostic, FocusNode, FocusProjection } from '../../focus/types';
 
-export const GRID_W = 96;
-export const GRID_H = 130;
-
 export const FOCUS_FILE = 'common/national_focus/swe_industry.txt';
 export const LOC_FILE = 'localisation/english/swe_focus_l_english.yml';
 const PROPOSAL = 'prop_01JB7Q4X2M';
@@ -76,15 +73,15 @@ const ADDED_LINES = [182, 191, 200, 209] as const;
 export const NODES: FocusNode[] = [
   make({ id: 'SWE_industrial_push', x: 2, y: 0, cost: 10, line: 12, sprite: 'GFX_goal_generic_construction' }),
   make({ id: 'SWE_steel_mills', x: 1, y: 1, cost: 10, line: 26, prereq: [['SWE_industrial_push']], sprite: 'GFX_goal_generic_production' }),
-  make({ id: 'SWE_civilian_factories', x: 3, y: 1, cost: 10, line: 40, prereq: [['SWE_industrial_push']], sprite: 'GFX_goal_generic_construction' }),
+  make({ id: 'SWE_civilian_factories', x: 3, y: 1, cost: 10, line: 40, prereq: [['SWE_industrial_push']], sprite: 'GFX_goal_generic_construct_civ_factory' }),
   make({ id: 'SWE_ore_exports', x: 0, y: 2, cost: 5, line: 54, prereq: [['SWE_steel_mills']], sprite: 'GFX_goal_generic_trade' }),
-  make({ id: 'SWE_military_reform', x: 2, y: 2, cost: 10, line: 68, prereq: [['SWE_steel_mills'], ['SWE_civilian_factories']], sprite: 'GFX_goal_generic_army_doctrine' }),
+  make({ id: 'SWE_military_reform', x: 2, y: 2, cost: 10, line: 68, prereq: [['SWE_steel_mills'], ['SWE_civilian_factories']], sprite: 'GFX_goal_generic_army_doctrines' }),
   make({ id: 'SWE_home_defense', x: 4, y: 2, cost: 10, line: 84, prereq: [['SWE_civilian_factories']], excl: ['SWE_open_trade'], sprite: 'GFX_goal_generic_defence' }),
   make({
     id: 'SWE_open_trade',
     x: 6,
     y: 2,
-    cost: 10,
+    cost: 7,
     line: 98,
     prereq: [['SWE_civilian_factories']],
     excl: ['SWE_home_defense'],
@@ -92,9 +89,9 @@ export const NODES: FocusNode[] = [
     pending: 'changed',
   }),
   make({ id: 'SWE_air_force', x: 1, y: 3, cost: 10, line: 112, prereq: [['SWE_military_reform']], sprite: 'GFX_focus_swe_air_force', iconOk: false }),
-  make({ id: 'SWE_conscription', x: 3, y: 3, cost: 5, line: 126, prereq: [['SWE_military_reform']], sprite: 'GFX_goal_generic_army_manpower' }),
-  make({ id: 'SWE_border_forts', x: 4, y: 4, cost: 10, line: 140, prereq: [['SWE_home_defense', 'SWE_conscription']], sprite: 'GFX_goal_generic_fortify' }),
-  make({ id: 'SWE_arms_export', x: 5, y: 3, cost: 5, line: 154, prereq: [['SWE_open_trade']], sprite: 'GFX_goal_generic_trade' }),
+  make({ id: 'SWE_conscription', x: 3, y: 3, cost: 5, line: 126, prereq: [['SWE_military_reform']], sprite: 'GFX_goal_generic_allies_build_infantry' }),
+  make({ id: 'SWE_border_forts', x: 4, y: 4, cost: 10, line: 140, prereq: [['SWE_home_defense', 'SWE_conscription']], sprite: 'GFX_goal_generic_fortify_city' }),
+  make({ id: 'SWE_arms_export', x: 5, y: 3, cost: 5, line: 154, prereq: [['SWE_open_trade']], sprite: 'GFX_goal_generic_construct_mil_factory' }),
   make({
     id: 'SWE_coastal_battery',
     x: 3,
@@ -102,13 +99,13 @@ export const NODES: FocusNode[] = [
     cost: 10,
     line: 168,
     prereq: [['SWE_border_forts']],
-    sprite: 'GFX_goal_generic_navy_coastal',
+    sprite: 'GFX_goal_generic_occupy_states_coastal',
     declared: { mode: 'relative', x: -1, y: 1, relativeTo: 'SWE_border_forts' },
     readOnly: 'Placed with relative_position_id. Edit it in the source file.',
   }),
   make({ id: 'SWE_nordic_trade_pact', x: 7, y: 3, cost: 5, line: ADDED_LINES[0], prereq: [['SWE_open_trade']], sprite: 'GFX_goal_generic_trade', pending: 'added' }),
-  make({ id: 'SWE_shipping_lanes', x: 6, y: 4, cost: 5, line: ADDED_LINES[1], prereq: [['SWE_nordic_trade_pact']], sprite: 'GFX_goal_generic_navy_convoy', pending: 'added' }),
-  make({ id: 'SWE_customs_union', x: 8, y: 4, cost: 10, line: ADDED_LINES[2], prereq: [['SWE_nordic_trade_pact']], sprite: 'GFX_goal_generic_trade', pending: 'added' }),
+  make({ id: 'SWE_shipping_lanes', x: 6, y: 4, cost: 5, line: ADDED_LINES[1], prereq: [['SWE_nordic_trade_pact']], sprite: 'GFX_goal_generic_navy_anti_submarine', pending: 'added' }),
+  make({ id: 'SWE_customs_union', x: 8, y: 4, cost: 10, line: ADDED_LINES[2], prereq: [['SWE_nordic_trade_pact']], sprite: 'GFX_goal_generic_construct_infrastructure', pending: 'added' }),
   make({
     id: 'SWE_joint_fleet',
     x: 7,
@@ -116,14 +113,14 @@ export const NODES: FocusNode[] = [
     cost: 10,
     line: ADDED_LINES[3],
     prereq: [['SWE_shipping_lanes'], ['SWE_customs_union']],
-    sprite: 'GFX_goal_generic_navy_naval_doctrine',
+    sprite: 'GFX_goal_generic_navy_doctrines_tactics',
     pending: 'added',
   }),
 ];
 
 /** The values a changed node had before the proposal, restored when the change is discarded. */
 export const PENDING_BEFORE: Record<string, Partial<FocusNode>> = {
-  SWE_open_trade: { cost: 6 },
+  SWE_open_trade: { cost: 10 },
 };
 
 export const DIAGNOSTICS: Diagnostic[] = [
@@ -199,8 +196,8 @@ function focusDiff(): string {
     ' \ty = 2',
     ' \tprerequisite = { focus = SWE_civilian_factories }',
     ' \tmutually_exclusive = { focus = SWE_home_defense }',
-    '-\tcost = 6',
-    '+\tcost = 10',
+    '-\tcost = 10',
+    '+\tcost = 7',
     ' \tcompletion_reward = {',
     `@@ -178,3 +178,${3 + body.length} @@`,
     ' \t\tadd_stability = 0.01',
@@ -244,7 +241,7 @@ export function makeCard(scenario: CardScenario): ChangeCard {
     operation: 'hoi4.focus_rewrite',
     summary: {
       added: ADDED.map((n) => n.id),
-      changed: [{ id: 'SWE_open_trade', fields: [{ name: 'cost', before: '6', after: '10' }] }],
+      changed: [{ id: 'SWE_open_trade', fields: [{ name: 'cost', before: '10', after: '7' }] }],
       removed: [],
     },
     files: [
@@ -270,9 +267,9 @@ export function makeCard(scenario: CardScenario): ChangeCard {
     layoutVerdict: 'pass',
     checks: CHECKS_OK,
     limits: [
-      'Source render, not a game check. The game was not started.',
+      'The picture is drawn from the source by the game view of the render tool. The game was not started.',
       'Conditional availability and AI weights were not evaluated.',
-      'Icons from the game files are shown as placeholders.',
+      'An icon the mod and the game do not define is left blank in the picture.',
     ],
     restorePoint: { ref: 'refs/factory/restore/task-0418', oid: '4d2b9e07a1c35f86d0e49b72a8c1f63d5e07b942' },
     state: 'pending',

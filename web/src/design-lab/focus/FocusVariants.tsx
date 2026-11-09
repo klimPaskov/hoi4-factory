@@ -1,10 +1,10 @@
-// Four layouts of the focus editor. They share the model, the canvas and the panels, and differ
+// Four layouts of the focus editor. They share the model, the live game preview and the panels, and differ
 // in where the list, the inspector and the problems live.
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Badge, Button, Dialog, Tabs } from '../../components/ui';
 import type { VariantProps } from '../rounds';
-import { FocusCanvas } from './Canvas';
+import { ModelPreview } from './ModelPreview';
 import { PROJECTION } from './fixtures';
 import { Banners, DiagnosticsList, Inspector, LayoutBadge, NodeList, NodeTable, PendingBar, SearchBox, Toolbar } from './Panels';
 import { useFocusModel, type FocusModel, type FocusScenario } from './useFocusModel';
@@ -23,7 +23,7 @@ function Title() {
   );
 }
 
-/** A. The canvas fills the page, the inspector sits on the right, the list is a drawer below. */
+/** A. The game render fills the page, the inspector sits on the right, the list is a drawer below. */
 export function FocusA({ state }: VariantProps) {
   const { t } = useTranslation();
   const model = useModel(state);
@@ -34,7 +34,7 @@ export function FocusA({ state }: VariantProps) {
       <Banners model={model} />
       <PendingBar model={model} />
       <div className="fxa-main">
-        <FocusCanvas model={model} label={t('designLab.focus.canvasLabel')} />
+        <ModelPreview model={model} label={t('designLab.focus.previewLabel')} />
         <aside className="fxa-side" aria-label={t('designLab.focus.inspector.title')}>
           <Inspector model={model} />
         </aside>
@@ -56,7 +56,7 @@ export function FocusA({ state }: VariantProps) {
   );
 }
 
-/** B. Three panes at once: the list on the left, the canvas in the middle, the inspector right. */
+/** B. Three panes at once: the list on the left, the render in the middle, the inspector right. */
 export function FocusB({ state }: VariantProps) {
   const { t } = useTranslation();
   const model = useModel(state);
@@ -78,7 +78,7 @@ export function FocusB({ state }: VariantProps) {
             </Button>
           </div>
           <PendingBar model={model} />
-          <FocusCanvas model={model} label={t('designLab.focus.canvasLabel')} />
+          <ModelPreview model={model} label={t('designLab.focus.previewLabel')} />
         </div>
         <aside className="fxb-side" aria-label={t('designLab.focus.inspector.title')}>
           <Inspector model={model} />
@@ -94,7 +94,7 @@ export function FocusB({ state }: VariantProps) {
 
 type Sheet = 'list' | 'problems' | null;
 
-/** C. Canvas only, with a small bar. The inspector floats over the canvas when a focus is selected. */
+/** C. The render only, with a small bar. The inspector floats over the render when a focus is selected. */
 export function FocusC({ state }: VariantProps) {
   const { t } = useTranslation();
   const model = useModel(state);
@@ -119,7 +119,7 @@ export function FocusC({ state }: VariantProps) {
       <Banners model={model} />
       <PendingBar model={model} />
       <div className="fxc-stage">
-        <FocusCanvas model={model} label={t('designLab.focus.canvasLabel')} className="fxc-canvas" />
+        <ModelPreview model={model} label={t('designLab.focus.previewLabel')} className="fxc-preview" />
         {model.selected ? (
           <aside className="fxc-float" aria-label={t('designLab.focus.inspector.title')}>
             <Button size="sm" variant="ghost" className="fxc-close" onClick={() => model.select(null)}>
@@ -155,7 +155,7 @@ export function FocusC({ state }: VariantProps) {
   );
 }
 
-/** D. A table is the main view, with the cost editable in the row. A small canvas gives the shape. */
+/** D. A table with the cost editable in the row sits beside the render. */
 export function FocusD({ state }: VariantProps) {
   const { t } = useTranslation();
   const model = useModel(state);
@@ -172,7 +172,7 @@ export function FocusD({ state }: VariantProps) {
       <Banners model={model} />
       <PendingBar model={model} />
       <div className="fxd-grid">
-      <FocusCanvas model={model} label={t('designLab.focus.canvasLabel')} className="fxd-canvas" />
+      <ModelPreview model={model} label={t('designLab.focus.previewLabel')} className="fxd-preview" />
       <Tabs
         label={t('designLab.focus.tabs.label')}
         value={tab}

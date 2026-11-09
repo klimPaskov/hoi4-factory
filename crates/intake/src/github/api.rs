@@ -7,7 +7,7 @@
 use std::time::Duration;
 
 use async_trait::async_trait;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde::de::DeserializeOwned;
 
 use crate::error::IntakeError;
@@ -187,6 +187,46 @@ pub trait GithubApi: Send + Sync + 'static {
         token: &str,
         full_name: &str,
     ) -> Result<RepositoryInfo, GithubError>;
+
+    /// Pull requests whose head is `owner:branch`, in any state (S04 publication).
+    async fn list_pulls(
+        &self,
+        token: &str,
+        full_name: &str,
+        head: &str,
+    ) -> Result<Vec<PullRequest>, GithubError>;
+
+    async fn create_pull(
+        &self,
+        token: &str,
+        full_name: &str,
+        new: &NewPullRequest,
+    ) -> Result<PullRequest, GithubError>;
+}
+
+/// A pull request as the publication routes need it.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PullRequest {
+    pub number: u64,
+    pub html_url: String,
+    pub state: String,
+    pub head: PullRef,
+    pub base: PullRef,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PullRef {
+    #[serde(rename = "ref")]
+    pub branch: String,
+    pub sha: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct NewPullRequest {
+    pub title: String,
+    pub head: String,
+    pub base: String,
+    pub body: String,
 }
 
 /// `reqwest` implementation.
@@ -345,5 +385,29 @@ impl GithubApi for HttpGithubApi {
     ) -> Result<RepositoryInfo, GithubError> {
         let url = format!("{}/repos/{full_name}", self.base);
         self.send(self.client.get(url), token).await
+    }
+
+    async fn list_pulls(
+        &self,
+        token: &str,
+        full_name: &str,
+        head: &str,
+    ) -> Result<Vec<PullRequest>, GithubError> {
+        let url = format!("{}/repos/{full_name}/pulls", self.base);
+        let request = self
+            .client
+            .get(url)
+            .query(&[("head", head), ("state", "all"), ("per_page", "100")]);
+        self.send(request, token).await
+    }
+
+    async fn create_pull(
+        &self,
+        token: &str,
+        full_name: &str,
+        new: &NewPullRequest,
+    ) -> Result<PullRequest, GithubError> {
+        let url = format!("{}/repos/{full_name}/pulls", self.base);
+        self.send(self.client.post(url).json(new), token).await
     }
 }
