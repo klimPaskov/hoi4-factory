@@ -49,10 +49,13 @@ Windows work still open before the move to the Mac (D-13a):
 - A kit package release must follow the last agent-tools release, so the coding-client profile that Setup installs names the same tool version as the Factory image.
 - [Issue #3](https://github.com/klimPaskov/hoi4-factory/issues/3) asks for the S03 tests to run on Windows and for process-tree kills there. It blocks the move to the Mac (S04-3) and is being fixed first, in its own session on this PC.
 
-Checks recorded for the move, because they only run on macOS:
+Checks that only run on macOS ran on 2026-11-08 and 2026-11-09 ([evidence](../evidence/macos/2026-11-checks.md)):
 
-- The real macOS Keychain sign-in of `hoi4-imagegen-mcp` (its layer L6, unexercised).
-- The Mac setup of Factory itself: the `.env` file, the Anthropic key in `~/.zshrc`, the GitHub App key and Docker Desktop, as listed in [maintainer questions](../evidence/maintainer-questions.md) item 5.
+- **Setup on a Mac (fail for the whole toolchain).** Setup 0.9.4 installs, opens past Gatekeeper as its guide says, and its in-app updater moved 0.9.3 to 0.9.4. On macOS it offers only hoi4-imagegen. HOI4 Agent Tools, the 3D workflow and Live Tools have no macOS route in the kit ([kit#124](https://github.com/klimPaskov/Agentic-HOI4-Modding/issues/124), [kit#125](https://github.com/klimPaskov/Agentic-HOI4-Modding/issues/125)). Update and repair fails on a fresh Mac project ([Setup#188](https://github.com/klimPaskov/HOI4-Mod-Setup/issues/188), [Setup#189](https://github.com/klimPaskov/HOI4-Mod-Setup/issues/189)).
+- **HOI4 Agent Tools on macOS (pass).** 4.12.0 with the bundled darwin-arm64 engine ran every read tool on a test mod. A state root under the macOS temporary folder failed and is fixed in [agent-tools#140](https://github.com/klimPaskov/hoi4-agent-tools/pull/140).
+- **hoi4-imagegen L6 (partial).** The login Keychain stores, keeps and removes the sign-in, and one test image passed. The MCP server asks for the keychain password on each start ([imagegen#2](https://github.com/klimPaskov/hoi4-imagegen-mcp/issues/2)).
+- **Kit Validate, Live Tools offline suite, Factory validator, `setup_gates` on arm64 and Compose (pass).** Each needed one fix, all merged. Open Factory items are [#15](https://github.com/klimPaskov/hoi4-factory/issues/15) and [#16](https://github.com/klimPaskov/hoi4-factory/issues/16).
+- **Still open:** the in-game checks listed in the evidence, and the Mac setup of Factory itself (`.env`, the Anthropic key in `~/.zshrc`, the GitHub App key), as listed in [maintainer questions](../evidence/maintainer-questions.md) item 5.
 
 The sections below describe the planning baseline. Statements in them that implementation has not started are historical.
 
