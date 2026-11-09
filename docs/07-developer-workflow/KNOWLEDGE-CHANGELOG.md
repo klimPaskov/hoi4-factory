@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.43, 2026-11-09, hoi4-imagegen-mcp is no longer a fork (D-54)
+
+- CLAUDE.md's pull request rule now applies to every repository and records that hoi4-imagegen-mcp was recreated as a non-fork with renumbered issues and PRs.
+
+Evidence: the maintainer asked for the repository to be their own with the same name (D-54). Rollback: revert this commit and regenerate.
+
 ## 0.2.42, 2026-11-09, explicit repository for pull requests in a fork
 
 - CLAUDE.md now says to pass `--repo` and `--base` to `gh pr create` in a forked repository such as hoi4-imagegen-mcp.
