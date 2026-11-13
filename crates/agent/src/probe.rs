@@ -132,6 +132,7 @@ fn probe_request() -> ModelRequest {
             }),
         }],
         max_output_tokens: 64,
+        reasoning: None,
     }
 }
 

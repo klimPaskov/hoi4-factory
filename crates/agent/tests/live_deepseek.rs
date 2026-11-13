@@ -461,6 +461,7 @@ fn deliberate_request() -> ModelRequest {
         )],
         tools: vec![write_file_tool()],
         max_output_tokens: 400,
+        reasoning: None,
     }
 }
 
@@ -531,6 +532,7 @@ async fn live_deepseek_legacy_model_name_deepseek_chat() {
         messages: vec![Message::user_text("Say ok.")],
         tools: vec![],
         max_output_tokens: 32,
+        reasoning: None,
     };
     let r = recorded_turn(
         "deepseek-chat-legacy-name",
@@ -549,4 +551,61 @@ async fn live_deepseek_legacy_model_name_deepseek_chat() {
         ),
         Err(e) => panic!("unexpected failure shape: {e:?}"),
     }
+}
+
+/// Issue #12: the compatible adapter now sends `max_tokens` as well as
+/// `max_completion_tokens`. Through the production client a bound of 8 must
+/// hold: DeepSeek returned 15 tokens for this prompt when only
+/// `max_completion_tokens` was sent (2026-11-02). Thinking is left at the
+/// default, so reasoning tokens count inside the bound. A turn cut by the bound
+/// ends with `finish_reason: length`, which the adapter reports as incomplete
+/// output, so the usage is read from either outcome.
+#[tokio::test]
+#[ignore = "live: needs DEEPSEEK_API_KEY, spends a fraction of a cent"]
+async fn live_deepseek_output_bound_holds() {
+    let req = ModelRequest {
+        system: String::new(),
+        messages: vec![Message::user_text("Say ok.")],
+        tools: vec![],
+        max_output_tokens: 8,
+        reasoning: None,
+    };
+    let usage = match recorded_turn("deepseek-bound-8", profile(), &req).await {
+        Ok(t) => t.usage,
+        Err(TurnError::IncompleteOutput { partial, .. }) => {
+            assert_eq!(partial.finish_reason.as_deref(), Some("length"));
+            partial.usage
+        }
+        Err(e) => panic!("unexpected failure: {e:?}"),
+    };
+    let u = usage.expect("usage");
+    assert!(
+        u.output_tokens <= 8,
+        "bound ignored: {} output tokens",
+        u.output_tokens
+    );
+}
+
+/// Issue #12: `reasoning: Off` is sent as `reasoning_effort: "none"`, which
+/// DeepSeek documents as switching thinking mode off. With the default the
+/// probe reasoned (81 of 122 output tokens on 2026-11-02).
+#[tokio::test]
+#[ignore = "live: needs DEEPSEEK_API_KEY, spends a fraction of a cent"]
+async fn live_deepseek_reasoning_off_is_honoured() {
+    use factory_agent::request::ReasoningEffort;
+    let req = ModelRequest {
+        system: String::new(),
+        messages: vec![Message::user_text(
+            "A train leaves at 09:40 and arrives at 13:05. How long is the trip? Answer in one line.",
+        )],
+        tools: vec![],
+        max_output_tokens: 200,
+        reasoning: Some(ReasoningEffort::Off),
+    };
+    let t = recorded_turn("deepseek-reasoning-off", profile(), &req)
+        .await
+        .expect("turn");
+    let u = t.usage.expect("usage");
+    assert_eq!(u.reasoning_tokens, 0, "the model still reasoned");
+    assert!(!t.text.is_empty());
 }

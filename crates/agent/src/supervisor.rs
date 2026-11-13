@@ -14,9 +14,9 @@ use std::process::ExitStatus;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
-use tokio::io::AsyncReadExt;
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::process::{Child, ChildStdin, Command};
-use tokio::sync::mpsc;
+use tokio::sync::{mpsc, oneshot};
 
 use crate::protocol::*;
 
@@ -61,9 +61,44 @@ pub enum CancelOutcome {
 
 type Inbound = Result<Frame, String>;
 
+/// One encoded frame for the writer task, and where to report the write's result.
+type Outbound = (Vec<u8>, oneshot::Sender<std::io::Result<()>>);
+
+/// Own the worker's stdin and write each queued frame completely, in order.
+///
+/// The caller only queues bytes and waits for the acknowledgement, so dropping the caller's
+/// future (a timeout or an aborted task) never leaves half a frame on the pipe (issue #13). The
+/// frame is then still delivered, and the host treats its request as in flight. After a failed
+/// write every later frame fails with the same error kind, because the stream position is lost.
+fn spawn_writer(mut stdin: ChildStdin) -> mpsc::UnboundedSender<Outbound> {
+    let (tx, mut rx) = mpsc::unbounded_channel::<Outbound>();
+    tokio::spawn(async move {
+        let mut broken: Option<(std::io::ErrorKind, String)> = None;
+        while let Some((wire, ack)) = rx.recv().await {
+            let result = match &broken {
+                Some((kind, msg)) => Err(std::io::Error::new(*kind, msg.clone())),
+                None => {
+                    let r = async {
+                        stdin.write_all(&wire).await?;
+                        stdin.flush().await
+                    }
+                    .await;
+                    if let Err(e) = &r {
+                        broken = Some((e.kind(), e.to_string()));
+                    }
+                    r
+                }
+            };
+            let _ = ack.send(result);
+        }
+        // Every sender is gone: dropping stdin here closes the worker's input.
+    });
+    tx
+}
+
 pub struct WorkerProcess {
     child: Child,
-    stdin: Option<ChildStdin>,
+    stdin: Option<mpsc::UnboundedSender<Outbound>>,
     frames: mpsc::UnboundedReceiver<Inbound>,
     stderr: Arc<Mutex<VecDeque<u8>>>,
     generation: u64,
@@ -141,7 +176,7 @@ impl WorkerProcess {
         });
         let mut me = Self {
             child,
-            stdin: Some(stdin),
+            stdin: Some(spawn_writer(stdin)),
             frames,
             stderr: ring,
             generation,
@@ -221,7 +256,7 @@ impl WorkerProcess {
         attempt_id: &str,
         body: Body,
     ) -> Result<(), SupervisorError> {
-        let Some(stdin) = self.stdin.as_mut() else {
+        let Some(stdin) = self.stdin.as_ref() else {
             return Err(SupervisorError::Protocol("worker input is closed".into()));
         };
         let frame = Frame {
@@ -231,12 +266,28 @@ impl WorkerProcess {
             attempt_id: attempt_id.into(),
             body,
         };
-        match write_frame(stdin, &frame).await {
-            Ok(_) => Ok(()),
-            Err(FrameError::TooLarge(n)) => Err(SupervisorError::Protocol(format!(
-                "frame of {n} bytes exceeds the {MAX_FRAME} byte limit"
-            ))),
-            Err(FrameError::Io(e)) if e.kind() == std::io::ErrorKind::BrokenPipe => {
+        let wire = match encode_frame(&frame) {
+            Ok(w) => w,
+            Err(FrameError::TooLarge(n)) => {
+                return Err(SupervisorError::Protocol(format!(
+                    "frame of {n} bytes exceeds the {MAX_FRAME} byte limit"
+                )));
+            }
+            Err(e) => return Err(SupervisorError::Protocol(e.to_string())),
+        };
+        let (ack, acked) = oneshot::channel();
+        // Queuing is synchronous, so from here on the whole frame reaches the worker even if
+        // this future is dropped.
+        let written = if stdin.send((wire, ack)).is_err() {
+            Err(std::io::Error::from(std::io::ErrorKind::BrokenPipe))
+        } else {
+            acked
+                .await
+                .unwrap_or_else(|_| Err(std::io::Error::from(std::io::ErrorKind::BrokenPipe)))
+        };
+        match written {
+            Ok(()) => Ok(()),
+            Err(e) if e.kind() == std::io::ErrorKind::BrokenPipe => {
                 let (exit, signal) = self.wait_exit(Duration::from_secs(2)).await;
                 Err(SupervisorError::WorkerExited {
                     exit,

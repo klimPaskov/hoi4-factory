@@ -1547,5 +1547,15 @@
    "verdict": "pass",
    "limitation": "Framing, codec, request shapes and HTTP classes. No model output in tests."
   }
- ]
+ ],
+ "source_manifest_rerecorded": {
+  "probes/runtime/run-exp03.sh": {
+   "date": "2026-11-13",
+   "sha256_as_recorded": "da25ba9d139251cc488913eea3177e395fdca060077f8821085c9dbe863f9d1a",
+   "sha256_now": "3cdb8d99eb89bfadd43ba840761499d8731cf719d641c9499b26578d96552e7c",
+   "change": "CRLF line endings converted to LF, no other byte changed. Removing every CR from the recorded bytes gives the current file exactly.",
+   "reason": "The CRLF script failed bash -n and could not run on macOS or Linux (hoi4-factory issue 16).",
+   "note": "source_manifest and source_manifest_sha256 stay as recorded in S01, so they describe the tree the EXP-03 checks ran on."
+  }
+ }
 }

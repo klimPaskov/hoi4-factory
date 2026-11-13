@@ -9,7 +9,7 @@
 
 use serde_json::{Value, json};
 
-use crate::profile::{Capabilities, Capability, ModelProfile};
+use crate::profile::{Capabilities, Capability, ModelProfile, ProviderKind};
 use crate::request::{ModelRequest, Part, Role};
 use crate::sse::SseParser;
 use crate::transport::ByteSource;
@@ -171,13 +171,24 @@ pub fn render_with(req: &ModelRequest, profile: &ModelProfile, caps: &Capabiliti
             v
         })
         .collect();
+    let bound = req.max_output_tokens.min(profile.max_output_tokens);
+    let mut extra = serde_json::Map::new();
+    // OpenAI's newer models refuse `max_tokens`, but many compatible servers honour only
+    // `max_tokens` (DeepSeek ignored `max_completion_tokens` live on 2026-11-02, issue #12), so
+    // the compatible kind sends both with the same bound.
+    if profile.provider == ProviderKind::OpenAiCompatible {
+        extra.insert("max_tokens".into(), json!(bound));
+    }
+    if let Some(effort) = req.reasoning {
+        extra.insert("reasoning_effort".into(), json!(effort.as_wire()));
+    }
     request_body(
         &profile.model,
         messages,
         &tools,
         None,
-        req.max_output_tokens.min(profile.max_output_tokens),
-        None,
+        bound,
+        (!extra.is_empty()).then_some(Value::Object(extra)),
     )
 }
 
@@ -200,6 +211,8 @@ pub fn classify_status(status: u16, error_type: Option<&str>, code: Option<&str>
         );
     match status {
         401 => HttpClass::Auth,
+        // DeepSeek documents 402 "Insufficient Balance" (issue #12). It is a billing stop.
+        402 => HttpClass::Quota,
         403 => HttpClass::Permission,
         404 => HttpClass::NotFound,
         429 if quota => HttpClass::Quota,
@@ -551,6 +564,69 @@ mod tests {
         let r = refusal_from_body(429, body);
         assert_eq!(r.class, HttpClass::Quota);
         assert!(!TurnError::Http(r).auto_retry_allowed());
+    }
+
+    /// DeepSeek documents HTTP 402 "Insufficient Balance" (issue #12). Not observed live: this
+    /// body is a labelled fixture with only the message from DeepSeek's error code table, not a
+    /// recording. The class comes from the status alone.
+    #[test]
+    fn documented_402_insufficient_balance_is_quota_not_retryable() {
+        let body = br#"{"error":{"message":"Insufficient Balance"}}"#;
+        let r = refusal_from_body(402, body);
+        assert_eq!(r.class, HttpClass::Quota);
+        assert!(!TurnError::Http(r).auto_retry_allowed());
+    }
+
+    fn one_turn(reasoning: Option<crate::request::ReasoningEffort>) -> ModelRequest {
+        ModelRequest {
+            system: String::new(),
+            messages: vec![crate::request::Message {
+                role: Role::User,
+                parts: vec![Part::text("hi")],
+            }],
+            tools: vec![],
+            max_output_tokens: 40,
+            reasoning,
+        }
+    }
+
+    #[test]
+    fn the_output_bound_field_depends_on_the_provider_kind() {
+        let compat = ModelProfile::openai_compatible("http://127.0.0.1:1", "m");
+        let b = render(&one_turn(None), &compat);
+        assert_eq!(
+            (b["max_completion_tokens"].clone(), b["max_tokens"].clone()),
+            (json!(40), json!(40))
+        );
+        let openai = ModelProfile {
+            provider: ProviderKind::OpenAi,
+            ..compat
+        };
+        let b = render(&one_turn(None), &openai);
+        assert_eq!(b["max_completion_tokens"], 40);
+        assert!(
+            b.get("max_tokens").is_none(),
+            "OpenAI's newer models refuse max_tokens"
+        );
+    }
+
+    #[test]
+    fn reasoning_effort_is_sent_only_when_the_request_sets_it() {
+        use crate::request::ReasoningEffort;
+        let p = ModelProfile::openai_compatible("http://127.0.0.1:1", "m");
+        assert!(
+            render(&one_turn(None), &p)
+                .get("reasoning_effort")
+                .is_none()
+        );
+        assert_eq!(
+            render(&one_turn(Some(ReasoningEffort::Off)), &p)["reasoning_effort"],
+            "none"
+        );
+        assert_eq!(
+            render(&one_turn(Some(ReasoningEffort::High)), &p)["reasoning_effort"],
+            "high"
+        );
     }
 
     #[test]

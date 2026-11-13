@@ -123,6 +123,7 @@ async fn record_agent_streams() {
         messages: vec![Message::user_text(write_task)],
         tools: tools(true),
         max_output_tokens: 1024,
+        reasoning: None,
     };
     let write = record("agent-write-turn", &req).await;
     assert_eq!(write.tool_calls.first().map(|c| c.name.as_str()), Some("write_file"));
@@ -142,6 +143,7 @@ async fn record_agent_streams() {
         )],
         tools: tools(true),
         max_output_tokens: 1024,
+        reasoning: None,
     };
     let o = record("agent-write-outside-turn", &outside).await;
     assert_eq!(o.tool_calls.first().map(|c| c.name.as_str()), Some("write_file"));
@@ -154,6 +156,7 @@ async fn record_agent_streams() {
         )],
         tools: tools(false),
         max_output_tokens: 1024,
+        reasoning: None,
     };
     let r = record("agent-read-turn", &read).await;
     assert_eq!(r.tool_calls.first().map(|c| c.name.as_str()), Some("read_file"));
@@ -187,6 +190,7 @@ async fn record_agent_tools_streams() {
         )],
         tools: specs,
         max_output_tokens: 1024,
+        reasoning: None,
     };
     let call = record("agent-tools-call-turn", &req).await;
     assert_eq!(call.tool_calls.first().map(|c| c.name.as_str()), Some("agent_tools_mod_index"));

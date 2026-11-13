@@ -1,0 +1,41 @@
+{
+  "captured_utc": "2026-11-13T18:13:21Z",
+  "chunk_sizes": [
+    304,
+    288,
+    290,
+    1726,
+    866,
+    460
+  ],
+  "cost": {
+    "kind": "estimated",
+    "model_priced_as": "deepseek-flash",
+    "source": "https://api-docs.deepseek.com/quick_start/pricing (read 2026-11-02)",
+    "usd_off_peak": 0.00001125,
+    "usd_peak": 0.0000225
+  },
+  "endpoint": "https://api.deepseek.com/chat/completions",
+  "evidence_kind": "live",
+  "name": "deepseek-reasoning-off",
+  "outcome": {
+    "ok": true,
+    "turn": {
+      "bytes": 3934,
+      "events": 14,
+      "finish_reason": "stop",
+      "model": "deepseek-flash",
+      "provider": "openai-chat-completions",
+      "response_id": "8df9789d-d785-4bc9-b6b5-420e457a2746",
+      "text": "The trip is 3 hours and 25 minutes.",
+      "tool_calls": [],
+      "usage": {
+        "cached_input_tokens": 0,
+        "input_tokens": 31,
+        "output_tokens": 11,
+        "reasoning_tokens": 0
+      }
+    }
+  },
+  "response_bytes": 3934
+}

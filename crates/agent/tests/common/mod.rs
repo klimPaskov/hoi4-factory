@@ -40,6 +40,7 @@ pub fn tool_request() -> ModelRequest {
         messages: vec![Message::user_text("Use the write_file tool to create notes/probe.txt whose content is one line: S01 runtime probe ok")],
         tools: vec![write_file_tool()],
         max_output_tokens: 300,
+        reasoning: None,
     }
 }
 

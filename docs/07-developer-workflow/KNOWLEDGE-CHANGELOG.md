@@ -2,6 +2,13 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.45, 2026-11-13, cancel-safe worker writes and a recovery-test race
+
+- CLAUDE.md's agent runtime rules gained three lines: whole frames go through a writer task that owns the worker's stdin, a dropped `run_turn` is followed by `cancel`, and a test that kills the host mid-turn waits until the replay server has the request.
+- The Agent Tools re-pin rule now includes classifying every listed tool in a profile or in `AGENT_TOOLS_WITHHELD` (issue #6).
+
+Evidence: issues #13 and #6, `crates/agent/tests/worker.rs` and `crates/server/tests/agent.rs`, and the [engineering lessons](ENGINEERING-LESSONS.md). Rollback: revert this commit and regenerate.
+
 ## 0.2.44, 2026-11-09, detach side sessions before a coordinator archives itself
 
 - `coordinate-sessions` now says the old coordinator detaches its side sessions with `detach_session` before it archives itself, because archiving a session also archives its finished side sessions.

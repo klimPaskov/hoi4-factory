@@ -88,6 +88,14 @@ The rules in this section of CLAUDE.md came from the S03 stage and S04. Their re
 
 CLAUDE.md rule: treat any status other than `ok`, or an unchanged source file, as a refusal before writing anything that depends on the rewrite. In S04 a blocked rewrite (`FOCUS_GAMEPLAY_REFERENCE_MISSING`) was taken as applied and the host appended localisation for a focus that was never written. The fix is in `focus/session.rs` with a regression test in `tests/focus.rs`.
 
+### A dropped `run_turn` cut a frame in half (2026-11-13, issue #13)
+
+CLAUDE.md rule: queue whole frames to a writer task that owns the worker's stdin. On 2026-11-06 the test `a_late_result_for_an_abandoned_request_is_rejected_and_counted` failed about once in five runs on Windows, because its 1 ms timeout dropped `run_turn` in the middle of `write_frame`. The worker then read the rest of the frame as a new length prefix and exited with "frame is not valid protocol JSON". The new test `dropping_run_turn_mid_write_never_corrupts_the_next_frame` drops a 4 MB turn 24 times at different points. It failed in round 0 on the old supervisor and passes with the writer task. The same test first expected the next turn to run straight away, which timed out because the worker ignores a `RunTurn` during a turn, hence the cancel rule.
+
+### A recovery test that raced the replay server (2026-11-13)
+
+CLAUDE.md rule: wait until the replay server has counted the request before killing the host mid-turn. `an_interrupted_write_is_reconciled_after_a_restart_and_never_rerun` failed about one run in four on Linux, on main as well. It aborted the runtime as soon as the `model_request` event appeared, sometimes before the worker had sent the request. The reopened attempt then got the 4-second delayed write turn meant for the dead attempt and ended `fenced`. With the wait it passed eight runs in a row.
+
 ### Formatting churn from `cargo fmt` (S04)
 
 CLAUDE.md rule: format only your own new files with `rustfmt --edition 2024 <file>`. `cargo fmt -p factory-server` rewrote twelve untouched files.

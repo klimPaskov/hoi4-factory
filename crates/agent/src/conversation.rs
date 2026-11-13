@@ -176,6 +176,7 @@ impl Conversation {
             messages: self.messages.clone(),
             tools: tools.to_vec(),
             max_output_tokens,
+            reasoning: None,
         })
     }
 

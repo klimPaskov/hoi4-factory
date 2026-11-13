@@ -138,6 +138,16 @@ async fn real_server_discovery_schemas_and_read_only_calls() {
     );
     let real = probe.list_tools().await.expect("list");
     eprintln!("server lists {} tools", real.len());
+    // Issue #6: every tool the real server lists is in a reviewed profile or withheld with a
+    // reason, so a re-pin that adds a tool fails here until it is classified.
+    let editor = factory_hoi4_tools::profile::agent_tools_focus_editor();
+    for t in &real {
+        let known = editor.tools.iter().any(|p| p.mcp_name == t.name)
+            || factory_hoi4_tools::profile::AGENT_TOOLS_WITHHELD
+                .iter()
+                .any(|(n, _)| *n == t.name);
+        assert!(known, "{} is neither in a profile nor withheld", t.name);
+    }
     for pt in &profile.tools {
         assert!(is_closed_schema(&pt.host_schema), "{} is open", pt.mcp_name);
         let found = real
