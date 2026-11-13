@@ -13,7 +13,7 @@ How the work is run across the HOI4 projects: approvals and autonomy, game launc
 | **Phase scope and priorities** | | | |
 | D-13 | 2026-10-31 | The first phase covered research and workflow updates only. Factory features stay designs until a stage is authorized. Kit work happens directly in its checkout. Amended by the S04 authorization of 2026-11-08. | [expansion record](../08-expansion-research/00-decision-record.md) |
 | D-36 | 2026-11-08 | Until about 2026-11-22, tools for other modders come first: a quick install and first run, more tool coverage and better images, all three at once. S04 keeps one low-priority session. 3D production stays paused, except the Tripo workflow and its one ZIN test model (D-55 in [3D](3d.md#decisions)). | [below](#decisions) |
-| D-46 | 2026-11-08 | After about 2026-11-22 the main effort goes to restarting the 3D route. S04 keeps one low-priority session. | [below](#decisions) |
+| D-46 | 2026-11-08 | After about 2026-11-22 the main effort goes to the 3D route. S04 keeps one low-priority session. The 3D models and trailer start earlier, as soon as the Tripo test is good (D-56 in [3D](3d.md#decisions)). | [below](#decisions) |
 | D-41 | 2026-11-08 | Next research is a fresh read-only scan of HOI4 AI and modding tools that appeared since October. | [below](#decisions) |
 | D-40 | 2026-11-08 | Feature releases at most about weekly per tool, fixes any time, then one kit pin and one Setup release after a fresh-install test. A promotion first releases the latest version and cleans the public text. | [below](#decisions) |
 | D-43 | 2026-11-08 | The next promotion is the whole modder workflow (Setup, the kit and every tool it installs) once the D-36 goals land. | [below](#decisions) |
