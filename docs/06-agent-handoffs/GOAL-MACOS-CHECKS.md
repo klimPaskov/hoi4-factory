@@ -48,7 +48,15 @@ Run every check that only runs on macOS across the HOI4 tools, fix what can be f
 ### C. hoi4-imagegen (layer L6 in its `docs/testing.md`)
 
 1. Run `doctor` and record what it reports for the platform and the credential store.
-2. Ask the maintainer to sign in to the ChatGPT route in the browser. Then confirm the tokens are stored in the macOS login Keychain under the service name its docs give, without printing them, that they survive a restart of the MCP server, and that sign-out removes them.
+2. Ask the maintainer to sign in to the ChatGPT route in the browser with `hoi4-imagegen login`. From 0.4.0 the tokens are a private file, not a Keychain item ([issue #2](https://github.com/klimPaskov/hoi4-imagegen-mcp/issues/2)). Without printing the tokens, confirm these points:
+   - The file is `~/Library/Application Support/hoi4-imagegen/chatgpt-login/auth.json`, with mode 0600, in a folder with mode 0700.
+   - `login` reports that it removed the Keychain item of an older sign-in, when a 0.3.x sign-in left one.
+   - Start `hoi4-imagegen-mcp` twice, and call `hoi4.image_status` each time. It reports `signed_in: true`, and macOS shows no Keychain password dialog. Note the version tested.
+   - After the next release, update the binaries and start the MCP server once more. It still shows no dialog and reports `signed_in: true`.
+   - `hoi4-imagegen logout` removes the file and leaves no `hoi4-imagegen.chatgpt-login` item in Keychain Access.
+   - With `HOI4_IMAGEGEN_CHATGPT_STORE=keychain` set for both programs, the tokens go to the Keychain instead. This is optional and expected to prompt.
+
+   When every point passes, close issue #2 with the result.
 3. Generate one small test image of a simple family, such as an idea icon, into the test mod, then run the audit tool on it. Look at the image yourself before calling it a pass.
 4. Update the L6 row in `docs/testing.md` with the result, by pull request.
 
