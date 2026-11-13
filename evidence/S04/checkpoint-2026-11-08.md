@@ -23,3 +23,7 @@ S04 runs at low priority (D-36, D-46). This note says where it stands so a resum
 ## Still to do
 
 The two browser pages from the chosen designs (gates 1, 2 and 4 in the browser), the Hagane round-trip comparison (gate 10, unavailable unless Hagane is run on the same tree), T-IMPORT-01 on a GitHub import, then `validate-stage`, the handoff and GOAL-S05.
+
+## Session of 2026-11-13
+
+Issues #12, #13, #15 and #16 fixed, and the withheld Agent Tools list for #6 added. See the [session handoff](handoff-2026-11-13-session.md).
