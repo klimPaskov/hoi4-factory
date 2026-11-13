@@ -2,7 +2,7 @@
  "stage": "S04",
  "scope": "Session of 2026-11-13: issues #12, #13, #15, #16 and #6 (withheld list). Not the stage's final gate review.",
  "base_revision": "cfd2061",
- "code_revision": "7a41e83",
+ "code_revision": "627b576",
  "host": "Windows 11 Pro 10.0.26200, Git Bash",
  "tools": {
   "rustc": "1.97.1 (8bab26f4f 2026-07-14)",
@@ -96,6 +96,29 @@
    "evidence_kind": "static validation",
    "exit_code": 0,
    "result": "LF, bash -n passes, sha256 3cdb8d99eb89bfadd43ba840761499d8731cf719d641c9499b26578d96552e7c recorded in source_manifest_rerecorded. Stripping CR from the recorded bytes gives the new file exactly."
+  },
+  {
+   "id": "IMPORT-GITHUB",
+   "test": "T-IMPORT-01",
+   "command": "scripts/linux-tests.sh -j 4 -p factory-server --test intake_api",
+   "evidence_kind": "test execution",
+   "exit_code": 0,
+   "result": "pass, the whole intake_api suite 20 of 20, including a_github_import_gets_a_preservation_report_and_a_baseline and the updated migration order test",
+   "limitation": "Against the stand-in GitHub (the intake crate's double serving real bare repositories through git http-backend), not github.com."
+  },
+  {
+   "id": "GATE10-HAGANE",
+   "gate": 10,
+   "command": "probes/hagane-round-trip/measure.sh in hf-hagane-measure:1, two runs",
+   "evidence_kind": "tool execution",
+   "exit_code": 0,
+   "result": "Hagane Studio 191c2fe: editor save 48 to 102 ms, move plus native export 2.0 to 2.8 s warm. HOI4 Factory (2026-11-08): 19.7 to 92.7 s. The exported Hagane file has the moved position.",
+   "artifacts": {
+    "evidence/S04/hagane-round-trip/run1.log": "884f2c69e63446e7d347e163036c207fdff31f7afe1b6ec2235e8a04f1f004f6",
+    "evidence/S04/hagane-round-trip/run2.log": "151971f8976605ee4ef5220fdcaa7158597a6ce2eb6644f9c444c76ea21ef97a",
+    "evidence/S04/hagane-round-trip/hagane-export-exp_basic.txt": "f56123a72e58f166671c31de380497f76f9d0fe5d06ec129fee2a48b7374d7e4"
+   },
+   "limitation": "Different days and environments for the two surfaces. Hagane without its React interface. The T-BENCH-01 half of gate 10 waits for the gate 11 re-pin."
   },
   {
    "id": "GUIDANCE",
