@@ -68,6 +68,10 @@ CLAUDE.md rule: commit empty crate skeletons and their workspace members on main
 
 CLAUDE.md rule: make every HOI4 image with hoi4-imagegen, never the general `gptimage` MCP. hoi4-imagegen paces its ChatGPT sign-in requests across all its processes on the machine, while `gptimage` uses the same Codex sign-in outside that limit. On 2026-11-08 both ran at once and OpenAI revoked the sign-in at 15:29 UTC.
 
+### A pull request opened on the upstream of a fork (2026-11-09)
+
+CLAUDE.md rule: pass `--repo` and `--base` to `gh pr create` in a forked repository. In hoi4-imagegen-mcp, a fork, `gh pr create` without them opened the colour PR on the upstream parent project. The session closed it within a minute and reopened it on our repository, but the closed PR stays visible there.
+
 ### Kit push that broke `main` on the quality ratchet
 
 CLAUDE.md rule: before an approved push to another repository, run that repository's own CI steps locally, not a hand-picked subset. A wiki push once broke the kit's `main` on the quality ratchet, which only the full list runs.
@@ -84,6 +88,14 @@ The rules in this section of CLAUDE.md came from the S03 stage and S04. Their re
 
 CLAUDE.md rule: treat any status other than `ok`, or an unchanged source file, as a refusal before writing anything that depends on the rewrite. In S04 a blocked rewrite (`FOCUS_GAMEPLAY_REFERENCE_MISSING`) was taken as applied and the host appended localisation for a focus that was never written. The fix is in `focus/session.rs` with a regression test in `tests/focus.rs`.
 
+### A dropped `run_turn` cut a frame in half (2026-11-13, issue #13)
+
+CLAUDE.md rule: queue whole frames to a writer task that owns the worker's stdin. On 2026-11-06 the test `a_late_result_for_an_abandoned_request_is_rejected_and_counted` failed about once in five runs on Windows, because its 1 ms timeout dropped `run_turn` in the middle of `write_frame`. The worker then read the rest of the frame as a new length prefix and exited with "frame is not valid protocol JSON". The new test `dropping_run_turn_mid_write_never_corrupts_the_next_frame` drops a 4 MB turn 24 times at different points. It failed in round 0 on the old supervisor and passes with the writer task. The same test first expected the next turn to run straight away, which timed out because the worker ignores a `RunTurn` during a turn, hence the cancel rule.
+
+### A recovery test that raced the replay server (2026-11-13)
+
+CLAUDE.md rule: wait until the replay server has counted the request before killing the host mid-turn. `an_interrupted_write_is_reconciled_after_a_restart_and_never_rerun` failed about one run in four on Linux, on main as well. It aborted the runtime as soon as the `model_request` event appeared, sometimes before the worker had sent the request. The reopened attempt then got the 4-second delayed write turn meant for the dead attempt and ended `fenced`. With the wait it passed eight runs in a row.
+
 ### Formatting churn from `cargo fmt` (S04)
 
 CLAUDE.md rule: format only your own new files with `rustfmt --edition 2024 <file>`. `cargo fmt -p factory-server` rewrote twelve untouched files.
@@ -93,3 +105,7 @@ CLAUDE.md rule: format only your own new files with `rustfmt --edition 2024 <fil
 ### Seven ZIN units in a trailer (2026-11-06)
 
 CLAUDE.md rule: visual work is not finished until someone has looked at it, at viewing size and in close-up, and a fresh-context reviewer has been asked to find every defect. On 2026-11-06 seven ZIN units passed every geometry check with 0 errors and went into a trailer cut together with existing Chaos Redux units. The maintainer saw holes and deformed animations in both at first glance.
+
+### A unit test that grew to 18 GB (2026-11-14)
+
+CLAUDE.md rule: local tests run under a memory cap and a timeout, and a loop-driven test uses a fake clock and an iteration cap. On the night of 2026-11-14 a HOI4 Live Tools unit test for the exit-to-menu flow used a mock game session with a real clock. A regex bug in the code under test meant the exit loop never ended. The loop spun for its 240 seconds of real time, and the mock recorded every call, so the process grew by about 4 GB a minute to 18 GB. Free memory fell to 1.26 GB with the maintainer asleep, and another session stopped that one process seconds before a third out-of-memory crash. The fix replaced the mock with plain callables, a fake clock that every sleep advances and a cap of 400 screen reads. The same file now runs in 6 ms, and that session runs local tests under a 1.5 GB cap and a 60 second timeout.

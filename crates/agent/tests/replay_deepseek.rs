@@ -150,17 +150,20 @@ async fn faults_in_real_deepseek_bytes_are_incomplete_and_never_retried() {
 /// and honors `max_tokens`. The test pins what the adapter sends so a change
 /// to either side is a deliberate one.
 #[tokio::test]
-async fn the_adapter_sends_max_completion_tokens_not_max_tokens() {
+async fn the_compatible_adapter_sends_the_bound_as_max_tokens_too() {
+    // Issue #12: DeepSeek ignored `max_completion_tokens` live, so the compatible kind sends
+    // `max_tokens` with the same bound. The recording predates that, which does not change the
+    // reply bytes being replayed.
     let rec = Recorded::load("deepseek-tool-turn");
     let (r, server) = turn(rec.reply(Fault::None)).await;
     r.expect("turn");
     let body: serde_json::Value =
         serde_json::from_str(&server.request_bodies(COMPLETIONS)[0]).unwrap();
     assert_eq!(body["max_completion_tokens"], 300);
-    assert!(body.get("max_tokens").is_none());
+    assert_eq!(body["max_tokens"], 300);
     assert!(
-        body.get("thinking").is_none(),
-        "no provider-specific fields are sent"
+        body.get("thinking").is_none() && body.get("reasoning_effort").is_none(),
+        "no reasoning field is sent unless the request sets one"
     );
     assert_eq!(
         rec.meta["request_body"]["max_completion_tokens"], 300,

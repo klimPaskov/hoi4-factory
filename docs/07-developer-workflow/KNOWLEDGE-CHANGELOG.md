@@ -2,6 +2,49 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.46, 2026-11-14, local tests run under a memory cap and a timeout
+
+- CLAUDE.md's verification section gained one rule: local tests run under a memory cap and a timeout, and a loop-driven test uses a fake clock and an iteration cap, never a mock object with a real clock. The maintainer approved the rule.
+
+Evidence: the Live Tools incident of 2026-11-14 in the [engineering lessons](ENGINEERING-LESSONS.md), fixed in HOI4-Live-Tools pull request 68. Rollback: revert this commit and regenerate.
+
+## 0.2.45, 2026-11-13, cancel-safe worker writes and a recovery-test race
+
+- CLAUDE.md's agent runtime rules gained three lines: whole frames go through a writer task that owns the worker's stdin, a dropped `run_turn` is followed by `cancel`, and a test that kills the host mid-turn waits until the replay server has the request.
+- The Agent Tools re-pin rule now includes classifying every listed tool in a profile or in `AGENT_TOOLS_WITHHELD` (issue #6).
+
+Evidence: issues #13 and #6, `crates/agent/tests/worker.rs` and `crates/server/tests/agent.rs`, and the [engineering lessons](ENGINEERING-LESSONS.md). Rollback: revert this commit and regenerate.
+
+## 0.2.44, 2026-11-09, detach side sessions before a coordinator archives itself
+
+- `coordinate-sessions` now says the old coordinator detaches its side sessions with `detach_session` before it archives itself, because archiving a session also archives its finished side sessions.
+
+Evidence: the 2026-11-09 handover to a new coordinator. Rollback: revert this commit and regenerate.
+
+## 0.2.43, 2026-11-09, hoi4-imagegen-mcp is no longer a fork (D-54)
+
+- CLAUDE.md's pull request rule now applies to every repository and records that hoi4-imagegen-mcp was recreated as a non-fork with renumbered issues and PRs.
+
+Evidence: the maintainer asked for the repository to be their own with the same name (D-54). Rollback: revert this commit and regenerate.
+
+## 0.2.42, 2026-11-09, explicit repository for pull requests in a fork
+
+- CLAUDE.md now says to pass `--repo` and `--base` to `gh pr create` in a forked repository such as hoi4-imagegen-mcp.
+
+Evidence: on 2026-11-09 a PR meant for hoi4-imagegen-mcp was opened on its upstream parent and closed at once. Rollback: revert this commit and regenerate.
+
+## 0.2.41, 2026-11-09, effort stays at high or below (D-53)
+
+- CLAUDE.md and `coordinate-sessions` now say no session or worker runs above high effort, and a coordinator lowers any it finds above high.
+
+Evidence: the maintainer asked that work not start on Opus at extra high effort and that each session use a fitting model and effort (D-53). Rollback: revert this commit and regenerate.
+
+## 0.2.40, 2026-11-08, gptimage for page mockups (D-52)
+
+- CLAUDE.md and `ui-design-iteration` now allow the general `gptimage` tool for HOI4 Factory page and UI mockups, one request at a time and never while hoi4-imagegen is generating, with game assets still only from hoi4-imagegen. The skill also says to pass a real game render as the reference when a page shows a game surface.
+
+Evidence: hoi4-imagegen has no family for a web page, and the maintainer allowed gptimage for mockups (D-52). Rollback: revert this commit and regenerate.
+
 ## 0.2.39, 2026-11-08, CLAUDE.md slimmed (D-42)
 
 - CLAUDE.md keeps every rule as a short line. Dated incident stories, measurements and one-time history moved to the new [engineering lessons](ENGINEERING-LESSONS.md), which says which rule each story belongs to. CLAUDE.md links to it from its opening paragraph and from the section on keeping the guidance current, which now says to put new stories there.

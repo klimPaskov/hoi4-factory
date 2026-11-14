@@ -1,0 +1,131 @@
+{
+ "stage": "S04",
+ "scope": "Session of 2026-11-13: issues #12, #13, #15, #16 and #6 (withheld list). Not the stage's final gate review.",
+ "base_revision": "cfd2061",
+ "code_revision": "627b576",
+ "host": "Windows 11 Pro 10.0.26200, Git Bash",
+ "tools": {
+  "rustc": "1.97.1 (8bab26f4f 2026-07-14)",
+  "cargo": "1.97.1 (c980f4866 2026-06-30)",
+  "docker": "28.5.2",
+  "linux_runner": "scripts/linux-tests.sh, image hoi4-factory-test-runner:1",
+  "agent_tools": "4.12.0 from image hoi4-factory-server:latest"
+ },
+ "checks": [
+  {
+   "id": "I13-REGRESSION",
+   "issue": 13,
+   "command": "cargo test -p factory-agent --test worker dropping",
+   "evidence_kind": "test execution",
+   "exit_code": 0,
+   "result": "pass on Windows. The same test on the old supervisor failed in round 0 (worker killed with exit 1 after a corrupt frame), so it detects the defect.",
+   "limitation": "24 rounds, not thousands. Each round is a real 4 MB frame through the real worker binary."
+  },
+  {
+   "id": "I13-FLAKE",
+   "issue": 13,
+   "command": "worker test binary, filters a_late_result dropping, 10 runs",
+   "evidence_kind": "test execution",
+   "exit_code": 0,
+   "result": "pass 10 of 10 on Windows"
+  },
+  {
+   "id": "AGENT-CRATES-WINDOWS",
+   "command": "cargo test --no-fail-fast -p factory-agent -p factory-hoi4-tools",
+   "evidence_kind": "test execution",
+   "exit_code": 0,
+   "result": "pass. factory-agent: 43 unit, 5 destination, 9 probe, 14 replay, 6 replay_deepseek, 16 worker, 11 live ignored. factory-hoi4-tools: 13 unit, 1 env_leak, 19 fake_server, 3 real_agent_tools (skipped without the Agent Tools environment variables).",
+   "limitation": "One later run had fake_server shutdown_kills_the_whole_process_group hang 300 s while a Linux Docker build ran at the same time. That code was not changed. It then passed 3 of 3 alone."
+  },
+  {
+   "id": "AGENT-CRATES-LINUX",
+   "command": "scripts/linux-tests.sh -p factory-agent -p factory-hoi4-tools --no-fail-fast",
+   "evidence_kind": "test execution",
+   "exit_code": 0,
+   "result": "pass, same counts as on Windows"
+  },
+  {
+   "id": "SERVER-AGENT-LINUX",
+   "command": "scripts/linux-tests.sh -j 4 -p factory-server --test agent -- --test-threads=2",
+   "evidence_kind": "test execution",
+   "exit_code": 0,
+   "result": "pass, 21 of 21"
+  },
+  {
+   "id": "RECOVERY-RACE",
+   "command": "scripts/linux-tests.sh -j 4 -p factory-server --test agent -- an_interrupted_write_is_reconciled",
+   "evidence_kind": "test execution",
+   "exit_code": 0,
+   "result": "Before the test fix: failed 1 of 3 on this branch and 1 of 4 on unchanged main (attempt 2 ended fenced). After: pass 8 of 8."
+  },
+  {
+   "id": "SERVER-COMPILE",
+   "command": "cargo test -p factory-server --no-run; cargo clippy -p factory-agent -p factory-hoi4-tools --tests",
+   "evidence_kind": "static validation",
+   "exit_code": 0,
+   "result": "builds, no clippy warnings"
+  },
+  {
+   "id": "I12-LIVE",
+   "issue": 12,
+   "command": "cargo test -p factory-agent --test live_deepseek -- --ignored --test-threads=1 live_deepseek_output_bound_holds live_deepseek_reasoning_off_is_honoured",
+   "evidence_kind": "live",
+   "exit_code": 0,
+   "result": "bound 8 gave 8 completion tokens and finish_reason length (15 with max_completion_tokens alone on 2026-11-02). reasoning_effort none gave 0 reasoning tokens. The first bound run failed on a wrong test expectation and is kept as run1.",
+   "artifacts": {
+    "evidence/S04/live-deepseek-adapter/deepseek-bound-8-run1.sse": "ce8d5d329e61021259ecc09f47d547c8e14bcd593a2eddd875132eb11b4ab97d",
+    "evidence/S04/live-deepseek-adapter/deepseek-bound-8.sse": "1f065c9bfb5897bc7755176f70432b6eb67ece7ceb966c3b7b845a2cafec2f18",
+    "evidence/S04/live-deepseek-adapter/deepseek-reasoning-off.sse": "00f6791308d51956dee10755a24cf497d9c94fb94ecaa9997eeac78a4f9ed2a3"
+   },
+   "spend_usd": "about 0.00003 (off-peak), at most 0.00006",
+   "limitation": "402 covered by a labelled documented fixture, not a recording"
+  },
+  {
+   "id": "I6-WITHHELD",
+   "issue": 6,
+   "command": "node .work/list-tools.mjs in hoi4-factory-server:latest; cargo test -p factory-hoi4-tools every_pinned_tool_is_exposed_or_withheld",
+   "evidence_kind": "tool execution and test execution",
+   "exit_code": 0,
+   "result": "The pinned server lists 34 tools. 11 are in agent_tools_focus_editor and 23 in AGENT_TOOLS_WITHHELD with reasons. The test checks the two sets are disjoint and cover the pinned list.",
+   "limitation": "The gated real-server check in real_agent_tools.rs was added but not run here, because the Agent Tools environment variables were not set on the host."
+  },
+  {
+   "id": "I16-LF",
+   "issue": 16,
+   "command": "bash -n probes/runtime/run-exp03.sh; validate_package.py",
+   "evidence_kind": "static validation",
+   "exit_code": 0,
+   "result": "LF, bash -n passes, sha256 3cdb8d99eb89bfadd43ba840761499d8731cf719d641c9499b26578d96552e7c recorded in source_manifest_rerecorded. Stripping CR from the recorded bytes gives the new file exactly."
+  },
+  {
+   "id": "IMPORT-GITHUB",
+   "test": "T-IMPORT-01",
+   "command": "scripts/linux-tests.sh -j 4 -p factory-server --test intake_api",
+   "evidence_kind": "test execution",
+   "exit_code": 0,
+   "result": "pass, the whole intake_api suite 20 of 20, including a_github_import_gets_a_preservation_report_and_a_baseline and the updated migration order test",
+   "limitation": "Against the stand-in GitHub (the intake crate's double serving real bare repositories through git http-backend), not github.com."
+  },
+  {
+   "id": "GATE10-HAGANE",
+   "gate": 10,
+   "command": "probes/hagane-round-trip/measure.sh in hf-hagane-measure:1, two runs",
+   "evidence_kind": "tool execution",
+   "exit_code": 0,
+   "result": "Hagane Studio 191c2fe: editor save 48 to 102 ms, move plus native export 2.0 to 2.8 s warm. HOI4 Factory (2026-11-08): 19.7 to 92.7 s. The exported Hagane file has the moved position.",
+   "artifacts": {
+    "evidence/S04/hagane-round-trip/run1.log": "884f2c69e63446e7d347e163036c207fdff31f7afe1b6ec2235e8a04f1f004f6",
+    "evidence/S04/hagane-round-trip/run2.log": "151971f8976605ee4ef5220fdcaa7158597a6ce2eb6644f9c444c76ea21ef97a",
+    "evidence/S04/hagane-round-trip/hagane-export-exp_basic.txt": "f56123a72e58f166671c31de380497f76f9d0fe5d06ec129fee2a48b7374d7e4"
+   },
+   "limitation": "Different days and environments for the two surfaces. Hagane without its React interface. The T-BENCH-01 half of gate 10 waits for the gate 11 re-pin."
+  },
+  {
+   "id": "GUIDANCE",
+   "command": "scripts/py.sh scripts/sync_skills.py --check; scripts/py.sh scripts/validate_package.py --root . --working-tree",
+   "evidence_kind": "static validation",
+   "exit_code": 0,
+   "result": "pass"
+  }
+ ]
+}

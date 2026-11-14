@@ -564,6 +564,7 @@ mod tests {
                 input_schema: json!({"type": "object"}),
             }],
             max_output_tokens: 100_000,
+            reasoning: None,
         }
     }
 

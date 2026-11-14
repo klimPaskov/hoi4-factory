@@ -464,6 +464,14 @@ async fn an_interrupted_write_is_reconciled_after_a_restart_and_never_rerun() {
     let start = a.start(&a.alice, &task).await;
     assert_eq!(start.status, 201, "{}", start.text);
     a.wait_event(&id, "model_request").await;
+    // The event is recorded before the worker sends the request. Abort only once the provider
+    // has it, or the next attempt gets the delayed write turn meant for this one (a flake seen on
+    // Linux, 2026-11-13).
+    let deadline = std::time::Instant::now() + Duration::from_secs(20);
+    while a.replay.request_count("/v1/messages") < 1 {
+        assert!(std::time::Instant::now() < deadline, "the turn never reached the provider");
+        tokio::time::sleep(Duration::from_millis(20)).await;
+    }
 
     // The process dies mid-turn: its runner and worker are gone without settling anything.
     let rt = a.runtime();

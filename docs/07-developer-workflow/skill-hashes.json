@@ -62,15 +62,15 @@
     {
       "name": "coordinate-sessions",
       "source": "docs/07-developer-workflow/skill-workflows/coordinate-sessions/BODY.md",
-      "body_sha256": "8f03e3f39601dca0fe79e368440603aa77a7e7b0aee7886f34b49f55944c45d1",
+      "body_sha256": "494121323c37de77cd05a07e2809a6b02e2eae0532c822187f2c72ae095b96d3",
       "generated": [
         {
           "path": ".claude/skills/coordinate-sessions/SKILL.md",
-          "sha256": "f021b84741d501fc5978512215e13c738e019f0a89524b344431fe5083ae48c7"
+          "sha256": "07ece34ca5e24de5b65b18dad331916f74fd30a39a6c4dd3bd1b4cf654c943ab"
         },
         {
           "path": ".codex/skills/coordinate-sessions/SKILL.md",
-          "sha256": "1fb3e6e0b6ddb874e0d3b8417c69d39bbc8cd7f8c01393d1174b9d7f770823fa"
+          "sha256": "01cc3685c40714e69c398d54c66c6051eab5b6d3887bc877b34ea21e469cb9a0"
         },
         {
           "path": ".codex/skills/coordinate-sessions/agents/openai.yaml",
@@ -78,7 +78,7 @@
         },
         {
           "path": ".agents/skills/coordinate-sessions/SKILL.md",
-          "sha256": "1fb3e6e0b6ddb874e0d3b8417c69d39bbc8cd7f8c01393d1174b9d7f770823fa"
+          "sha256": "01cc3685c40714e69c398d54c66c6051eab5b6d3887bc877b34ea21e469cb9a0"
         },
         {
           "path": ".agents/skills/coordinate-sessions/agents/openai.yaml",
@@ -224,15 +224,15 @@
     {
       "name": "ui-design-iteration",
       "source": "docs/07-developer-workflow/skill-workflows/ui-design-iteration/BODY.md",
-      "body_sha256": "3d1cdb766773a134b01729f6754dbdd28b5c1b0fc082d4fcce20b78bf0ef4cef",
+      "body_sha256": "37a46a346db3076e8d3d5d5b49d683652352ea738057808462c0396a07bd0b13",
       "generated": [
         {
           "path": ".claude/skills/ui-design-iteration/SKILL.md",
-          "sha256": "bcf7e2350308b5a75b50f34934e20467a8a8178d8907bacd241f060a0646bfc5"
+          "sha256": "77fffcf52dc3ba36b931f995e6dfd827e7f805118447c6ba3b2019a7dfdf935d"
         },
         {
           "path": ".codex/skills/ui-design-iteration/SKILL.md",
-          "sha256": "bcf7e2350308b5a75b50f34934e20467a8a8178d8907bacd241f060a0646bfc5"
+          "sha256": "77fffcf52dc3ba36b931f995e6dfd827e7f805118447c6ba3b2019a7dfdf935d"
         },
         {
           "path": ".codex/skills/ui-design-iteration/agents/openai.yaml",
@@ -240,7 +240,7 @@
         },
         {
           "path": ".agents/skills/ui-design-iteration/SKILL.md",
-          "sha256": "bcf7e2350308b5a75b50f34934e20467a8a8178d8907bacd241f060a0646bfc5"
+          "sha256": "77fffcf52dc3ba36b931f995e6dfd827e7f805118447c6ba3b2019a7dfdf935d"
         },
         {
           "path": ".agents/skills/ui-design-iteration/agents/openai.yaml",

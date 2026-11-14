@@ -798,6 +798,136 @@ async fn github_import_through_the_app_installation() {
     assert_eq!(after.body["live_check"], "not_applicable");
 }
 
+/// Every file of a workspace (outside `.git`) with its SHA-256.
+fn tree_hashes(root: &std::path::Path) -> std::collections::BTreeMap<String, String> {
+    fn walk(
+        base: &std::path::Path,
+        dir: &std::path::Path,
+        out: &mut std::collections::BTreeMap<String, String>,
+    ) {
+        for entry in std::fs::read_dir(dir).unwrap() {
+            let entry = entry.unwrap();
+            let path = entry.path();
+            if entry.file_name() == ".git" {
+                continue;
+            }
+            if entry.file_type().unwrap().is_dir() {
+                walk(base, &path, out);
+            } else {
+                let rel = path
+                    .strip_prefix(base)
+                    .unwrap()
+                    .to_string_lossy()
+                    .replace('\\', "/");
+                out.insert(rel, sha256_hex(&std::fs::read(&path).unwrap()));
+            }
+        }
+    }
+    let mut out = std::collections::BTreeMap::new();
+    walk(root, root, &mut out);
+    out
+}
+
+/// T-IMPORT-01 on a GitHub import (S04 gate 8, P4): the imported commit gets a preservation
+/// report with one row per imported file, its engine baseline is recorded for exactly that
+/// commit, and recording it changes no byte of the workspace. The ZIP side is
+/// `an_upload_gets_a_preservation_report_and_a_baseline` in `publish.rs`.
+#[tokio::test]
+async fn a_github_import_gets_a_preservation_report_and_a_baseline() {
+    let gh = github_fixture().await;
+    let h = Harness::start(Options {
+        github: Some(gh),
+        anthropic_key: Some("sk-ant-not-used"),
+        agent: AgentOptions {
+            worker: None,
+            settings: None,
+            tools: Some(None),
+            skip_recovery: true,
+        },
+        ..Options::default()
+    })
+    .await;
+    let alice = h.verified_user("alice@example.org").await;
+    let project = h.project(&alice, "Imported").await;
+    let base = format!("/api/v1/projects/{project}");
+    h.link_github(&alice, 424_242).await;
+    *h.installations.list.lock().unwrap() = vec![installation(424_242, "selected")];
+    let done = alice
+        .client
+        .post(
+            &format!("{base}/github/import"),
+            json!({"repository": REPO}),
+        )
+        .await;
+    assert_eq!(done.status, 201, "{}", done.text);
+    let tip = h.github.as_ref().unwrap().remote.main_tip.clone();
+    let source = h.workspace_source(&alice, &project);
+    let imported = tree_hashes(&source);
+    assert!(
+        imported.contains_key("descriptor.mod") && imported.contains_key("gfx/art.dds"),
+        "{imported:?}"
+    );
+
+    let deadline = std::time::Instant::now() + Duration::from_secs(120);
+    let report = loop {
+        let r = alice.client.get(&format!("{base}/import-report")).await;
+        assert_eq!(r.status, 200, "{}", r.text);
+        if r.body["state"] == "recorded" {
+            break r.body["report"].clone();
+        }
+        assert!(
+            std::time::Instant::now() < deadline,
+            "no report: {}",
+            r.text
+        );
+        tokio::time::sleep(Duration::from_millis(250)).await;
+    };
+    assert_eq!(
+        report["commit"], tip,
+        "the baseline belongs to the imported commit"
+    );
+    assert_eq!(report["engine_rev"], factory_engine_check::ENGINE_REV);
+    assert_ne!(report["verdict"], "pass", "no game reference: never a pass");
+
+    // One row per imported file, each with a known status, and nothing else.
+    let rows = report["preservation"]["rows"].as_array().unwrap();
+    let listed: std::collections::BTreeSet<String> = rows
+        .iter()
+        .map(|r| r["path"].as_str().unwrap().to_owned())
+        .collect();
+    assert_eq!(
+        listed.len(),
+        rows.len(),
+        "a path is listed twice: {report:#}"
+    );
+    let expected: std::collections::BTreeSet<String> = imported.keys().cloned().collect();
+    assert_eq!(listed, expected, "{report:#}");
+    for r in rows {
+        assert!(
+            ["parsed", "kept_byte_exact", "not_understood"]
+                .contains(&r["status"].as_str().unwrap()),
+            "{r}"
+        );
+    }
+    let status = |p: &str| {
+        rows.iter()
+            .find(|r| r["path"] == p)
+            .map(|r| r["status"].clone())
+            .unwrap_or(Value::Null)
+    };
+    assert_eq!(status("gfx/art.dds"), "kept_byte_exact");
+    assert_eq!(status("data/legacy.csv"), "kept_byte_exact");
+    let totals = &report["preservation"];
+    let sum = ["parsed", "kept_byte_exact", "not_understood"]
+        .iter()
+        .map(|k| totals[*k].as_u64().unwrap())
+        .sum::<u64>();
+    assert_eq!(sum as usize, rows.len(), "{totals}");
+
+    // Recording the report and baseline wrote nothing into the workspace.
+    assert_eq!(tree_hashes(&source), imported);
+}
+
 #[tokio::test]
 async fn github_features_report_unavailable_when_the_app_is_not_configured() {
     let h = Harness::start(Options::default()).await;
@@ -1470,7 +1600,10 @@ async fn the_setup_migrations_run_in_order_after_intake() {
         .iter()
         .map(|c| c.name)
         .collect();
-    assert_eq!(names, ["accounts", "intake", "setup-adapter", "tasks", "broker"]);
+    assert_eq!(
+        names,
+        ["accounts", "intake", "setup-adapter", "tasks", "broker", "focus"]
+    );
     let latest: Vec<i64> = h
         .state
         .migrations

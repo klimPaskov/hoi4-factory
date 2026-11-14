@@ -517,6 +517,53 @@ pub fn agent_tools_focus_editor() -> ToolProfile {
     profile
 }
 
+/// Every tool of the pinned Agent Tools ([`AGENT_TOOLS_VERSION`]) that no profile exposes, with
+/// the reason (issue #6). Together with [`agent_tools_focus_editor`] it covers the whole tool
+/// list the pinned server reports, so a re-pin that adds a tool fails
+/// `every_pinned_tool_is_exposed_or_withheld` until the new tool is classified here or given a
+/// reviewed profile entry (effect class, closed host schema, output bound and schema hash).
+pub const AGENT_TOOLS_WITHHELD: &[(&str, &str)] = &[
+    ("hoi4.gui_rewrite", WITHHELD_REWRITE),
+    ("hoi4.map_rewrite", WITHHELD_REWRITE),
+    ("hoi4.gui_render", WITHHELD_RENDER),
+    ("hoi4.event_render", WITHHELD_RENDER),
+    ("hoi4.tech_render", WITHHELD_RENDER),
+    ("hoi4.gui_inspect", WITHHELD_READ),
+    ("hoi4.map_inspect", WITHHELD_READ),
+    ("hoi4.localisation_inspect", WITHHELD_READ),
+    ("hoi4.idea_inspect", WITHHELD_READ),
+    ("hoi4.system_inspect", WITHHELD_READ),
+    ("hoi4.unit_inspect", WITHHELD_READ),
+    ("hoi4.asset_inspect", WITHHELD_READ),
+    ("hoi4.impact_inspect", WITHHELD_READ),
+    ("hoi4.tech_inspect", WITHHELD_READ),
+    ("hoi4.probability_inspect", WITHHELD_READ),
+    ("hoi4.probability_analyze", WITHHELD_READ),
+    ("hoi4.mechanic_test", WITHHELD_READ),
+    ("hoi4.scenario_test", WITHHELD_READ),
+    ("hoi4.package_check", WITHHELD_READ),
+    (
+        "hoi4.error_log",
+        "Reads the game's own logs, which exist only on the player's PC. The server never runs the game, so the local companion (C4) brings logs instead.",
+    ),
+    (
+        "hoi4.skill",
+        "Serves the kit's skill text. The agent loads kit knowledge as versioned, labelled data (A4), not through a tool call.",
+    ),
+    (
+        "hoi4.job_inspect",
+        "The host runs every call to completion or its own timeout and cancels through MCP cancellation, so it never polls background jobs.",
+    ),
+    (
+        "hoi4.job_cancel",
+        "Destructive job control stays with the host. The host cancels its own calls through MCP cancellation.",
+    ),
+];
+
+const WITHHELD_REWRITE: &str = "Rewrites mod source. It needs its own editor's guarded proposal path (host hash guards, a supported-subset check and review), which comes with the GUI and map editors in later stages. Only focus_rewrite has that path in S04.";
+const WITHHELD_RENDER: &str = "Draws a preview for an editor that does not exist yet. It is added with that editor and its preview isolation. Only focus_render is used in S04.";
+const WITHHELD_READ: &str = "Read-only, so it can be exposed safely, but it has no reviewed closed host schema, output bound or pinned schema hash yet. The S04 focus slice does not need it. It is added when a task type needs it.";
+
 /// The host's name for `hoi4.focus_render` in [`agent_tools_focus_editor`].
 pub const FOCUS_RENDER: &str = "agent_tools_focus_render";
 
@@ -578,6 +625,74 @@ const SCHEMA_HASHES: [Option<&str>; 9] = [
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// The tool list `hoi4-agent-tools` 4.12.0 reported over stdio on 2026-11-13 (from the server
+    /// image, `tools/list`). Replace it from the real server at every re-pin.
+    const PINNED_TOOL_LIST: [&str; 34] = [
+        "hoi4.focus_inspect",
+        "hoi4.focus_render",
+        "hoi4.focus_rewrite",
+        "hoi4.gui_inspect",
+        "hoi4.gui_render",
+        "hoi4.gui_rewrite",
+        "hoi4.map_inspect",
+        "hoi4.map_rewrite",
+        "hoi4.reference_search",
+        "hoi4.reference_read",
+        "hoi4.reference_context",
+        "hoi4.source_lookup",
+        "hoi4.script_validate",
+        "hoi4.error_log",
+        "hoi4.mod_index",
+        "hoi4.localisation_inspect",
+        "hoi4.idea_inspect",
+        "hoi4.system_inspect",
+        "hoi4.unit_inspect",
+        "hoi4.asset_inspect",
+        "hoi4.skill",
+        "hoi4.event_inspect",
+        "hoi4.event_render",
+        "hoi4.impact_inspect",
+        "hoi4.decision_inspect",
+        "hoi4.mechanic_test",
+        "hoi4.package_check",
+        "hoi4.scenario_test",
+        "hoi4.tech_inspect",
+        "hoi4.tech_render",
+        "hoi4.probability_inspect",
+        "hoi4.probability_analyze",
+        "hoi4.job_inspect",
+        "hoi4.job_cancel",
+    ];
+
+    /// Issue #6: every tool of the pinned server is either in a reviewed profile or withheld
+    /// with a reason, never both and never neither.
+    #[test]
+    fn every_pinned_tool_is_exposed_or_withheld() {
+        use std::collections::BTreeSet;
+        let profile = agent_tools_focus_editor();
+        let exposed: BTreeSet<String> = profile.tools.iter().map(|t| t.mcp_name.clone()).collect();
+        let withheld: BTreeSet<String> = AGENT_TOOLS_WITHHELD
+            .iter()
+            .map(|(n, _)| (*n).to_owned())
+            .collect();
+        assert_eq!(
+            withheld.len(),
+            AGENT_TOOLS_WITHHELD.len(),
+            "a tool is withheld twice"
+        );
+        assert!(
+            exposed.is_disjoint(&withheld),
+            "{:?}",
+            exposed.intersection(&withheld).collect::<Vec<_>>()
+        );
+        let pinned: BTreeSet<String> = PINNED_TOOL_LIST.iter().map(|n| (*n).to_owned()).collect();
+        let covered: BTreeSet<String> = exposed.union(&withheld).cloned().collect();
+        assert_eq!(covered, pinned);
+        for (name, reason) in AGENT_TOOLS_WITHHELD {
+            assert!(reason.len() > 40, "{name} needs a real reason");
+        }
+    }
 
     #[test]
     fn profile_is_closed_and_namespaced() {

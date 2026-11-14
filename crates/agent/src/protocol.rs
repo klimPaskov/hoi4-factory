@@ -119,15 +119,25 @@ pub enum FrameError {
     Io(#[from] std::io::Error),
 }
 
-pub async fn write_frame<W: AsyncWrite + Unpin>(w: &mut W, f: &Frame) -> Result<usize, FrameError> {
+/// One frame as it goes on the wire: the big-endian length prefix, then the JSON body.
+pub fn encode_frame(f: &Frame) -> Result<Vec<u8>, FrameError> {
     let bytes = serde_json::to_vec(f).map_err(|e| FrameError::BadJson(e.to_string()))?;
     if bytes.len() > MAX_FRAME {
         return Err(FrameError::TooLarge(bytes.len()));
     }
-    w.write_all(&(bytes.len() as u32).to_be_bytes()).await?;
-    w.write_all(&bytes).await?;
+    let mut wire = Vec::with_capacity(bytes.len() + 4);
+    wire.extend_from_slice(&(bytes.len() as u32).to_be_bytes());
+    wire.extend_from_slice(&bytes);
+    Ok(wire)
+}
+
+/// Not cancel-safe: a dropped call can leave part of a frame on `w`. The host side writes
+/// through the supervisor's writer task instead, which always finishes a frame it started.
+pub async fn write_frame<W: AsyncWrite + Unpin>(w: &mut W, f: &Frame) -> Result<usize, FrameError> {
+    let wire = encode_frame(f)?;
+    w.write_all(&wire).await?;
     w.flush().await?;
-    Ok(bytes.len() + 4)
+    Ok(wire.len())
 }
 
 pub async fn read_frame<R: AsyncRead + Unpin>(r: &mut R) -> Result<Frame, FrameError> {
@@ -186,6 +196,7 @@ mod tests {
                 messages: vec![],
                 tools: vec![],
                 max_output_tokens: 1,
+                reasoning: None,
             },
             policy: DestinationPolicy::default(),
             max_response_bytes: 1,

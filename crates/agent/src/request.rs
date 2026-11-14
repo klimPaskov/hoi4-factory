@@ -69,6 +69,33 @@ pub struct ModelRequest {
     pub messages: Vec<Message>,
     pub tools: Vec<ToolSpec>,
     pub max_output_tokens: u32,
+    /// How much the model may reason before answering. `None` leaves the provider's default.
+    /// It sets effort only: reasoning text itself is never part of a request (see above).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reasoning: Option<ReasoningEffort>,
+}
+
+/// A reasoning effort request (issue #12). The Chat Completions adapters send it as
+/// `reasoning_effort`, and `Off` as `"none"`, which also switches DeepSeek's thinking mode
+/// off. The Anthropic adapter does not send extended thinking at all, so it ignores this.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ReasoningEffort {
+    Off,
+    Low,
+    Medium,
+    High,
+}
+
+impl ReasoningEffort {
+    pub fn as_wire(self) -> &'static str {
+        match self {
+            Self::Off => "none",
+            Self::Low => "low",
+            Self::Medium => "medium",
+            Self::High => "high",
+        }
+    }
 }
 
 impl ModelRequest {

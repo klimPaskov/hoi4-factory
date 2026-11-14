@@ -309,6 +309,51 @@ async fn a_late_result_for_an_abandoned_request_is_rejected_and_counted() {
     w.shutdown().await;
 }
 
+/// Issue #13: a caller that drops `run_turn` while a large frame is still being written must
+/// never leave half a frame on the worker's stdin. Each round drops a multi-megabyte turn after
+/// a different short delay, then follows the documented contract (cancel after a dropped
+/// turn). The cancel must be answered cooperatively and the next turn on the same worker must
+/// succeed. Before the fix the cut frame made the worker exit with "frame is not valid
+/// protocol JSON".
+#[tokio::test]
+async fn dropping_run_turn_mid_write_never_corrupts_the_next_frame() {
+    let server = tool_server(false).await;
+    let mut w = spawn(1, None).await;
+    let mut big = payload(&server.base_url);
+    big.request.system = "x".repeat(4 * 1024 * 1024);
+    let rounds = 24u64;
+    for i in 0..rounds {
+        let delay = Duration::from_micros((i * 397) % 3000);
+        let _ = tokio::time::timeout(
+            delay,
+            w.run_turn(
+                &format!("drop-{i}"),
+                "drop-att",
+                &big,
+                Duration::from_secs(30),
+            ),
+        )
+        .await;
+        match w.cancel(Duration::from_secs(20)).await {
+            CancelOutcome::Cooperative { .. } => {}
+            other => panic!("round {i}: the worker did not answer the cancel: {other:?}"),
+        }
+        let o = w
+            .run_turn(
+                &format!("next-{i}"),
+                "next-att",
+                &payload(&server.base_url),
+                Duration::from_secs(30),
+            )
+            .await
+            .unwrap_or_else(|e| panic!("round {i}: the turn after a dropped write failed: {e}"));
+        assert!(o.result.is_ok(), "round {i}");
+    }
+    assert!(w.stale_frames_rejected() <= rounds);
+    let (exit, _) = w.shutdown().await;
+    assert_eq!(exit, Some(0), "the worker never saw a corrupt frame");
+}
+
 #[tokio::test]
 async fn an_oversize_outgoing_frame_is_refused_by_the_host_and_the_worker_survives() {
     let server = tool_server(false).await;

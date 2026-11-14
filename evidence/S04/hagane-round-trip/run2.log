@@ -1,0 +1,98 @@
+project 1
+import {"tree_id":"exp_basic_tree","total":4,"tree_action":"created","created_nodes":4,"preserved_fields":{},"warnings":[],"conflict_policy":"overwrite"}
+tree 1 node exp_right=3 nodes=4
+move_round_trip_ms 52 101 48 48 48
+move_and_export_ms 119108 2034 2041 2836 2157
+exported focus file: FocusSmall/common/national_focus/exp_basic.txt
+exp_right 		x = 7
+--- exported tree
+focus_tree = {
+	id = exp_basic_tree
+
+	country = {
+		factor = 0
+
+		modifier = {
+			add = 100
+			tag = XAA
+		}
+	}
+
+	continuous_focus_position = { x = 50 y = 1000 }
+
+	default = no
+
+	focus = {
+		id = exp_root
+		icon = GFX_goal_unknown
+		x = 4
+		y = 0
+		cost = 10
+		cancel_if_invalid = yes
+		continue_if_invalid = no
+		available_if_capitulated = no
+		search_filters = { FOCUS_FILTER_POLITICAL }
+		ai_will_do = {
+			factor = 1
+		}
+		completion_reward = {
+			add_political_power = 25 # small reward
+		}
+	}
+
+	focus = {
+		id = exp_left
+		icon = GFX_goal_unknown
+		x = 2
+		y = 1
+		cost = 5
+		prerequisite = { focus = exp_root }
+		mutually_exclusive = { focus = exp_right }
+		cancel_if_invalid = yes
+		continue_if_invalid = no
+		available_if_capitulated = no
+		ai_will_do = {
+			factor = 2
+		}
+		completion_reward = {
+			add_stability = 0.05
+		}
+	}
+
+	focus = {
+		id = exp_right
+		icon = GFX_goal_unknown
+		x = 7
+		y = 1
+		cost = 5
+		prerequisite = { focus = exp_root }
+		mutually_exclusive = { focus = exp_left }
+		cancel_if_invalid = yes
+		continue_if_invalid = no
+		available_if_capitulated = no
+		ai_will_do = {
+			factor = 1
+		}
+		completion_reward = {
+			add_war_support = 0.05
+		}
+	}
+
+	focus = {
+		id = exp_join
+		icon = GFX_goal_unknown
+		x = 4
+		y = 2
+		cost = 7
+		prerequisite = { focus = exp_left focus = exp_right }
+		cancel_if_invalid = yes
+		continue_if_invalid = no
+		available_if_capitulated = no
+		ai_will_do = {
+			factor = 1
+		}
+		completion_reward = {
+			add_political_power = 50
+		}
+	}
+}

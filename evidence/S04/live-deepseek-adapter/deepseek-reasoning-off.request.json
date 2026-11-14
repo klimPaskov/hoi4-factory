@@ -1,0 +1,16 @@
+{
+  "max_completion_tokens": 200,
+  "max_tokens": 200,
+  "messages": [
+    {
+      "content": "A train leaves at 09:40 and arrives at 13:05. How long is the trip? Answer in one line.",
+      "role": "user"
+    }
+  ],
+  "model": "deepseek-flash",
+  "reasoning_effort": "none",
+  "stream": true,
+  "stream_options": {
+    "include_usage": true
+  }
+}

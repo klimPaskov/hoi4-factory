@@ -220,8 +220,26 @@ async fn call_returns_content_and_inventory_is_healthy() {
     // fake.write exists on the server and is Available in the inventory, but a write tool is
     // never offered to the model (S04). Calling it is still refused by the read-only check
     // (`read_only_mode_refuses_a_write_before_the_server_sees_it`).
-    assert!(session.inventory().tools.iter().any(|t| t.mcp_name == "fake.write" && t.state == ToolState::Available));
-    assert_eq!(session.exposed_tools().len(), 2);
+    assert!(
+        session
+            .inventory()
+            .tools
+            .iter()
+            .any(|t| t.mcp_name == "fake.write" && t.state == ToolState::Available)
+    );
+    // The model is offered the pure-read and derived-job tools, never the write tool (issue #15).
+    let exposed: Vec<(String, EffectClass)> = session
+        .exposed_tools()
+        .into_iter()
+        .map(|t| (t.name, t.effect_class))
+        .collect();
+    assert_eq!(
+        exposed,
+        vec![
+            ("fake_read".to_owned(), EffectClass::PureRead),
+            ("fake_job".to_owned(), EffectClass::DerivedJob),
+        ]
+    );
     let r = session
         .call("fake_read", &json!({"text":"hi"}), soon())
         .await

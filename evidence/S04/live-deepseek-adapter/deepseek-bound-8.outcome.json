@@ -1,0 +1,28 @@
+{
+  "captured_utc": "2026-11-13T18:13:42Z",
+  "chunk_sizes": [
+    329,
+    313,
+    315,
+    2419
+  ],
+  "cost": {
+    "kind": "usage_unknown"
+  },
+  "endpoint": "https://api.deepseek.com/chat/completions",
+  "evidence_kind": "live",
+  "name": "deepseek-bound-8",
+  "outcome": {
+    "class": "incomplete_output",
+    "http": null,
+    "normalized": {
+      "code": "provider_output_incomplete",
+      "cost": "possible",
+      "message": "incomplete output: finish_reason=length, output was cut by the provider",
+      "provider_status": null,
+      "retry_class": "reconcile_first"
+    },
+    "ok": false
+  },
+  "response_bytes": 3376
+}
