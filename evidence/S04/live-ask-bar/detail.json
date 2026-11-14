@@ -1,0 +1,136 @@
+{
+ "attempts": [
+  {
+   "admitted_at": "2026-11-14T21:18:10.437599Z",
+   "attempt_no": 1,
+   "bundle": {
+    "id": "86c5ed00-7f2e-4ffc-9e98-a488a4f6d817",
+    "manifest_sha256": "fcb39f42561aafe432a73b24250187404dd23e5541ac43cf305b25a56caf4739"
+   },
+   "error_code": null,
+   "fencing_generation": 1,
+   "finished_at": "2026-11-14T21:19:30.277105Z",
+   "funding": "user_key",
+   "grant": {
+    "allowed_roots": [
+     "common/national_focus",
+     "localisation"
+    ],
+    "expires_at": "2026-11-14T23:18:10.437364Z",
+    "id": "62de644f-19f5-448b-af85-8a65b3a58da3",
+    "max_cost_micros": 500000,
+    "operation_classes": [
+     "model_inference",
+     "read_source",
+     "run_read_only_tool",
+     "write_task_worktree"
+    ],
+    "provider_destinations": [
+     "openai_compatible:https://api.deepseek.com"
+    ],
+    "revocation_epoch": 1,
+    "revoked": false
+   },
+   "id": "aaad0910-f456-4d85-8dd4-6bfcadac020a",
+   "outcome": {
+    "branch": "hoi4factory/4c558135-66ef-49d6-89ab-9bdb04cc6768",
+    "changed_files": [
+     "common/national_focus/exp_basic.txt",
+     "localisation/english/exp_basic_tree_l_english.yml"
+    ],
+    "commit": null,
+    "open_questions": [
+     "The editor wrote the new localisation into a separate file (exp_basic_tree_l_english.yml) instead of the existing exp_basic_l_english.yml that holds the other focuses' keys. Keys do not collide, so both load correctly, but if you want all tree localisation in one file I can merge them.",
+     "Do you want a search_filters entry on exp_reform (e.g. FOCUS_FILTER_POLITICAL) to clear the FOCUS_FILTER_MISSING warning? focus_edit cannot set it, so it would need a direct file write.",
+     "The pre-existing placeholder icon texture gfx/interface/goals/exp02_placeholder.dds is missing from the mod, so every focus shows a FOCUS_ICON_TEXTURE_MISSING error. Add the texture, or should the icons point elsewhere?"
+    ],
+    "reported_changed_files": [
+     "common/national_focus/exp_basic.txt",
+     "localisation/english/exp_basic_tree_l_english.yml"
+    ],
+    "summary": "Added the new focus `Reform` (exp_reform) directly below `Join` in the exp_basic_tree focus tree, using focus_edit so only the new block was appended and all existing bytes were preserved.\n\nWhat was added (common/national_focus/exp_basic.txt, appended after exp_join):\n- focus id exp_reform, icon GFX_exp_icon_created (an existing sprite in interface/exp02_icons.gfx)\n- prerequisite = { focus = exp_join }, placed at x = 4, y = 3 (directly below Join, which sits at x = 4, y = 2)\n- cost = 5, ai_will_do = { factor = 1 }, completion_reward = { add_political_power = 25 }\n\nLocalisation went to a new file, localisation/english/exp_basic_tree_l_english.yml, which the editor writes (the pre-existing exp_basic_l_english.yml was left untouched):\n- exp_reform:0 \"Reform\"\n- exp_reform_desc:0 \"Join opens the door; now we reshape the state.\"\n\nVerification: the projection now lists five focuses with exp_reform cost 5, prerequisites [[exp_join]], x 4 / y 3, title \"Reform\", and layout_verdict \"pass\". agent_tools_script_validate on the focus file returns valid = true with zero findings.\n\nNotes on remaining diagnostics: the FOCUS_ICON_TEXTURE_MISSING errors on every focus (including the pre-existing ones) come from the fixture's placeholder dds texture gfx/interface/goals/exp02_placeholder.dds not being present in the mod — not from this change. exp_reform also gets the same FOCUS_FILTER_MISSING warning that exp_left/exp_right/exp_join already have, because focus_edit's create operation has no field for search_filters; I kept it consistent with the neighbours rather than hand-editing the file."
+   },
+   "started_at": "2026-11-14T21:18:10.453874Z",
+   "state": "succeeded",
+   "version": 15
+  },
+  {
+   "admitted_at": "2026-11-14T21:20:28.881116Z",
+   "attempt_no": 2,
+   "bundle": {
+    "id": "5ebadf0f-496b-443f-9c08-6aff17bf39a8",
+    "manifest_sha256": "7860faf925bdf6a4b41e6b332500fe27c9f09b7838fc873985a6386ca0126713"
+   },
+   "error_code": null,
+   "fencing_generation": 1,
+   "finished_at": "2026-11-14T21:21:30.427644Z",
+   "funding": "user_key",
+   "grant": {
+    "allowed_roots": [
+     "common/national_focus",
+     "localisation"
+    ],
+    "expires_at": "2026-11-14T23:20:28.880872Z",
+    "id": "f91b2276-9d29-44ec-89b9-a739ba4d9475",
+    "max_cost_micros": 500000,
+    "operation_classes": [
+     "model_inference",
+     "read_source",
+     "run_read_only_tool",
+     "write_task_worktree"
+    ],
+    "provider_destinations": [
+     "openai_compatible:https://api.deepseek.com"
+    ],
+    "revocation_epoch": 1,
+    "revoked": false
+   },
+   "id": "2765a8d3-33d7-47b6-ac1d-5452096f07f0",
+   "outcome": {
+    "branch": "hoi4factory/4c558135-66ef-49d6-89ab-9bdb04cc6768",
+    "changed_files": [
+     "common/national_focus/exp_basic.txt"
+    ],
+    "commit": null,
+    "open_questions": [
+     "The placeholder icon textures (gfx/interface/goals/exp02_placeholder.dds) referenced by all five focuses are missing from the mod, so the focuses show icon errors in game — art files need adding under gfx/interface/goals, which is outside this task's allowed paths.",
+     "Four focuses still have no search_filters metadata (only exp_root does); add them if the focus search UI matters for this fixture."
+    ],
+    "reported_changed_files": [
+     "common/national_focus/exp_basic.txt"
+    ],
+    "summary": "Set the Reform focus (exp_reform) in tree exp_basic_tree to cost 3 instead of 5, using focus_edit with a single set_cost operation against the current projection hash (7676e0f2…2e75).\n\n- Focus: exp_reform (\"Reform\", x 4 / y 3, prerequisite exp_join).\n- Change: cost 5 → 3. Nothing else in the tree was touched; re-reading the file shows comments, tab indentation and all other focuses byte-identical, so the file grew no incidental reformatting. Only common/national_focus/exp_basic.txt changed; no localisation is affected because focus cost is not a localised string.\n- Verification: agent_tools_script_validate on common/national_focus/exp_basic.txt reports valid = true, 5 roots, 0 findings. The new projection hash is c70714b5…cb4b with layout_verdict \"pass\", and the summary confirms a single changed focus field (cost 5 → 3).\n\nPre-existing diagnostics, not caused by this edit and left alone: all five focuses fail to resolve the sprite texture gfx/interface/goals/exp02_placeholder.dds (the sprites are declared in interface/exp02_icons.gfx but the .dds art files are not present in the mod), and exp_left/exp_right/exp_join/exp_reform have no search_filters metadata."
+   },
+   "started_at": "2026-11-14T21:20:28.892841Z",
+   "state": "succeeded",
+   "version": 13
+  }
+ ],
+ "pending_effects": [],
+ "task": {
+  "allowed_paths": [
+   "common/national_focus",
+   "localisation"
+  ],
+  "budget_micros": 500000,
+  "created_at": "2026-11-14T21:09:30.675075Z",
+  "id": "4c558135-66ef-49d6-89ab-9bdb04cc6768",
+  "last_seq": 81,
+  "max_turns": 20,
+  "mode": "edit",
+  "model": {
+   "funding": "user_key",
+   "key_id": "8ad425ec-a8e3-4e6e-ab8d-54f51844b192",
+   "profile_id": "user:8ad425ec-a8e3-4e6e-ab8d-54f51844b192"
+  },
+  "objective": "Edit the focus tree exp_basic_tree as asked in the editor.",
+  "pause_reason": null,
+  "paused": false,
+  "project_id": "6c0fb6e9-b420-4f32-adbc-ea8e7ee2e307",
+  "spend_unknown": false,
+  "spent_micros": 9607,
+  "state": "in_review",
+  "updated_at": "2026-11-14T21:21:30.427644Z",
+  "version": 7
+ }
+}

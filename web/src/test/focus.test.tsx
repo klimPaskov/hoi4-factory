@@ -2,6 +2,7 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Proposal } from '../api/focus';
+import { firstSentence } from '../focus/session';
 import type { Attempt, Task } from '../api/tasks';
 import { AGENT_PROPOSAL, AGENT_PROPOSAL_SAVED, AGENT_SENTENCE, COMMIT_PUBLICATION, OWN_PROPOSAL, PROJECTION, TREE_ID } from '../design-lab/focusFixtures';
 import map from '../design-lab/render/game-proposed.json';
@@ -378,6 +379,17 @@ describe('the change card', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Reject' }));
     expect(await screen.findByText('Rejected. Nothing was changed.')).toBeInTheDocument();
     expect(api.requests.some((r) => r.method === 'POST' && r.path.endsWith('/discard'))).toBe(true);
+  });
+});
+
+describe('the one sentence about a change', () => {
+  it('keeps only the first sentence of a long report from the model', () => {
+    const report = 'Added the new focus `Reform` (exp_reform) directly below `Join`. What was added (common/national_focus/exp_basic.txt): - focus id exp_reform';
+    expect(firstSentence(report)).toBe('Added the new focus Reform (exp_reform) directly below Join.');
+    expect(firstSentence('One sentence only')).toBe('One sentence only');
+    const long = firstSentence(`${'word '.repeat(80)}end.`);
+    expect(long.length).toBeLessThanOrEqual(201);
+    expect(long.endsWith('…')).toBe(true);
   });
 });
 

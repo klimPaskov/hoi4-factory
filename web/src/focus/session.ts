@@ -64,13 +64,27 @@ export function withPending(nodes: FocusNode[], open: Proposal[]): FocusNode[] {
   return nodes.map((node) => ({ ...node, pending: marks.get(node.id) }));
 }
 
+/**
+ * The first sentence of a longer text, for the one line the pages show. A model can answer with a
+ * whole report. The rest stays on the task page, with the attempt.
+ */
+export function firstSentence(text: string, limit = 200): string {
+  const plain = text.replace(/[`*#]/g, '').replace(/\s+/g, ' ').trim();
+  const end = plain.search(/[.!?](\s|$)/);
+  const sentence = end >= 0 ? plain.slice(0, end + 1) : plain;
+  if (sentence.length <= limit) return sentence;
+  const cut = sentence.slice(0, limit);
+  return `${cut.slice(0, Math.max(cut.lastIndexOf(' '), limit - 40)).trimEnd()}…`;
+}
+
 /** The agent's own sentence about the open changes, when the agent made them and said one. */
 export function agentSentence(detail: TaskDetail | null, open: Proposal[]): string | null {
   const attempts = new Set(open.filter((p) => p.actorKind !== 'person').map((p) => p.attemptId));
   const said = (detail?.attempts ?? [])
     .filter((a) => attempts.has(a.id) && a.outcome?.summary)
     .sort((a, b) => b.attempt_no - a.attempt_no)[0];
-  return said?.outcome?.summary ?? null;
+  const summary = said?.outcome?.summary;
+  return summary ? firstSentence(summary) : null;
 }
 
 /** Loads the picture of the tree whenever its projection changes, and frees the old one. */

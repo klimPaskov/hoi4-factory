@@ -71,7 +71,9 @@ Keep changes small and in the mod's existing style. To change a national focus t
 focus_projection and change it with focus_edit, never by writing its file with write_file: focus_edit \
 keeps every untouched byte, writes the localisation and is the same path a person's editor uses. \
 When the work is done, or cannot continue, \
-call finish exactly once with a short summary, the files you changed and any open questions.";
+call finish exactly once with a short summary, the files you changed and any open questions. \
+Begin the summary with one plain sentence for the modder that says what changed, in the titles \
+people see in the game, with no ids, file names, hashes or tool names. Details may follow after it.";
 
 /// Everything a runner needs about its attempt.
 #[derive(Debug, Clone)]

@@ -1,0 +1,163 @@
+{
+ "proposals": [
+  {
+   "actorAccountId": null,
+   "actorKind": "native_agent",
+   "after": {
+    "common/national_focus/exp_basic.focus-plan.json": "absent",
+    "common/national_focus/exp_basic.txt": "63d215f9d44e74fd488a47ce66ddcb710a7a25d7b2b63e8cddc0e7a59a1c7b4e",
+    "localisation/english/exp_basic_tree_l_english.yml": "e942b66ecbc33dfd0fc43cf4385b29fbfcb40b50c186b661465f96a3d3fb8493"
+   },
+   "afterProjectionId": "04ca28c6-dbc0-4ce4-9290-a850418dffb5",
+   "attemptId": "aaad0910-f456-4d85-8dd4-6bfcadac020a",
+   "baseProjectionHash": "6ec95c9cc682d73f8deb9645c3c273777a1ab1ebeb1d037e19b081a14aca2bd7",
+   "before": {
+    "common/national_focus/exp_basic.focus-plan.json": "absent",
+    "common/national_focus/exp_basic.txt": "68bd406d428bcc8add0a35b616904611bded565fe9e987d7bb0287fdfd15fcf9",
+    "localisation/english/exp_basic_tree_l_english.yml": "absent"
+   },
+   "changedIds": [
+    "exp_reform"
+   ],
+   "changedPaths": [
+    "common/national_focus/exp_basic.txt",
+    "localisation/english/exp_basic_tree_l_english.yml"
+   ],
+   "createdAt": "2026-11-14T21:19:09.498858Z",
+   "diffs": [
+    {
+     "diff": "--- a/common/national_focus/exp_basic.txt\n+++ b/common/national_focus/exp_basic.txt\n@@ -55,4 +55,15 @@\n \t\tai_will_do = { factor = 1 }\n \t\tcompletion_reward = { add_political_power = 50 }\n \t}\n+\n+\tfocus = {\n+\t\tid = exp_reform\n+\t\ticon = GFX_exp_icon_created\n+\t\tprerequisite = { focus = exp_join }\n+\t\tx = 4\n+\t\ty = 3\n+\t\tcost = 5\n+\t\tai_will_do = { factor = 1 }\n+\t\tcompletion_reward = { add_political_power = 25 }\n+\t}\n }\n",
+     "path": "common/national_focus/exp_basic.txt"
+    },
+    {
+     "diff": "--- /dev/null\n+++ b/localisation/english/exp_basic_tree_l_english.yml\n@@ -0,0 +1,3 @@\n+﻿l_english:\n+ exp_reform:0 \"Reform\"\n+ exp_reform_desc:0 \"Join opens the door; now we reshape the state.\"\n",
+     "path": "localisation/english/exp_basic_tree_l_english.yml"
+    }
+   ],
+   "engineReport": {
+    "baseline_commit": "2670e42f0a25b1bfd46bc7b9ba99cf2c499d752e",
+    "baselined_findings": 0,
+    "blocking": [],
+    "elapsed_ms": 7177,
+    "engine_rev": "73a5d7199ab7d1e4e3aeca74598d946512e23f3d",
+    "engine_version": "0.1.0",
+    "game_version": "1.19.4.2",
+    "new_findings": 0,
+    "unknown": {
+     "commands_resolved": 6,
+     "commands_unknown": 0,
+     "commands_unresolved": 0,
+     "game_layer": true,
+     "references_resolved": 7,
+     "references_unknown": 0,
+     "references_unresolved": 0,
+     "unmodelled_script_files": 0,
+     "vocabulary_available": true
+    },
+    "verdict": "pass"
+   },
+   "findingDelta": {
+    "changed": 0,
+    "improved": 0,
+    "introduced": 0,
+    "resolved": 0,
+    "unchanged": 0,
+    "worsened": 0
+   },
+   "id": "8c6fc7f7-76a6-48b3-b51d-eaedbf35ee6e",
+   "operations": [
+    {
+     "cost": 5.0,
+     "description": "Join opens the door; now we reshape the state.",
+     "focus_id": "exp_reform",
+     "icon": "GFX_exp_icon_created",
+     "op": "create",
+     "prerequisites": [
+      "exp_join"
+     ],
+     "reward": "add_political_power = 25",
+     "title": "Reform",
+     "x": 4,
+     "y": 3
+    }
+   ],
+   "proposalHash": "cdaa708d648012587518299c085e3b0367ae73435a02e9f256fea710969aa8a6",
+   "requestSha256": "a3d61d28ff3e8067a367676851b460384e6a464123e96fb9dbe44e8a3c79a6f5",
+   "state": "committed",
+   "summary": {
+    "added": [
+     "exp_reform"
+    ],
+    "changed": [],
+    "removed": []
+   },
+   "taskId": "4c558135-66ef-49d6-89ab-9bdb04cc6768",
+   "toolOperation": "hoi4.focus_rewrite",
+   "toolVersion": "4.12.0",
+   "treeId": "exp_basic_tree",
+   "updatedAt": "2026-11-14T21:20:07.618314Z"
+  },
+  {
+   "actorAccountId": null,
+   "actorKind": "native_agent",
+   "after": {
+    "common/national_focus/exp_basic.focus-plan.json": "absent",
+    "common/national_focus/exp_basic.txt": "51fe813bb5116bb3e6f6a0ac8d2ca1384ca2b3710dbff7b6b90f08e96a3fcf27"
+   },
+   "afterProjectionId": "b8f20703-c4a9-4b93-8bca-cfd4a78eeefa",
+   "attemptId": "2765a8d3-33d7-47b6-ac1d-5452096f07f0",
+   "baseProjectionHash": "7676e0f2c4aeda85b5b78234e6ad0fd02e3b215cf5af5bc304b59d694fdd2e75",
+   "before": {
+    "common/national_focus/exp_basic.focus-plan.json": "absent",
+    "common/national_focus/exp_basic.txt": "63d215f9d44e74fd488a47ce66ddcb710a7a25d7b2b63e8cddc0e7a59a1c7b4e"
+   },
+   "changedIds": [
+    "exp_reform"
+   ],
+   "changedPaths": [
+    "common/national_focus/exp_basic.txt"
+   ],
+   "createdAt": "2026-11-14T21:21:12.248299Z",
+   "diffs": [
+    {
+     "diff": "--- a/common/national_focus/exp_basic.txt\n+++ b/common/national_focus/exp_basic.txt\n@@ -62,7 +62,7 @@\n \t\tprerequisite = { focus = exp_join }\n \t\tx = 4\n \t\ty = 3\n-\t\tcost = 5\n+\t\tcost = 3\n \t\tai_will_do = { factor = 1 }\n \t\tcompletion_reward = { add_political_power = 25 }\n \t}\n",
+     "path": "common/national_focus/exp_basic.txt"
+    }
+   ],
+   "engineReport": null,
+   "findingDelta": null,
+   "id": "1b8b7c5c-4500-42c2-99f4-ad970ece45d7",
+   "operations": [
+    {
+     "cost": 3.0,
+     "focus_id": "exp_reform",
+     "op": "set_cost"
+    }
+   ],
+   "proposalHash": "1715cec7630674a4a96fb93e1664b041cd2a129f92ba01ee0a59ff59fdf81914",
+   "requestSha256": "63b3270e2ed48738bd75b9c37e61f9b58680e1277142df7d1864d56fdaecfa65",
+   "state": "applied",
+   "summary": {
+    "added": [],
+    "changed": [
+     {
+      "fields": [
+       {
+        "after": "3",
+        "before": "5",
+        "name": "cost"
+       }
+      ],
+      "id": "exp_reform"
+     }
+    ],
+    "removed": []
+   },
+   "taskId": "4c558135-66ef-49d6-89ab-9bdb04cc6768",
+   "toolOperation": "hoi4.focus_rewrite",
+   "toolVersion": "4.12.0",
+   "treeId": "exp_basic_tree",
+   "updatedAt": "2026-11-14T21:21:12.248300Z"
+  }
+ ]
+}
