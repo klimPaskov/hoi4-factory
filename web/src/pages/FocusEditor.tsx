@@ -251,9 +251,12 @@ function FocusCard({ session, node, frozen, onClose }: { session: FocusSession; 
   };
   const saveText = () => {
     if (frozen) return;
-    const next = { title: title.trim(), description: description.trim() };
-    if (!next.title || (next.title === node.label && next.description === (node.description ?? ''))) return;
-    session.setText(node.id, next.title, next.description);
+    // Only what changed is sent. An emptied field is left as it was.
+    const text: { title?: string; description?: string } = {};
+    if (title.trim() && title.trim() !== node.label) text.title = title.trim();
+    if (description.trim() && description.trim() !== (node.description ?? '')) text.description = description.trim();
+    if (text.title === undefined && text.description === undefined) return;
+    session.setText(node.id, text);
   };
   return (
     <aside className="fx-card" aria-label={t('focus.card.label', { name: node.label })}>

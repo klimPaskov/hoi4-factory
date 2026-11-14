@@ -13,7 +13,7 @@ use serde_json::{Map, Value, json};
 use super::ops::not_editable_reason;
 
 pub const INSPECT_TOOL: &str = "hoi4.focus_inspect";
-pub const SUPPORTED_OPERATIONS: [&str; 4] = ["create", "link", "move", "set_cost"];
+pub const SUPPORTED_OPERATIONS: [&str; 5] = ["create", "link", "move", "set_cost", "set_text"];
 
 /// A projection with what the host needs to guard a later rewrite.
 #[derive(Debug, Clone)]
@@ -180,6 +180,9 @@ pub fn build(
         let mut node = Map::new();
         node.insert("id".into(), json!(id));
         node.insert("label".into(), json!(title.unwrap_or(&id)));
+        if let Some(description) = entry["description"].as_str() {
+            node.insert("description".into(), json!(description));
+        }
         node.insert(
             "titleKey".into(),
             json!(f["localisation"]["titleKey"].as_str().unwrap_or(&id)),

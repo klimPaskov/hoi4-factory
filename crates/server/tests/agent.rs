@@ -1050,3 +1050,56 @@ async fn admission_follows_the_stored_probe_of_a_self_hosted_endpoint() {
     assert_eq!(outcomes[1].1, "unsupported", "{outcomes:?}");
     assert_eq!((outcomes[1].2, outcomes[1].3.clone()), (409, json!("capability_unsatisfied")), "{outcomes:?}");
 }
+
+// ----- A follow-up request: one more attempt on the same task, asked something new -----------
+
+#[tokio::test]
+async fn a_follow_up_request_is_what_the_next_attempt_is_asked() {
+    let a = agent(Setup { replies: vec![rec("agent-write-turn"), rec("agent-finish-turn"), rec("agent-finish-turn")], ..Setup::default() }).await;
+    let task = a.edit_task(&["common/ideas"]).await;
+    let id = task["id"].as_str().unwrap().to_owned();
+    let start = a.start(&a.alice, &task).await;
+    assert_eq!(start.status, 201, "{}", start.text);
+    let d = a.wait_state(&id, "succeeded").await;
+    let attempts = format!("{}/{id}/attempts", a.tasks());
+
+    // An empty or overlong request is refused before anything is admitted.
+    for bad in ["   ".to_owned(), "x".repeat(2001)] {
+        let r = a.alice.client.post(&attempts, json!({ "expected_version": d["task"]["version"], "instruction": bad })).await;
+        assert_eq!(r.status, 400, "{}", r.text);
+        assert_eq!(r.body["error"]["affected_ids"]["field"], "instruction", "{}", r.text);
+    }
+    assert_eq!(a.detail(&id).await["attempts"].as_array().unwrap().len(), 1);
+
+    let request = "Also give the idea a second line";
+    let follow = a.alice.client.post(&attempts, json!({ "expected_version": d["task"]["version"], "instruction": request })).await;
+    assert_eq!(follow.status, 201, "{}", follow.text);
+    let d = a.wait(&id, 40, |last| last["attempt_no"] == 2 && last["state"] == "succeeded").await;
+    assert_eq!(d["task"]["objective"], "Add an idea file", "the task keeps its first objective");
+
+    // The model was asked the follow-up, with a reminder of the task it follows.
+    let bodies = a.replay.request_bodies("/v1/messages");
+    assert_eq!(bodies.len(), 3, "two turns for the first attempt, one for the follow-up");
+    assert!(!bodies[0].contains(request));
+    assert!(bodies[2].contains(request), "the follow-up attempt opens with the request");
+    assert!(bodies[2].contains("follow-up request on an earlier task"));
+    assert!(bodies[2].contains("Add an idea file"), "and is reminded of the first objective");
+
+    // The stored bundle of the second attempt says the same, so a recovered attempt reads it too.
+    let admin = a.h.admin().await;
+    let bundle_id: Uuid = sqlx::query_scalar("SELECT bundle_id FROM agent_attempts WHERE task_id = $1 AND attempt_no = 2")
+        .bind(Uuid::parse_str(&id).unwrap())
+        .fetch_one(&admin)
+        .await
+        .unwrap();
+    let mut conn = admin.acquire().await.unwrap();
+    let bundle = factory_tasks::load_bundle(&mut conn, factory_tasks::BundleId(bundle_id)).await.expect("the bundle verifies");
+    drop(conn);
+    assert!(bundle.content.scope.objective.starts_with(request), "{}", bundle.content.scope.objective);
+    admin.close().await;
+    let events = a.events(&id).await;
+    let attached: Vec<&Value> = events.iter().filter(|e| e["type"] == "context_bundle_attached").collect();
+    assert_eq!(attached.len(), 2);
+    assert_eq!(attached[0]["payload"]["follow_up"], Value::Null);
+    assert_eq!(attached[1]["payload"]["follow_up"], request);
+}

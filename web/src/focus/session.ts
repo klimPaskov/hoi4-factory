@@ -131,7 +131,8 @@ export interface FocusSession {
   editable: boolean;
   move: (id: string, x: number, y: number) => void;
   setCost: (id: string, cost: number) => void;
-  setText: (id: string, title: string, description: string) => void;
+  /** Sets the title, the description or both. Leave out what stays as it is. */
+  setText: (id: string, text: { title?: string; description?: string }) => void;
   /** Saves every open change. `anyway` accepts a check that could not finish. */
   approve: (message: string, anyway: boolean) => void;
   reject: () => void;
@@ -244,7 +245,7 @@ export function useFocusSession(projectId: string, taskId: string, treeId: strin
     editable: task !== undefined && task.mode === 'edit' && task.state !== 'completed' && task.state !== 'cancelled',
     move: (id, x, y) => operate([{ op: 'move', focus_id: id, x, y }]),
     setCost: (id, cost) => operate([{ op: 'set_cost', focus_id: id, cost }]),
-    setText: (id, title, description) => operate([{ op: 'set_text', focus_id: id, title, description }]),
+    setText: (id, text) => operate([{ op: 'set_text', focus_id: id, ...text }]),
     approve: (message, anyway) =>
       void act(async () => {
         await commitProposals(

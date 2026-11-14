@@ -246,7 +246,7 @@ impl ToolSet {
         self.add(
             FOCUS_EDIT,
             ToolKind::FocusEdit,
-            "Change a national focus tree with up to 20 operations, applied together or not at all, exactly like the editor: move {focus_id, x, y}, set_cost {focus_id, cost}, link {focus_id, prerequisites: [ids, any one of them]}, create {focus_id, x, y, cost, prerequisites, icon (a GFX_ sprite), title, description, reward (effect lines such as add_political_power = 25)}. Pass expected_projection_hash from focus_projection. Only focuses with a literal x and y can move or link. The tool writes the focus file and the English localisation, and returns the new projection.",
+            "Change a national focus tree with up to 20 operations, applied together or not at all, exactly like the editor: move {focus_id, x, y}, set_cost {focus_id, cost}, link {focus_id, prerequisites: [ids, any one of them]}, set_text {focus_id, title, description (either or both, of an existing focus)}, create {focus_id, x, y, cost, prerequisites, icon (a GFX_ sprite), title, description, reward (effect lines such as add_political_power = 25)}. Pass expected_projection_hash from focus_projection. Only focuses with a literal x and y can move or link. The tool writes the focus file and the English localisation, and returns the new projection.",
             crate::focus::ops::ops_schema(),
             EffectClass::IdempotentWrite,
             OperationClass::WriteTaskWorktree,

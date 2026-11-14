@@ -178,6 +178,95 @@ fn append_localisation(root: &Path, rel: &str, lines: &[(String, String)]) -> Re
     std::fs::write(&path, text).map_err(|e| FocusError::Internal { message: e.to_string() })
 }
 
+/// The English localisation file under `localisation/` that defines `key`, if any.
+fn find_localisation(root: &Path, key: &str) -> Option<String> {
+    fn walk(dir: &Path, rel: &str, depth: usize, out: &mut Vec<String>) {
+        if depth > 4 {
+            return;
+        }
+        let Ok(entries) = std::fs::read_dir(dir) else { return };
+        for entry in entries.flatten() {
+            let name = entry.file_name().to_string_lossy().into_owned();
+            let child = format!("{rel}/{name}");
+            match entry.file_type() {
+                Ok(kind) if kind.is_dir() => walk(&entry.path(), &child, depth + 1, out),
+                Ok(kind) if kind.is_file() && name.ends_with("l_english.yml") => out.push(child),
+                _ => {}
+            }
+        }
+    }
+    let mut files = Vec::new();
+    walk(&root.join("localisation"), "localisation", 0, &mut files);
+    files.sort();
+    files.into_iter().find(|rel| {
+        std::fs::read(root.join(rel))
+            .ok()
+            .is_some_and(|bytes| String::from_utf8_lossy(&bytes).lines().any(|line| key_of(line) == Some(key)))
+    })
+}
+
+/// The key a localisation line defines: `key` of ` key:0 "text"`.
+fn key_of(line: &str) -> Option<&str> {
+    let line = line.trim_start_matches('\u{feff}').trim_start();
+    let (key, _) = line.split_once(':')?;
+    (!key.is_empty() && !key.starts_with('#') && !key.contains(char::is_whitespace)).then_some(key)
+}
+
+/// The text of a localisation file with the line of `key` set to `value`. The line keeps its
+/// indentation, its version number and its line ending. A key the file does not have is added
+/// at the end. `existing` is `None` for a file that is created, with a BOM and the language header.
+fn with_localisation_line(existing: Option<&str>, key: &str, value: &str) -> String {
+    let text = existing.map(str::to_owned).unwrap_or_else(|| "\u{feff}l_english:\n".to_owned());
+    let mut out = String::with_capacity(text.len() + value.len() + key.len() + 8);
+    let mut replaced = false;
+    for line in text.split_inclusive('\n') {
+        if !replaced && key_of(line) == Some(key) {
+            let body = line.trim_end_matches(['\r', '\n']);
+            let ending = &line[body.len()..];
+            let head_len = body.find(':').map_or(body.len(), |i| i + 1);
+            let version: String = body[head_len..].chars().take_while(char::is_ascii_digit).collect();
+            out.push_str(&body[..head_len]);
+            out.push_str(&version);
+            out.push_str(&format!(" \"{value}\""));
+            out.push_str(ending);
+            replaced = true;
+        } else {
+            out.push_str(line);
+        }
+    }
+    if !replaced {
+        if !out.ends_with('\n') {
+            out.push('\n');
+        }
+        out.push_str(&format!(" {key}:0 \"{value}\"\n"));
+    }
+    out
+}
+
+fn write_localisation_line(root: &Path, rel: &str, key: &str, value: &str) -> Result<(), FocusError> {
+    let path = root.join(rel);
+    let existing = match std::fs::read(&path) {
+        Ok(bytes) => Some(String::from_utf8(bytes).map_err(|_| FocusError::Internal { message: format!("{rel} is not UTF-8") })?),
+        Err(_) => None,
+    };
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| FocusError::Internal { message: e.to_string() })?;
+    }
+    std::fs::write(&path, with_localisation_line(existing.as_deref(), key, value)).map_err(|e| FocusError::Internal { message: e.to_string() })
+}
+
+/// The localisation file each text edit of `ops` writes: the file that defines the key today, or
+/// the tree's own English file for a key no file defines. A caller checks these paths against the
+/// task's allowed paths before the edit, and the rewrite writes exactly these.
+pub fn text_targets(root: &Path, base: &Built, ops: &[FocusOp]) -> Vec<(String, String)> {
+    let Ok((_, change)) = apply_ops(&base.plan, ops) else { return Vec::new() };
+    change
+        .text
+        .iter()
+        .map(|(key, _)| (key.clone(), find_localisation(root, key).unwrap_or_else(|| localisation_path(&base.tree_id))))
+        .collect()
+}
+
 pub struct FocusSession {
     session: ToolSession,
     root: PathBuf,
@@ -338,7 +427,7 @@ impl FocusSession {
     /// path, the agent path and the coding-client parity test all send exactly this.
     pub fn request(base: &Built, ops: &[FocusOp]) -> Result<(Value, PlanChange), FocusError> {
         let (plan, change) = apply_ops(&base.plan, ops).map_err(|error| FocusError::OperationRefused { error })?;
-        for (_, text) in &change.localisation {
+        for (_, text) in change.localisation.iter().chain(&change.text) {
             if !localisation_text_ok(text) {
                 return Err(FocusError::OperationRefused {
                     error: OpError {
@@ -363,18 +452,33 @@ impl FocusSession {
             return Err(FocusError::StaleBase { current });
         }
         let (request, change) = Self::request(base, ops)?;
-        let request_sha256 = factory_hoi4_tools::mcp::canonical_sha256(&request);
+        // A text edit is not part of the tool's request, so it is hashed beside it.
+        let request_sha256 = if change.text.is_empty() {
+            factory_hoi4_tools::mcp::canonical_sha256(&request)
+        } else {
+            factory_hoi4_tools::mcp::canonical_sha256(&json!({ "request": request, "text": change.text }))
+        };
+        // Operations that only set text leave the plan as it is. The tool is not called for them:
+        // it would answer that the rewrite changed nothing.
+        let plan_changed = request["plan"] != base.plan;
+        let text_files = text_targets(&self.root, base, ops);
         let sidecar = sidecar_path(&base.relative_path);
         let loc = localisation_path(&base.tree_id);
         let mut touched = vec![base.relative_path.clone(), sidecar.clone()];
         if !change.localisation.is_empty() {
             touched.push(loc.clone());
         }
+        for (_, file) in &text_files {
+            if !touched.contains(file) {
+                touched.push(file.clone());
+            }
+        }
         let before: BTreeMap<String, String> = touched.iter().map(|p| (p.clone(), hash_file(&self.root, p))).collect();
         let before_bytes: BTreeMap<String, Option<Vec<u8>>> =
             touched.iter().map(|p| (p.clone(), std::fs::read(self.root.join(p)).ok())).collect();
         let dirty_before = dirty_paths(&self.root)?;
 
+        if plan_changed {
         let deadline = Instant::now() + REWRITE_TIMEOUT;
         let result = match self.session.call(FOCUS_REWRITE, &request, deadline).await {
             Ok(r) => r,
@@ -429,11 +533,23 @@ impl FocusSession {
         if !unexpected.is_empty() {
             return Err(FocusError::UnexpectedWrite { paths: unexpected });
         }
+        }
         if !change.localisation.is_empty() {
             append_localisation(&self.root, &loc, &change.localisation)?;
         }
+        for ((key, text), (_, file)) in change.text.iter().zip(&text_files) {
+            write_localisation_line(&self.root, file, key, text)?;
+        }
         let after: BTreeMap<String, String> = touched.iter().map(|p| (p.clone(), hash_file(&self.root, p))).collect();
         let changed_paths: Vec<String> = touched.iter().filter(|p| before[*p] != after[*p]).cloned().collect();
+        if changed_paths.is_empty() {
+            // Only possible for text that is already what was asked: there is nothing to review.
+            return Err(FocusError::ToolRefused {
+                tool_code: "NO_SOURCE_CHANGE".to_owned(),
+                message: "the text is already what was asked".to_owned(),
+                blockers: Value::Array(Vec::new()),
+            });
+        }
         let diffs = changed_paths
             .iter()
             .map(|p| {
@@ -454,6 +570,42 @@ fn tool_error(e: ToolError) -> FocusError {
     match e {
         ToolError::NotAvailable { name, reason } => FocusError::ToolsUnavailable { message: format!("{name}: {reason}") },
         other => FocusError::Internal { message: other.to_string() },
+    }
+}
+
+#[cfg(test)]
+mod text_tests {
+    use super::*;
+
+    #[test]
+    fn a_localisation_line_is_replaced_in_place_or_added() {
+        let file = "\u{feff}l_english:\r\n a:0 \"Alpha\"\r\n  a_desc:1 \"Old text\" # note\r\n b: \"Beta\"\r\n";
+        let out = with_localisation_line(Some(file), "a_desc", "New text");
+        assert_eq!(out, "\u{feff}l_english:\r\n a:0 \"Alpha\"\r\n  a_desc:1 \"New text\"\r\n b: \"Beta\"\r\n", "indentation, version and line ending stay");
+        let out = with_localisation_line(Some(file), "b", "B");
+        assert!(out.contains("\n b: \"B\"\r\n"), "a line without a version number keeps none: {out:?}");
+        let out = with_localisation_line(Some(" a:0 \"Alpha\""), "c", "Gamma");
+        assert_eq!(out, " a:0 \"Alpha\"\n c:0 \"Gamma\"\n", "a missing key is added at the end");
+        assert_eq!(with_localisation_line(None, "c", "Gamma"), "\u{feff}l_english:\n c:0 \"Gamma\"\n", "a new file gets the BOM and the header");
+        // A key that only starts like another is a different key.
+        assert_eq!(key_of(" a_desc:0 \"x\""), Some("a_desc"));
+        assert_eq!(key_of("# a:0 \"x\""), None);
+        assert_eq!(key_of("\u{feff}l_english:"), Some("l_english"));
+    }
+
+    #[test]
+    fn a_text_edit_goes_to_the_file_that_defines_its_key() {
+        let dir = tempfile::tempdir().unwrap();
+        let root = dir.path();
+        std::fs::create_dir_all(root.join("localisation/english")).unwrap();
+        std::fs::write(root.join("localisation/english/other_l_english.yml"), "\u{feff}l_english:\n a:0 \"Alpha\"\n").unwrap();
+        std::fs::write(root.join("localisation/english/notes.txt"), " a_desc:0 \"not a localisation file\"\n").unwrap();
+        assert_eq!(find_localisation(root, "a").as_deref(), Some("localisation/english/other_l_english.yml"));
+        assert_eq!(find_localisation(root, "a_desc"), None);
+        write_localisation_line(root, "localisation/english/other_l_english.yml", "a", "Alpha two").unwrap();
+        write_localisation_line(root, &localisation_path("t"), "a_desc", "Text").unwrap();
+        assert_eq!(std::fs::read_to_string(root.join("localisation/english/other_l_english.yml")).unwrap(), "\u{feff}l_english:\n a:0 \"Alpha two\"\n");
+        assert_eq!(std::fs::read_to_string(root.join("localisation/english/t_l_english.yml")).unwrap(), "\u{feff}l_english:\n a_desc:0 \"Text\"\n");
     }
 }
 

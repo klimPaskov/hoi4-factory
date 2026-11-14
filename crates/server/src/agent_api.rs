@@ -9,7 +9,7 @@
 //! | `GET /account/usage` | signed in | This month's operator allowance and own-key usage |
 //! | `GET /projects/{id}/tasks`, `POST` | member; create needs `CreateTask` | List and create agent tasks |
 //! | `GET /projects/{id}/tasks/{task}` | member | Task, attempts, grants and unresolved effects |
-//! | `POST .../tasks/{task}/attempts` | `CreateTask`, verified email | Admit an attempt and start the agent |
+//! | `POST .../tasks/{task}/attempts` | `CreateTask`, verified email | Admit an attempt and start the agent. An optional `instruction` is a follow-up request the attempt works from |
 //! | `POST .../tasks/{task}/pause`, `.../resume` | `CreateTask` | Durable pause (expected version) |
 //! | `POST .../attempts/{attempt}/interrupt` | `CreateTask` | Request cancellation; the attempt reports how it stopped |
 //! | `POST .../grants/{grant}/revoke` | grantor or owner | Revoke the attempt's grant (new epoch) |
@@ -727,6 +727,9 @@ struct Expected {
     expected_version: i64,
     #[serde(default)]
     reason: Option<String>,
+    /// Only for a new attempt: one more request on the same task, from the focus editor's bar.
+    #[serde(default)]
+    instruction: Option<String>,
 }
 
 /// Opens (or reopens) the task's own worktree on its owned branch.
@@ -812,6 +815,13 @@ async fn start_attempt(
     if task.paused {
         return Err(task_error(factory_tasks::TaskError::Paused).into());
     }
+    let instruction = match body.instruction.as_deref().map(str::trim) {
+        None => None,
+        Some(text) if text.is_empty() || text.chars().count() > runner::MAX_INSTRUCTION_CHARS => {
+            return Err(ApiError::invalid_request(format!("Write the request in 1 to {} characters.", runner::MAX_INSTRUCTION_CHARS)).with_id("field", "instruction").into());
+        }
+        Some(text) => Some(text.to_owned()),
+    };
     let (profile, funding) = resolve_choice(rt, principal.account_id(), &task.model_choice).await?;
     if let Err(missing) = profile.starting_capabilities().require(profiles::REQUIRED) {
         return Err(Fail::from(ApiError::new(
@@ -841,6 +851,7 @@ async fn start_attempt(
             verified: principal.account.email_verified,
             expected_version: body.expected_version,
             task,
+            instruction,
             profile,
             funding,
             worktree,

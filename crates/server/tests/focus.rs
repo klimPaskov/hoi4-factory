@@ -712,3 +712,74 @@ async fn the_live_preview_is_the_game_render_and_follows_the_source() {
     let refused = mallory.client.get(&format!("{}/focus/trees/exp_basic_tree/preview.png", e.base())).await;
     assert_eq!(refused.status, 404);
 }
+
+// ----- A title or description edit changes only the line of its key ---------------------------
+
+#[tokio::test]
+async fn a_text_edit_changes_only_the_localisation_line_of_its_key() {
+    const LOC: &str = "localisation/english/exp_basic_l_english.yml";
+    let Some(e) = editor().await else { return };
+    let p = e.projection().await;
+    assert!(p["supportedOperations"].as_array().unwrap().contains(&json!("set_text")), "{}", p["supportedOperations"]);
+    let left = p["nodes"].as_array().unwrap().iter().find(|n| n["id"] == "exp_left").unwrap();
+    assert_eq!(left["label"], "Left");
+    assert_eq!(left["description"], "Go left.", "the projection carries the description the card shows");
+    let source_before = e.source();
+    let loc_before = std::fs::read_to_string(e.worktree().join(LOC)).unwrap();
+
+    let r = e
+        .ops(&e.alice, p["projectionHash"].as_str().unwrap(), json!([{"op": "set_text", "focus_id": "exp_left", "title": "Left road"}]))
+        .await;
+    assert_eq!(r.status, 201, "{}", r.text);
+    let proposal = &r.body["proposal"];
+    assert_eq!(proposal["changedIds"], json!(["exp_left"]));
+    assert_eq!(proposal["changedPaths"], json!([LOC]), "the key's own file, not the tree's default file");
+    assert_eq!(proposal["summary"]["changed"][0]["fields"][0]["name"], "title", "{}", proposal["summary"]);
+    assert_eq!(e.source(), source_before, "the tree's source keeps every byte");
+    let loc_after = std::fs::read_to_string(e.worktree().join(LOC)).unwrap();
+    assert_eq!(loc_after, loc_before.replacen(" exp_left:0 \"Left\"", " exp_left:0 \"Left road\"", 1), "only that line changed");
+    assert!(!e.worktree().join("localisation/english/exp_basic_tree_l_english.yml").exists(), "no second file for a key that already has one");
+    let after = &r.body["projection"];
+    let left = after["nodes"].as_array().unwrap().iter().find(|n| n["id"] == "exp_left").unwrap();
+    assert_eq!(left["label"], "Left road", "{left}");
+
+    // The same text again changes nothing and is refused, so no empty proposal is left to review.
+    let again = e
+        .ops(&e.alice, after["projectionHash"].as_str().unwrap(), json!([{"op": "set_text", "focus_id": "exp_left", "title": "Left road"}]))
+        .await;
+    assert_eq!(again.status, 422, "{}", again.text);
+    assert_eq!(again.body["error"]["code"], "tool_refused");
+    // A double quote would break the line, and an unknown focus has no text.
+    for ops in [json!([{"op": "set_text", "focus_id": "exp_left", "title": "Left \"road\""}]), json!([{"op": "set_text", "focus_id": "exp_nowhere", "title": "X"}])] {
+        let bad = e.ops(&e.alice, after["projectionHash"].as_str().unwrap(), ops).await;
+        assert_eq!(bad.status, 422, "{}", bad.text);
+        assert_eq!(bad.body["error"]["code"], "operation_refused");
+    }
+    assert_eq!(std::fs::read_to_string(e.worktree().join(LOC)).unwrap(), loc_after, "a refusal writes nothing");
+
+    // Undo puts the line back exactly.
+    let id = proposal["id"].as_str().unwrap();
+    let undo = e.alice.client.post(&format!("{}/proposals/{id}/discard", e.base()), json!({})).await;
+    assert_eq!(undo.status, 200, "{}", undo.text);
+    assert_eq!(std::fs::read_to_string(e.worktree().join(LOC)).unwrap(), loc_before);
+}
+
+#[tokio::test]
+async fn a_text_edit_outside_the_allowed_paths_is_refused() {
+    let Some(e) = editor().await else { return };
+    // A second task that may write the tree but not the localisation folder.
+    let t = e
+        .alice
+        .client
+        .post(&format!("/api/v1/projects/{}/tasks", e.project), json!({ "objective": "Move focuses only", "mode": "edit", "allowed_paths": ["common/national_focus", "localisation/english/exp_basic_tree_l_english.yml"] }))
+        .await;
+    assert_eq!(t.status, 201, "{}", t.text);
+    let narrow = Editor { h: e.h, alice: e.alice, project: e.project, task: t.body["id"].as_str().unwrap().to_owned() };
+    let p = narrow.projection().await;
+    let before = std::fs::read(narrow.worktree().join("localisation/english/exp_basic_l_english.yml")).unwrap();
+    let r = narrow
+        .ops(&narrow.alice, p["projectionHash"].as_str().unwrap(), json!([{"op": "set_text", "focus_id": "exp_left", "title": "Left road"}]))
+        .await;
+    assert_eq!(r.status, 403, "{}", r.text);
+    assert_eq!(std::fs::read(narrow.worktree().join("localisation/english/exp_basic_l_english.yml")).unwrap(), before);
+}

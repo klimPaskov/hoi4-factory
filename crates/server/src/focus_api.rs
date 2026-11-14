@@ -4,7 +4,7 @@
 //! |---|---|---|
 //! | `GET /projects/{id}/tasks/{task}/focus/trees/{tree}` | member | The tree's projection from `hoi4.focus_inspect` in the task's worktree |
 //! | `GET .../focus/trees/{tree}/preview.png`, `.../preview.json` | member | The live preview as the game draws it (D-50) and its hover map |
-//! | `POST .../focus/trees/{tree}/operations` | `CreateTask`, edit task | Apply focus operations as one C-02 proposal, with the person as actor |
+//! | `POST .../focus/trees/{tree}/operations` | `CreateTask`, edit task | Apply focus operations (move, cost, link, text, create) as one C-02 proposal, with the person as actor |
 //! | `GET /projects/{id}/tasks/{task}/proposals` | member | The task's change proposals, oldest first |
 //! | `GET .../proposals/{proposal}` | member | One proposal: summary, diffs, hashes and checks |
 //! | `POST .../proposals/{proposal}/discard` | `CreateTask` | Put an uncommitted proposal's files back, if nothing changed them since |
@@ -71,6 +71,12 @@ pub fn focus_fail(e: FocusError) -> Fail {
     Fail::from(ApiError::new(status, code, message, retry)).with_details(serde_json::to_value(&e).unwrap_or(Value::Null))
 }
 
+fn path_covered(task: &Task, path: &str) -> bool {
+    task.allowed_paths
+        .iter()
+        .any(|a| path == a || path.starts_with(&format!("{}/", a.trim_end_matches('/'))))
+}
+
 /// Whether the task may write the paths a focus edit of `relative_path` and `tree_id` touches.
 pub fn edit_allowed(task: &Task, relative_path: &str, tree_id: &str) -> Result<(), Fail> {
     if task.mode != TaskMode::Edit {
@@ -135,16 +141,22 @@ async fn operations(
         return Err(ApiError::invalid_request("expected_projection_hash is the projection's SHA-256.").into());
     }
     let (root, _) = ensure_worktree(&state, &project, task.id).await?;
-    let relative_path = {
+    let base = {
         let mut tx = rt.tx(principal.account_id()).await?;
         let latest = store::latest_projection(&mut tx, task.id, &tree).await?;
         tx.commit().await?;
         match latest {
-            Some((_, b)) => b.relative_path,
+            Some((_, b)) => b,
             None => return Err(focus_fail(FocusError::StaleBase { current: Default::default() })),
         }
     };
-    edit_allowed(&task, &relative_path, &tree)?;
+    edit_allowed(&task, &base.relative_path, &tree)?;
+    // A title or description edit writes the localisation file that defines its key.
+    for (_, file) in crate::focus::session::text_targets(&root, &base, &body.operations) {
+        if !path_covered(&task, &file) {
+            return Err(Fail::from(ApiError::forbidden(format!("The task may not write {file}."))).with_id("path", file));
+        }
+    }
     let applied = apply_operations(
         rt,
         &TaskKeys::of(&task, principal.account_id()),

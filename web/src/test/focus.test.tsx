@@ -149,6 +149,39 @@ describe('the focus editor', () => {
     expect(api.requests.find((r) => r.path === `${TREE}/operations`)?.body).toMatchObject({ operations: [{ op: 'set_cost', focus_id: 'SWE_military_reform', cost: 5 }] });
   });
 
+  it('changes a title from the card and sends only what changed', async () => {
+    const api = mockApi(
+      routes(() => [], {
+        [`POST ${TREE}/operations`]: { status: 201, json: { proposal: OWN_PROPOSAL, projection: PROJECTION } },
+      }),
+    );
+    renderApp(EDITOR);
+    await userEvent.click(await screen.findByRole('button', { name: 'Military Reform' }));
+    const card = screen.getByRole('complementary', { name: 'Military Reform' });
+    const title = within(card).getByLabelText('Title');
+    await userEvent.clear(title);
+    await userEvent.type(title, 'Army Reform');
+    await userEvent.click(within(card).getByLabelText('Description'));
+    await waitFor(() => expect(api.requests.some((r) => r.path === `${TREE}/operations`)).toBe(true));
+    expect(api.requests.find((r) => r.path === `${TREE}/operations`)?.body).toMatchObject({
+      operations: [{ op: 'set_text', focus_id: 'SWE_military_reform', title: 'Army Reform' }],
+    });
+    expect((api.requests.find((r) => r.path === `${TREE}/operations`)?.body as { operations: object[] }).operations[0]).not.toHaveProperty('description');
+  });
+
+  it('asks the agent for a change as a new attempt with the request', async () => {
+    const api = mockApi(
+      routes(() => [], {
+        [`POST ${TASK}/attempts`]: { status: 201, json: { task: task(), attempt: attempt({ state: 'running', outcome: null }) } },
+      }),
+    );
+    renderApp(EDITOR);
+    await userEvent.type(await screen.findByLabelText('Ask the agent for a change'), 'Add a naval branch');
+    await userEvent.click(screen.getByRole('button', { name: 'Send' }));
+    await waitFor(() => expect(api.requests.some((r) => r.method === 'POST' && r.path === `${TASK}/attempts`)).toBe(true));
+    expect(api.requests.find((r) => r.method === 'POST' && r.path === `${TASK}/attempts`)?.body).toEqual({ expected_version: 7, instruction: 'Add a naval branch' });
+  });
+
   it('undoes open changes newest first', async () => {
     const second = { ...OWN_PROPOSAL, id: 'second' };
     let list: Proposal[] = [OWN_PROPOSAL, second];

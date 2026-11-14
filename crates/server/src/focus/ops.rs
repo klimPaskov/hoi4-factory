@@ -5,6 +5,9 @@
 //! [`apply_ops`] turns them into one change of the tool's own focus-tree plan, which the host then
 //! sends to `hoi4.focus_rewrite`. No operation exists only for the editor.
 //!
+//! A title or description edit changes only the localisation line of its key. It never goes
+//! through the tool's rewrite, so the tree's source file keeps every byte.
+//!
 //! Only EXP-02's source-preserving subset is writable: moves and new links on focuses with a
 //! literal position, scalar costs, and new focuses with literal positions. A relative or shared
 //! focus is refused with a reason instead of being converted.
@@ -31,6 +34,14 @@ pub enum FocusOp {
         focus_id: String,
         prerequisites: Vec<String>,
     },
+    /// Sets the English title, the description, or both, of an existing focus.
+    SetText {
+        focus_id: String,
+        #[serde(default)]
+        title: Option<String>,
+        #[serde(default)]
+        description: Option<String>,
+    },
     /// Adds a focus with a literal position, optional prerequisites (one group), an icon sprite,
     /// localisation text and a completion reward (an effect block body).
     Create {
@@ -55,6 +66,7 @@ impl FocusOp {
             FocusOp::Move { focus_id, .. }
             | FocusOp::SetCost { focus_id, .. }
             | FocusOp::Link { focus_id, .. }
+            | FocusOp::SetText { focus_id, .. }
             | FocusOp::Create { focus_id, .. } => focus_id,
         }
     }
@@ -76,7 +88,7 @@ pub fn ops_schema() -> Value {
                 "items": {
                     "type": "object",
                     "properties": {
-                        "op": {"type": "string", "enum": ["move", "set_cost", "link", "create"]},
+                        "op": {"type": "string", "enum": ["move", "set_cost", "link", "set_text", "create"]},
                         "focus_id": id,
                         "x": coord,
                         "y": coord,
@@ -121,6 +133,9 @@ pub struct PlanChange {
     pub created_ids: Vec<String>,
     /// `(key, text)` pairs for the tree's English localisation file.
     pub localisation: Vec<(String, String)>,
+    /// `(key, text)` pairs of existing focuses: the line of each key is replaced where it is
+    /// defined, or added to the tree's English localisation file when no file defines it.
+    pub text: Vec<(String, String)>,
 }
 
 fn valid_id(id: &str) -> bool {
@@ -248,6 +263,30 @@ pub fn apply_ops(plan: &Value, ops: &[FocusOp]) -> Result<(Value, PlanChange), O
                     return Err(err("not_editable", &id, "its cost is not a literal number"));
                 }
                 list[i]["cost"] = number(*cost);
+            }
+            FocusOp::SetText { title, description, .. } => {
+                let i = index_of(list, &id).ok_or_else(|| err("focus_not_found", &id, "no such focus in this tree"))?;
+                if list[i]["sharedSupport"] == true {
+                    return Err(err("not_editable", &id, "a shared focus is edited in its own source"));
+                }
+                if title.is_none() && description.is_none() {
+                    return Err(err("invalid_value", &id, "give a title, a description or both"));
+                }
+                let keys = &list[i]["localisation"];
+                let title_key = keys["titleKey"].as_str().unwrap_or(&id).to_owned();
+                let description_key = keys["descriptionKey"].as_str().map(str::to_owned).unwrap_or_else(|| format!("{id}_desc"));
+                for (key, text) in [(title_key, title), (description_key, description)] {
+                    let Some(text) = text else { continue };
+                    let text = text.trim();
+                    if text.is_empty() || text.chars().count() > MAX_TEXT {
+                        return Err(err("invalid_value", &id, format!("a title or description has 1 to {MAX_TEXT} characters")));
+                    }
+                    if !valid_id(&key) {
+                        return Err(err("not_editable", &id, "its text key is not a plain name"));
+                    }
+                    change.text.retain(|(k, _)| k != &key);
+                    change.text.push((key, text.to_owned()));
+                }
             }
             FocusOp::Link { prerequisites, .. } => {
                 let i = index_of(list, &id).ok_or_else(|| err("focus_not_found", &id, "no such focus in this tree"))?;
@@ -422,6 +461,33 @@ mod tests {
         assert_eq!(change.localisation[1], ("c_desc".into(), "A new focus.".into()));
         // The input plan is untouched.
         assert_eq!(plan()["focuses"][1]["position"]["x"], 4);
+    }
+
+    #[test]
+    fn a_text_edit_names_the_keys_and_leaves_the_plan_alone() {
+        let mut p = plan();
+        p["focuses"][1]["localisation"] = json!({"titleKey": "b_title", "descriptionKey": "b_text"});
+        let ops = vec![
+            FocusOp::SetText { focus_id: "a".into(), title: Some("  Alpha  ".into()), description: None },
+            FocusOp::SetText { focus_id: "b".into(), title: Some("Old".into()), description: Some("Beta text".into()) },
+            FocusOp::SetText { focus_id: "b".into(), title: Some("Beta".into()), description: None },
+        ];
+        let (out, change) = apply_ops(&p, &ops).unwrap();
+        assert_eq!(out, p, "a text edit is not a change of the tree's source");
+        assert_eq!(
+            change.text,
+            vec![("a".to_owned(), "Alpha".to_owned()), ("b_text".to_owned(), "Beta text".to_owned()), ("b_title".to_owned(), "Beta".to_owned())],
+            "keys come from the focus, and a later edit of the same key wins"
+        );
+        assert_eq!(change.changed_ids, vec!["a", "b"]);
+        assert!(change.localisation.is_empty() && change.created_ids.is_empty());
+        let refuse = |op: FocusOp, code: &str| assert_eq!(apply_ops(&p, &[op]).unwrap_err().code, code);
+        refuse(FocusOp::SetText { focus_id: "a".into(), title: None, description: None }, "invalid_value");
+        refuse(FocusOp::SetText { focus_id: "a".into(), title: Some("  ".into()), description: None }, "invalid_value");
+        refuse(FocusOp::SetText { focus_id: "a".into(), title: Some("x".repeat(MAX_TEXT + 1)), description: None }, "invalid_value");
+        refuse(FocusOp::SetText { focus_id: "zz".into(), title: Some("x".into()), description: None }, "focus_not_found");
+        let v = jsonschema::validator_for(&ops_schema()).unwrap();
+        assert!(v.is_valid(&json!({"tree_id": "t", "operations": [{"op": "set_text", "focus_id": "a", "title": "Alpha"}]})));
     }
 
     #[test]

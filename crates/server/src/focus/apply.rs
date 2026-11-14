@@ -171,7 +171,7 @@ pub fn semantic_summary(before: &Value, after: &Value, changed_ids: &[String]) -
             (None, Some(_)) => added.push(json!(id)),
             (Some(old), Some(new)) => {
                 let mut fields = Vec::new();
-                for (name, key) in [("cost", "cost"), ("x", "x"), ("y", "y"), ("prerequisites", "prerequisiteGroups"), ("title", "label")] {
+                for (name, key) in [("cost", "cost"), ("x", "x"), ("y", "y"), ("prerequisites", "prerequisiteGroups"), ("title", "label"), ("description", "description")] {
                     if old[key] != new[key] {
                         fields.push(json!({"name": name, "before": old[key].to_string(), "after": new[key].to_string()}));
                     }

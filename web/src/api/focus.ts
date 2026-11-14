@@ -9,7 +9,7 @@ export type FocusOp =
   | { op: 'move'; focus_id: string; x: number; y: number }
   | { op: 'set_cost'; focus_id: string; cost: number }
   | { op: 'link'; focus_id: string; prerequisites: string[] }
-  | { op: 'set_text'; focus_id: string; title: string; description: string }
+  | { op: 'set_text'; focus_id: string; title?: string; description?: string }
   | {
       op: 'create';
       focus_id: string;
