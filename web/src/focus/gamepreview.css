@@ -1,0 +1,202 @@
+/* The live game preview (D-50). The picture is always dark, so markers on it use fixed colors
+   with their own backgrounds. The chrome around it uses the Workbench tokens. */
+
+.gp {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+}
+.gp-frame {
+  position: relative;
+  flex: 1;
+  min-height: 18rem;
+  overflow: hidden;
+  background: #101114;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.gp-frame:active {
+  cursor: grabbing;
+}
+.gp-frame:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.gp-world {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+}
+.gp-img {
+  display: block;
+  max-width: none;
+  pointer-events: none;
+  transition: opacity 0.25s, filter 0.25s;
+}
+.is-redrawing .gp-img {
+  opacity: 0.4;
+  filter: grayscale(0.6) blur(1px);
+}
+.gp-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.gp-slot {
+  position: absolute;
+  pointer-events: none;
+}
+.gp-hit {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: none;
+}
+.gp-hit:hover {
+  box-shadow: inset 0 0 0 2px rgb(255 255 255 / 0.55);
+}
+.gp-hit:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px #2d58cc;
+}
+.gp-hit.is-selected {
+  box-shadow: 0 0 0 3px #ffffff, 0 0 0 6px #2d58cc;
+}
+.gp-hit.is-pending.is-added {
+  box-shadow: 0 0 0 3px #3ddc84;
+  background: rgb(61 220 132 / 0.1);
+}
+.gp-hit.is-pending.is-changed {
+  box-shadow: 0 0 0 3px #ffb020;
+  background: rgb(255 176 32 / 0.1);
+}
+.gp-hit.is-pending.is-selected {
+  box-shadow: 0 0 0 3px #ffffff, 0 0 0 7px #2d58cc;
+}
+.gp-hit.is-moved,
+.gp-hit.is-undrawn {
+  border: 3px dashed #ffffff;
+  background: rgb(16 17 20 / 0.82);
+}
+.gp-hit.is-dragging {
+  opacity: 0.35;
+}
+.gp-ghost {
+  position: absolute;
+  border: 3px dashed #84a2ff;
+  border-radius: 10px;
+  background: rgb(132 162 255 / 0.18);
+  pointer-events: none;
+}
+/* Markers keep close to their screen size at every zoom. A new or changed focus gets a small pin, a
+   problem gets a small dot. Nothing on the picture is a button, so nothing covers a neighbour. */
+.gp-pin {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  font-weight: 800;
+  font-size: 13px;
+  line-height: 1;
+  color: #101114;
+  transform: translate(-35%, -35%) scale(var(--gp-inv));
+  transform-origin: center;
+  pointer-events: none;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.6);
+}
+.gp-pin-added {
+  background: #3ddc84;
+}
+.gp-pin-changed {
+  background: #ffb020;
+}
+.gp-mark {
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  font-weight: 800;
+  font-size: 12px;
+  line-height: 1;
+  transform: translate(35%, -35%) scale(var(--gp-inv));
+  transform-origin: center;
+  pointer-events: none;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.6);
+}
+.gp-mark-warning {
+  background: #ffb020;
+  color: #101114;
+}
+.gp-mark-error {
+  background: #ff5a5a;
+  color: #101114;
+}
+/* Zoom to fit */
+.gp-controls {
+  position: absolute;
+  left: var(--space-2);
+  top: var(--space-2);
+  z-index: 6;
+  display: flex;
+  align-items: stretch;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  cursor: default;
+}
+.gp-controls button {
+  min-width: var(--control-h-sm);
+  height: var(--control-h-sm);
+  border: 0;
+  border-inline-end: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  padding: 0 var(--space-3);
+  cursor: pointer;
+}
+.gp-controls button:hover {
+  background: var(--surface-2);
+}
+.gp-controls button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+/* On a phone the frame follows the picture's shape instead of filling a tall box. */
+@media (max-width: 48rem) {
+  .gp {
+    height: auto !important;
+  }
+  .gp-frame {
+    flex: none;
+    aspect-ratio: 1.1;
+    min-height: 16rem;
+  }
+}

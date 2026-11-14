@@ -720,7 +720,11 @@
     "listLabel_other": "{{n}} tasks",
     "tabsLabel": "Task details",
     "permissionTab": "Permission",
-    "settingsTab": "Settings"
+    "settingsTab": "Settings",
+    "openFocusTree": "Open the focus tree",
+    "openFocusTreeNamed": "Open the focus tree {{name}}",
+    "reviewChange": "Review the change",
+    "changesTitle": "Focus tree"
   },
   "apiKeys": {
     "title": "Model API keys",
@@ -768,5 +772,124 @@
     "unknown_other": "{{count}} uses are not known yet and are counted at their reserved amount.",
     "userKey": "Spent with your own keys: {{amount}}",
     "used": "Used this month"
+  },
+  "focus": {
+    "title": "Focus tree",
+    "backToTask": "Back to the task",
+    "loading": "Loading the focus tree…",
+    "errorTitle": "Could not open this focus tree",
+    "drawing": "Drawing the tree…",
+    "pictureLabel": "The focus tree as the game draws it. Click a focus to select it, drag it to move it, or use the arrow keys on a selected focus. Scroll or press plus and minus to zoom, zero to fit.",
+    "pictureAlt": "The focus tree as the game draws it.",
+    "fit": "Fit",
+    "node": {
+      "plain": "{{name}}",
+      "added": "{{name}}, new",
+      "changed": "{{name}}, changed"
+    },
+    "details": "Details",
+    "requires": "Requires",
+    "excludes": "Cannot be taken together with",
+    "source": "Where it is written",
+    "sourceAt": "{{path}}, line {{line}}",
+    "or": "or",
+    "none": "None",
+    "problems": "Problems",
+    "noProblems": "No problems found.",
+    "working": "The agent is working on it.",
+    "saving": "Saving…",
+    "redrawing": "Redrawing the tree.",
+    "changesRegion": "Changes that are not saved yet",
+    "costChange": "{{name}}: cost {{before}} to {{after}}",
+    "trouble": {
+      "stale": "The tree was changed after this was made, so it no longer fits.",
+      "failed": "A check found a problem with this change.",
+      "unchecked": "Part of this change could not be checked."
+    },
+    "approveAnyway": "Approve anyway",
+    "agent": {
+      "approve": "Approve",
+      "reject": "Reject"
+    },
+    "own": {
+      "approve": "Save",
+      "reject": "Undo",
+      "both": "New: {{added}}. Changed: {{changed}}.",
+      "added": "New: {{names}}.",
+      "changed": "Changed: {{names}}."
+    },
+    "ask": {
+      "label": "Ask the agent for a change",
+      "placeholder": "Ask for a change",
+      "placeholderFor": "Ask for a change to {{name}}",
+      "send": "Send",
+      "about": "About {{name}}: {{request}}",
+      "fix": "Fix this: {{problem}}"
+    },
+    "card": {
+      "label": "{{name}}",
+      "close": "Close",
+      "cantDrag": "{{name}} can't be dragged, because its place follows another focus. Ask the agent to move it.",
+      "title": "Title",
+      "description": "Description",
+      "cost": "Cost",
+      "fix": "Ask the agent to fix it"
+    }
+  },
+  "change": {
+    "title": "Review change",
+    "loading": "Loading the change…",
+    "errorTitle": "Could not open this change",
+    "pictureLabel": "The focus tree with the change, as the game draws it",
+    "outcome": {
+      "approved": "Approved. The change is saved in your project.",
+      "rejected": "Rejected. Nothing was changed.",
+      "sentBack": "Sent back to the agent."
+    },
+    "redo": "Ask the agent to redo it",
+    "fix": "Ask the agent to fix it",
+    "instruction": {
+      "redo": "The focus tree changed after your last change, so that change no longer fits. Look at the tree as it is now and make the change again.",
+      "fix": "The check found problems in your last change. Read them and fix them."
+    },
+    "sections": {
+      "what": "What changed",
+      "files": "Changes by file",
+      "checks": "Checks",
+      "limits": "Limits and restore point"
+    },
+    "added": "New focus: {{name}}",
+    "changed": "{{name}}: {{what}}",
+    "field": "{{name}} {{before}} to {{after}}",
+    "removed": "Removed: {{name}}",
+    "by": {
+      "person": "Made by a person in the editor.",
+      "native_agent": "Made by the agent.",
+      "coding_client": "Made by a coding client."
+    },
+    "verdict": {
+      "pass": "Passed",
+      "fail": "Failed",
+      "incomplete": "Incomplete"
+    },
+    "checkFindings": "New problems: {{fresh}}. Already known before this change: {{known}}.",
+    "references": "References found: {{resolved}}. Not found: {{unresolved}}. Could not be checked: {{unknown}}.",
+    "checkNotRun": "The check runs when you approve.",
+    "delta": "Compared with before: {{introduced}} new, {{worsened}} worse, {{improved}} better, {{resolved}} fixed.",
+    "layout": {
+      "pass": "Layout looks fine.",
+      "revise": "Layout needs work.",
+      "blocked": "Layout has a blocking problem.",
+      "unknown": "Layout was not judged."
+    },
+    "limits": {
+      "render": "The picture is drawn from the files the way the game draws a focus tree. The game was not started.",
+      "game": "How this plays is confirmed only by a check in the game."
+    },
+    "restore": {
+      "saved": "A restore point was saved, so this change can be undone.",
+      "none": "No restore point was saved.",
+      "later": "A restore point is saved when you approve."
+    }
   }
 }

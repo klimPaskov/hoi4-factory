@@ -2,6 +2,13 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.47, 2026-11-14, Docker Desktop stays up and the client check has a WSL fallback
+
+- CLAUDE.md, Working environment: when Docker is down the client check runs in WSL from a copy of `web/`. On Windows, Docker Desktop is left running once it is up.
+- Reason: a `docker desktop stop` left a socket file that Windows would not delete, and the next start crashed. The story is in the engineering lessons.
+- Evidence: the S04 browser pages passed `npm run check` in WSL on 2026-11-14 (96 tests and the build).
+- Authority: engineering guidance only. It widens no access, cost or scope.
+
 ## 0.2.46, 2026-11-14, local tests run under a memory cap and a timeout
 
 - CLAUDE.md's verification section gained one rule: local tests run under a memory cap and a timeout, and a loop-driven test uses a fake clock and an iteration cap, never a mock object with a real clock. The maintainer approved the rule.

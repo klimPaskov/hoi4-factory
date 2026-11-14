@@ -49,6 +49,7 @@ function installFetch(scenario: Scenario) {
     const method = (init?.method ?? (input instanceof Request ? input.method : 'GET')).toUpperCase();
     const answer = reply(scenario, method, url.pathname.slice(API.length));
     if (answer.pending) return new Promise<Response>(() => {});
+    if (answer.asset) return realFetch(answer.asset);
     // A short delay, so loading states flash the way they do against a real server.
     await new Promise((resolve) => setTimeout(resolve, 150));
     const status = answer.status ?? 200;

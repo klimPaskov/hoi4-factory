@@ -1,11 +1,11 @@
-// Sample data for the focus editor and change card rounds. A small Swedish industry tree, with a
-// branch an agent proposed (four new focuses and one changed cost), built on the server's shapes
-// (src/focus/types.ts). Nothing here is read from a real project.
-import type { ChangeCard, CheckRow, Diagnostic, FocusNode, FocusProjection } from '../../focus/types';
+// Sample data for the focus editor and the change card: a small Swedish industry tree with a
+// branch an agent added (four new focuses and one changed cost), in the server's shapes. Nothing
+// here is read from a real project.
+import type { EngineCheck, Proposal, Publication } from '../api/focus';
+import type { Diagnostic, FocusNode, FocusProjection } from '../focus/types';
 
 export const FOCUS_FILE = 'common/national_focus/swe_industry.txt';
 export const LOC_FILE = 'localisation/english/swe_focus_l_english.yml';
-const PROPOSAL = 'prop_01JB7Q4X2M';
 
 export interface FocusText {
   title: string;
@@ -63,7 +63,7 @@ function make(seed: Seed): FocusNode {
     source: { path: FOCUS_FILE, line: seed.line, column: 1 },
     editable: !seed.readOnly,
     notEditableReason: seed.readOnly,
-    pending: seed.pending ? { proposalId: PROPOSAL, actor: 'native_agent', change: seed.pending } : undefined,
+    description: text?.description,
   };
 }
 
@@ -101,7 +101,7 @@ export const NODES: FocusNode[] = [
     prereq: [['SWE_border_forts']],
     sprite: 'GFX_goal_generic_occupy_states_coastal',
     declared: { mode: 'relative', x: -1, y: 1, relativeTo: 'SWE_border_forts' },
-    readOnly: 'Placed with relative_position_id. Edit it in the source file.',
+    readOnly: 'It follows Northern Forts.',
   }),
   make({ id: 'SWE_nordic_trade_pact', x: 7, y: 3, cost: 5, line: ADDED_LINES[0], prereq: [['SWE_open_trade']], sprite: 'GFX_goal_generic_trade', pending: 'added' }),
   make({ id: 'SWE_shipping_lanes', x: 6, y: 4, cost: 5, line: ADDED_LINES[1], prereq: [['SWE_nordic_trade_pact']], sprite: 'GFX_goal_generic_navy_anti_submarine', pending: 'added' }),
@@ -118,37 +118,32 @@ export const NODES: FocusNode[] = [
   }),
 ];
 
-/** The values a changed node had before the proposal, restored when the change is discarded. */
-export const PENDING_BEFORE: Record<string, Partial<FocusNode>> = {
-  SWE_open_trade: { cost: 10 },
-};
-
 export const DIAGNOSTICS: Diagnostic[] = [
   {
     code: 'focus.icon_missing',
     severity: 'warning',
-    message: 'Icon GFX_focus_swe_air_force is not defined by the mod or the game.',
+    message: 'Build the Air Force has no icon, so the game leaves it blank.',
     focusId: 'SWE_air_force',
     source: { path: FOCUS_FILE, line: 114, column: 2 },
   },
   {
     code: 'focus.localisation_missing',
     severity: 'warning',
-    message: 'No English text for SWE_arms_export. The game would show the key.',
+    message: 'The focus under Open Trade has no title or description yet.',
     focusId: 'SWE_arms_export',
     source: { path: FOCUS_FILE, line: 155, column: 2 },
   },
   {
     code: 'focus.relative_position',
     severity: 'info',
-    message: 'Placed relative to SWE_border_forts. Moving it here is not supported yet.',
+    message: 'Coastal Batteries follows Northern Forts, so it cannot be dragged on its own.',
     focusId: 'SWE_coastal_battery',
     source: { path: FOCUS_FILE, line: 170, column: 2 },
   },
   {
     code: 'layout.line_crossing',
     severity: 'warning',
-    message: 'Two prerequisite lines cross below the Nordic Trade Pact.',
+    message: 'Two lines cross below Nordic Trade Pact.',
     focusId: 'SWE_joint_fleet',
     source: { path: FOCUS_FILE, line: ADDED_LINES[3], column: 1 },
   },
@@ -166,10 +161,10 @@ export const PROJECTION: FocusProjection = {
   layoutVerdict: 'revise',
   nodes: NODES,
   diagnostics: DIAGNOSTICS,
-  supportedOperations: ['create', 'link', 'move', 'set_cost'],
+  supportedOperations: ['create', 'link', 'move', 'set_cost', 'set_text'],
 };
 
-// ----- Change card ------------------------------------------------------------------------
+// ----- Proposals ---------------------------------------------------------------------------
 
 function block(node: FocusNode): string[] {
   const out = ['focus = {', `\tid = ${node.id}`, `\ticon = ${node.icon?.sprite ?? ''}`, `\tx = ${node.x}`, `\ty = ${node.y}`];
@@ -180,7 +175,8 @@ function block(node: FocusNode): string[] {
   return out;
 }
 
-const ADDED = NODES.filter((n) => n.pending?.change === 'added');
+const ADDED_IDS = ['SWE_nordic_trade_pact', 'SWE_shipping_lanes', 'SWE_customs_union', 'SWE_joint_fleet'];
+const ADDED = NODES.filter((n) => ADDED_IDS.includes(n.id));
 
 function focusDiff(): string {
   const body: string[] = [];
@@ -223,87 +219,94 @@ function locDiff(): string {
   ].join('\n');
 }
 
-const CHECKS_OK: CheckRow[] = [
-  { name: 'Syntax of the changed files', result: 'passed', detail: 'Parsed 2 files, 0 errors.' },
-  { name: 'Reference closure', result: 'passed', detail: 'Every focus, icon and text key this change uses resolves.' },
-  { name: 'Lints and override audit', result: 'passed', detail: '0 new findings.' },
-  { name: 'Layout', result: 'passed', detail: 'No overlaps. 1 line crossing.' },
-  { name: 'Findings baseline', result: 'passed', detail: 'Compared with the baseline taken at import.' },
-];
+export const TREE_ID = PROJECTION.treeId;
+export const AGENT_SENTENCE = 'I added a Nordic trade branch under Open Trade and made Open Trade cheaper.';
 
-export type CardScenario = 'ready' | 'incomplete' | 'failed' | 'stale' | 'committed';
+const CHECK_OK: EngineCheck = {
+  verdict: 'pass',
+  engine_version: '4.12.0',
+  engine_rev: '73a5d71',
+  game_version: '1.16.4',
+  baseline_commit: '4d2b9e07a1c35f86d0e49b72a8c1f63d5e07b942',
+  new_findings: 0,
+  baselined_findings: 14,
+  blocking: [],
+  unknown: {
+    references_resolved: 31,
+    references_unresolved: 0,
+    references_unknown: 0,
+    commands_resolved: 12,
+    commands_unresolved: 0,
+    commands_unknown: 0,
+    unmodelled_script_files: 0,
+    vocabulary_available: true,
+    game_layer: true,
+  },
+  elapsed_ms: 840,
+};
 
-export function makeCard(scenario: CardScenario): ChangeCard {
-  const base: ChangeCard = {
-    proposalId: PROPOSAL,
-    proposalHash: 'sha256:5be07a31d94c2f68a0c3e19b7d4256f8c1a90e3b6d7f42a58c0e91b3d6f7a204',
-    actor: { kind: 'native_agent', name: 'Factory agent' },
-    operation: 'hoi4.focus_rewrite',
+function proposal(overrides: Partial<Proposal>): Proposal {
+  return {
+    id: '0b9d2f6e-5a1c-4e37-9c41-7d5a2b8e3f10',
+    taskId: 'tsk_customs',
+    actorKind: 'native_agent',
+    actorAccountId: null,
+    attemptId: 'att_1',
+    treeId: TREE_ID,
+    toolOperation: 'hoi4.focus_rewrite',
+    toolVersion: '4.12.0',
+    baseProjectionHash: '1f'.repeat(32),
+    operations: [],
+    requestSha256: '2a'.repeat(32),
+    before: { [FOCUS_FILE]: 'a4'.repeat(32), [LOC_FILE]: '0e'.repeat(32) },
+    after: { [FOCUS_FILE]: '93'.repeat(32), [LOC_FILE]: 'c7'.repeat(32) },
+    changedPaths: [FOCUS_FILE, LOC_FILE],
+    changedIds: [...ADDED_IDS, 'SWE_open_trade'],
     summary: {
-      added: ADDED.map((n) => n.id),
+      added: ADDED_IDS,
       changed: [{ id: 'SWE_open_trade', fields: [{ name: 'cost', before: '10', after: '7' }] }],
       removed: [],
     },
-    files: [
-      {
-        path: FOCUS_FILE,
-        beforeSha256: 'a41f0c3be97d25f6d8031c4ab7e92f50c6d1e8837b4a29f05e3c71d6a8b09c42',
-        afterSha256: '93d6a0b1e7c2584f3a96d1c0e8b7f24a5d3091c6e8f7b24d1a0c95e3b7f6d812',
-        unifiedDiff: focusDiff(),
-      },
-      {
-        path: LOC_FILE,
-        beforeSha256: '0e9b5d27c1a4f83e6d02b7a95c18f4e3d6a0b92c7e51f8d34a6c0b1e9d7f2a58',
-        afterSha256: 'c7f20a95e1d3b846a02c9f17d5e83b60a4c1d7f92e05b38a6d4c1f0e97b2a835',
-        unifiedDiff: locDiff(),
-      },
+    diffs: [
+      { path: FOCUS_FILE, diff: focusDiff() },
+      { path: LOC_FILE, diff: locDiff() },
     ],
-    sourceLinks: [
-      ...ADDED.map((n) => ({ focusId: n.id, source: n.source })),
-      { focusId: 'SWE_open_trade', source: { path: FOCUS_FILE, line: 105, column: 2 } },
-    ],
+    proposalHash: '5b'.repeat(32),
+    state: 'applied',
+    afterProjectionId: null,
+    engineReport: CHECK_OK,
     findingDelta: { introduced: 0, worsened: 0, changed: 1, improved: 0, unchanged: 14, resolved: 0 },
-    closure: { verdict: 'pass', resolved: 31, unresolved: 0, unknown: 0 },
-    layoutVerdict: 'pass',
-    checks: CHECKS_OK,
-    limits: [
-      'The picture is drawn from the source by the game view of the render tool. The game was not started.',
-      'Conditional availability and AI weights were not evaluated.',
-      'An icon the mod and the game do not define is left blank in the picture.',
-    ],
-    restorePoint: { ref: 'refs/factory/restore/task-0418', oid: '4d2b9e07a1c35f86d0e49b72a8c1f63d5e07b942' },
-    state: 'pending',
-    publication: { canPush: false, reason: 'No publication grant yet. The project owner has to allow pushing to GitHub.' },
+    createdAt: '2026-11-02T09:36:00Z',
+    updatedAt: '2026-11-02T09:36:00Z',
+    ...overrides,
   };
-  if (scenario === 'incomplete') {
-    return {
-      ...base,
-      findingDelta: { introduced: 0, worsened: 0, changed: 1, improved: 0, unchanged: 14, resolved: 0 },
-      closure: { verdict: 'incomplete', resolved: 28, unresolved: 0, unknown: 3 },
-      layoutVerdict: 'revise',
-      checks: [
-        CHECKS_OK[0] as CheckRow,
-        { name: 'Reference closure', result: 'unavailable', detail: '3 references could not be resolved because the game reference was not loaded for icons.' },
-        { name: 'Lints and override audit', result: 'skipped', detail: 'Skipped because reference closure is incomplete.' },
-        { name: 'Layout', result: 'passed', detail: 'No overlaps. 2 line crossings.' },
-        { name: 'Findings baseline', result: 'skipped', detail: 'No baseline exists for this project yet.' },
-      ],
-    };
-  }
-  if (scenario === 'failed') {
-    return {
-      ...base,
-      findingDelta: { introduced: 1, worsened: 0, changed: 1, improved: 0, unchanged: 14, resolved: 0 },
-      checks: [
-        CHECKS_OK[0] as CheckRow,
-        CHECKS_OK[1] as CheckRow,
-        { name: 'Lints and override audit', result: 'failed', detail: '1 new finding: the icon of SWE_joint_fleet is not defined.' },
-        CHECKS_OK[3] as CheckRow,
-        CHECKS_OK[4] as CheckRow,
-      ],
-    };
-  }
-  if (scenario === 'stale') return { ...base, state: 'stale' };
-  if (scenario === 'committed') return { ...base, state: 'committed' };
-  return base;
 }
+
+/** The agent's branch: four new focuses and one cheaper focus, written but not saved yet. */
+export const AGENT_PROPOSAL = proposal({});
+export const AGENT_PROPOSAL_SAVED = proposal({ state: 'committed' });
+
+/** A person dragged Ore Exports one row down. */
+export const OWN_PROPOSAL = proposal({
+  id: '7c4e1a90-2b6d-4f58-8e13-9a0c5d7b2e44',
+  actorKind: 'person',
+  actorAccountId: 'acc_otto',
+  attemptId: null,
+  changedPaths: [FOCUS_FILE],
+  changedIds: ['SWE_ore_exports'],
+  summary: { added: [], changed: [{ id: 'SWE_ore_exports', fields: [{ name: 'y', before: '2', after: '3' }] }], removed: [] },
+  diffs: [{ path: FOCUS_FILE, diff: ['--- a/' + FOCUS_FILE, '+++ b/' + FOCUS_FILE, '@@ -56,3 +56,3 @@ focus = {', ' \tx = 0', '-\ty = 2', '+\ty = 3'].join('\n') }],
+  engineReport: null,
+  findingDelta: null,
+});
+
+export const COMMIT_PUBLICATION: Publication = {
+  id: 'pub_01',
+  kind: 'commit',
+  idempotencyKey: 'commit-sample',
+  state: 'succeeded',
+  intent: { proposals: [{ id: AGENT_PROPOSAL.id }] },
+  result: { commit: '8e41c0d7', restore_point: { ref: 'refs/factory/restore/task-0418', oid: '4d2b9e07a1c35f86d0e49b72a8c1f63d5e07b942' } },
+  createdAt: '2026-11-02T09:41:00Z',
+  settledAt: '2026-11-02T09:41:02Z',
+};

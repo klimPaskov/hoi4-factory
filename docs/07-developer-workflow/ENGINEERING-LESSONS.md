@@ -106,6 +106,10 @@ CLAUDE.md rule: format only your own new files with `rustfmt --edition 2024 <fil
 
 CLAUDE.md rule: visual work is not finished until someone has looked at it, at viewing size and in close-up, and a fresh-context reviewer has been asked to find every defect. On 2026-11-06 seven ZIN units passed every geometry check with 0 errors and went into a trailer cut together with existing Chaos Redux units. The maintainer saw holes and deformed animations in both at first glance.
 
+### Docker Desktop that would not start again (2026-11-14)
+
+CLAUDE.md rules: leave Docker Desktop running once it is up, and run the client check in WSL when Docker is down. On 2026-11-14 an S04 design session started Docker Desktop for the dev server and stopped it again with `docker desktop stop` after each render, to free memory. The third start crashed in the backend with "initializing Inference manager: listening on unix://...\Docker\run\dockerInference". The socket file from the earlier run was still there, and Windows answered error 1920 to every attempt to delete it. The session then ran lint, the type check, the 96 client tests and the build in the WSL Ubuntu from a copy of `web/`, because Vitest could not write its temporary config file under `/mnt/c`.
+
 ### A unit test that grew to 18 GB (2026-11-14)
 
 CLAUDE.md rule: local tests run under a memory cap and a timeout, and a loop-driven test uses a fake clock and an iteration cap. On the night of 2026-11-14 a HOI4 Live Tools unit test for the exit-to-menu flow used a mock game session with a real clock. A regex bug in the code under test meant the exit loop never ended. The loop spun for its 240 seconds of real time, and the mock recorded every call, so the process grew by about 4 GB a minute to 18 GB. Free memory fell to 1.26 GB with the maintainer asleep, and another session stopped that one process seconds before a third out-of-memory crash. The fix replaced the mock with plain callables, a fake clock that every sleep advances and a cap of 400 screen reads. The same file now runs in 6 ms, and that session runs local tests under a 1.5 GB cap and a 60 second timeout.

@@ -55,10 +55,12 @@ On both machines:
 - Run tests that apply a Setup plan on Linux, the server's platform: `scripts/linux-tests.sh -p factory-server --test setup_gates`. The script builds its image from `docker/test-runner.Dockerfile` and starts its own PostgreSQL (trust authentication, because the test roles have no password) on a shared Docker network. Setup's readiness depends on the host platform. On Windows it blocks readiness on the uninstalled MCP route, and its Linux Node check accepts only Debian's `/usr/bin/node`.
 - Tests that assert behavior of a pinned upstream revision go stale when the pin moves. Assert against `SETUP_PIN` (for example `contains_pr_105_fix`) instead of a fixed value, and rerun the whole workspace after every pin change.
 - Setup's source client wraps a blocking HTTP client. Build and drop it off the async runtime (`DetachedDrop`, `spawn_blocking`), or tokio panics on drop.
+- When Docker is down, the client check still runs in WSL. Copy `web/` into the WSL home with `rsync` (the test runner cannot write its temporary files under `/mnt/c`), run `npm run check` there with Node 22, and delete the copy afterwards. `tsc` and `eslint` also run on the host from the installed `node_modules`.
 - Docker Desktop also runs the maintainer's other projects. On the Mac it can hang with its VM unreachable (every `docker` command times out while `docker desktop status` says running), and only a restart (`docker desktop restart`) recovers it. Never restart it, prune shared images or volumes, or stop containers you did not start. Ask the maintainer instead. Stop your own test containers when done.
 
 On Windows only:
 
+- Leave Docker Desktop running once it is up. Stop your own containers and nothing else. A `docker desktop stop` can leave a socket file under `%LOCALAPPDATA%\Docker\run` that Windows refuses to delete, and then the next start crashes.
 - The locale encoding is cp1252, and Python text-mode writes produce CRLF. Write files in binary mode or with `newline="\n"`.
 - Git over HTTP stalls after a `401` from the server even with prompts disabled, until the caller's timeout. Tests that only need a failed Git request make the fake GitHub answer `500` (`git_error_after`). Keep `401` for the cases that test revocation itself.
 - The host's npm 12 refuses `npm ci` for a package that ships only `npm-shrinkwrap.json`. For a local install of an Agent Tools release tarball, copy the shrinkwrap to `package-lock.json` first. The image's npm 10 takes the shrinkwrap as it is.

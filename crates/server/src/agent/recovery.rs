@@ -315,7 +315,7 @@ pub async fn prepare_resume(rt: &AgentRuntime, account: AccountId, task: &Task, 
         let bundle = factory_tasks::load_bundle(&mut tx, attempt.bundle_id)
             .await
             .map_err(|_| ApiError::internal())?;
-        Some(super::runner::render_context(&task.objective, &bundle))
+        Some(super::runner::render_context(&bundle))
     } else {
         None
     };
