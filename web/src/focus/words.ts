@@ -8,6 +8,18 @@ type Translate = (key: string, options?: Record<string, unknown>) => string;
 
 export const labelOf = (nodes: FocusNode[], id: string): string => nodes.find((n) => n.id === id)?.label ?? id;
 
+/**
+ * A problem's sentence with titles in place of internal names. The tools name a focus by its id.
+ * Longer ids go first, so an id that starts like another is not cut in half.
+ */
+export function plainMessage(message: string, nodes: FocusNode[]): string {
+  let out = message;
+  for (const node of [...nodes].sort((a, b) => b.id.length - a.id.length)) {
+    if (node.label !== node.id) out = out.split(node.id).join(node.label);
+  }
+  return out;
+}
+
 /** The names of what the changes touched, for changes that have no sentence from the agent. */
 export function namesSentence(t: Translate, proposals: Proposal[], nodes: FocusNode[]): string {
   const added = new Set<string>();

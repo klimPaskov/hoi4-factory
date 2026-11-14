@@ -10,7 +10,7 @@ import { Button, ErrorMessage, Loading, NotAvailableYet } from '../components/ui
 import { GamePreview } from '../focus/GamePreview';
 import { useFocusSession, type FocusSession } from '../focus/session';
 import type { Diagnostic, FocusNode } from '../focus/types';
-import { labelOf, namesSentence, useWide } from '../focus/words';
+import { labelOf, namesSentence, plainMessage, useWide } from '../focus/words';
 import { usePageTitle } from '../hooks';
 import '../focus/focus.css';
 
@@ -142,7 +142,7 @@ function Header({ session, selected, back }: { session: FocusSession; selected: 
                 {diagnostics.map((d) => (
                   <li key={`${d.code}:${d.focusId ?? ''}:${d.source?.line ?? 0}`}>
                     <span className={`fx-dot is-${d.severity}`} aria-hidden="true" />
-                    <span dir="auto">{d.message}</span>
+                    <span dir="auto">{plainMessage(d.message, session.nodes)}</span>
                   </li>
                 ))}
               </ul>
@@ -292,8 +292,8 @@ function FocusCard({ session, node, frozen, onClose }: { session: FocusSession; 
       </div>
       {problem ? (
         <div className="fx-card-problem">
-          <p dir="auto">{problem.message}</p>
-          <Button size="sm" disabled={frozen} onClick={() => session.ask(t('focus.ask.fix', { problem: problem.message }))}>
+          <p dir="auto">{plainMessage(problem.message, session.nodes)}</p>
+          <Button size="sm" disabled={frozen} onClick={() => session.ask(t('focus.ask.fix', { problem: plainMessage(problem.message, session.nodes) }))}>
             {t('focus.card.fix')}
           </Button>
         </div>

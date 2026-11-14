@@ -107,8 +107,9 @@ function Review({ projectId, taskId, loaded, back, onLoaded }: { projectId: stri
       else setFailure(cause);
     }
     try {
-      const [fresh, publications] = await Promise.all([getProposal(projectId, taskId, proposal.id), listPublications(projectId, taskId)]);
-      onLoaded({ ...loaded, proposal: fresh, publications });
+      // The tree is read again too: a rejected change is gone from the picture.
+      const [fresh, publications, tree] = await Promise.all([getProposal(projectId, taskId, proposal.id), listPublications(projectId, taskId), getProjection(projectId, taskId, proposal.treeId)]);
+      onLoaded({ ...loaded, proposal: fresh, publications, projection: tree });
     } catch (cause) {
       setFailure((current: unknown) => current ?? cause);
     }
