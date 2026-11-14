@@ -208,84 +208,6 @@
   margin: 0;
 }
 
-/* ----- C: the side column ------------------------------------------------------------------- */
-
-.mxc-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 20rem;
-  gap: var(--space-3);
-  flex: 1;
-  min-height: 0;
-}
-.mxc-side {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  min-height: 0;
-}
-.mxc-thread {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  min-height: 0;
-  overflow: auto;
-}
-.mxc-thread > p {
-  margin: 0;
-}
-.mxc-asked {
-  align-self: flex-end;
-  max-width: 92%;
-  padding: var(--space-2) var(--space-3);
-  background: var(--surface-2);
-  border-radius: var(--radius-lg);
-}
-.mx-changes {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.mx-change {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  width: 100%;
-  padding: var(--space-2);
-  font: inherit;
-  color: var(--text);
-  text-align: start;
-  background: transparent;
-  border: 0;
-  border-radius: var(--radius);
-  cursor: pointer;
-}
-.mx-change:hover {
-  background: var(--surface-2);
-}
-.mx-change.is-selected {
-  background: var(--primary-soft);
-}
-.mx-change:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: -2px;
-}
-.mx-change-pin {
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: 1.25rem;
-  height: 1.25rem;
-  border-radius: 50%;
-  font-weight: 800;
-  font-size: 0.8rem;
-  line-height: 1;
-  color: #101114;
-  background: #ffb020;
-}
-.mx-change-pin.is-added {
-  background: #3ddc84;
-}
-
 /* ----- Narrow screens ---------------------------------------------------------------------- */
 
 @media (max-width: 48rem) {
@@ -305,9 +227,6 @@
     max-width: none;
     max-height: none;
     box-shadow: none;
-  }
-  .mxc-grid {
-    grid-template-columns: minmax(0, 1fr);
   }
   .mx-ask {
     flex-wrap: wrap;

@@ -3,7 +3,7 @@
 // buttons. The diff, the checks, the counts, the limits and the restore point sit behind Details.
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Badge, Button, SegmentedControl, type Tone } from '../../components/ui';
+import { Badge, Button, type Tone } from '../../components/ui';
 import type { ChangeCard, CheckRow, LayoutVerdict } from '../../focus/types';
 import { GamePreview } from './GamePreview';
 import { makeCard, NODES, type CardScenario } from './fixtures';
@@ -66,59 +66,11 @@ export function Summary({ card }: { card: ChangeCard }) {
 
 // ----- The picture ------------------------------------------------------------------------
 
-/** How the before and after pictures sit together: one at a time, under a divider, or next to each other. */
-export type PictureMode = 'toggle' | 'slider' | 'side';
-
-const AFTER_NODES = NODES;
-// The before picture does not draw the focuses the agent added, and marks nothing.
-const BEFORE_NODES = NODES.filter((node) => node.pending?.change !== 'added').map((node) => ({ ...node, pending: undefined }));
-
-/** The game pictures of the tree before and after the change. New and changed focuses are outlined. */
-export function Picture({ mode, under = 0 }: { mode: PictureMode; under?: number }) {
+/** The game picture of the tree with the change applied. New and changed focuses are outlined. */
+export function Picture({ under = 0 }: { under?: number }) {
   const { t } = useTranslation();
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [which, setWhich] = useState('after');
-  const [pos, setPos] = useState(0.5);
-  const common = { plain: true, fitInset: under, diagnostics: [], selectedId, onSelect: setSelectedId, readOnly: true, revealId: selectedId };
-  if (mode === 'side') {
-    return (
-      <div className="cx-sides">
-        <figure>
-          <figcaption>{t('designLab.change.compare.before')}</figcaption>
-          <GamePreview {...common} image="base" alignTo="proposed" nodes={BEFORE_NODES} label={t('designLab.change.preview.labelBefore')} />
-        </figure>
-        <figure>
-          <figcaption>{t('designLab.change.compare.after')}</figcaption>
-          <GamePreview {...common} image="proposed" nodes={AFTER_NODES} label={t('designLab.change.preview.labelAfter')} />
-        </figure>
-      </div>
-    );
-  }
-  if (mode === 'slider') {
-    return <GamePreview {...common} image="proposed" nodes={AFTER_NODES} compare={{ pos, onChange: setPos }} label={t('designLab.change.preview.labelSlider')} />;
-  }
-  return (
-    <div className="cx-toggle">
-      <GamePreview
-        {...common}
-        image={which === 'before' ? 'base' : 'proposed'}
-        alignTo="proposed"
-        nodes={which === 'before' ? BEFORE_NODES : AFTER_NODES}
-        label={t(which === 'before' ? 'designLab.change.preview.labelBefore' : 'designLab.change.preview.labelAfter')}
-      />
-      <div className="cx-switch">
-        <SegmentedControl
-          legend={t('designLab.change.preview.show')}
-          value={which}
-          onChange={setWhich}
-          options={[
-            { value: 'after', label: t('designLab.change.compare.after') },
-            { value: 'before', label: t('designLab.change.compare.before') },
-          ]}
-        />
-      </div>
-    </div>
-  );
+  return <GamePreview plain readOnly fitInset={under} image="proposed" nodes={NODES} diagnostics={[]} selectedId={selectedId} onSelect={setSelectedId} revealId={selectedId} label={t('designLab.change.preview.label')} />;
 }
 
 // ----- The decision -----------------------------------------------------------------------

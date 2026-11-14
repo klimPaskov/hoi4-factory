@@ -110,14 +110,10 @@ export interface GamePreviewProps {
   /** Counts up to ask for the focus `revealId` to be brought into view. */
   revealTick?: number;
   revealId?: string | null;
-  /** Draws the before render over the after render up to `pos` (0 to 1 of the width), with a draggable divider. */
-  compare?: { pos: number; onChange: (pos: number) => void };
   /** Only the picture and its markers: no grid numbers while dragging, no bar below and no note. The page says those things itself. */
   plain?: boolean;
   /** Pixels at the bottom of the frame that something else covers. The fitted picture stays above them. */
   fitInset?: number;
-  /** Frame the picture as this other render is framed, so switching between the two does not move anything. */
-  alignTo?: RenderName;
   label: string;
   className?: string;
 }
@@ -129,10 +125,9 @@ interface Ghost {
 }
 
 export function GamePreview(props: GamePreviewProps) {
-  const { image, nodes, diagnostics = [], selectedId, onSelect, query = '', readOnly = false, redrawing = false, onMove, onApply, onDiscard, revealTick = 0, revealId, compare, plain = false, fitInset = 0, alignTo, label, className } = props;
+  const { image, nodes, diagnostics = [], selectedId, onSelect, query = '', readOnly = false, redrawing = false, onMove, onApply, onDiscard, revealTick = 0, revealId, plain = false, fitInset = 0, label, className } = props;
   const { t } = useTranslation();
-  const geo = compare ? GEOMETRY.proposed : GEOMETRY[image];
-  const world = alignTo ? GEOMETRY[alignTo] : geo;
+  const geo = GEOMETRY[image];
   const frame = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
   const [free, setFree] = useState<View>({ z: 1, x: 0, y: 0 });
@@ -145,10 +140,10 @@ export function GamePreview(props: GamePreviewProps) {
   const fit = useCallback(
     (w: number, h: number): View => {
       const room = Math.max(h - fitInset, h / 2);
-      const z = clamp(Math.min(w / world.width, room / world.height), MIN_Z, 1.2);
-      return { z, x: (w - world.width * z) / 2, y: (room - world.height * z) / 2 };
+      const z = clamp(Math.min(w / geo.width, room / geo.height), MIN_Z, 1.2);
+      return { z, x: (w - geo.width * z) / 2, y: (room - geo.height * z) / 2 };
     },
-    [world.width, world.height, fitInset],
+    [geo.width, geo.height, fitInset],
   );
 
   useLayoutEffect(() => {
@@ -214,14 +209,8 @@ export function GamePreview(props: GamePreviewProps) {
   }, [diagnostics]);
 
   const frozen = readOnly || redrawing;
-  const toWorld = (clientX: number, clientY: number) => {
-    const rect = frame.current?.getBoundingClientRect();
-    const v = viewRef.current;
-    return { x: (clientX - (rect?.left ?? 0) - v.x) / v.z, y: (clientY - (rect?.top ?? 0) - v.y) / v.z };
-  };
-
   const onFramePointerDown = (event: PointerEvent<HTMLDivElement>) => {
-    if (event.button !== 0 || (event.target as HTMLElement).closest('.gp-hit, .gp-controls, .gp-divider')) return;
+    if (event.button !== 0 || (event.target as HTMLElement).closest('.gp-hit, .gp-controls')) return;
     pan.current = { px: event.clientX, py: event.clientY, vx: view.x, vy: view.y };
     event.currentTarget.setPointerCapture(event.pointerId);
   };
@@ -273,20 +262,8 @@ export function GamePreview(props: GamePreviewProps) {
     else if (event.key === '0') setFitted(true);
   };
 
-  const dragPointer = useRef(false);
-  const onDivider = (event: PointerEvent<HTMLButtonElement>) => {
-    if (!compare) return;
-    if (event.type === 'pointerdown') {
-      dragPointer.current = true;
-      event.currentTarget.setPointerCapture(event.pointerId);
-    }
-    if (dragPointer.current) compare.onChange(clamp(toWorld(event.clientX, event.clientY).x / geo.width, 0, 1));
-    if (event.type === 'pointerup' || event.type === 'pointercancel') dragPointer.current = false;
-  };
-
   const selectedNode = nodes.find((n) => n.id === selectedId);
   const dim = (node: FocusNode) => query !== '' && !matchesQuery(node, query);
-  const cut = compare ? compare.pos * geo.width : 0;
 
   return (
     <div className={`gp${className ? ` ${className}` : ''}${redrawing ? ' is-redrawing' : ''}`} aria-busy={redrawing || undefined}>
@@ -302,13 +279,8 @@ export function GamePreview(props: GamePreviewProps) {
         onPointerCancel={endPan}
         onKeyDown={onFrameKey}
       >
-        <div className="gp-world" style={{ width: world.width, height: world.height, transform: `translate(${view.x}px, ${view.y}px) scale(${view.z})`, ['--gp-inv' as string]: String(1 / view.z ** 0.65) }}>
+        <div className="gp-world" style={{ width: geo.width, height: geo.height, transform: `translate(${view.x}px, ${view.y}px) scale(${view.z})`, ['--gp-inv' as string]: String(1 / view.z ** 0.65) }}>
           <img className="gp-img" src={geo.url} width={geo.width} height={geo.height} alt={t('designLab.focus.render.alt')} draggable={false} />
-          {compare ? (
-            <div className="gp-before" style={{ clipPath: `inset(0 ${geo.width - cut}px 0 0)` }}>
-              <img className="gp-img" src={GEOMETRY.base.url} width={GEOMETRY.base.width} height={GEOMETRY.base.height} alt="" draggable={false} />
-            </div>
-          ) : null}
           <div className="gp-overlay">
             {nodes.map((node) => {
               const drawn = geo.boxes.get(node.id);
@@ -369,33 +341,6 @@ export function GamePreview(props: GamePreviewProps) {
               </div>
             ) : null}
           </div>
-          {compare ? (
-            <button
-              type="button"
-              role="slider"
-              className="gp-divider"
-              style={{ left: cut }}
-              aria-label={t('designLab.change.compare.slider')}
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={Math.round(compare.pos * 100)}
-              aria-valuetext={t('designLab.change.compare.value', { percent: Math.round(compare.pos * 100) })}
-              onPointerDown={onDivider}
-              onPointerMove={onDivider}
-              onPointerUp={onDivider}
-              onPointerCancel={onDivider}
-              onKeyDown={(event) => {
-                if (event.key === 'ArrowLeft') compare.onChange(clamp(compare.pos - 0.05, 0, 1));
-                if (event.key === 'ArrowRight') compare.onChange(clamp(compare.pos + 0.05, 0, 1));
-                if (event.key === 'Home') compare.onChange(0);
-                if (event.key === 'End') compare.onChange(1);
-              }}
-            >
-              <span className="gp-divider-grip" aria-hidden="true">
-                &#8596;
-              </span>
-            </button>
-          ) : null}
         </div>
         <div className="gp-controls" role="group" aria-label={t('designLab.focus.view.label')}>
           {plain ? null : (
@@ -412,12 +357,6 @@ export function GamePreview(props: GamePreviewProps) {
             {t('designLab.focus.view.fit')}
           </button>
         </div>
-        {compare ? (
-          <>
-            <span className="gp-side gp-side-before">{t('designLab.change.compare.before')}</span>
-            <span className="gp-side gp-side-after">{t('designLab.change.compare.after')}</span>
-          </>
-        ) : null}
         {redrawing && !plain ? (
           <p className="gp-note" role="status">
             <span className="spinner" aria-hidden="true" /> {t('designLab.focus.render.redrawing')}

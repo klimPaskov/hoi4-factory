@@ -9,18 +9,7 @@ export interface Decision {
   round?: string;
 }
 
-export const OPEN: Decision[] = [
-  {
-    id: 'focusEditor',
-    round: 'focusEditor',
-    options: ['100-focus-a-just-ask', '101-focus-b-focus-card', '102-focus-c-change-list'],
-  },
-  {
-    id: 'changeCard',
-    round: 'changeCard',
-    options: ['105-change-a-switch', '106-change-b-divider', '107-change-c-side-by-side', '108-change-d-small-card'],
-  },
-];
+export const OPEN: Decision[] = [];
 
 /**
  * Choices made overnight while the maintainer was away (they asked that work continue without
@@ -30,6 +19,8 @@ export const OPEN: Decision[] = [
 export const PROVISIONAL: (Decision & { chosen: number })[] = [];
 
 export const HISTORY: Decision[] = [
+  { id: 'changeCard', options: ['111-change-card-final', '105-change-a-switch', '106-change-b-divider', '107-change-c-side-by-side', '108-change-d-small-card'] },
+  { id: 'focusEditor', options: ['110-focus-editor-final', '100-focus-a-just-ask', '101-focus-b-focus-card', '102-focus-c-change-list'] },
   { id: 'changeCardDetailed', options: ['95-change-a-side-by-side', '96-change-b-toggle', '97-change-c-slider', '98-change-d-tabs'] },
   { id: 'focusEditorDetailed', options: ['90-focus-a-render-inspector', '91-focus-b-three-panes', '92-focus-c-floating', '93-focus-d-table'] },
   { id: 'account', options: ['70-account-a-cards', '71-account-b-settings', '72-account-c-usage'] },

@@ -1,16 +1,12 @@
-// Three minimal layouts of the focus editor (D-61). In each the game render fills the page, the
-// modder asks the agent for a change in plain words and approves or rejects what comes back.
-// There are no layout numbers, no internal names and no lists: a focus moves by dragging it on
-// the tree or by asking. Everything a modder rarely needs sits behind the one Details toggle.
-//   A. Only a prompt bar over the tree. No fields at all.
-//   B. The prompt bar, plus a small card with the title, description and cost of the selected focus.
-//   C. A side column that lists what the agent changed, with the prompt under it.
-import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from 'react';
+// The focus editor (D-61, chosen 2026-11-14). The game render fills the page. The modder asks the
+// agent for a change in plain words and approves or rejects what comes back, drags a focus to
+// move it, and clicks one to type its title, description and cost. There are no layout numbers,
+// no internal names and no lists. Everything a modder rarely needs sits behind the one Details toggle.
+import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Field } from '../../components/ui';
 import type { Diagnostic, FocusNode } from '../../focus/types';
 import type { VariantProps } from '../rounds';
-import { PENDING_BEFORE } from './fixtures';
 import { GamePreview } from './GamePreview';
 import { DiagnosticsList, labelOf, SourceLink } from './Panels';
 import { useFocusModel, type FocusModel, type FocusScenario } from './useFocusModel';
@@ -65,13 +61,6 @@ function useEditor(state: string): Editor {
 }
 
 // ----- What the agent changed, in plain sentences ------------------------------------------
-
-function changeText(t: (key: string, options?: Record<string, unknown>) => string, node: FocusNode): string {
-  if (node.pending?.change === 'added') return t('designLab.focus.change.added', { name: node.label });
-  const before = PENDING_BEFORE[node.id];
-  if (before?.cost !== undefined) return t('designLab.focus.change.cost', { name: node.label, before: before.cost, after: node.cost ?? 0 });
-  return t('designLab.focus.change.changed', { name: node.label });
-}
 
 function summaryText(t: (key: string, options?: Record<string, unknown>) => string, model: FocusModel): string {
   const added = model.nodes.filter((n) => n.pending?.change === 'added').length;
@@ -165,13 +154,13 @@ function Header({ editor }: { editor: Editor }) {
 }
 
 /** What the agent did and the two actions: approve it or reject it. */
-function Verdict({ editor, children }: { editor: Editor; children?: ReactNode }) {
+function Verdict({ editor }: { editor: Editor }) {
   const { t } = useTranslation();
   const { model, agent, busy } = editor;
   if (model.pendingCount === 0) return null;
   return (
     <div className="mx-verdict" role="region" aria-label={t('designLab.focus.pending.region')}>
-      {children ?? <p>{agent.summary || summaryText(t, model)}</p>}
+      <p>{agent.summary || summaryText(t, model)}</p>
       <div className="button-row">
         <Button size="sm" variant="primary" onClick={model.applyAll} disabled={busy}>
           {t('designLab.focus.approve')}
@@ -235,52 +224,7 @@ function Ask({ editor }: { editor: Editor }) {
   );
 }
 
-/** What there is to say about the selected focus: the agent's change, a problem to fix, or why it is locked. */
-function SelectedNote({ editor }: { editor: Editor }) {
-  const { t } = useTranslation();
-  const { model, agent, busy } = editor;
-  const node = model.selected;
-  if (!node) return null;
-  const problem = fixable(model, node.id);
-  const text = node.pending ? changeText(t, node) : problem ? problem.message : !node.editable ? t('designLab.focus.lockedNote', { name: node.label, reason: node.notEditableReason }) : null;
-  return (
-    <div className="mx-selected">
-      <p>{text ?? <strong>{node.label}</strong>}</p>
-      {problem && !node.pending ? (
-        <Button size="sm" disabled={busy} onClick={() => agent.ask(t('designLab.focus.ask.fix', { problem: problem.message }))}>
-          {t('designLab.focus.fix')}
-        </Button>
-      ) : null}
-      <Button size="sm" variant="ghost" aria-label={t('designLab.focus.deselect', { name: node.label })} onClick={() => model.select(null)}>
-        <span aria-hidden="true">&times;</span>
-      </Button>
-    </div>
-  );
-}
-
-// ----- A. Only a prompt bar ------------------------------------------------------------------
-
-/** A. The tree and one bar: what the agent did, approve or reject, and the request box. No fields. */
-export function FocusA({ state }: VariantProps) {
-  const editor = useEditor(state);
-  const wide = useWide();
-  return (
-    <div className="mx-page mxa">
-      <Header editor={editor} />
-      <div className="mx-stage">
-        <Tree editor={editor} under={wide ? DOCK_ROOM : 0} />
-        <div className="mx-dock">
-          <Status editor={editor} />
-          <Verdict editor={editor} />
-          <SelectedNote editor={editor} />
-          <Ask editor={editor} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ----- B. Prompt bar and a card for the selected focus ---------------------------------------
+// ----- The card of the selected focus -----------------------------------------------------
 
 function CostField({ model, node, disabled }: { model: FocusModel; node: FocusNode; disabled: boolean }) {
   const { t } = useTranslation();
@@ -325,12 +269,12 @@ function FocusCard({ editor }: { editor: Editor }) {
   );
 }
 
-/** B. As A, and selecting a focus opens a small card with its title, description and cost. */
-export function FocusB({ state }: VariantProps) {
+/** The tree, the card of the selected focus, and one bar: what the agent did, approve or reject, and the request box. */
+export function FocusEditor({ state }: VariantProps) {
   const editor = useEditor(state);
   const wide = useWide();
   return (
-    <div className="mx-page mxb">
+    <div className="mx-page">
       <Header editor={editor} />
       <div className="mx-stage">
         <Tree editor={editor} under={wide ? DOCK_ROOM : 0} />
@@ -340,66 +284,6 @@ export function FocusB({ state }: VariantProps) {
           <Verdict editor={editor} />
           <Ask editor={editor} />
         </div>
-      </div>
-    </div>
-  );
-}
-
-// ----- C. A side column with the change list -------------------------------------------------
-
-function ChangeList({ editor }: { editor: Editor }) {
-  const { t } = useTranslation();
-  const { model } = editor;
-  const pending = model.nodes.filter((n) => n.pending);
-  return (
-    <ul className="mx-changes" aria-label={t('designLab.focus.pending.region')}>
-      {pending.map((node) => (
-        <li key={node.id}>
-          <button type="button" className={`mx-change${node.id === model.selectedId ? ' is-selected' : ''}`} aria-pressed={node.id === model.selectedId} onClick={() => model.reveal(node.id)}>
-            <span className={`mx-change-pin is-${node.pending?.change ?? 'changed'}`} aria-hidden="true">
-              {node.pending?.change === 'added' ? '+' : ''}
-            </span>
-            {changeText(t, node)}
-          </button>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-/** C. The tree beside one narrow column: your request, the list of what the agent changed, approve or reject, and the request box. */
-export function FocusC({ state }: VariantProps) {
-  const { t } = useTranslation();
-  const editor = useEditor(state);
-  const { model, agent } = editor;
-  const idle = model.pendingCount === 0 && !agent.working && !model.refreshing;
-  return (
-    <div className="mx-page mxc">
-      <Header editor={editor} />
-      <div className="mxc-grid">
-        <Tree editor={editor} />
-        <aside className="mxc-side" aria-label={t('designLab.focus.agentColumn')}>
-          <div className="mxc-thread">
-            {agent.asked && !idle ? (
-              <p className="mxc-asked">
-                <span className="sr-only">{t('designLab.focus.youAsked')} </span>
-                {agent.asked}
-              </p>
-            ) : null}
-            {idle ? <p className="muted">{t('designLab.focus.idleHint')}</p> : null}
-            <Status editor={editor} />
-            {model.pendingCount > 0 ? (
-              <>
-                <ChangeList editor={editor} />
-                <Verdict editor={editor}>
-                  <p className="sr-only">{agent.summary || summaryText(t, model)}</p>
-                </Verdict>
-              </>
-            ) : null}
-          </div>
-          <SelectedNote editor={editor} />
-          <Ask editor={editor} />
-        </aside>
       </div>
     </div>
   );

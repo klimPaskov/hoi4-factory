@@ -145,44 +145,12 @@
       "several": "Two pages to decide",
       "live": "Open this variant live",
       "focusEditor": {
-        "title": "Focus editor",
-        "question": "Which minimal focus editor should be built? In all three the game render fills the page, you ask the agent in plain words and approve or reject what it did. You move a focus by dragging it. There are no number fields and no lists.",
-        "options": [
-          {
-            "name": "Just ask",
-            "summary": "Only the tree and one bar: what the agent did, Approve or Reject, and the request box. No fields at all. Every change goes through the agent."
-          },
-          {
-            "name": "Ask, with a focus card",
-            "summary": "The same bar. Clicking a focus also opens a small card where you can type its title, description and cost yourself."
-          },
-          {
-            "name": "Change list",
-            "summary": "A narrow column beside the tree lists each thing the agent changed. Click a line to see it on the tree. The request box sits under the list."
-          }
-        ]
+        "title": "Focus editor, minimal round",
+        "outcome": "Chosen: the bar that asks the agent, with direct editing kept. You drag a focus to move it and click one to type its title, description and cost (first picture)."
       },
       "changeCard": {
-        "title": "Change card",
-        "question": "Which minimal change card should be built? All four show the game picture of the change, one plain sentence about it, Approve and Reject, and keep everything else behind Details.",
-        "options": [
-          {
-            "name": "One picture, switch",
-            "summary": "The picture fills the page. A small After and Before switch flips it. The sentence and the two buttons float at the bottom."
-          },
-          {
-            "name": "One picture, divider",
-            "summary": "The picture fills the page. You drag a divider across it to compare before and after. The same bar at the bottom."
-          },
-          {
-            "name": "Side by side",
-            "summary": "Before on the left, after on the right. The sentence and the two buttons sit in one row under them."
-          },
-          {
-            "name": "Small card",
-            "summary": "A compact card that fits inside a task: the sentence, a smaller picture with the switch, and the two buttons."
-          }
-        ]
+        "title": "Change card, minimal round",
+        "outcome": "Chosen: one full-page picture of the final result with one sentence, Approve and Reject. No before and after comparison (first picture)."
       },
       "focusEditorDetailed": {
         "title": "Focus editor, first round",
@@ -330,13 +298,7 @@
       "focusEditor": {
         "variants": {
           "a": {
-            "name": "A. Just ask"
-          },
-          "b": {
-            "name": "B. Ask, with a focus card"
-          },
-          "c": {
-            "name": "C. Change list"
+            "name": "Focus editor"
           }
         },
         "states": {
@@ -350,16 +312,7 @@
       "changeCard": {
         "variants": {
           "a": {
-            "name": "A. One picture, switch"
-          },
-          "b": {
-            "name": "B. One picture, divider"
-          },
-          "c": {
-            "name": "C. Side by side"
-          },
-          "d": {
-            "name": "D. Small card"
+            "name": "Change card"
           }
         },
         "states": {
@@ -388,9 +341,6 @@
       "deselect": "Stop talking about {{name}}",
       "working": "The agent is working on it.",
       "refreshing": "The source changed. Updating the tree.",
-      "agentColumn": "The agent",
-      "youAsked": "You asked:",
-      "idleHint": "Say what you want changed. The agent edits the tree and you approve the result here.",
       "ask": {
         "label": "Ask the agent for a change",
         "placeholder": "Ask for a change",
@@ -398,11 +348,6 @@
         "send": "Send",
         "about": "About {{name}}: {{request}}",
         "fix": "Fix this: {{problem}}"
-      },
-      "change": {
-        "added": "Added {{name}}",
-        "cost": "{{name}}: cost {{before}} to {{after}}",
-        "changed": "Changed {{name}}"
       },
       "summary": {
         "both": "The agent {{added}} and {{changed}}.",
@@ -501,10 +446,7 @@
         "resolved": "Fixed: {{count}}"
       },
       "preview": {
-        "show": "Show",
-        "labelBefore": "The focus tree before the change, as the game draws it",
-        "labelAfter": "The focus tree with the change, as the game draws it",
-        "labelSlider": "The focus tree before and after the change, as the game draws it, with a divider to drag"
+        "label": "The focus tree with the change, as the game draws it"
       },
       "checks": {
         "passed": "Passed",
@@ -515,12 +457,6 @@
       "restore": {
         "label": "A restore point was saved, so this change can be undone.",
         "none": "No restore point was taken."
-      },
-      "compare": {
-        "before": "Before",
-        "after": "After",
-        "slider": "Divider between the before and after pictures",
-        "value": "{{percent}} percent of the width shows the before picture"
       },
       "counts": {
         "closure": "{{resolved}} references resolved, {{unresolved}} not resolved, {{unknown}} could not be checked."

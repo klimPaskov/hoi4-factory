@@ -39,7 +39,7 @@
   font-weight: 600;
 }
 
-/* A and B: the bar over the picture */
+/* The bar over the picture */
 .cx-bar {
   position: absolute;
   inset-inline: 0;
@@ -61,88 +61,6 @@
 .cx-bar .cx-summary {
   flex: 1 1 18rem;
 }
-.cx-toggle {
-  position: relative;
-  height: 100%;
-}
-.cx-switch {
-  position: absolute;
-  inset-inline-end: var(--space-2);
-  top: var(--space-2);
-  z-index: 6;
-  background: var(--surface);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-}
-.cx-switch .segmented {
-  margin: 0;
-}
-.cx-switch .segmented legend {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-/* C: side by side */
-.cxc .cx-stage {
-  height: calc(100dvh - 12.5rem);
-}
-.cx-sides {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-3);
-  height: 100%;
-}
-.cx-sides figure {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  margin: 0;
-  min-width: 0;
-  min-height: 0;
-}
-.cx-sides figcaption {
-  font-weight: 600;
-  font-size: var(--text-sm);
-}
-.cx-sides .gp {
-  flex: 1;
-  height: auto;
-}
-.cx-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2) var(--space-4);
-  padding: var(--space-2) 0;
-}
-
-/* D: a small card */
-.cxd {
-  padding-top: var(--space-5);
-}
-.cx-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  width: min(40rem, 100%);
-  margin: 0 auto;
-  padding: var(--space-4);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-}
-.cx-card-picture {
-  height: 26rem;
-}
-.cx-card-picture .gp {
-  height: 100%;
-}
-
 /* Details: the one toggle */
 .fc-details > summary {
   cursor: pointer;
@@ -264,8 +182,7 @@
 
 /* Narrow screens */
 @media (max-width: 48rem) {
-  .cx-stage,
-  .cxc .cx-stage {
+  .cx-stage {
     height: auto;
     min-height: 0;
   }
@@ -274,15 +191,5 @@
     width: auto;
     margin-top: var(--space-2);
     box-shadow: none;
-  }
-  .cx-sides {
-    grid-template-columns: minmax(0, 1fr);
-    height: auto;
-  }
-  .cx-card {
-    padding: var(--space-3);
-  }
-  .cx-card-picture {
-    height: auto;
   }
 }
