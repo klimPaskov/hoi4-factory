@@ -377,8 +377,8 @@ fn tool(
 /// The pinned HOI4 Agent Tools: its commit (also `AGENT_TOOLS_REV` in `docker/server.Dockerfile`)
 /// and package version. Move both together, then refresh [`SCHEMA_HASHES`] from the real server
 /// (the `real_agent_tools` test prints them) and rerun that test.
-pub const AGENT_TOOLS_REV: &str = "73a5d7199ab7d1e4e3aeca74598d946512e23f3d";
-pub const AGENT_TOOLS_VERSION: &str = "4.12.0";
+pub const AGENT_TOOLS_REV: &str = "fb78624c7c76c993268c33fe1c50a62632547b98";
+pub const AGENT_TOOLS_VERSION: &str = "4.18.0";
 
 /// The S03 profile: nine read tools of the pinned HOI4 Agent Tools, nothing that writes mod source.
 pub fn agent_tools_read_only() -> ToolProfile {
@@ -524,11 +524,16 @@ pub fn agent_tools_focus_editor() -> ToolProfile {
 /// reviewed profile entry (effect class, closed host schema, output bound and schema hash).
 pub const AGENT_TOOLS_WITHHELD: &[(&str, &str)] = &[
     ("hoi4.gui_rewrite", WITHHELD_REWRITE),
+    ("hoi4.localisation_write", WITHHELD_REWRITE),
     ("hoi4.map_rewrite", WITHHELD_REWRITE),
     ("hoi4.gui_render", WITHHELD_RENDER),
     ("hoi4.event_render", WITHHELD_RENDER),
     ("hoi4.tech_render", WITHHELD_RENDER),
     ("hoi4.gui_inspect", WITHHELD_READ),
+    ("hoi4.explain_error", WITHHELD_READ),
+    ("hoi4.mod_health", WITHHELD_READ),
+    ("hoi4.script_guard", WITHHELD_READ),
+    ("hoi4.compat_check", WITHHELD_READ),
     ("hoi4.map_inspect", WITHHELD_READ),
     ("hoi4.localisation_inspect", WITHHELD_READ),
     ("hoi4.idea_inspect", WITHHELD_READ),
@@ -613,8 +618,8 @@ const FOCUS_REWRITE_SCHEMA_HASH: Option<&str> =
 const SCHEMA_HASHES: [Option<&str>; 9] = [
     Some("939462b1642f19d2753b6b192e5458be0745a41ffc38056047e613a58afb0a7c"),
     Some("ae6435313935a25847456a6fd057bbabe373150fbd8433012d22210affd20287"),
-    Some("077ffc26f39c6510fbed9700a4885c05e8b4b6b79f6a038b4b8b9b5a38c2ae61"),
-    Some("d86e10b44856dae435eb5b67a900c7e13218e52faedccb80c9a073630f3096ec"),
+    Some("faeeca344f40bf185952ecd45e1d888fd50c1b191331b8058ff19dbd115fb9ee"),
+    Some("ccd879806b8490c15f21fc4cd1d39526b51b63091d90df0cf261df4299b29e25"),
     Some("38b573180961cb6288d3a674f090d59da47d4b10c1e9c31c508d4561ab21b207"),
     Some("5159991d7d1b98d3f274530ebe8ca4bcb5b77122d9580f5dcff7fd99ff97a7d8"),
     Some("b0abf49e379a42e76060b17190330e3483320f3f2cddf054de681b5b3b7200d9"),
@@ -626,9 +631,10 @@ const SCHEMA_HASHES: [Option<&str>; 9] = [
 mod tests {
     use super::*;
 
-    /// The tool list `hoi4-agent-tools` 4.12.0 reported over stdio on 2026-11-13 (from the server
-    /// image, `tools/list`). Replace it from the real server at every re-pin.
-    const PINNED_TOOL_LIST: [&str; 34] = [
+    /// The tool list `hoi4-agent-tools` 4.18.0 reported over stdio on 2026-11-15 with every profile
+    /// on (`HOI4_AGENT_TOOLS_PROFILES=all`, the release tarball, `tools/list`). Replace it from the
+    /// real server at every re-pin.
+    const PINNED_TOOL_LIST: [&str; 39] = [
         "hoi4.focus_inspect",
         "hoi4.focus_render",
         "hoi4.focus_rewrite",
@@ -637,12 +643,16 @@ mod tests {
         "hoi4.gui_rewrite",
         "hoi4.map_inspect",
         "hoi4.map_rewrite",
+        "hoi4.localisation_write",
         "hoi4.reference_search",
         "hoi4.reference_read",
         "hoi4.reference_context",
         "hoi4.source_lookup",
         "hoi4.script_validate",
         "hoi4.error_log",
+        "hoi4.explain_error",
+        "hoi4.mod_health",
+        "hoi4.script_guard",
         "hoi4.mod_index",
         "hoi4.localisation_inspect",
         "hoi4.idea_inspect",
@@ -650,6 +660,7 @@ mod tests {
         "hoi4.unit_inspect",
         "hoi4.asset_inspect",
         "hoi4.skill",
+        "hoi4.compat_check",
         "hoi4.event_inspect",
         "hoi4.event_render",
         "hoi4.impact_inspect",

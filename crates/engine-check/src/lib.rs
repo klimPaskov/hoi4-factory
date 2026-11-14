@@ -31,7 +31,7 @@ use serde::{Deserialize, Serialize};
 pub const ENGINE_VERSION: &str = hoi4_engine::VERSION;
 /// The hoi4-agent-tools commit the engine is linked from. It must equal the `rev` of the
 /// `hoi4-engine` dependency in the root `Cargo.toml` and the image's Agent Tools release commit.
-pub const ENGINE_REV: &str = "73a5d7199ab7d1e4e3aeca74598d946512e23f3d";
+pub const ENGINE_REV: &str = "fb78624c7c76c993268c33fe1c50a62632547b98";
 pub const REPORT_SCHEMA: &str = report::SCHEMA;
 pub const BASELINE_SCHEMA: &str = hoi4_engine::baseline::SCHEMA;
 
