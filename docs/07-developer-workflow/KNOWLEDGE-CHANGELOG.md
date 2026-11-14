@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.46, 2026-11-14, local tests run under a memory cap and a timeout
+
+- CLAUDE.md's verification section gained one rule: local tests run under a memory cap and a timeout, and a loop-driven test uses a fake clock and an iteration cap, never a mock object with a real clock. The maintainer approved the rule.
+
+Evidence: the Live Tools incident of 2026-11-14 in the [engineering lessons](ENGINEERING-LESSONS.md), fixed in HOI4-Live-Tools pull request 68. Rollback: revert this commit and regenerate.
+
 ## 0.2.45, 2026-11-13, cancel-safe worker writes and a recovery-test race
 
 - CLAUDE.md's agent runtime rules gained three lines: whole frames go through a writer task that owns the worker's stdin, a dropped `run_turn` is followed by `cancel`, and a test that kills the host mid-turn waits until the replay server has the request.

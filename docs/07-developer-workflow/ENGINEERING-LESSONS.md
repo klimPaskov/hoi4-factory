@@ -105,3 +105,7 @@ CLAUDE.md rule: format only your own new files with `rustfmt --edition 2024 <fil
 ### Seven ZIN units in a trailer (2026-11-06)
 
 CLAUDE.md rule: visual work is not finished until someone has looked at it, at viewing size and in close-up, and a fresh-context reviewer has been asked to find every defect. On 2026-11-06 seven ZIN units passed every geometry check with 0 errors and went into a trailer cut together with existing Chaos Redux units. The maintainer saw holes and deformed animations in both at first glance.
+
+### A unit test that grew to 18 GB (2026-11-14)
+
+CLAUDE.md rule: local tests run under a memory cap and a timeout, and a loop-driven test uses a fake clock and an iteration cap. On the night of 2026-11-14 a HOI4 Live Tools unit test for the exit-to-menu flow used a mock game session with a real clock. A regex bug in the code under test meant the exit loop never ended. The loop spun for its 240 seconds of real time, and the mock recorded every call, so the process grew by about 4 GB a minute to 18 GB. Free memory fell to 1.26 GB with the maintainer asleep, and another session stopped that one process seconds before a third out-of-memory crash. The fix replaced the mock with plain callables, a fake clock that every sleep advances and a cap of 400 screen reads. The same file now runs in 6 ms, and that session runs local tests under a 1.5 GB cap and a 60 second timeout.
