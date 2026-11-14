@@ -783,3 +783,27 @@ async fn a_text_edit_outside_the_allowed_paths_is_refused() {
     assert_eq!(r.status, 403, "{}", r.text);
     assert_eq!(std::fs::read(narrow.worktree().join("localisation/english/exp_basic_l_english.yml")).unwrap(), before);
 }
+
+// ----- The list of a mod's focus trees (D-66) --------------------------------------------------
+
+#[tokio::test]
+async fn the_trees_of_the_mod_are_listed_for_members_only() {
+    let Some(e) = editor().await else { return };
+    // The first request opens the task's worktree. The second shows that listing writes nothing.
+    let first = e.alice.client.get(&format!("{}/focus/trees", e.base())).await;
+    assert_eq!(first.status, 200, "{}", first.text);
+    let before = e.source();
+    let r = e.alice.client.get(&format!("{}/focus/trees", e.base())).await;
+    assert_eq!(r.status, 200, "{}", r.text);
+    assert_eq!(r.body, first.body);
+    assert_eq!(r.body["trees"], json!([{ "treeId": "exp_basic_tree", "sourcePath": SOURCE, "focusCount": 4 }]));
+    assert!(!r.text.contains(&e.h.data_dir.path().to_string_lossy().to_string()), "no server paths reach the browser");
+    assert_eq!(e.source(), before, "listing reads and writes nothing");
+    // The listed id opens the tree.
+    let p = e.projection().await;
+    assert_eq!(p["treeId"], r.body["trees"][0]["treeId"]);
+    // Someone who is not a member of the project learns nothing.
+    let mallory = e.h.verified_user("mallory@example.org").await;
+    let denied = mallory.client.get(&format!("{}/focus/trees", e.base())).await;
+    assert_eq!(denied.status, 404, "{}", denied.text);
+}

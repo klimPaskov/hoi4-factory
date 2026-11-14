@@ -358,6 +358,7 @@ function focusRoutes(proposals: Proposal[], attempts: Attempt[], more: Routes = 
   const t = task({ state: attempts.some((a) => a.state === 'running') ? 'running' : 'in_review', allowed_paths: ['common/national_focus', 'localisation/english'] });
   return {
     ...taskRoutes({ task: t, attempts }, runEvents()),
+    [`GET ${FOCUS_TASK}/focus/trees`]: { json: { trees: [{ treeId: TREE_ID, sourcePath: PROJECTION.sourcePath, focusCount: PROJECTION.nodes.length }] } },
     [`GET ${TREE}`]: { json: PROJECTION },
     [`GET ${TREE}/preview.json`]: { json: proposedMap },
     [`GET ${TREE}/preview.png`]: { asset: proposedPicture },

@@ -53,8 +53,8 @@ function TaskView({ projectId, taskId }: { projectId: string; taskId: string }) 
 }
 
 /**
- * The way from a task to its focus tree and to changes that wait for review. It shows nothing
- * for a task that has not touched a focus tree, or on a server without the focus routes.
+ * The way from a task to the mod's focus trees and to a change that waits for review. The tree
+ * link opens the list of trees, which the server reads only when someone asks for it.
  */
 function FocusLinks({ projectId, taskId, version }: { projectId: string; taskId: string; version: number }) {
   const { t } = useTranslation();
@@ -69,17 +69,13 @@ function FocusLinks({ projectId, taskId, version }: { projectId: string; taskId:
     );
     return () => controller.abort();
   }, [projectId, taskId, version]);
-  const trees = [...new Set(proposals.map((p) => p.treeId))];
-  if (trees.length === 0) return null;
   const base = `/projects/${encodeURIComponent(projectId)}/tasks/${encodeURIComponent(taskId)}`;
   const waiting = proposals.filter((p) => p.state === 'applied');
   return (
     <nav className="button-row" aria-label={t('tasks.changesTitle')}>
-      {trees.map((tree) => (
-        <Link key={tree} className="button secondary" to={`${base}/focus/${encodeURIComponent(tree)}`}>
-          {trees.length === 1 ? t('tasks.openFocusTree') : t('tasks.openFocusTreeNamed', { name: tree })}
-        </Link>
-      ))}
+      <Link className="button secondary" to={`${base}/focus`}>
+        {t('tasks.openFocusTree')}
+      </Link>
       {waiting.length > 0 ? (
         <Link className="button secondary" to={`${base}/changes/${encodeURIComponent((waiting[waiting.length - 1] as Proposal).id)}`}>
           {t('tasks.reviewChange')}

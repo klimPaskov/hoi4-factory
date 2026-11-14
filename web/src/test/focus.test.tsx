@@ -182,6 +182,81 @@ describe('the focus editor', () => {
     expect(api.requests.find((r) => r.method === 'POST' && r.path === `${TASK}/attempts`)?.body).toEqual({ expected_version: 7, instruction: 'Add a naval branch' });
   });
 
+  it('shows an edit at once and confirms it when the server answers', async () => {
+    let answer: () => void = () => {};
+    const held = new Promise<void>((resolve) => {
+      answer = resolve;
+    });
+    const renamed = { ...PROJECTION, projectionHash: 'c'.repeat(64), nodes: PROJECTION.nodes.map((n) => (n.id === 'SWE_military_reform' ? { ...n, label: 'Army Reform' } : n)) };
+    mockApi(
+      routes(() => [], {
+        [`POST ${TREE}/operations`]: { status: 201, json: { proposal: { ...OWN_PROPOSAL, changedIds: ['SWE_military_reform'], summary: { added: [], changed: [{ id: 'SWE_military_reform', fields: [] }], removed: [] } }, projection: renamed }, wait: held },
+      }),
+    );
+    renderApp(EDITOR);
+    await userEvent.click(await screen.findByRole('button', { name: 'Military Reform' }));
+    const title = within(screen.getByRole('complementary', { name: 'Military Reform' })).getByLabelText('Title');
+    await userEvent.clear(title);
+    await userEvent.type(title, 'Army Reform');
+    await userEvent.tab();
+    // Before the server has answered: the new title is on the tree and the page says it is checking.
+    expect(await screen.findByRole('button', { name: 'Army Reform' })).toBeInTheDocument();
+    expect(screen.getByText('Checking the change…')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Save' })).not.toBeInTheDocument();
+    answer();
+    // Confirmed: the change is recorded and can be saved or undone.
+    expect(await screen.findByRole('button', { name: 'Save' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Army Reform, changed' })).toBeInTheDocument();
+    expect(screen.queryByText('Checking the change…')).not.toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('puts the tree back and says why when the server refuses an edit', async () => {
+    let answer: () => void = () => {};
+    const held = new Promise<void>((resolve) => {
+      answer = resolve;
+    });
+    mockApi(
+      routes(() => [], {
+        [`POST ${TREE}/operations`]: { status: 422, json: envelope('operation_refused', 'titles and descriptions are one line without double quotes Nothing was written.'), wait: held },
+      }),
+    );
+    renderApp(EDITOR);
+    await userEvent.click(await screen.findByRole('button', { name: 'Military Reform' }));
+    const title = within(screen.getByRole('complementary', { name: 'Military Reform' })).getByLabelText('Title');
+    await userEvent.clear(title);
+    await userEvent.type(title, 'Army "Reform"');
+    await userEvent.tab();
+    expect(await screen.findByRole('button', { name: 'Army "Reform"' })).toBeInTheDocument();
+    answer();
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent('That change was not made.');
+    expect(alert).toHaveTextContent('titles and descriptions are one line without double quotes');
+    expect(alert).toHaveTextContent('The tree is back as it was.');
+    // The tree and the card are back at the title the server has.
+    expect(screen.getByRole('button', { name: 'Military Reform' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Army "Reform"' })).not.toBeInTheDocument();
+    expect(within(screen.getByRole('complementary', { name: 'Military Reform' })).getByLabelText('Title')).toHaveValue('Military Reform');
+    expect(screen.queryByRole('button', { name: 'Save' })).not.toBeInTheDocument();
+    await userEvent.click(within(alert).getByRole('button', { name: 'OK' }));
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('puts a moved focus back when the tree changed under the page', async () => {
+    mockApi(
+      routes(() => [], {
+        [`POST ${TREE}/operations`]: { status: 409, json: envelope('stale_base', 'The tree changed since you looked at it. Nothing was written.', { retry_class: 'refresh_preconditions' }) },
+      }),
+    );
+    renderApp(EDITOR);
+    const focus = await screen.findByRole('button', { name: 'Ore Exports' });
+    focus.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent('Something else changed the tree first.');
+    expect(alert).toHaveTextContent('The tree is back as it was.');
+  });
+
   it('undoes open changes newest first', async () => {
     const second = { ...OWN_PROPOSAL, id: 'second' };
     let list: Proposal[] = [OWN_PROPOSAL, second];
@@ -306,12 +381,37 @@ describe('the change card', () => {
   });
 });
 
+describe('the list of focus trees', () => {
+  const one = { treeId: TREE_ID, sourcePath: 'common/national_focus/swe_industry.txt', focusCount: 16 };
+
+  it('goes straight to the tree of a mod that has one', async () => {
+    mockApi(routes(() => [AGENT_PROPOSAL], { [`GET ${TASK}/focus/trees`]: { json: { trees: [one] } } }));
+    renderApp(`${TASK}/focus`);
+    expect(await screen.findByText(AGENT_SENTENCE)).toBeInTheDocument();
+  });
+
+  it('offers each tree of a mod that has several', async () => {
+    mockApi(routes(() => [], { [`GET ${TASK}/focus/trees`]: { json: { trees: [one, { treeId: 'SWE_navy', sourcePath: 'common/national_focus/swe_navy.txt', focusCount: 1 }] } } }));
+    renderApp(`${TASK}/focus`);
+    expect(await screen.findByRole('link', { name: TREE_ID })).toHaveAttribute('href', EDITOR);
+    expect(screen.getByRole('link', { name: 'SWE_navy' })).toHaveAttribute('href', `${TASK}/focus/SWE_navy`);
+    expect(screen.getByText('16 focuses')).toBeInTheDocument();
+    expect(screen.getByText('1 focus')).toBeInTheDocument();
+  });
+
+  it('says so when the mod has no focus tree', async () => {
+    mockApi(routes(() => [], { [`GET ${TASK}/focus/trees`]: { json: { trees: [] } } }));
+    renderApp(`${TASK}/focus`);
+    expect(await screen.findByRole('heading', { name: 'This mod has no focus tree yet' })).toBeInTheDocument();
+  });
+});
+
 describe('the task page', () => {
   it('links to the focus tree and to the change that waits for review', async () => {
     mockApi(routes(() => [AGENT_PROPOSAL]));
     renderApp(TASK);
     const tree = await screen.findByRole('link', { name: 'Open the focus tree' });
-    expect(tree).toHaveAttribute('href', EDITOR);
-    expect(screen.getByRole('link', { name: 'Review the change' })).toHaveAttribute('href', `${TASK}/changes/${AGENT_PROPOSAL.id}`);
+    expect(tree).toHaveAttribute('href', `${TASK}/focus`);
+    expect(await screen.findByRole('link', { name: 'Review the change' })).toHaveAttribute('href', `${TASK}/changes/${AGENT_PROPOSAL.id}`);
   });
 });

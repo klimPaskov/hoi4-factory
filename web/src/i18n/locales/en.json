@@ -120,7 +120,8 @@
       "workspace_busy": "Another server process is using this project right now. Try again in a minute.",
       "workspace_not_ready": "The mod has no Git baseline yet. Finish bringing the mod in first.",
       "agent_unavailable": "The agent is not available on this server.",
-      "attempt_not_active": "This attempt is not running any more."
+      "attempt_not_active": "This attempt is not running any more.",
+      "stale_base": "Something else changed the tree first."
     }
   },
   "unavailable": {
@@ -722,7 +723,6 @@
     "permissionTab": "Permission",
     "settingsTab": "Settings",
     "openFocusTree": "Open the focus tree",
-    "openFocusTreeNamed": "Open the focus tree {{name}}",
     "reviewChange": "Review the change",
     "changesTitle": "Focus tree"
   },
@@ -834,6 +834,20 @@
       "description": "Description",
       "cost": "Cost",
       "fix": "Ask the agent to fix it"
+    },
+    "trees": {
+      "loading": "Looking for focus trees…",
+      "noneTitle": "This mod has no focus tree yet",
+      "noneBody": "Ask the agent to make one in a task, then open it here.",
+      "choose": "This mod has more than one focus tree. Pick the one to open.",
+      "size_one": "{{count}} focus",
+      "size_other": "{{count}} focuses"
+    },
+    "checking": "Checking the change…",
+    "refused": {
+      "title": "That change was not made.",
+      "restored": "The tree is back as it was.",
+      "dismiss": "OK"
     }
   },
   "change": {
