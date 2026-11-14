@@ -76,9 +76,6 @@
 .gp-hit.is-selected {
   box-shadow: 0 0 0 3px #ffffff, 0 0 0 6px #2d58cc;
 }
-.gp-hit.is-dim {
-  background: rgb(8 9 12 / 0.72);
-}
 .gp-hit.is-pending.is-added {
   box-shadow: 0 0 0 3px #3ddc84;
   background: rgb(61 220 132 / 0.1);
@@ -105,20 +102,6 @@
   background: rgb(132 162 255 / 0.18);
   pointer-events: none;
 }
-.gp-ghost-cell {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%) scale(var(--gp-inv));
-  padding: 2px 8px;
-  border-radius: 6px;
-  background: #101114;
-  color: #ffffff;
-  font-family: var(--mono);
-  font-size: 13px;
-  white-space: nowrap;
-}
-
 /* Markers keep close to their screen size at every zoom. A new or changed focus gets a small pin, a
    problem gets a small dot. Nothing on the picture is a button, so nothing covers a neighbour. */
 .gp-pin {
@@ -172,23 +155,7 @@
   background: #ff5a5a;
   color: #101114;
 }
-.gp-mark-info {
-  background: #6cb4ff;
-  color: #101114;
-}
-.gp-selbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-2) var(--space-3);
-  padding-top: var(--space-1);
-}
-.gp-selbar p {
-  margin: 0;
-  margin-inline-end: auto;
-}
-
-/* Controls and notes */
+/* Zoom to fit */
 .gp-controls {
   position: absolute;
   left: var(--space-2);
@@ -221,22 +188,6 @@
 .gp-controls button:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: -2px;
-}
-.gp-note {
-  position: absolute;
-  left: 50%;
-  bottom: var(--space-3);
-  transform: translateX(-50%);
-  z-index: 6;
-  margin: 0;
-  padding: var(--space-2) var(--space-3);
-  background: var(--surface);
-  color: var(--text);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-md);
-  font-size: var(--text-sm);
-  max-width: calc(100% - 2 * var(--space-3));
 }
 /* On a phone the frame follows the picture's shape instead of filling a tall box. */
 @media (max-width: 48rem) {

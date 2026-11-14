@@ -22,6 +22,7 @@ Every current screen was captured on sample data before any design change, in li
 | Overall direction | A Workbench, B Dossier, C War room, D Studio, each applied to the project list with working states | A Workbench | A quiet, modern tool with sidebar navigation, neutral greys and one blue accent |
 | Image model first | Not offered. The maintainer asked for it | Every visual starts as an image: page mockups, icons, logo and mascot. Code matches the chosen image | Better ideas and a clear target before code |
 | Design system | Tokens (light-dark pairs), shared components in `ui.tsx`, the sidebar shell, and parts from the mockups (circle stepper, meters, segmented control, chips, timeline, stat cards, flag-style avatars) | Approved, with the [mockups](mockups/) as the target look for every page | Matches the mockups. All text pairs pass WCAG AA in both themes, form outlines reach 3:1 |
+| S04 pages | Two rounds each for the focus editor and the change card | The ask bar with direct editing kept, and a change card that shows only the final result | The agent does most of the work, and the modder looks, asks and approves (D-61, D-63) |
 | Minimal screens | Not offered. The maintainer asked for it | As little on screen as possible | Hobbyist users, low friction |
 | API additions | Project list extras, recent activity, changed file counts | None | Minimal screens. Designs use the data the API returns today |
 | Icons | A generated icon sheet | Used, sliced into 24 alpha masks that take the text color (`web/src/assets/icons`) | Consistent stroke icons from one image |
@@ -87,6 +88,23 @@ One master image fixes the character, and every pose was generated with it as th
 - Provisional overnight: stacked cards. Confirmed by the maintainer on review.
 - Built: one narrow column of cards. Your details show the email and GitHub states as badges. Usage shows the allowance left as one line and a meter of what was used this month, with the unknown-cost note and the spend with your own keys. Model keys are quiet rows with Delete as a text button and the same confirmation. Sessions are unchanged. Behavior and API calls are unchanged.
 - Before: `account-*` in [screenshots/before](screenshots/before/). After: `account-*` in [screenshots/after](screenshots/after/).
+
+### Focus editor (2026-11-14)
+
+- Offered, first round: four layouts around the live game render ([render and inspector](mockups/90-focus-a-render-inspector.webp), [three panes](mockups/91-focus-b-three-panes.webp), [floating inspector](mockups/92-focus-c-floating.webp), [table](mockups/93-focus-d-table.webp)). None chosen. All showed too much (D-61).
+- Offered, second round: three minimal layouts ([just ask](mockups/100-focus-a-just-ask.webp), [ask with a focus card](mockups/101-focus-b-focus-card.webp), [change list](mockups/102-focus-c-change-list.webp)).
+- Chosen by the maintainer: the ask bar over the full-page render, with direct editing kept (D-63). See the [final mockup](mockups/110-focus-editor-final.webp), the [drag](mockups/112-focus-editor-drag.webp) and the [agent change](mockups/113-focus-editor-agent-change.webp).
+- Built: the route `/projects/:id/tasks/:taskId/focus/:treeId`. The game render of the task's worktree fills the page. A focus moves by dragging it or with the arrow keys, and a dashed box shows where it lands. Clicking a focus opens a small card with its title, description and cost. One bar holds the request box, the agent's own sentence about its change, and two buttons: Approve and Reject for the agent's changes, Save and Undo for the person's own edits. A check that fails or cannot finish is one sentence beside the buttons. What a focus requires, the problems and the source line sit behind the one Details toggle. There are no position numbers, no internal names and no lists.
+- Waiting on a server decision: sending a request to the agent from the bar, and changing a title or description, need two server additions. Until then the title is read-only, the description is hidden and the request box answers with the server's error.
+- After: `focus-editor-*` in [screenshots/after](screenshots/after/). There is no before, because the page is new.
+
+### Change card (2026-11-14)
+
+- Offered, first round: four layouts ([side by side](mockups/95-change-a-side-by-side.webp), [toggle](mockups/96-change-b-toggle.webp), [slider](mockups/97-change-c-slider.webp), [tabs](mockups/98-change-d-tabs.webp)). Set aside with the first focus editor round (D-61).
+- Offered, second round: four minimal layouts ([one picture with a switch](mockups/105-change-a-switch.webp), [one picture with a divider](mockups/106-change-b-divider.webp), [side by side](mockups/107-change-c-side-by-side.webp), [small card](mockups/108-change-d-small-card.webp)).
+- Chosen by the maintainer: one full-page picture of the final result, with no before and after comparison (D-63). See the [final mockup](mockups/111-change-card-final.webp).
+- Built: the route `/projects/:id/tasks/:taskId/changes/:proposalId`. The picture of the result, one sentence, Approve and Reject. Approve is bound to the proposal hash. When the check cannot finish, the main action becomes Approve anyway. When it fails or the tree changed since, the main action hands the change back to the agent. The diff, the checks, the limits and the restore point sit behind the one Details toggle. The task page links to the focus tree and to the change that waits for review.
+- After: `change-card-*` and `task-focus-links-*` in [screenshots/after](screenshots/after/). There is no before, because the page is new.
 
 All pages in the default order follow the design, and every choice is the maintainer's.
 

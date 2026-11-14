@@ -129,6 +129,23 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
   return (text ? JSON.parse(text) : undefined) as T;
 }
 
+/** One round trip that answers with bytes (a picture). Errors use the same envelope as `request`. */
+export async function requestBlob(path: string, signal?: AbortSignal): Promise<Blob> {
+  let response: Response;
+  try {
+    response = await fetch(`${API_PREFIX}${path}`, { credentials: 'same-origin', signal });
+  } catch (cause) {
+    if (cause instanceof DOMException && cause.name === 'AbortError') throw cause;
+    throw new ApiError({ status: 0, code: NETWORK_ERROR, message: 'The server could not be reached.', retryClass: 'safe_same_inputs' });
+  }
+  if (!response.ok) {
+    const error = await toApiError(response);
+    if (response.status === 401 && error.code === 'unauthenticated') unauthenticatedListener?.();
+    throw error;
+  }
+  return response.blob();
+}
+
 export function isAbort(error: unknown): boolean {
   return error instanceof DOMException && error.name === 'AbortError';
 }

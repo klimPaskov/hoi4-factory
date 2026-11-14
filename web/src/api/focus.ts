@@ -1,13 +1,15 @@
 // The focus editor, review, commit and publication routes (stage S04). The focus projection and
 // the change card types live in ../focus/types.ts and are shared with the design lab.
-import { request } from './client';
-import type { ChangeCard, CheckRow, FocusProjection, LayoutVerdict, Verdict } from '../focus/types';
+import { request, requestBlob } from './client';
+import type { HoverMap } from '../focus/GamePreview';
+import type { FocusProjection, Verdict } from '../focus/types';
 
 /** One focus operation, the same vocabulary the agent's focus_edit tool uses. */
 export type FocusOp =
   | { op: 'move'; focus_id: string; x: number; y: number }
   | { op: 'set_cost'; focus_id: string; cost: number }
   | { op: 'link'; focus_id: string; prerequisites: string[] }
+  | { op: 'set_text'; focus_id: string; title: string; description: string }
   | {
       op: 'create';
       focus_id: string;
@@ -122,6 +124,25 @@ export function applyOperations(
   });
 }
 
+/** The hover map of the tree's game render: where each focus is drawn. */
+export function getPreviewMap(projectId: string, taskId: string, treeId: string, signal?: AbortSignal): Promise<HoverMap> {
+  return request(`${taskPath(projectId, taskId)}/focus/trees/${encodeURIComponent(treeId)}/preview.json`, { signal });
+}
+
+/** The tree as the game draws it, as a PNG. */
+export function getPreviewImage(projectId: string, taskId: string, treeId: string, signal?: AbortSignal): Promise<Blob> {
+  return requestBlob(`${taskPath(projectId, taskId)}/focus/trees/${encodeURIComponent(treeId)}/preview.png`, signal);
+}
+
+export function getProposal(projectId: string, taskId: string, proposalId: string, signal?: AbortSignal): Promise<Proposal> {
+  return request(`${taskPath(projectId, taskId)}/proposals/${encodeURIComponent(proposalId)}`, { signal });
+}
+
+/** Puts an uncommitted proposal's files back. */
+export function discardProposal(projectId: string, taskId: string, proposalId: string): Promise<unknown> {
+  return request(`${taskPath(projectId, taskId)}/proposals/${encodeURIComponent(proposalId)}/discard`, { method: 'POST', body: {} });
+}
+
 export async function listProposals(projectId: string, taskId: string, signal?: AbortSignal): Promise<Proposal[]> {
   const data = await request<{ proposals: Proposal[] }>(`${taskPath(projectId, taskId)}/proposals`, { signal });
   return data.proposals;
@@ -196,74 +217,4 @@ export function syncBranch(projectId: string, taskId: string) {
 /** Same-origin URL of the task branch as a ZIP; the session cookie rides along. */
 export function downloadUrl(projectId: string, taskId: string): string {
   return `/api/v1${taskPath(projectId, taskId)}/download`;
-}
-
-const LIMITS = [
-  'The preview is a source render, not a game check.',
-  'Game behavior is confirmed only by an in-game check.',
-];
-
-/** The change card of one proposal, from the proposal, the projection after it and the task's publications. */
-export function toChangeCard(
-  p: Proposal,
-  projection: FocusProjection | null,
-  publications: Publication[],
-  canPush: { canPush: boolean; reason?: string },
-  actorName: string,
-): ChangeCard {
-  const check = p.engineReport;
-  const verdict: Verdict = check?.verdict ?? 'incomplete';
-  const unknown = check?.unknown;
-  const checks: CheckRow[] = [
-    check
-      ? {
-          name: 'engineCheck',
-          result: check.verdict === 'fail' ? 'failed' : check.verdict === 'pass' ? 'passed' : 'unavailable',
-          detail: `${check.new_findings} new, ${check.baselined_findings} in the baseline (engine ${check.engine_version})`,
-        }
-      : { name: 'engineCheck', result: 'skipped', detail: 'Not run yet' },
-    {
-      name: 'layout',
-      result: projection ? (projection.layoutVerdict === 'pass' ? 'passed' : projection.layoutVerdict === 'unknown' ? 'unavailable' : 'failed') : 'skipped',
-      detail: projection ? projection.layoutVerdict : 'No projection',
-    },
-  ];
-  const commit = publications.find(
-    (x) => x.kind === 'commit' && x.state === 'succeeded' && JSON.stringify(x.intent.proposals ?? []).includes(p.id),
-  );
-  const restore = commit?.result?.restore_point as { ref: string; oid: string } | undefined;
-  const nodes = new Map((projection?.nodes ?? []).map((n) => [n.id, n]));
-  return {
-    proposalId: p.id,
-    proposalHash: p.proposalHash,
-    actor: { kind: p.actorKind, name: actorName },
-    operation: p.toolOperation,
-    summary: { added: p.summary.added, changed: p.summary.changed, removed: p.summary.removed },
-    files: p.diffs.map((d) => {
-      const before = p.before[d.path];
-      return {
-        path: d.path,
-        beforeSha256: before !== undefined && before !== 'absent' ? before : null,
-        afterSha256: p.after[d.path] ?? '',
-        unifiedDiff: d.diff,
-      };
-    }),
-    sourceLinks: p.changedIds.flatMap((id) => {
-      const n = nodes.get(id);
-      return n ? [{ focusId: id, source: n.source }] : [];
-    }),
-    findingDelta: p.findingDelta ?? { introduced: 0, worsened: 0, changed: 0, improved: 0, unchanged: 0, resolved: 0 },
-    closure: {
-      verdict,
-      resolved: (unknown?.references_resolved ?? 0) + (unknown?.commands_resolved ?? 0),
-      unresolved: (unknown?.references_unresolved ?? 0) + (unknown?.commands_unresolved ?? 0),
-      unknown: (unknown?.references_unknown ?? 0) + (unknown?.commands_unknown ?? 0),
-    },
-    layoutVerdict: (projection?.layoutVerdict ?? 'unknown') as LayoutVerdict,
-    checks,
-    limits: LIMITS,
-    restorePoint: restore ?? null,
-    state: p.state === 'applied' ? 'pending' : p.state === 'committed' ? 'committed' : 'discarded',
-    publication: canPush,
-  };
 }

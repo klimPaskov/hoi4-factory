@@ -1,0 +1,427 @@
+/* The focus editor and the change card (S04). Uses the Workbench tokens from styles.css only.
+   The game picture is the main element. */
+
+.fx-title {
+  margin: 0;
+  font-size: var(--text-lg);
+}
+.mono {
+  font-family: var(--mono);
+  font-size: 0.92em;
+}
+.fx-dot {
+  flex: none;
+  width: 0.55rem;
+  height: 0.55rem;
+  margin-top: 0.45rem;
+  border-radius: 50%;
+  background: var(--muted);
+}
+.fx-dot.is-warning {
+  background: var(--warning);
+}
+.fx-dot.is-error {
+  background: var(--danger);
+}
+.fx-link {
+  font: inherit;
+  text-decoration-color: var(--border-strong);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--link);
+  text-decoration: underline;
+  cursor: pointer;
+  text-align: start;
+}
+.fx-link:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.fx-source-link {
+  font-size: var(--text-sm);
+}
+.fx-diags {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.fx-diags li {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  padding: var(--space-1) 0;
+}
+.fx-fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+/* ----- The page: a thin header and the tree ---------------------------------------------- */
+
+/* These two pages use the whole width of the app shell: the picture is the page. */
+.app-main:has(.fx-page) {
+  max-width: none;
+  padding: var(--space-3) var(--space-4);
+}
+.app-shell:has(.fx-page) .app-footer {
+  display: none;
+}
+/* The change card can grow: its Details open below the picture. */
+.fx-page.fx-grow {
+  height: auto;
+}
+.fx-grow .fx-stage {
+  flex: none;
+  height: calc(100dvh - 8.5rem);
+  min-height: 28rem;
+}
+.fx-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3) var(--space-3);
+  height: calc(100dvh - 2 * var(--space-3));
+  min-height: 34rem;
+}
+.fx-head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.fx-details {
+  position: absolute;
+  inset-inline-end: 0;
+  top: calc(100% + var(--space-1));
+  z-index: 8;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 22rem;
+  max-width: calc(100vw - 2 * var(--space-3));
+  max-height: 70dvh;
+  overflow: auto;
+  padding: var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+.fx-details h2 {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-md);
+}
+.fx-facts {
+  margin: 0 0 var(--space-2);
+}
+.fx-facts dt {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+.fx-facts dd {
+  margin: 0 0 var(--space-2);
+}
+.fx-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+.fx-tree {
+  height: 100%;
+}
+
+/* ----- The bar over the tree (A and B) ---------------------------------------------------- */
+
+.fx-dock {
+  position: absolute;
+  inset-inline: 0;
+  bottom: var(--space-4);
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: min(42rem, calc(100% - 2 * var(--space-3)));
+  margin-inline: auto;
+  padding: var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+.fx-status {
+  margin: 0;
+  color: var(--muted);
+}
+.fx-status:empty {
+  display: none;
+}
+.fx-verdict,
+.fx-selected {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+.fx-verdict p,
+.fx-selected p {
+  margin: 0;
+  margin-inline-end: auto;
+}
+.fx-selected {
+  font-size: var(--text-sm);
+}
+.fx-ask {
+  display: flex;
+  gap: var(--space-2);
+}
+.fx-ask input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ----- B: the card of the selected focus --------------------------------------------------- */
+
+.fx-card {
+  position: absolute;
+  inset-inline-end: var(--space-3);
+  top: var(--space-3);
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 19rem;
+  max-width: calc(100% - 2 * var(--space-3));
+  max-height: calc(100% - 2 * var(--space-3));
+  overflow: auto;
+  padding: var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+.fx-card-close {
+  align-self: flex-end;
+  margin-bottom: calc(-1 * var(--space-2));
+}
+.fx-card-note {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+.fx-cost input {
+  width: 6rem;
+}
+.fx-card-problem {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+}
+.fx-card-problem p {
+  margin: 0;
+}
+
+/* ----- The change card: the sentence and the buttons in one row ------------------------------ */
+
+.fx-dock-row {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  width: min(46rem, calc(100% - 2 * var(--space-3)));
+}
+.fx-summary {
+  flex: 1 1 18rem;
+}
+.fx-summary p,
+.fx-verdict p {
+  margin: 0;
+}
+.fx-fine {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+.fx-decision {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.fx-trouble,
+.fx-outcome {
+  margin: 0;
+  font-weight: 600;
+}
+.fx-nopicture {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  min-height: 18rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+}
+.fc-plain {
+  list-style: none;
+  margin: 0 0 var(--space-3);
+  padding: 0;
+}
+.fc-plain li {
+  padding: var(--space-1) 0;
+  overflow-wrap: anywhere;
+}
+
+/* Details: the one toggle */
+.fc-details > summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+.fc-details > summary:focus-visible,
+.fc-file > summary:focus-visible,
+.fc-pre:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.fc-details[open] > summary {
+  margin-bottom: var(--space-3);
+}
+.fc-details-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.fc-details-body h2 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-md);
+}
+.fc-details-body p {
+  margin: 0 0 var(--space-1);
+}
+.fc-file {
+  margin-bottom: var(--space-2);
+  min-width: 0;
+}
+.fc-file > summary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-3);
+  cursor: pointer;
+}
+.fc-file > summary .mono {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.fc-file-meta {
+  font-size: var(--text-sm);
+}
+.fc-plus {
+  color: var(--success);
+  font-weight: 700;
+}
+.fc-minus {
+  color: var(--danger);
+  font-weight: 700;
+}
+.fc-pre {
+  margin: var(--space-1) 0 0;
+  padding: var(--space-2) 0;
+  overflow: auto;
+  max-height: 22rem;
+  background: var(--surface-2);
+  border-radius: var(--radius);
+  font-family: var(--mono);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  tab-size: 4;
+}
+.fc-pre code {
+  display: block;
+  width: max-content;
+  min-width: 100%;
+}
+.fc-line {
+  display: block;
+  padding: 0 var(--space-3);
+  white-space: pre;
+}
+.fc-add {
+  background: var(--success-bg);
+}
+.fc-del {
+  background: var(--danger-bg);
+}
+.fc-hunk {
+  color: var(--info);
+}
+.fc-meta {
+  color: var(--muted);
+}
+.fc-checks,
+.fc-limits {
+  list-style: none;
+  margin: 0 0 var(--space-3);
+  padding: 0;
+}
+.fc-checks li {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-1) 0;
+}
+.fc-checks .badge {
+  flex: none;
+  min-width: 6.5rem;
+  justify-content: center;
+}
+.fc-checks p {
+  margin: 0;
+}
+.fc-check-name {
+  font-weight: 600;
+}
+.fc-limits li {
+  padding: var(--space-1) 0;
+}
+.fc-limits li,
+.fc-check-name {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+/* ----- Narrow screens ---------------------------------------------------------------------- */
+
+@media (max-width: 48rem) {
+  .fx-page {
+    height: auto;
+    min-height: 0;
+  }
+  .fx-grow .fx-stage {
+    height: auto;
+    min-height: 0;
+  }
+  .fx-stage {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .fx-dock,
+  .fx-card {
+    position: static;
+    width: auto;
+    max-width: none;
+    max-height: none;
+    box-shadow: none;
+  }
+  .fx-ask {
+    flex-wrap: wrap;
+  }
+  .fx-ask input {
+    flex-basis: 100%;
+  }
+}

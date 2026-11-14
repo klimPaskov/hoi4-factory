@@ -240,6 +240,22 @@ export function startAttempt(
   });
 }
 
+/**
+ * Asks the agent for one more change on an edit task: a new attempt that works from `request`
+ * on top of what the task already holds.
+ */
+export function askAgent(
+  projectId: string,
+  taskId: string,
+  expectedVersion: number,
+  instruction: string,
+): Promise<{ task: Task; attempt: Attempt }> {
+  return request(`${taskPath(projectId, taskId)}/attempts`, {
+    method: 'POST',
+    body: { expected_version: expectedVersion, instruction },
+  });
+}
+
 export function pauseTask(
   projectId: string,
   taskId: string,

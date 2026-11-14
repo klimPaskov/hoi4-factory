@@ -146,11 +146,11 @@
       "live": "Open this variant live",
       "focusEditor": {
         "title": "Focus editor, minimal round",
-        "outcome": "Chosen: the bar that asks the agent, with direct editing kept. You drag a focus to move it and click one to type its title, description and cost (first picture)."
+        "outcome": "Chosen and built: the bar that asks the agent, with direct editing kept. You drag a focus to move it and click one to change its title, description and cost (first picture)."
       },
       "changeCard": {
         "title": "Change card, minimal round",
-        "outcome": "Chosen: one full-page picture of the final result with one sentence, Approve and Reject. No before and after comparison (first picture)."
+        "outcome": "Chosen and built: one full-page picture of the final result with one sentence, Approve and Reject. No before and after comparison (first picture)."
       },
       "focusEditorDetailed": {
         "title": "Focus editor, first round",
@@ -265,7 +265,8 @@
         "setup": "Setup wizard and recovery",
         "tasks": "Task list",
         "task": "Task page",
-        "account": "Account"
+        "account": "Account",
+        "focus": "Focus editor and change card"
       }
     },
     "fixtures": {
@@ -294,174 +295,6 @@
       "dossierKicker": "Your files",
       "requisition": "Fill in a name to open a new file."
     },
-    "round": {
-      "focusEditor": {
-        "variants": {
-          "a": {
-            "name": "Focus editor"
-          }
-        },
-        "states": {
-          "pending": "Agent change waiting",
-          "settled": "Nothing waiting",
-          "working": "Agent working",
-          "refreshing": "Source changed, reloading",
-          "readonly": "Focus that can't be dragged"
-        }
-      },
-      "changeCard": {
-        "variants": {
-          "a": {
-            "name": "Change card"
-          }
-        },
-        "states": {
-          "ready": "Ready",
-          "incomplete": "Something not checked",
-          "failed": "A check failed",
-          "stale": "Tree changed since",
-          "committed": "Approved"
-        }
-      }
-    },
-    "shared": {
-      "layout": {
-        "pass": "Layout looks fine.",
-        "revise": "Layout needs work.",
-        "blocked": "Layout is blocked.",
-        "unknown": "Layout was not checked."
-      }
-    },
-    "focus": {
-      "pageTitle": "Focus tree",
-      "sampleRequest": "Add a Nordic trade branch under Open Trade, and make Open Trade a little cheaper.",
-      "approve": "Approve",
-      "reject": "Reject",
-      "fix": "Ask the agent to fix it",
-      "deselect": "Stop talking about {{name}}",
-      "working": "The agent is working on it.",
-      "refreshing": "The source changed. Updating the tree.",
-      "ask": {
-        "label": "Ask the agent for a change",
-        "placeholder": "Ask for a change",
-        "placeholderFor": "Ask for a change to {{name}}",
-        "send": "Send",
-        "about": "About {{name}}: {{request}}",
-        "fix": "Fix this: {{problem}}"
-      },
-      "summary": {
-        "both": "The agent {{added}} and {{changed}}.",
-        "only": "The agent {{what}}.",
-        "added_one": "added {{count}} focus",
-        "added_other": "added {{count}} focuses",
-        "changed_one": "changed {{count}} focus",
-        "changed_other": "changed {{count}} focuses"
-      },
-      "problems": "Problems",
-      "noProblems": "No problems found.",
-      "viewSource": "View source",
-      "none": "None",
-      "or": "or",
-      "view": {
-        "label": "View",
-        "zoomIn": "Zoom in",
-        "zoomOut": "Zoom out",
-        "fit": "Fit"
-      },
-      "node": {
-        "label": "{{name}}, cost {{cost}}",
-        "label_added": "{{name}}, new from the agent, cost {{cost}}",
-        "label_changed": "{{name}}, changed by the agent, cost {{cost}}"
-      },
-      "pending": {
-        "region": "Changes from the agent",
-        "apply": "Apply",
-        "discard": "Discard",
-        "one_added": "{{name}} is new.",
-        "one_changed": "{{name}} was changed."
-      },
-      "inspector": {
-        "title": "Selected focus",
-        "close": "Close"
-      },
-      "fields": {
-        "legend": "Focus fields",
-        "title": "Title",
-        "description": "Description",
-        "cost": "Cost",
-        "requires": "Requires",
-        "excludes": "Cannot be taken together with"
-      },
-      "previewLabel": "The focus tree as the game draws it. Click a focus to select it, drag it to move it, or use the arrow keys on a selected focus. Scroll or press plus and minus to zoom, zero to fit.",
-      "render": {
-        "alt": "The focus tree as the game draws it.",
-        "redrawing": "Redrawing the tree."
-      },
-      "lockedNote": "{{name}} can't be dragged. {{reason}} Ask the agent to move it.",
-      "sampleSummary": "I added a Nordic trade branch under Open Trade and made Open Trade cheaper."
-    },
-    "change": {
-      "title": "Review change",
-      "sampleSummary": "I added a Nordic trade branch under Open Trade and made Open Trade cheaper.",
-      "by": "Proposed by {{who}}.",
-      "actor": {
-        "native_agent": "the agent",
-        "coding_client": "a coding client",
-        "person": "a person"
-      },
-      "sections": {
-        "summary": "What changed",
-        "diff": "Changes by file",
-        "checks": "Checks",
-        "limits": "Limits and restore point"
-      },
-      "summary": {
-        "added": "New focus: {{name}}",
-        "changed": "{{name}}: {{what}}",
-        "field": "{{name}} {{before}} to {{after}}"
-      },
-      "trouble": {
-        "stale": "The tree was changed after the agent made this, so it no longer fits.",
-        "failed": "A check found a problem with this change.",
-        "unchecked": "Part of this change could not be checked."
-      },
-      "actions": {
-        "approve": "Approve",
-        "approveAnyway": "Approve anyway",
-        "reject": "Reject",
-        "fix": "Ask the agent to fix it",
-        "redo": "Ask the agent to redo it"
-      },
-      "outcome": {
-        "approved": "Approved. The change is saved in your project.",
-        "rejected": "Rejected. Nothing was changed.",
-        "sentBack": "Sent back to the agent."
-      },
-      "delta": {
-        "introduced": "New problems: {{count}}",
-        "worsened": "Worse: {{count}}",
-        "changed": "Changed: {{count}}",
-        "improved": "Better: {{count}}",
-        "unchanged": "Unchanged: {{count}}",
-        "resolved": "Fixed: {{count}}"
-      },
-      "preview": {
-        "label": "The focus tree with the change, as the game draws it"
-      },
-      "checks": {
-        "passed": "Passed",
-        "failed": "Failed",
-        "unavailable": "Unavailable",
-        "skipped": "Skipped"
-      },
-      "restore": {
-        "label": "A restore point was saved, so this change can be undone.",
-        "none": "No restore point was taken."
-      },
-      "counts": {
-        "closure": "{{resolved}} references resolved, {{unresolved}} not resolved, {{unknown}} could not be checked."
-      }
-    },
-    "details": "Details"
+    "round": {}
   }
 }

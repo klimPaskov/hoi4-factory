@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { ApiError } from '../api/client';
@@ -13,6 +13,7 @@ import {
   type Attempt,
   type TaskDetail,
 } from '../api/tasks';
+import { listProposals, type Proposal } from '../api/focus';
 import { TaskEvents } from '../components/TaskEvents';
 import { Alert, Badge, ErrorMessage, Icon, Loading, Meter, NotAvailableYet, Tabs, type Tone } from '../components/ui';
 import { formatDateTime, formatMicros } from '../format';
@@ -48,6 +49,43 @@ function TaskView({ projectId, taskId }: { projectId: string; taskId: string }) 
         <TaskBody projectId={projectId} taskId={taskId} detail={state.data} onDetail={state.replace} />
       ) : null}
     </>
+  );
+}
+
+/**
+ * The way from a task to its focus tree and to changes that wait for review. It shows nothing
+ * for a task that has not touched a focus tree, or on a server without the focus routes.
+ */
+function FocusLinks({ projectId, taskId, version }: { projectId: string; taskId: string; version: number }) {
+  const { t } = useTranslation();
+  const [proposals, setProposals] = useState<Proposal[]>([]);
+  useEffect(() => {
+    const controller = new AbortController();
+    listProposals(projectId, taskId, controller.signal).then(
+      (list) => {
+        if (!controller.signal.aborted) setProposals(list);
+      },
+      () => undefined,
+    );
+    return () => controller.abort();
+  }, [projectId, taskId, version]);
+  const trees = [...new Set(proposals.map((p) => p.treeId))];
+  if (trees.length === 0) return null;
+  const base = `/projects/${encodeURIComponent(projectId)}/tasks/${encodeURIComponent(taskId)}`;
+  const waiting = proposals.filter((p) => p.state === 'applied');
+  return (
+    <nav className="button-row" aria-label={t('tasks.changesTitle')}>
+      {trees.map((tree) => (
+        <Link key={tree} className="button secondary" to={`${base}/focus/${encodeURIComponent(tree)}`}>
+          {trees.length === 1 ? t('tasks.openFocusTree') : t('tasks.openFocusTreeNamed', { name: tree })}
+        </Link>
+      ))}
+      {waiting.length > 0 ? (
+        <Link className="button secondary" to={`${base}/changes/${encodeURIComponent((waiting[waiting.length - 1] as Proposal).id)}`}>
+          {t('tasks.reviewChange')}
+        </Link>
+      ) : null}
+    </nav>
   );
 }
 
@@ -198,6 +236,8 @@ function TaskBody({
           {t('tasks.pausedNote', { reason: task.pause_reason ? `: ${task.pause_reason}` : '' })}
         </Alert>
       ) : null}
+
+      <FocusLinks projectId={projectId} taskId={taskId} version={task.last_seq} />
 
       {pending.length > 0 ? (
         <section className="card" aria-labelledby="task-pending-title">

@@ -3,13 +3,19 @@
 // without seeding a database or running a model. Shapes follow the server contract, as the
 // component tests do.
 import type { Account, Project } from '../api/types';
+import type { Proposal, Publication } from '../api/focus';
 import type { Attempt, RunEvent, Task } from '../api/tasks';
+import { AGENT_PROPOSAL, AGENT_PROPOSAL_SAVED, AGENT_SENTENCE, COMMIT_PUBLICATION, OWN_PROPOSAL, PROJECTION, TREE_ID } from './focusFixtures';
+import proposedMap from './render/game-proposed.json';
+import proposedPicture from './render/game-proposed.webp';
 
 export interface Reply {
   status?: number;
   json?: unknown;
   /** Never answers, to show a loading state. */
   pending?: boolean;
+  /** Answers with this bundled file instead of JSON (a picture). */
+  asset?: string;
 }
 
 export type Routes = Record<string, Reply>;
@@ -337,6 +343,39 @@ function taskScenario(
   };
 }
 
+// ----- The focus editor and the change card ------------------------------------------------
+
+const FOCUS_TASK = `${P}/tasks/tsk_customs`;
+const TREE = `${FOCUS_TASK}/focus/trees/${TREE_ID}`;
+const AGENT_DONE = attempt({
+  state: 'succeeded',
+  finished_at: '2026-11-02T09:36:00Z',
+  outcome: { summary: AGENT_SENTENCE, changed_files: AGENT_PROPOSAL.changedPaths, branch: 'factory/tsk_customs', commit: null, open_questions: [] },
+});
+
+/** The routes both pages read: the task, the tree, its picture and the task's proposals. */
+function focusRoutes(proposals: Proposal[], attempts: Attempt[], more: Routes = {}, publications: Publication[] = []): Routes {
+  const t = task({ state: attempts.some((a) => a.state === 'running') ? 'running' : 'in_review', allowed_paths: ['common/national_focus', 'localisation/english'] });
+  return {
+    ...taskRoutes({ task: t, attempts }, runEvents()),
+    [`GET ${TREE}`]: { json: PROJECTION },
+    [`GET ${TREE}/preview.json`]: { json: proposedMap },
+    [`GET ${TREE}/preview.png`]: { asset: proposedPicture },
+    [`GET ${FOCUS_TASK}/proposals`]: { json: { proposals } },
+    [`GET ${FOCUS_TASK}/publications`]: { json: { publications } },
+    ...Object.fromEntries(proposals.map((p) => [`GET ${FOCUS_TASK}/proposals/${p.id}`, { json: p }])),
+    ...more,
+  };
+}
+
+function focusScenario(routes: Routes): Scenario {
+  return { group: 'focus', path: `${FOCUS_TASK}/focus/${TREE_ID}`, routes };
+}
+
+function changeScenario(routes: Routes): Scenario {
+  return { group: 'focus', path: `${FOCUS_TASK}/changes/${AGENT_PROPOSAL.id}`, routes };
+}
+
 // ----- The scenarios -----------------------------------------------------------------------
 
 export const SCENARIOS: Record<string, Scenario> = {
@@ -476,7 +515,29 @@ export const SCENARIOS: Record<string, Scenario> = {
     }),
   ]),
   'task-polling': taskScenario({ state: 'running', spent_micros: 41_230 }, [attempt()], { streamFails: true }),
+  'task-with-focus-change': { group: 'task', path: FOCUS_TASK, routes: focusRoutes([AGENT_PROPOSAL], [AGENT_DONE]) },
   'task-loading': { group: 'task', path: `${P}/tasks/tsk_customs`, routes: { ...signedIn(), [`GET ${P}/tasks/tsk_customs`]: { pending: true } } },
+
+  'focus-editor': focusScenario(focusRoutes([AGENT_PROPOSAL_SAVED], [AGENT_DONE])),
+  'focus-editor-agent-change': focusScenario(focusRoutes([AGENT_PROPOSAL], [AGENT_DONE])),
+  'focus-editor-own-edit': focusScenario(focusRoutes([AGENT_PROPOSAL_SAVED, OWN_PROPOSAL], [AGENT_DONE])),
+  'focus-editor-agent-working': focusScenario(focusRoutes([AGENT_PROPOSAL_SAVED], [AGENT_DONE, attempt({ id: 'att_2', attempt_no: 2, state: 'running' })])),
+  'focus-editor-check-failed': focusScenario(
+    focusRoutes([AGENT_PROPOSAL], [AGENT_DONE], { [`POST ${FOCUS_TASK}/commit`]: { status: 409, json: envelope('commit_blocked', 'The commit check found new problems in the agent\'s changes. Nothing was committed.') } }),
+  ),
+  'focus-editor-loading': focusScenario({ ...focusRoutes([], [AGENT_DONE]), [`GET ${TREE}`]: { pending: true } }),
+  'focus-editor-tools-down': focusScenario({
+    ...focusRoutes([], [AGENT_DONE]),
+    [`GET ${TREE}`]: { status: 503, json: envelope('tools_unavailable', 'HOI4 Agent Tools are unavailable: the tool server did not start.', 'safe_same_inputs') },
+  }),
+  'change-card': changeScenario(focusRoutes([AGENT_PROPOSAL], [AGENT_DONE])),
+  'change-card-not-checked': changeScenario(
+    focusRoutes([AGENT_PROPOSAL], [AGENT_DONE], { [`POST ${FOCUS_TASK}/commit`]: { status: 409, json: envelope('check_incomplete', 'The commit check could not finish. Nothing was committed.') } }),
+  ),
+  'change-card-check-failed': changeScenario(
+    focusRoutes([AGENT_PROPOSAL], [AGENT_DONE], { [`POST ${FOCUS_TASK}/commit`]: { status: 409, json: envelope('commit_blocked', 'The commit check found new problems in the agent\'s changes. Nothing was committed.') } }),
+  ),
+  'change-card-approved': changeScenario(focusRoutes([AGENT_PROPOSAL_SAVED], [AGENT_DONE], {}, [COMMIT_PUBLICATION])),
 
   'account': {
     group: 'account',
@@ -499,4 +560,4 @@ export const SCENARIOS: Record<string, Scenario> = {
   },
 };
 
-export const SCENARIO_GROUPS = ['auth', 'projects', 'project', 'setup', 'tasks', 'task', 'account'] as const;
+export const SCENARIO_GROUPS = ['auth', 'projects', 'project', 'setup', 'tasks', 'task', 'focus', 'account'] as const;
