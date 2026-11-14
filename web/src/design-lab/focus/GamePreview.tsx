@@ -116,6 +116,8 @@ export interface GamePreviewProps {
   plain?: boolean;
   /** Pixels at the bottom of the frame that something else covers. The fitted picture stays above them. */
   fitInset?: number;
+  /** Frame the picture as this other render is framed, so switching between the two does not move anything. */
+  alignTo?: RenderName;
   label: string;
   className?: string;
 }
@@ -127,9 +129,10 @@ interface Ghost {
 }
 
 export function GamePreview(props: GamePreviewProps) {
-  const { image, nodes, diagnostics = [], selectedId, onSelect, query = '', readOnly = false, redrawing = false, onMove, onApply, onDiscard, revealTick = 0, revealId, compare, plain = false, fitInset = 0, label, className } = props;
+  const { image, nodes, diagnostics = [], selectedId, onSelect, query = '', readOnly = false, redrawing = false, onMove, onApply, onDiscard, revealTick = 0, revealId, compare, plain = false, fitInset = 0, alignTo, label, className } = props;
   const { t } = useTranslation();
   const geo = compare ? GEOMETRY.proposed : GEOMETRY[image];
+  const world = alignTo ? GEOMETRY[alignTo] : geo;
   const frame = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
   const [free, setFree] = useState<View>({ z: 1, x: 0, y: 0 });
@@ -142,10 +145,10 @@ export function GamePreview(props: GamePreviewProps) {
   const fit = useCallback(
     (w: number, h: number): View => {
       const room = Math.max(h - fitInset, h / 2);
-      const z = clamp(Math.min(w / geo.width, room / geo.height), MIN_Z, 1.2);
-      return { z, x: (w - geo.width * z) / 2, y: (room - geo.height * z) / 2 };
+      const z = clamp(Math.min(w / world.width, room / world.height), MIN_Z, 1.2);
+      return { z, x: (w - world.width * z) / 2, y: (room - world.height * z) / 2 };
     },
-    [geo.width, geo.height, fitInset],
+    [world.width, world.height, fitInset],
   );
 
   useLayoutEffect(() => {
@@ -299,7 +302,7 @@ export function GamePreview(props: GamePreviewProps) {
         onPointerCancel={endPan}
         onKeyDown={onFrameKey}
       >
-        <div className="gp-world" style={{ width: geo.width, height: geo.height, transform: `translate(${view.x}px, ${view.y}px) scale(${view.z})`, ['--gp-inv' as string]: String(1 / view.z ** 0.65) }}>
+        <div className="gp-world" style={{ width: world.width, height: world.height, transform: `translate(${view.x}px, ${view.y}px) scale(${view.z})`, ['--gp-inv' as string]: String(1 / view.z ** 0.65) }}>
           <img className="gp-img" src={geo.url} width={geo.width} height={geo.height} alt={t('designLab.focus.render.alt')} draggable={false} />
           {compare ? (
             <div className="gp-before" style={{ clipPath: `inset(0 ${geo.width - cut}px 0 0)` }}>

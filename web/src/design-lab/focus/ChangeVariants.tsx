@@ -1,85 +1,103 @@
-// Four layouts of the change card: the review of one proposal before it is committed. Each shows the
-// render, a few plain lines about what changed, Approve and Discard, and one Details toggle.
-import { useState } from 'react';
+// Four minimal layouts of the change card (D-61): the review of one change before it is saved.
+// Each shows the game picture of the change, one plain sentence, one main and one secondary
+// action, and the one Details toggle. They differ in how before and after are compared and in
+// how much of the page the card takes.
+//   A. One picture fills the page, with an After and Before switch.
+//   B. One picture fills the page, with a divider to drag between before and after.
+//   C. Before and after side by side.
+//   D. A small card, as it would sit in a task's conversation.
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tabs } from '../../components/ui';
 import type { VariantProps } from '../rounds';
-import { Actions, CardHeader, DetailsBody, PreviewSection, ReviewDetails, SummarySection, useCard, type CardControl } from './ChangeParts';
+import { Decision, Picture, ReviewDetails, Summary, useCard, type CardControl, type PictureMode } from './ChangeParts';
 import type { CardScenario } from './fixtures';
 
 function useScenario(state: string): CardControl {
   return useCard(state as CardScenario);
 }
 
-/** A. One page in review order. The before and after renders sit side by side at the top, and the actions stay in a bar at the bottom. */
-export function ChangeA({ state }: VariantProps) {
-  const ctl = useScenario(state);
-  return (
-    <div className="fc-page fca">
-      <CardHeader ctl={ctl} />
-      <PreviewSection mode="side" />
-      <SummarySection card={ctl.card} />
-      <ReviewDetails card={ctl.card} />
-      <div className="fca-bar">
-        <Actions ctl={ctl} />
-      </div>
-    </div>
-  );
+function Title() {
+  const { t } = useTranslation();
+  return <h1 className="cx-title">{t('designLab.change.title')}</h1>;
 }
 
-/** B. Two columns: what changed and the actions on the left, one render with a before and after toggle on the right. */
-export function ChangeB({ state }: VariantProps) {
+/** True while the bar floats over the picture. On a narrow screen it sits below instead. */
+function useWide(): boolean {
+  const query = '(min-width: 48.01rem)';
+  const [wide, setWide] = useState(() => window.matchMedia(query).matches);
+  useEffect(() => {
+    const media = window.matchMedia(query);
+    const on = () => setWide(media.matches);
+    media.addEventListener('change', on);
+    return () => media.removeEventListener('change', on);
+  }, []);
+  return wide;
+}
+
+/** Room kept free under the fitted picture for the bar that floats over it, in pixels. */
+const BAR_ROOM = 150;
+
+/** The picture fills the page. The sentence and the two buttons float over its lower edge. */
+function FullPage({ state, mode, name }: { state: string; mode: PictureMode; name: string }) {
   const ctl = useScenario(state);
+  const wide = useWide();
   return (
-    <div className="fc-page fcb">
-      <div className="fcb-grid">
-        <div className="fcb-left">
-          <CardHeader ctl={ctl} />
-          <SummarySection card={ctl.card} />
-          <Actions ctl={ctl} />
-          <ReviewDetails card={ctl.card} />
+    <div className={`cx-page ${name}`}>
+      <Title />
+      <div className="cx-stage">
+        <Picture mode={mode} under={wide ? BAR_ROOM : 0} />
+        <div className="cx-bar">
+          <Summary card={ctl.card} />
+          <Decision ctl={ctl} />
         </div>
-        <PreviewSection mode="toggle" />
       </div>
+      <ReviewDetails card={ctl.card} />
     </div>
   );
 }
 
-/** C. The decision first: what changed and the actions in one line of text above one render with a before and after slider. */
+/** A. One picture with an After and Before switch. */
+export function ChangeA({ state }: VariantProps) {
+  return <FullPage state={state} mode="toggle" name="cxa" />;
+}
+
+/** B. One picture with a divider to drag between before and after. */
+export function ChangeB({ state }: VariantProps) {
+  return <FullPage state={state} mode="slider" name="cxb" />;
+}
+
+/** C. Before and after side by side, the sentence and the buttons in one row under them. */
 export function ChangeC({ state }: VariantProps) {
   const ctl = useScenario(state);
   return (
-    <div className="fc-page fcc">
-      <CardHeader ctl={ctl} />
-      <section className="fcc-verdict">
-        <SummarySection card={ctl.card} />
-        <Actions ctl={ctl} />
-      </section>
-      <PreviewSection mode="slider" />
+    <div className="cx-page cxc">
+      <Title />
+      <div className="cx-stage">
+        <Picture mode="side" />
+      </div>
+      <div className="cx-row">
+        <Summary card={ctl.card} />
+        <Decision ctl={ctl} />
+      </div>
       <ReviewDetails card={ctl.card} />
     </div>
   );
 }
 
-/** D. The render with a before and after toggle on top, always in view. What changed and Details are tabs under it, with the actions beside the tab row. */
+/** D. A small card: the sentence, the picture with the switch, the buttons. It fits inside a task's conversation. */
 export function ChangeD({ state }: VariantProps) {
-  const { t } = useTranslation();
   const ctl = useScenario(state);
-  const [tab, setTab] = useState('summary');
   return (
-    <div className="fc-page fcd">
-      <CardHeader ctl={ctl} />
-      <PreviewSection mode="toggle" className="fcd-preview" />
-      <Tabs
-        label={t('designLab.change.sections.evidence')}
-        value={tab}
-        onChange={setTab}
-        aside={<Actions ctl={ctl} />}
-        tabs={[
-          { id: 'summary', label: t('designLab.change.sections.summary'), panel: <SummarySection card={ctl.card} /> },
-          { id: 'details', label: t('designLab.details'), panel: <DetailsBody card={ctl.card} /> },
-        ]}
-      />
+    <div className="cx-page cxd">
+      <article className="cx-card">
+        <Title />
+        <Summary card={ctl.card} />
+        <div className="cx-card-picture">
+          <Picture mode="toggle" />
+        </div>
+        <Decision ctl={ctl} />
+        <ReviewDetails card={ctl.card} />
+      </article>
     </div>
   );
 }

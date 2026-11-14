@@ -1,10 +1,9 @@
-// The parts of the change card. The variants arrange the same parts differently: where the render
-// sits, where the actions are and how the one Details toggle opens. The default view holds only
-// what a modder needs to decide: what changed, the render and the actions. Checks, counts and the
-// diff sit behind Details.
+// The parts of the change card (D-61). The variants arrange the same parts differently. What a
+// modder sees by default is the game picture of the change, one plain sentence about it and two
+// buttons. The diff, the checks, the counts, the limits and the restore point sit behind Details.
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Badge, Button, CheckboxField, SegmentedControl, type Tone } from '../../components/ui';
+import { Badge, Button, SegmentedControl, type Tone } from '../../components/ui';
 import type { ChangeCard, CheckRow, LayoutVerdict } from '../../focus/types';
 import { GamePreview } from './GamePreview';
 import { makeCard, NODES, type CardScenario } from './fixtures';
@@ -14,103 +13,100 @@ import './change.css';
 
 export interface CardControl {
   card: ChangeCard;
-  /** Why approving is not possible now, or null. */
-  blocked: 'stale' | 'failed' | 'done' | null;
-  needsAck: boolean;
-  ack: boolean;
-  setAck: (value: boolean) => void;
-  canApprove: boolean;
+  /** What stands in the way of a plain Approve, or null. */
+  trouble: 'stale' | 'failed' | 'unchecked' | null;
+  /** How it ended, or null while the modder still has to decide. */
+  outcome: 'approved' | 'rejected' | 'sentBack' | null;
   approve: () => void;
-  discard: () => void;
-  discarded: boolean;
+  reject: () => void;
+  /** Hands the change back to the agent to fix or redo. */
+  sendBack: () => void;
 }
 
 export function useCard(scenario: CardScenario): CardControl {
-  const [card, setCard] = useState<ChangeCard>(() => makeCard(scenario));
-  const [ack, setAck] = useState(false);
-  const [discarded, setDiscarded] = useState(false);
+  const [card] = useState<ChangeCard>(() => makeCard(scenario));
+  const [outcome, setOutcome] = useState<CardControl['outcome']>(card.state === 'committed' ? 'approved' : null);
   const failed = card.checks.some((c) => c.result === 'failed') || card.closure.verdict === 'fail';
-  const blocked = card.state === 'committed' || discarded ? 'done' : card.state === 'stale' ? 'stale' : failed ? 'failed' : null;
-  const needsAck = card.closure.verdict === 'incomplete' || card.checks.some((c) => c.result === 'unavailable');
+  const unchecked = card.closure.verdict === 'incomplete' || card.checks.some((c) => c.result === 'unavailable');
   return {
     card,
-    blocked,
-    needsAck,
-    ack,
-    setAck,
-    canApprove: blocked === null && (!needsAck || ack),
-    approve: () => setCard((c) => ({ ...c, state: 'committed' })),
-    discard: () => setDiscarded(true),
-    discarded,
+    trouble: card.state === 'stale' ? 'stale' : failed ? 'failed' : unchecked ? 'unchecked' : null,
+    outcome,
+    approve: () => setOutcome('approved'),
+    reject: () => setOutcome('rejected'),
+    sendBack: () => setOutcome('sentBack'),
   };
 }
 
 const CHECK_TONE: Record<CheckRow['result'], Tone> = { passed: 'success', failed: 'danger', unavailable: 'warning', skipped: 'neutral' };
 const labelOf = (id: string): string => NODES.find((n) => n.id === id)?.label ?? id;
 
-// ----- Header and summary -----------------------------------------------------------------
+// ----- What changed, in plain words -------------------------------------------------------
 
-export function CardHeader({ ctl }: { ctl: CardControl }) {
+/**
+ * The agent's own sentence about the change, then one line for each change the picture cannot
+ * show (a new cost). New focuses are not listed: the picture outlines them.
+ */
+export function Summary({ card }: { card: ChangeCard }) {
   const { t } = useTranslation();
   return (
-    <header className="fc-head">
-      <h1>{t('designLab.change.title')}</h1>
-      <p className="muted">{t('designLab.change.by', { who: t(`designLab.change.actor.${ctl.card.actor.kind}`) })}</p>
-    </header>
-  );
-}
-
-/** What changed, in a few plain lines. The colors match the outlines on the render. */
-export function SummarySection({ card }: { card: ChangeCard }) {
-  const { t } = useTranslation();
-  const { added, changed, removed } = card.summary;
-  return (
-    <ul className="fc-changes" aria-label={t('designLab.change.summary.label')}>
-      {added.length > 0 ? (
-        <li>
-          <span className="fc-swatch is-added" aria-hidden="true" />
-          {t('designLab.change.summary.added', { count: added.length, names: added.map(labelOf).join(', ') })}
-        </li>
-      ) : null}
-      {changed.map((change) => (
-        <li key={change.id}>
-          <span className="fc-swatch is-changed" aria-hidden="true" />
+    <div className="cx-summary">
+      <p>{t('designLab.change.sampleSummary')}</p>
+      {card.summary.changed.map((change) => (
+        <p key={change.id} className="cx-fine">
           {t('designLab.change.summary.changed', {
             name: labelOf(change.id),
             what: change.fields.map((f) => t('designLab.change.summary.field', { name: f.name, before: f.before, after: f.after })).join(', '),
           })}
-        </li>
+        </p>
       ))}
-      {removed.length > 0 ? (
-        <li>
-          <span className="fc-swatch is-removed" aria-hidden="true" />
-          {t('designLab.change.summary.removed', { count: removed.length, names: removed.map(labelOf).join(', ') })}
-        </li>
-      ) : null}
-    </ul>
+    </div>
   );
 }
 
-// ----- Preview ----------------------------------------------------------------------------
+// ----- The picture ------------------------------------------------------------------------
 
-/** How the before and after renders sit together: next to each other, one at a time, or under a divider. */
-export type PreviewMode = 'side' | 'toggle' | 'slider';
+/** How the before and after pictures sit together: one at a time, under a divider, or next to each other. */
+export type PictureMode = 'toggle' | 'slider' | 'side';
 
 const AFTER_NODES = NODES;
-// The before render does not draw the focuses the agent added.
-const BEFORE_NODES = NODES.filter((node) => node.pending?.change !== 'added');
+// The before picture does not draw the focuses the agent added, and marks nothing.
+const BEFORE_NODES = NODES.filter((node) => node.pending?.change !== 'added').map((node) => ({ ...node, pending: undefined }));
 
-/** The before and after game renders of the proposal. Only the selection ring and the small pins on changed focuses sit on them. */
-export function PreviewSection({ mode, className }: { mode: PreviewMode; className?: string }) {
+/** The game pictures of the tree before and after the change. New and changed focuses are outlined. */
+export function Picture({ mode, under = 0 }: { mode: PictureMode; under?: number }) {
   const { t } = useTranslation();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [which, setWhich] = useState('after');
   const [pos, setPos] = useState(0.5);
-  const common = { diagnostics: [], selectedId, onSelect: setSelectedId, readOnly: true, revealId: selectedId };
-
+  const common = { plain: true, fitInset: under, diagnostics: [], selectedId, onSelect: setSelectedId, readOnly: true, revealId: selectedId };
+  if (mode === 'side') {
+    return (
+      <div className="cx-sides">
+        <figure>
+          <figcaption>{t('designLab.change.compare.before')}</figcaption>
+          <GamePreview {...common} image="base" alignTo="proposed" nodes={BEFORE_NODES} label={t('designLab.change.preview.labelBefore')} />
+        </figure>
+        <figure>
+          <figcaption>{t('designLab.change.compare.after')}</figcaption>
+          <GamePreview {...common} image="proposed" nodes={AFTER_NODES} label={t('designLab.change.preview.labelAfter')} />
+        </figure>
+      </div>
+    );
+  }
+  if (mode === 'slider') {
+    return <GamePreview {...common} image="proposed" nodes={AFTER_NODES} compare={{ pos, onChange: setPos }} label={t('designLab.change.preview.labelSlider')} />;
+  }
   return (
-    <div className={`fc-preview fc-preview-${mode}${className ? ` ${className}` : ''}`}>
-      {mode === 'toggle' ? (
+    <div className="cx-toggle">
+      <GamePreview
+        {...common}
+        image={which === 'before' ? 'base' : 'proposed'}
+        alignTo="proposed"
+        nodes={which === 'before' ? BEFORE_NODES : AFTER_NODES}
+        label={t(which === 'before' ? 'designLab.change.preview.labelBefore' : 'designLab.change.preview.labelAfter')}
+      />
+      <div className="cx-switch">
         <SegmentedControl
           legend={t('designLab.change.preview.show')}
           value={which}
@@ -120,33 +116,47 @@ export function PreviewSection({ mode, className }: { mode: PreviewMode; classNa
             { value: 'before', label: t('designLab.change.compare.before') },
           ]}
         />
-      ) : null}
-      {mode === 'side' ? (
-        <div className="fc-sides">
-          <figure>
-            <figcaption>{t('designLab.change.compare.before')}</figcaption>
-            <GamePreview {...common} image="base" nodes={BEFORE_NODES} label={t('designLab.change.preview.labelBefore')} />
-          </figure>
-          <figure>
-            <figcaption>{t('designLab.change.compare.after')}</figcaption>
-            <GamePreview {...common} image="proposed" nodes={AFTER_NODES} label={t('designLab.change.preview.labelAfter')} />
-          </figure>
-        </div>
-      ) : null}
-      {mode === 'toggle' ? (
-        <GamePreview
-          {...common}
-          image={which === 'before' ? 'base' : 'proposed'}
-          nodes={which === 'before' ? BEFORE_NODES : AFTER_NODES}
-          label={t(which === 'before' ? 'designLab.change.preview.labelBefore' : 'designLab.change.preview.labelAfter')}
-        />
-      ) : null}
-      {mode === 'slider' ? <GamePreview {...common} image="proposed" nodes={AFTER_NODES} compare={{ pos, onChange: setPos }} label={t('designLab.change.preview.labelSlider')} /> : null}
+      </div>
     </div>
   );
 }
 
-// ----- Details: counts, checks, diff, limits ----------------------------------------------
+// ----- The decision -----------------------------------------------------------------------
+
+/**
+ * One main action and one secondary action. When something stands in the way, one sentence says
+ * what, and the main action hands the change back to the agent instead.
+ */
+export function Decision({ ctl }: { ctl: CardControl }) {
+  const { t } = useTranslation();
+  if (ctl.outcome) {
+    return (
+      <p className="cx-outcome" role="status">
+        {t(`designLab.change.outcome.${ctl.outcome}`)}
+      </p>
+    );
+  }
+  const { trouble } = ctl;
+  return (
+    <div className="cx-decision">
+      {trouble ? <p className="cx-trouble">{t(`designLab.change.trouble.${trouble}`)}</p> : null}
+      <div className="button-row">
+        {trouble === 'stale' || trouble === 'failed' ? (
+          <Button variant="primary" onClick={ctl.sendBack}>
+            {t(`designLab.change.actions.${trouble === 'stale' ? 'redo' : 'fix'}`)}
+          </Button>
+        ) : (
+          <Button variant="primary" onClick={ctl.approve}>
+            {t(trouble === 'unchecked' ? 'designLab.change.actions.approveAnyway' : 'designLab.change.actions.approve')}
+          </Button>
+        )}
+        <Button onClick={ctl.reject}>{t('designLab.change.actions.reject')}</Button>
+      </div>
+    </div>
+  );
+}
+
+// ----- Details: files, checks, counts, limits ----------------------------------------------
 
 interface DiffLine {
   kind: 'add' | 'del' | 'hunk' | 'ctx' | 'meta';
@@ -225,11 +235,28 @@ function ChecksSection({ checks }: { checks: CheckRow[] }) {
   );
 }
 
-/** Everything a modder does not need to decide. One toggle, closed by default. */
-export function DetailsBody({ card }: { card: ChangeCard }) {
+function DetailsBody({ card }: { card: ChangeCard }) {
   const { t } = useTranslation();
+  const { added, changed } = card.summary;
   return (
     <div className="fc-details-body">
+      <section aria-labelledby="fc-d-what">
+        <h3 id="fc-d-what">{t('designLab.change.sections.summary')}</h3>
+        <ul className="fc-limits">
+          {added.map((id) => (
+            <li key={id}>{t('designLab.change.summary.added', { name: labelOf(id) })}</li>
+          ))}
+          {changed.map((change) => (
+            <li key={change.id}>
+              {t('designLab.change.summary.changed', {
+                name: labelOf(change.id),
+                what: change.fields.map((f) => t('designLab.change.summary.field', { name: f.name, before: f.before, after: f.after })).join(', '),
+              })}
+            </li>
+          ))}
+        </ul>
+        <p>{t('designLab.change.by', { who: t(`designLab.change.actor.${card.actor.kind}`) })}</p>
+      </section>
       <section aria-labelledby="fc-d-files">
         <h3 id="fc-d-files">{t('designLab.change.sections.diff')}</h3>
         <DiffSection card={card} />
@@ -247,19 +274,14 @@ export function DetailsBody({ card }: { card: ChangeCard }) {
           ))}
         </ul>
         <p>
-          {card.restorePoint ? (
-            <>
-              {t('designLab.change.restore.label')} <span className="mono">{card.restorePoint.ref}</span>
-            </>
-          ) : (
-            t('designLab.change.restore.none')
-          )}
+          {t(card.restorePoint ? 'designLab.change.restore.label' : 'designLab.change.restore.none')}
         </p>
       </section>
     </div>
   );
 }
 
+/** Everything a modder does not need to decide. One toggle, closed by default. */
 export function ReviewDetails({ card }: { card: ChangeCard }) {
   const { t } = useTranslation();
   return (
@@ -267,44 +289,5 @@ export function ReviewDetails({ card }: { card: ChangeCard }) {
       <summary>{t('designLab.details')}</summary>
       <DetailsBody card={card} />
     </details>
-  );
-}
-
-// ----- Actions ----------------------------------------------------------------------------
-
-const REASON: Record<'stale' | 'failed', string> = {
-  stale: 'designLab.change.actions.staleReason',
-  failed: 'designLab.change.actions.failedReason',
-};
-
-/**
- * One main action and one secondary action. A button that cannot be used is not drawn. A blocker is
- * one short sentence. When a check was incomplete, a checkbox with one line sits next to Approve.
- */
-export function Actions({ ctl }: { ctl: CardControl }) {
-  const { t } = useTranslation();
-  const { card } = ctl;
-  if (card.state === 'committed') return <p className="fc-result">{t('designLab.change.actions.committed')}</p>;
-  if (ctl.discarded) return <p className="fc-result">{t('designLab.change.actions.discarded')}</p>;
-  const blocker = ctl.blocked === 'stale' || ctl.blocked === 'failed' ? ctl.blocked : null;
-  return (
-    <div className="fc-actions">
-      {blocker ? <p className="fc-blocker">{t(REASON[blocker])}</p> : null}
-      <div className="fc-action-row">
-        {ctl.needsAck && !blocker ? (
-          <CheckboxField
-            label={card.closure.unknown > 0 ? t('designLab.change.actions.acknowledge', { count: card.closure.unknown }) : t('designLab.change.actions.acknowledgeChecks')}
-            checked={ctl.ack}
-            onChange={ctl.setAck}
-          />
-        ) : null}
-        {blocker ? null : (
-          <Button variant="primary" disabled={!ctl.canApprove} onClick={ctl.approve}>
-            {t('designLab.change.actions.approve')}
-          </Button>
-        )}
-        <Button onClick={ctl.discard}>{t('designLab.change.actions.discard')}</Button>
-      </div>
-    </div>
   );
 }

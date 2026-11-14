@@ -164,29 +164,33 @@
       },
       "changeCard": {
         "title": "Change card",
-        "question": "How should the review of one proposal show the game render before it is approved? All four show the same few lines and the same two buttons.",
+        "question": "Which minimal change card should be built? All four show the game picture of the change, one plain sentence about it, Approve and Reject, and keep everything else behind Details.",
         "options": [
           {
-            "name": "Before and after side by side",
-            "summary": "Both renders at the top, what changed under them, Approve and Discard in a bar at the bottom."
+            "name": "One picture, switch",
+            "summary": "The picture fills the page. A small After and Before switch flips it. The sentence and the two buttons float at the bottom."
           },
           {
-            "name": "Two columns with a toggle",
-            "summary": "What changed and the buttons on the left. On the right one render with an After and Before toggle."
+            "name": "One picture, divider",
+            "summary": "The picture fills the page. You drag a divider across it to compare before and after. The same bar at the bottom."
           },
           {
-            "name": "Decision first with a slider",
-            "summary": "What changed and the buttons first. Under them one render with a divider you drag to compare."
+            "name": "Side by side",
+            "summary": "Before on the left, after on the right. The sentence and the two buttons sit in one row under them."
           },
           {
-            "name": "Render on top with tabs",
-            "summary": "The render with an After and Before toggle on top. What changed and Details are tabs, the buttons beside them."
+            "name": "Small card",
+            "summary": "A compact card that fits inside a task: the sentence, a smaller picture with the switch, and the two buttons."
           }
         ]
       },
       "focusEditorDetailed": {
         "title": "Focus editor, first round",
         "outcome": "None chosen. All four showed too much. The editor has to be far more minimal, with the agent doing most of the work."
+      },
+      "changeCardDetailed": {
+        "title": "Change card, first round",
+        "outcome": "None chosen. All four showed too much, like the first focus editor round."
       }
     },
     "toolbar": {
@@ -346,24 +350,24 @@
       "changeCard": {
         "variants": {
           "a": {
-            "name": "A. Before and after side by side"
+            "name": "A. One picture, switch"
           },
           "b": {
-            "name": "B. Two columns, toggle"
+            "name": "B. One picture, divider"
           },
           "c": {
-            "name": "C. Verdict first, slider"
+            "name": "C. Side by side"
           },
           "d": {
-            "name": "D. Render on top, tabs"
+            "name": "D. Small card"
           }
         },
         "states": {
           "ready": "Ready",
-          "incomplete": "Closure incomplete",
+          "incomplete": "Something not checked",
           "failed": "A check failed",
-          "stale": "Source changed",
-          "committed": "Committed"
+          "stale": "Tree changed since",
+          "committed": "Approved"
         }
       }
     },
@@ -453,6 +457,7 @@
     },
     "change": {
       "title": "Review change",
+      "sampleSummary": "I added a Nordic trade branch under Open Trade and made Open Trade cheaper.",
       "by": "Proposed by {{who}}.",
       "actor": {
         "native_agent": "the agent",
@@ -463,17 +468,29 @@
         "summary": "What changed",
         "diff": "Changes by file",
         "checks": "Checks",
-        "limits": "Limits and restore point",
-        "evidence": "Review"
+        "limits": "Limits and restore point"
       },
       "summary": {
-        "label": "What changed",
-        "added_one": "New focus: {{names}}",
-        "added_other": "{{count}} new focuses: {{names}}",
+        "added": "New focus: {{name}}",
         "changed": "{{name}}: {{what}}",
-        "field": "{{name}} {{before}} to {{after}}",
-        "removed_one": "Removed: {{names}}",
-        "removed_other": "{{count}} removed: {{names}}"
+        "field": "{{name}} {{before}} to {{after}}"
+      },
+      "trouble": {
+        "stale": "The tree was changed after the agent made this, so it no longer fits.",
+        "failed": "A check found a problem with this change.",
+        "unchecked": "Part of this change could not be checked."
+      },
+      "actions": {
+        "approve": "Approve",
+        "approveAnyway": "Approve anyway",
+        "reject": "Reject",
+        "fix": "Ask the agent to fix it",
+        "redo": "Ask the agent to redo it"
+      },
+      "outcome": {
+        "approved": "Approved. The change is saved in your project.",
+        "rejected": "Rejected. Nothing was changed.",
+        "sentBack": "Sent back to the agent."
       },
       "delta": {
         "introduced": "New problems: {{count}}",
@@ -496,19 +513,8 @@
         "skipped": "Skipped"
       },
       "restore": {
-        "label": "Restore point:",
+        "label": "A restore point was saved, so this change can be undone.",
         "none": "No restore point was taken."
-      },
-      "actions": {
-        "approve": "Approve",
-        "discard": "Discard",
-        "acknowledge_one": "{{count}} reference couldn't be checked. I accept this.",
-        "acknowledge_other": "{{count}} references couldn't be checked. I accept this.",
-        "acknowledgeChecks": "Some checks couldn't run. I accept this.",
-        "staleReason": "Someone changed this file after the agent. Reload to review again.",
-        "failedReason": "A check failed, so this can't be approved.",
-        "committed": "Approved. The change is saved in your project.",
-        "discarded": "Discarded. Nothing was changed."
       },
       "compare": {
         "before": "Before",

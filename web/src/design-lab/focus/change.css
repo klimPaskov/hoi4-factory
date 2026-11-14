@@ -1,80 +1,146 @@
-/* The change card rounds (design lab). Uses the Workbench tokens from styles.css only. Few boxes
-   and borders: the live game render is the main element. */
+/* The change card round (design lab, D-61). Uses the Workbench tokens from styles.css only.
+   The game picture is the main element. */
 
-.fc-page {
+.cx-page {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
-  width: 100%;
-  max-width: 84rem;
-  margin: 0 auto;
-  padding: var(--space-4);
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3) var(--space-3);
 }
-.fc-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: var(--space-1) var(--space-3);
-}
-.fc-head h1 {
+.cx-title {
   margin: 0;
   font-size: var(--text-lg);
 }
-.fc-head p {
-  margin: 0;
+.cx-stage {
+  position: relative;
+  height: calc(100dvh - 7.5rem);
+  min-height: 30rem;
+}
+.cx-stage .gp {
+  height: 100%;
 }
 
-/* What changed */
-.fc-changes {
-  list-style: none;
+/* What changed and the decision */
+.cx-summary p {
   margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
 }
-.fc-changes li {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-2);
-  overflow-wrap: anywhere;
+.cx-summary .cx-fine {
+  color: var(--muted);
+  font-size: var(--text-sm);
 }
-.fc-swatch {
-  flex: none;
-  display: inline-block;
-  width: 0.7rem;
-  height: 0.7rem;
-  border-radius: 50%;
-}
-.fc-swatch.is-added {
-  background: #3ddc84;
-}
-.fc-swatch.is-changed {
-  background: #ffb020;
-}
-.fc-swatch.is-removed {
-  background: #ff5a5a;
-}
-
-/* Actions: one main, one secondary */
-.fc-actions {
+.cx-decision {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
 }
-.fc-action-row {
+.cx-trouble,
+.cx-outcome {
+  margin: 0;
+  font-weight: 600;
+}
+
+/* A and B: the bar over the picture */
+.cx-bar {
+  position: absolute;
+  inset-inline: 0;
+  bottom: var(--space-4);
+  z-index: 6;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-2) var(--space-3);
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  width: min(46rem, calc(100% - 2 * var(--space-3)));
+  margin-inline: auto;
+  padding: var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
 }
-.fc-action-row .choice {
+.cx-bar .cx-summary {
+  flex: 1 1 18rem;
+}
+.cx-toggle {
+  position: relative;
+  height: 100%;
+}
+.cx-switch {
+  position: absolute;
+  inset-inline-end: var(--space-2);
+  top: var(--space-2);
+  z-index: 6;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+.cx-switch .segmented {
   margin: 0;
 }
-.fc-blocker,
-.fc-result {
+.cx-switch .segmented legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* C: side by side */
+.cxc .cx-stage {
+  height: calc(100dvh - 12.5rem);
+}
+.cx-sides {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  height: 100%;
+}
+.cx-sides figure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
   margin: 0;
+  min-width: 0;
+  min-height: 0;
+}
+.cx-sides figcaption {
   font-weight: 600;
+  font-size: var(--text-sm);
+}
+.cx-sides .gp {
+  flex: 1;
+  height: auto;
+}
+.cx-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  padding: var(--space-2) 0;
+}
+
+/* D: a small card */
+.cxd {
+  padding-top: var(--space-5);
+}
+.cx-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: min(40rem, 100%);
+  margin: 0 auto;
+  padding: var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+.cx-card-picture {
+  height: 26rem;
+}
+.cx-card-picture .gp {
+  height: 100%;
 }
 
 /* Details: the one toggle */
@@ -196,116 +262,27 @@
   min-width: 0;
 }
 
-/* The render */
-.fc-preview {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  min-width: 0;
-}
-.fc-preview .gp {
-  height: 38rem;
-}
-.fc-preview .segmented {
-  margin: 0;
-}
-.fc-sides {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-3);
-}
-.fc-sides figure {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  min-width: 0;
-}
-.fc-sides figcaption {
-  font-weight: 600;
-  color: var(--muted);
-}
-.fc-sides .gp {
-  height: 34rem;
-}
-
-/* A: the actions stay at the bottom */
-.fca-bar {
-  position: sticky;
-  bottom: 0;
-  z-index: 10;
-  padding: var(--space-3) var(--space-4);
-  margin: 0 calc(-1 * var(--space-4)) calc(-1 * var(--space-4));
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-}
-
-/* B: summary and actions on the left, one render on the right */
-.fcb {
-  max-width: 96rem;
-}
-.fcb-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
-  gap: var(--space-5, var(--space-4));
-  align-items: start;
-}
-.fcb-left {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-.fcb .fc-preview .gp {
-  height: 44rem;
-}
-
-/* C: what changed and the actions above one render */
-.fcc {
-  max-width: 76rem;
-}
-.fcc-verdict {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-.fcc .fc-preview .gp {
-  height: 42rem;
-}
-
-/* D: the render on top, tabs under it with the actions beside them */
-.fcd .tabs-bar {
-  align-items: flex-start;
-}
-.fcd .tabs-aside {
-  margin-inline-start: auto;
-  max-width: 36rem;
-}
-.fcd .tab-panel {
-  padding-top: var(--space-3);
-}
-.fcd .fc-preview .gp {
-  height: 40rem;
-}
-
-@media (max-width: 64rem) {
-  .fcb-grid {
+/* Narrow screens */
+@media (max-width: 48rem) {
+  .cx-stage,
+  .cxc .cx-stage {
+    height: auto;
+    min-height: 0;
+  }
+  .cx-bar {
+    position: static;
+    width: auto;
+    margin-top: var(--space-2);
+    box-shadow: none;
+  }
+  .cx-sides {
     grid-template-columns: minmax(0, 1fr);
+    height: auto;
   }
-  .fcb-grid > .fc-preview {
-    order: -1;
+  .cx-card {
+    padding: var(--space-3);
   }
-  .fcd .tabs-bar {
-    flex-direction: column;
-  }
-  .fcd .tabs-aside {
-    margin-inline-start: 0;
-    order: 2;
-  }
-  .fc-sides {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .fc-preview .gp,
-  .fc-sides .gp {
-    height: 26rem;
+  .cx-card-picture {
+    height: auto;
   }
 }
