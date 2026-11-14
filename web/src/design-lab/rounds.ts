@@ -2,7 +2,7 @@
 // (and its variant files are deleted) once the maintainer has chosen and the page is built.
 import type { ComponentType } from 'react';
 import { ChangeA, ChangeB, ChangeC, ChangeD } from './focus/ChangeVariants';
-import { FocusA, FocusB, FocusC, FocusD } from './focus/FocusVariants';
+import { FocusA, FocusB, FocusC } from './focus/FocusVariants';
 
 export interface VariantProps {
   /** One of the round's `states`, picked in the lab bar. */
@@ -18,12 +18,11 @@ export interface Round {
 export const ROUNDS: Round[] = [
   {
     id: 'focusEditor',
-    states: ['pending', 'settled', 'refreshing', 'readonly'],
+    states: ['pending', 'settled', 'working', 'refreshing', 'readonly'],
     variants: [
       { id: 'a', Component: FocusA },
       { id: 'b', Component: FocusB },
       { id: 'c', Component: FocusC },
-      { id: 'd', Component: FocusD },
     ],
   },
   {

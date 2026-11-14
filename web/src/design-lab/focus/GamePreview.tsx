@@ -112,6 +112,10 @@ export interface GamePreviewProps {
   revealId?: string | null;
   /** Draws the before render over the after render up to `pos` (0 to 1 of the width), with a draggable divider. */
   compare?: { pos: number; onChange: (pos: number) => void };
+  /** Only the picture and its markers: no grid numbers while dragging, no bar below and no note. The page says those things itself. */
+  plain?: boolean;
+  /** Pixels at the bottom of the frame that something else covers. The fitted picture stays above them. */
+  fitInset?: number;
   label: string;
   className?: string;
 }
@@ -123,7 +127,7 @@ interface Ghost {
 }
 
 export function GamePreview(props: GamePreviewProps) {
-  const { image, nodes, diagnostics = [], selectedId, onSelect, query = '', readOnly = false, redrawing = false, onMove, onApply, onDiscard, revealTick = 0, revealId, compare, label, className } = props;
+  const { image, nodes, diagnostics = [], selectedId, onSelect, query = '', readOnly = false, redrawing = false, onMove, onApply, onDiscard, revealTick = 0, revealId, compare, plain = false, fitInset = 0, label, className } = props;
   const { t } = useTranslation();
   const geo = compare ? GEOMETRY.proposed : GEOMETRY[image];
   const frame = useRef<HTMLDivElement>(null);
@@ -137,10 +141,11 @@ export function GamePreview(props: GamePreviewProps) {
 
   const fit = useCallback(
     (w: number, h: number): View => {
-      const z = clamp(Math.min(w / geo.width, h / geo.height), MIN_Z, 1.2);
-      return { z, x: (w - geo.width * z) / 2, y: (h - geo.height * z) / 2 };
+      const room = Math.max(h - fitInset, h / 2);
+      const z = clamp(Math.min(w / geo.width, room / geo.height), MIN_Z, 1.2);
+      return { z, x: (w - geo.width * z) / 2, y: (room - geo.height * z) / 2 };
     },
-    [geo.width, geo.height],
+    [geo.width, geo.height, fitInset],
   );
 
   useLayoutEffect(() => {
@@ -173,14 +178,14 @@ export function GamePreview(props: GamePreviewProps) {
     const el = frame.current;
     if (!el) return;
     const onWheel = (event: WheelEvent) => {
-      if (!event.ctrlKey && !event.metaKey) return;
+      if (!plain && !event.ctrlKey && !event.metaKey) return;
       event.preventDefault();
       const rect = el.getBoundingClientRect();
       zoomAt(event.deltaY < 0 ? 1.15 : 1 / 1.15, event.clientX - rect.left, event.clientY - rect.top);
     };
     el.addEventListener('wheel', onWheel, { passive: false });
     return () => el.removeEventListener('wheel', onWheel);
-  }, [zoomAt]);
+  }, [zoomAt, plain]);
 
   // Bring the requested focus into view, zoomed to at least a readable size.
   if (revealTick !== seenTick) {
@@ -337,7 +342,7 @@ export function GamePreview(props: GamePreviewProps) {
                   />
                   {node.pending ? (
                     <span className={`gp-pin gp-pin-${node.pending.change}`} aria-hidden="true">
-                      {node.pending.change === 'added' ? '+' : '~'}
+                      {node.pending.change === 'added' ? '+' : plain ? '' : '~'}
                     </span>
                   ) : null}
                   {info ? (
@@ -357,7 +362,7 @@ export function GamePreview(props: GamePreviewProps) {
                   return { left: b.x, top: b.y, width: b.w, height: b.h };
                 })()}
               >
-                <span className="gp-ghost-cell">{`${ghost.x}, ${ghost.y}`}</span>
+                {plain ? null : <span className="gp-ghost-cell">{`${ghost.x}, ${ghost.y}`}</span>}
               </div>
             ) : null}
           </div>
@@ -390,12 +395,16 @@ export function GamePreview(props: GamePreviewProps) {
           ) : null}
         </div>
         <div className="gp-controls" role="group" aria-label={t('designLab.focus.view.label')}>
-          <button type="button" onClick={() => zoomAt(1.25, size.w / 2, size.h / 2)} aria-label={t('designLab.focus.view.zoomIn')}>
-            <span aria-hidden="true">+</span>
-          </button>
-          <button type="button" onClick={() => zoomAt(1 / 1.25, size.w / 2, size.h / 2)} aria-label={t('designLab.focus.view.zoomOut')}>
-            <span aria-hidden="true">&minus;</span>
-          </button>
+          {plain ? null : (
+            <>
+              <button type="button" onClick={() => zoomAt(1.25, size.w / 2, size.h / 2)} aria-label={t('designLab.focus.view.zoomIn')}>
+                <span aria-hidden="true">+</span>
+              </button>
+              <button type="button" onClick={() => zoomAt(1 / 1.25, size.w / 2, size.h / 2)} aria-label={t('designLab.focus.view.zoomOut')}>
+                <span aria-hidden="true">&minus;</span>
+              </button>
+            </>
+          )}
           <button type="button" onClick={() => setFitted(true)}>
             {t('designLab.focus.view.fit')}
           </button>
@@ -406,13 +415,13 @@ export function GamePreview(props: GamePreviewProps) {
             <span className="gp-side gp-side-after">{t('designLab.change.compare.after')}</span>
           </>
         ) : null}
-        {redrawing ? (
+        {redrawing && !plain ? (
           <p className="gp-note" role="status">
             <span className="spinner" aria-hidden="true" /> {t('designLab.focus.render.redrawing')}
           </p>
         ) : null}
       </div>
-      {selectedNode?.pending && !readOnly ? (
+      {selectedNode?.pending && !readOnly && !plain ? (
         <div className="gp-selbar" role="group" aria-label={t('designLab.focus.pending.region')}>
           <p>{t(`designLab.focus.pending.one_${selectedNode.pending.change}`, { name: selectedNode.label })}</p>
           <Button size="sm" variant="primary" disabled={redrawing} onClick={() => onApply?.(selectedNode.id)}>

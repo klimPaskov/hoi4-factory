@@ -13,7 +13,7 @@ export const OPEN: Decision[] = [
   {
     id: 'focusEditor',
     round: 'focusEditor',
-    options: ['90-focus-a-render-inspector', '91-focus-b-three-panes', '92-focus-c-floating', '93-focus-d-table'],
+    options: ['100-focus-a-just-ask', '101-focus-b-focus-card', '102-focus-c-change-list'],
   },
   {
     id: 'changeCard',
@@ -30,6 +30,7 @@ export const OPEN: Decision[] = [
 export const PROVISIONAL: (Decision & { chosen: number })[] = [];
 
 export const HISTORY: Decision[] = [
+  { id: 'focusEditorDetailed', options: ['90-focus-a-render-inspector', '91-focus-b-three-panes', '92-focus-c-floating', '93-focus-d-table'] },
   { id: 'account', options: ['70-account-a-cards', '71-account-b-settings', '72-account-c-usage'] },
   { id: 'taskPage', options: ['62-task-c-tabs', '61-task-b-story', '60-task-a-columns'] },
   { id: 'tasks', options: ['50-tasks-a-panel', '52-tasks-c-grouped', '51-tasks-b-composer'] },

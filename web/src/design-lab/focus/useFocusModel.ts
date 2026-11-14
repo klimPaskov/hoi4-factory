@@ -7,7 +7,7 @@ import { DIAGNOSTICS, FOCUS_TEXT, NODES, PENDING_BEFORE, PROJECTION, type FocusT
 /** Which of the two real renders the preview shows. */
 export type RenderName = 'base' | 'proposed';
 
-export type FocusScenario = 'pending' | 'settled' | 'refreshing' | 'readonly';
+export type FocusScenario = 'pending' | 'settled' | 'working' | 'refreshing' | 'readonly';
 
 export type Notice = { key: 'self' | 'duplicate' | 'cycle' | 'readonly' | 'added' | 'linked'; id?: string; other?: string } | null;
 
@@ -41,6 +41,8 @@ export interface FocusModel {
   apply: (id: string) => void;
   discard: (id: string) => void;
   applyAll: () => void;
+  /** The lab's stand-in for an agent answer: the sample proposal arrives. */
+  propose: () => void;
   discardAll: () => void;
   pendingCount: number;
 }
@@ -61,7 +63,7 @@ export function matchesQuery(node: FocusNode, query: string): boolean {
 }
 
 export function useFocusModel(scenario: FocusScenario): FocusModel {
-  const [nodes, setNodes] = useState<FocusNode[]>(() => (scenario === 'settled' || scenario === 'readonly' ? NODES.map(settle) : NODES));
+  const [nodes, setNodes] = useState<FocusNode[]>(() => (scenario === 'settled' || scenario === 'readonly' || scenario === 'working' ? NODES.map(settle) : NODES));
   const [texts, setTexts] = useState<Record<string, FocusText>>(FOCUS_TEXT);
   const [selectedId, setSelectedId] = useState<string | null>(scenario === 'readonly' ? 'SWE_coastal_battery' : null);
   const [query, setQuery] = useState('');
@@ -149,13 +151,12 @@ export function useFocusModel(scenario: FocusScenario): FocusModel {
       redraw();
     },
     setCost: (id, cost) => {
-      update(id, (n) => ({ ...n, cost }));
+      setNodes((list) => list.map((n) => (n.id === id ? { ...n, cost } : n)));
       redraw();
     },
     setText: (id, field, value) => {
-      if (!writable(id)) return;
       setTexts((all) => ({ ...all, [id]: { title: '', description: '', ...all[id], [field]: value } }));
-      if (field === 'title') update(id, (n) => ({ ...n, label: value.trim() || n.id }));
+      if (field === 'title') setNodes((list) => list.map((n) => (n.id === id ? { ...n, label: value.trim() || n.id } : n)));
     },
     addFocus: () => {
       let n = nodes.length + 1;
@@ -203,6 +204,7 @@ export function useFocusModel(scenario: FocusScenario): FocusModel {
       }
     },
     applyAll: () => setNodes((list) => list.map(settle)),
+    propose: () => setNodes(NODES),
     discardAll: () => {
       const gone = new Set(nodes.filter((n) => n.pending?.change === 'added').map((n) => n.id));
       setNodes((list) =>

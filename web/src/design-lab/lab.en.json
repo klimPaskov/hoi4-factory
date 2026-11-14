@@ -146,23 +146,19 @@
       "live": "Open this variant live",
       "focusEditor": {
         "title": "Focus editor",
-        "question": "How should the focus tree editor be laid out around the live game render? All four edit the same tree and show the same agent proposal.",
+        "question": "Which minimal focus editor should be built? In all three the game render fills the page, you ask the agent in plain words and approve or reject what it did. You move a focus by dragging it. There are no number fields and no lists.",
         "options": [
           {
-            "name": "Render and inspector",
-            "summary": "The game render fills the page with the fields of the selected focus on the right. The list folds away below."
+            "name": "Just ask",
+            "summary": "Only the tree and one bar: what the agent did, Approve or Reject, and the request box. No fields at all. Every change goes through the agent."
           },
           {
-            "name": "Three panes",
-            "summary": "Focus list on the left, the game render in the middle, the fields and problems on the right."
+            "name": "Ask, with a focus card",
+            "summary": "The same bar. Clicking a focus also opens a small card where you can type its title, description and cost yourself."
           },
           {
-            "name": "Full render, floating inspector",
-            "summary": "Only the game render and a thin bar. The fields float over the render when a focus is selected."
-          },
-          {
-            "name": "Table beside the render",
-            "summary": "The game render on the left. A table of all focuses with the cost editable in the row sits beside it."
+            "name": "Change list",
+            "summary": "A narrow column beside the tree lists each thing the agent changed. Click a line to see it on the tree. The request box sits under the list."
           }
         ]
       },
@@ -187,6 +183,10 @@
             "summary": "The render with an After and Before toggle on top. What changed and Details are tabs, the buttons beside them."
           }
         ]
+      },
+      "focusEditorDetailed": {
+        "title": "Focus editor, first round",
+        "outcome": "None chosen. All four showed too much. The editor has to be far more minimal, with the agent doing most of the work."
       }
     },
     "toolbar": {
@@ -326,23 +326,21 @@
       "focusEditor": {
         "variants": {
           "a": {
-            "name": "A. Render and inspector"
+            "name": "A. Just ask"
           },
           "b": {
-            "name": "B. Three panes"
+            "name": "B. Ask, with a focus card"
           },
           "c": {
-            "name": "C. Full render, floating inspector"
-          },
-          "d": {
-            "name": "D. Table beside the render"
+            "name": "C. Change list"
           }
         },
         "states": {
-          "pending": "Agent change pending",
-          "settled": "No pending change",
-          "refreshing": "Source changed, refreshing",
-          "readonly": "Read-only focus selected"
+          "pending": "Agent change waiting",
+          "settled": "Nothing waiting",
+          "working": "Agent working",
+          "refreshing": "Source changed, reloading",
+          "readonly": "Focus that can't be dragged"
         }
       },
       "changeCard": {
@@ -379,21 +377,42 @@
     },
     "focus": {
       "pageTitle": "Focus tree",
-      "search": {
-        "label": "Find a focus by ID or title",
-        "placeholder": "Find a focus"
-      },
-      "add": "Add focus",
-      "problemCount_one": "{{count}} problem",
-      "problemCount_other": "{{count}} problems",
-      "problems": "Problems",
-      "problemsHere": "Problems with this focus",
-      "noProblems": "No problems found.",
-      "editSelected": "Edit {{name}}",
-      "viewSource": "View source",
+      "sampleRequest": "Add a Nordic trade branch under Open Trade, and make Open Trade a little cheaper.",
+      "approve": "Approve",
+      "reject": "Reject",
+      "fix": "Ask the agent to fix it",
+      "deselect": "Stop talking about {{name}}",
+      "working": "The agent is working on it.",
       "refreshing": "The source changed. Updating the tree.",
+      "agentColumn": "The agent",
+      "youAsked": "You asked:",
+      "idleHint": "Say what you want changed. The agent edits the tree and you approve the result here.",
+      "ask": {
+        "label": "Ask the agent for a change",
+        "placeholder": "Ask for a change",
+        "placeholderFor": "Ask for a change to {{name}}",
+        "send": "Send",
+        "about": "About {{name}}: {{request}}",
+        "fix": "Fix this: {{problem}}"
+      },
+      "change": {
+        "added": "Added {{name}}",
+        "cost": "{{name}}: cost {{before}} to {{after}}",
+        "changed": "Changed {{name}}"
+      },
+      "summary": {
+        "both": "The agent {{added}} and {{changed}}.",
+        "only": "The agent {{what}}.",
+        "added_one": "added {{count}} focus",
+        "added_other": "added {{count}} focuses",
+        "changed_one": "changed {{count}} focus",
+        "changed_other": "changed {{count}} focuses"
+      },
+      "problems": "Problems",
+      "noProblems": "No problems found.",
+      "viewSource": "View source",
       "none": "None",
-      "missingText": "No title yet.",
+      "or": "or",
       "view": {
         "label": "View",
         "zoomIn": "Zoom in",
@@ -401,47 +420,19 @@
         "fit": "Fit"
       },
       "node": {
-        "added": "New",
-        "changed": "Changed",
         "label": "{{name}}, cost {{cost}}",
         "label_added": "{{name}}, new from the agent, cost {{cost}}",
         "label_changed": "{{name}}, changed by the agent, cost {{cost}}"
       },
-      "list": {
-        "title": "Focuses",
-        "empty": "No focus matches your search.",
-        "problem": "Problem"
-      },
-      "table": {
-        "focus": "Focus",
-        "requires": "Requires",
-        "costOf": "Cost of {{name}}"
-      },
       "pending": {
         "region": "Changes from the agent",
-        "banner_one": "The agent suggested {{count}} change.",
-        "banner_other": "The agent suggested {{count}} changes.",
-        "applyAll": "Apply all",
-        "discardAll": "Discard all",
         "apply": "Apply",
         "discard": "Discard",
         "one_added": "{{name}} is new.",
-        "one_changed": "{{name}} was changed.",
-        "addedTitle": "New from the agent.",
-        "changedTitle": "Changed by the agent.",
-        "costChange": "Changed by the agent: cost {{before}} to {{after}}."
-      },
-      "notice": {
-        "self": "{{id}} cannot require itself.",
-        "duplicate": "{{id}} already requires {{other}}.",
-        "cycle": "{{other}} comes after {{id}} in the tree, so requiring it would make a loop.",
-        "readonly": "{{id}} cannot be edited here. Change it in the source file.",
-        "added": "Added {{id}}.",
-        "linked": "{{id}} now requires {{other}}."
+        "one_changed": "{{name}} was changed."
       },
       "inspector": {
         "title": "Selected focus",
-        "none": "Select a focus on the picture or in the list to edit it.",
         "close": "Close"
       },
       "fields": {
@@ -449,36 +440,16 @@
         "title": "Title",
         "description": "Description",
         "cost": "Cost",
-        "x": "Column",
-        "y": "Row",
         "requires": "Requires",
-        "excludes": "Cannot be taken together with",
-        "placed": "Position set by",
-        "icon": "Icon",
-        "id": "Internal name"
+        "excludes": "Cannot be taken together with"
       },
-      "placed": {
-        "absolute": "Fixed column and row",
-        "relative": "Relative position",
-        "auto": "Automatic"
-      },
-      "placedRelative": "Relative to {{to}}",
-      "noRequirements": "No requirement. This focus can be taken first.",
-      "anyOf": "Any one of",
-      "removeRequirement": "Remove the requirement {{name}}",
-      "addRequirement": "Add a requirement",
-      "chooseFocus": "Choose a focus",
-      "asPartOf": "Add it as",
-      "newGroup": "A separate requirement",
-      "alternativeTo": "An alternative to {{name}}",
-      "addRequirementButton": "Add requirement",
-      "previewLabel": "The focus tree as the game draws it. Click a focus to select it, drag it to move it on the grid, or use the arrow keys on a selected focus. Press plus, minus or zero to zoom or fit.",
+      "previewLabel": "The focus tree as the game draws it. Click a focus to select it, drag it to move it, or use the arrow keys on a selected focus. Scroll or press plus and minus to zoom, zero to fit.",
       "render": {
         "alt": "The focus tree as the game draws it.",
         "redrawing": "Redrawing the tree."
       },
-      "lockedNote": "You can't edit this focus here. {{reason}}",
-      "or": "or"
+      "lockedNote": "{{name}} can't be dragged. {{reason}} Ask the agent to move it.",
+      "sampleSummary": "I added a Nordic trade branch under Open Trade and made Open Trade cheaper."
     },
     "change": {
       "title": "Review change",

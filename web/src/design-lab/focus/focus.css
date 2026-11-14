@@ -1,12 +1,5 @@
-/* The focus editor rounds (design lab). Uses the Workbench tokens from styles.css only. */
+/* The focus editor round (design lab, D-61). Uses the Workbench tokens from styles.css only. */
 
-.fx-page {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-4);
-  min-height: calc(100dvh - 3rem);
-}
 .fx-page-title {
   margin: 0;
   font-size: var(--text-lg);
@@ -14,72 +7,6 @@
 .mono {
   font-family: var(--mono);
   font-size: 0.92em;
-}
-
-/* ----- Toolbar, search, banners ------------------------------------------------------- */
-
-.fx-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-2) var(--space-3);
-}
-.fx-search {
-  position: relative;
-  flex: 1 1 13rem;
-  max-width: 22rem;
-  min-width: 0;
-}
-.fx-search input {
-  width: 100%;
-}
-.fx-pending-bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2) var(--space-4);
-  padding: var(--space-2) var(--space-3);
-  background: var(--primary-soft);
-  border-radius: var(--radius);
-}
-.fx-pending-bar p {
-  margin: 0;
-}
-.fx-note {
-  margin: 0;
-  color: var(--muted);
-}
-.fx-note.is-warn {
-  color: var(--text);
-  font-weight: 600;
-}
-.fx-more > summary {
-  cursor: pointer;
-  color: var(--muted);
-  font-size: var(--text-sm);
-}
-.fx-more[open] > summary {
-  margin-bottom: var(--space-2);
-}
-.fx-more > a {
-  display: inline-block;
-  margin-top: var(--space-2);
-}
-.fx-problems h2 {
-  font-size: var(--text-md);
-  margin: 0 0 var(--space-1);
-}
-.fx-flag {
-  font-size: var(--text-xs);
-  font-weight: 600;
-  color: var(--muted);
-}
-.fx-flag.is-added {
-  color: var(--success);
-}
-.fx-flag.is-changed {
-  color: var(--warning);
 }
 .fx-dot {
   flex: none;
@@ -113,59 +40,10 @@
 .fx-source-link {
   font-size: var(--text-sm);
 }
-
-/* ----- List, table, diagnostics -------------------------------------------------------- */
-
-.fx-list ul,
-.fx-diags,
-.fx-groups {
+.fx-diags {
   list-style: none;
   margin: 0;
   padding: 0;
-}
-.fx-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
-  width: 100%;
-  padding: var(--space-2) var(--space-3);
-  text-align: start;
-  font: inherit;
-  color: var(--text);
-  background: transparent;
-  border: 0;
-  cursor: pointer;
-}
-.fx-row:hover {
-  background: var(--surface-2);
-}
-.fx-row.is-selected {
-  background: var(--primary-soft);
-}
-.fx-row:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: -2px;
-}
-.fx-row-label {
-  font-weight: 500;
-}
-.fx-row-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1);
-  justify-content: flex-end;
-}
-.fx-table tr.is-selected > * {
-  background: var(--primary-soft);
-}
-.fx-table th[scope='row'] {
-  font-weight: 600;
-  text-align: start;
-}
-.fx-table .fx-cell-input[type='number'] {
-  width: 5rem;
-  min-height: 2rem;
 }
 .fx-diags li {
   display: flex;
@@ -173,203 +51,268 @@
   align-items: flex-start;
   padding: var(--space-1) 0;
 }
-.fx-diags p {
-  margin: 0;
-}
-
-/* ----- Inspector ----------------------------------------------------------------------- */
-
-.fx-inspector {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-.fx-inspector-head h2 {
-  margin: 0;
-}
-.fx-inspector-head p {
-  margin: 0;
-}
 .fx-fieldset {
   border: 0;
   margin: 0;
   padding: 0;
   min-width: 0;
 }
-.fx-fieldset > legend {
-  font-weight: 600;
-  font-size: var(--text-sm);
-  padding: 0;
-  margin-bottom: var(--space-1);
-}
-.fx-numbers {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+/* ----- The page: a thin header and the tree ---------------------------------------------- */
+
+.mx-page {
+  display: flex;
+  flex-direction: column;
   gap: var(--space-2);
+  padding: var(--space-2) var(--space-3) var(--space-3);
+  height: calc(100dvh - 2.5rem);
+  min-height: 34rem;
 }
-.fx-groups li {
-  margin-bottom: var(--space-2);
-}
-.fx-groups p {
-  margin: 0 0 var(--space-1);
-}
-.fx-facts {
-  margin: 0;
-}
-
-/* ----- Variant A: canvas, inspector on the right, drawer below ------------------------- */
-
-.fxa-main {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 21rem;
+.mx-head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--space-3);
-  height: max(32rem, calc(100dvh - 17rem));
 }
-.fxa-side {
+.mx-details {
+  position: absolute;
+  inset-inline-end: 0;
+  top: calc(100% + var(--space-1));
+  z-index: 8;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 22rem;
+  max-width: calc(100vw - 2 * var(--space-3));
+  max-height: 70dvh;
   overflow: auto;
-  padding: var(--space-1) var(--space-2);
+  padding: var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
 }
-.fx-drawer > summary {
-  padding: var(--space-2) 0;
-  cursor: pointer;
+.mx-details h2 {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-md);
+}
+.mx-facts {
+  margin: 0 0 var(--space-2);
+}
+.mx-facts dt {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+.mx-facts dd {
+  margin: 0 0 var(--space-2);
+}
+.mx-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+.mx-tree {
+  height: 100%;
+}
+
+/* ----- The bar over the tree (A and B) ---------------------------------------------------- */
+
+.mx-dock {
+  position: absolute;
+  inset-inline: 0;
+  bottom: var(--space-4);
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: min(42rem, calc(100% - 2 * var(--space-3)));
+  margin-inline: auto;
+  padding: var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+.mx-status {
+  margin: 0;
   color: var(--muted);
 }
-.fx-drawer > summary:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: -2px;
+.mx-status:empty {
+  display: none;
 }
-.fxa-drawer-body {
-  max-width: 28rem;
-  padding-bottom: var(--space-3);
-}
-
-/* ----- Variant B: three panes ---------------------------------------------------------- */
-
-.fxb-grid {
-  display: grid;
-  grid-template-columns: 16rem minmax(0, 1fr) 21rem;
-  gap: var(--space-3);
-  height: max(34rem, calc(100dvh - 9rem));
-}
-.fxb-list,
-.fxb-side {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  overflow: auto;
-  padding: var(--space-1) var(--space-2);
-  min-height: 0;
-}
-.fxb-list .fx-search {
-  max-width: none;
-  flex: none;
-}
-.fxb-center {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  min-width: 0;
-  min-height: 0;
-}
-.fxb-center .gp {
-  flex: 1;
-}
-
-/* ----- Variant C: render with a floating inspector ------------------------------------- */
-
-.fxc {
-  padding: var(--space-2);
-}
-.fxc-bar {
+.mx-verdict,
+.mx-selected {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2) var(--space-3);
 }
-.fxc-stage {
-  position: relative;
-  flex: none;
-  height: calc(100dvh - 15rem);
-  min-height: 30rem;
+.mx-verdict p,
+.mx-selected p {
+  margin: 0;
+  margin-inline-end: auto;
 }
-.fxc-float {
+.mx-selected {
+  font-size: var(--text-sm);
+}
+.mx-ask {
+  display: flex;
+  gap: var(--space-2);
+}
+.mx-ask input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ----- B: the card of the selected focus --------------------------------------------------- */
+
+.mx-card {
   position: absolute;
   inset-inline-end: var(--space-3);
   top: var(--space-3);
   z-index: 6;
-  width: 21rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 19rem;
   max-width: calc(100% - 2 * var(--space-3));
   max-height: calc(100% - 2 * var(--space-3));
   overflow: auto;
   padding: var(--space-3);
   background: var(--surface);
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
 }
-.fxc-close {
-  float: inline-end;
+.mx-card-close {
+  align-self: flex-end;
+  margin-bottom: calc(-1 * var(--space-2));
 }
-
-/* ----- Variant D: table beside the render ---------------------------------------------------------- */
-
-.fxd-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
-  gap: var(--space-3);
-  align-items: start;
+.mx-card-note {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--muted);
 }
-.fxd-preview {
-  height: max(30rem, calc(100dvh - 15rem));
-  position: sticky;
-  top: 3.5rem;
+.mx-cost input {
+  width: 6rem;
 }
-.fxd-side {
+.mx-card-problem {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
-  min-width: 0;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+}
+.mx-card-problem p {
+  margin: 0;
 }
 
-/* ----- Narrow screens ------------------------------------------------------------------ */
+/* ----- C: the side column ------------------------------------------------------------------- */
 
-@media (max-width: 64rem) {
-  .fxd-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .fxd-preview {
-    height: 28rem;
-    position: static;
-  }
-  .fxa-main,
-  .fxb-grid {
-    grid-template-columns: minmax(0, 1fr);
+.mxc-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 20rem;
+  gap: var(--space-3);
+  flex: 1;
+  min-height: 0;
+}
+.mxc-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 0;
+}
+.mxc-thread {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 0;
+  overflow: auto;
+}
+.mxc-thread > p {
+  margin: 0;
+}
+.mxc-asked {
+  align-self: flex-end;
+  max-width: 92%;
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-2);
+  border-radius: var(--radius-lg);
+}
+.mx-changes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.mx-change {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2);
+  font: inherit;
+  color: var(--text);
+  text-align: start;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.mx-change:hover {
+  background: var(--surface-2);
+}
+.mx-change.is-selected {
+  background: var(--primary-soft);
+}
+.mx-change:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+.mx-change-pin {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  font-weight: 800;
+  font-size: 0.8rem;
+  line-height: 1;
+  color: #101114;
+  background: #ffb020;
+}
+.mx-change-pin.is-added {
+  background: #3ddc84;
+}
+
+/* ----- Narrow screens ---------------------------------------------------------------------- */
+
+@media (max-width: 48rem) {
+  .mx-page {
     height: auto;
+    min-height: 0;
   }
-  .fxa-main .gp,
-  .fxb-center .gp {
-    height: 60dvh;
-    min-height: 20rem;
+  .mx-stage {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
   }
-  .fxa-side,
-  .fxb-list,
-  .fxb-side {
-    max-height: none;
-  }
-  .fxb-list {
-    max-height: 16rem;
-  }
-  .fxb-center {
-    order: -1;
-  }
-  .fxc-float {
-    inset-inline: var(--space-2);
-    top: auto;
-    bottom: var(--space-2);
+  .mx-dock,
+  .mx-card {
+    position: static;
     width: auto;
-    max-height: 60%;
+    max-width: none;
+    max-height: none;
+    box-shadow: none;
   }
-}
-
-.fx-table th[scope='row'] {
-  min-width: 13rem;
+  .mxc-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .mx-ask {
+    flex-wrap: wrap;
+  }
+  .mx-ask input {
+    flex-basis: 100%;
+  }
 }
