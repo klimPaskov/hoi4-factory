@@ -311,10 +311,24 @@ pub async fn admit(
         MeterFunding::UserKey { key_id } => Some(key_id.0),
         MeterFunding::OperatorAllowance => None,
     };
+    // A follow-up request reopens a task that waits for review: the person asked for more work.
+    let mut expected_version = req.expected_version;
+    if req.instruction.is_some() && task.state == factory_tasks::TaskState::InReview {
+        let reopened = factory_tasks::transition_task(
+            &mut tx,
+            task.id,
+            expected_version,
+            factory_tasks::TaskState::Ready,
+            event(None, Actor::user(req.account), "task_ready", "Reopened by a follow-up request", json!({})),
+        )
+        .await
+        .map_err(task_error)?;
+        expected_version = reopened.version;
+    }
     let attempt = factory_tasks::admit_attempt(
         &mut tx,
         task.id,
-        req.expected_version,
+        expected_version,
         Admission {
             bundle_id: bundle.id,
             grant_id: grant.id.0,

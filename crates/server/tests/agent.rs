@@ -1075,6 +1075,7 @@ async fn a_follow_up_request_is_what_the_next_attempt_is_asked() {
     let follow = a.alice.client.post(&attempts, json!({ "expected_version": d["task"]["version"], "instruction": request })).await;
     assert_eq!(follow.status, 201, "{}", follow.text);
     let d = a.wait(&id, 40, |last| last["attempt_no"] == 2 && last["state"] == "succeeded").await;
+    assert_eq!(d["task"]["state"], "in_review", "the reopened task is back in review after the follow-up");
     assert_eq!(d["task"]["objective"], "Add an idea file", "the task keeps its first objective");
 
     // The model was asked the follow-up, with a reminder of the task it follows.
