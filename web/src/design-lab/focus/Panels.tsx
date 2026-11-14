@@ -1,19 +1,12 @@
-// The parts of the focus editor that the variants arrange differently: search and actions, the
-// node list, the inspector, diagnostics, the pending-change bar and the refresh banner.
+// The parts of the focus editor that the variants arrange differently: search and add, the
+// node list, the inspector, the problems list, the agent's suggestion banner and the notices.
+// Text is plain words. Anything technical sits behind the one Details toggle of the inspector.
 import { useId, useState, type ReactNode } from 'react';
-import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
-import { Alert, Badge, Button, Chip, Field, SelectField, type Tone } from '../../components/ui';
-import type { Diagnostic, FocusNode, LayoutVerdict } from '../../focus/types';
+import { Button, Chip, Field, SelectField } from '../../components/ui';
+import type { FocusNode } from '../../focus/types';
 import { PENDING_BEFORE } from './fixtures';
 import type { FocusModel } from './useFocusModel';
-
-const LAYOUT_TONE: Record<LayoutVerdict, Tone> = { pass: 'success', revise: 'warning', blocked: 'danger', unknown: 'neutral' };
-
-export function LayoutBadge({ verdict }: { verdict: LayoutVerdict }) {
-  const { t } = useTranslation();
-  return <Badge tone={LAYOUT_TONE[verdict]}>{t(`designLab.shared.layout.${verdict}`)}</Badge>;
-}
 
 export function sourceHref(path: string, line: number): string {
   return `#source=${path}:${line}`;
@@ -28,9 +21,9 @@ export function SourceLink({ path, line }: { path: string; line: number }) {
   );
 }
 
-const SEVERITY_TONE: Record<Diagnostic['severity'], Tone> = { error: 'danger', warning: 'warning', info: 'info' };
+const labelOf = (model: FocusModel, id: string): string => model.nodes.find((n) => n.id === id)?.label ?? id;
 
-// ----- Search and actions -----------------------------------------------------------------
+// ----- Search and add ---------------------------------------------------------------------
 
 export function SearchBox({ model }: { model: FocusModel }) {
   const { t } = useTranslation();
@@ -54,43 +47,37 @@ export function SearchBox({ model }: { model: FocusModel }) {
           }
         }}
       />
-      {model.query ? (
-        <span className="fx-search-count" role="status">
-          {t('designLab.focus.search.count', { shown: model.matches.length, total: model.nodes.length })}
-        </span>
-      ) : null}
     </div>
   );
 }
 
-export function Toolbar({ model, children }: { model: FocusModel; children?: ReactNode }) {
+export function AddButton({ model }: { model: FocusModel }) {
   const { t } = useTranslation();
-  const problems = model.diagnostics.length;
+  return (
+    <Button size="sm" variant="ghost" icon="plus" onClick={model.addFocus} disabled={model.refreshing}>
+      {t('designLab.focus.add')}
+    </Button>
+  );
+}
+
+export function Toolbar({ model, children }: { model: FocusModel; children?: ReactNode }) {
   return (
     <div className="fx-toolbar">
       <SearchBox model={model} />
-      <LayoutBadge verdict={model.layoutVerdict} />
-      <Badge tone={problems ? 'warning' : 'success'}>{t('designLab.focus.problemCount', { count: problems })}</Badge>
-      <Button size="sm" icon="plus" onClick={model.addFocus} disabled={model.refreshing}>
-        {t('designLab.focus.add')}
-      </Button>
+      <AddButton model={model} />
       {children}
     </div>
   );
 }
 
-// ----- Pending change bar and banners -----------------------------------------------------
+// ----- The agent's suggestion and notices -------------------------------------------------
 
 export function PendingBar({ model }: { model: FocusModel }) {
   const { t } = useTranslation();
   if (model.pendingCount === 0) return null;
-  const added = model.nodes.filter((n) => n.pending?.change === 'added').length;
-  const changed = model.nodes.filter((n) => n.pending?.change === 'changed').length;
   return (
     <div className="fx-pending-bar" role="region" aria-label={t('designLab.focus.pending.region')}>
-      <p>
-        <strong>{t('designLab.focus.pending.title')}</strong> {t('designLab.focus.pending.counts', { added, changed })}
-      </p>
+      <p>{t('designLab.focus.pending.banner', { count: model.pendingCount })}</p>
       <div className="button-row">
         <Button size="sm" variant="primary" onClick={model.applyAll} disabled={model.refreshing}>
           {t('designLab.focus.pending.applyAll')}
@@ -106,41 +93,30 @@ export function PendingBar({ model }: { model: FocusModel }) {
 export function Banners({ model }: { model: FocusModel }) {
   const { t } = useTranslation();
   const notice = model.notice;
+  const quiet = notice && (notice.key === 'added' || notice.key === 'linked');
+  const text = notice ? t(`designLab.focus.notice.${notice.key}`, { id: labelOf(model, notice.id ?? ''), other: labelOf(model, notice.other ?? '') }) : '';
   return (
     <>
       {model.refreshing ? (
-        <Alert kind="info">
-          <p>
-            <span className="spinner" aria-hidden="true" /> {t('designLab.focus.refreshing')}
-          </p>
-        </Alert>
+        <p className="fx-note" role="status">
+          <span className="spinner" aria-hidden="true" /> {t('designLab.focus.refreshing')}
+        </p>
       ) : null}
-      {notice && notice.key !== 'added' && notice.key !== 'linked' ? (
-        <Alert kind="warning">
-          <p>{t(`designLab.focus.notice.${notice.key}`, { id: notice.id, other: notice.other })}</p>
-        </Alert>
-      ) : null}
-      {notice && (notice.key === 'added' || notice.key === 'linked') ? (
+      {notice && !quiet ? <p className="fx-note is-warn">{text}</p> : null}
+      {notice && quiet ? (
         <p className="sr-only" role="status">
-          {t(`designLab.focus.notice.${notice.key}`, { id: notice.id, other: notice.other })}
+          {text}
         </p>
       ) : null}
     </>
   );
 }
 
-// ----- Node list --------------------------------------------------------------------------
-
-function stateText(node: FocusNode, t: TFunction): string {
-  if (node.pending) return t(`designLab.focus.node.${node.pending.change}`);
-  if (!node.editable) return t('designLab.focus.node.locked');
-  return '';
-}
+// ----- Node list and table ----------------------------------------------------------------
 
 export function NodeList({ model }: { model: FocusModel }) {
   const { t } = useTranslation();
-  const counts = new Map<string, number>();
-  for (const d of model.diagnostics) if (d.focusId) counts.set(d.focusId, (counts.get(d.focusId) ?? 0) + 1);
+  const withProblems = new Set(model.diagnostics.map((d) => d.focusId));
   return (
     <div className="fx-list">
       {model.matches.length === 0 ? (
@@ -150,13 +126,10 @@ export function NodeList({ model }: { model: FocusModel }) {
           {model.matches.map((node) => (
             <li key={node.id}>
               <button type="button" className={`fx-row${node.id === model.selectedId ? ' is-selected' : ''}`} aria-pressed={node.id === model.selectedId} onClick={() => model.reveal(node.id)}>
-                <span className="fx-row-main">
-                  <span className="fx-row-label">{node.label}</span>
-                  <span className="fx-row-id mono">{node.id}</span>
-                </span>
+                <span className="fx-row-label">{node.label}</span>
                 <span className="fx-row-meta">
-                  {stateText(node, t) ? <Badge tone={node.pending ? 'accent' : 'neutral'}>{stateText(node, t)}</Badge> : null}
-                  {counts.get(node.id) ? <Badge tone="warning">{t('designLab.focus.list.problems', { count: counts.get(node.id) })}</Badge> : null}
+                  {node.pending ? <span className={`fx-flag is-${node.pending.change}`}>{t(`designLab.focus.node.${node.pending.change}`)}</span> : null}
+                  {withProblems.has(node.id) ? <span className="fx-flag is-problem">{t('designLab.focus.list.problem')}</span> : null}
                 </span>
               </button>
             </li>
@@ -178,9 +151,7 @@ export function NodeTable({ model }: { model: FocusModel }) {
           <tr>
             <th scope="col">{t('designLab.focus.table.focus')}</th>
             <th scope="col">{t('designLab.focus.fields.cost')}</th>
-            <th scope="col">{t('designLab.focus.table.position')}</th>
             <th scope="col">{t('designLab.focus.table.requires')}</th>
-            <th scope="col">{t('designLab.focus.table.state')}</th>
           </tr>
         </thead>
         <tbody>
@@ -189,8 +160,8 @@ export function NodeTable({ model }: { model: FocusModel }) {
               <th scope="row">
                 <button type="button" className="fx-link" aria-pressed={node.id === model.selectedId} onClick={() => model.reveal(node.id)}>
                   {node.label}
-                </button>
-                <span className="fx-row-id mono">{node.id}</span>
+                </button>{' '}
+                {node.pending ? <span className={`fx-flag is-${node.pending.change}`}>{t(`designLab.focus.node.${node.pending.change}`)}</span> : null}
               </th>
               <td>
                 <input
@@ -202,9 +173,7 @@ export function NodeTable({ model }: { model: FocusModel }) {
                   onChange={(event) => model.setCost(node.id, event.target.value === '' ? null : Number(event.target.value))}
                 />
               </td>
-              <td className="mono">{`${node.x}, ${node.y}`}</td>
-              <td>{node.prerequisiteGroups.map((g) => g.join(' | ')).join(' + ') || t('designLab.focus.none')}</td>
-              <td>{stateText(node, t)}</td>
+              <td>{node.prerequisiteGroups.map((g) => g.map((id) => labelOf(model, id)).join(` ${t('designLab.focus.or')} `)).join(', ') || t('designLab.focus.none')}</td>
             </tr>
           ))}
         </tbody>
@@ -213,8 +182,9 @@ export function NodeTable({ model }: { model: FocusModel }) {
   );
 }
 
-// ----- Diagnostics ------------------------------------------------------------------------
+// ----- Problems ---------------------------------------------------------------------------
 
+/** One plain sentence per problem. A problem about a focus selects that focus. */
 export function DiagnosticsList({ model }: { model: FocusModel }) {
   const { t } = useTranslation();
   if (model.diagnostics.length === 0) return <p className="muted">{t('designLab.focus.noProblems')}</p>;
@@ -222,18 +192,14 @@ export function DiagnosticsList({ model }: { model: FocusModel }) {
     <ul className="fx-diags">
       {model.diagnostics.map((d) => (
         <li key={`${d.code}:${d.focusId ?? ''}`}>
-          <Badge tone={SEVERITY_TONE[d.severity]}>{t(`designLab.focus.severity.${d.severity}`)}</Badge>
-          <div>
-            <p>{d.message}</p>
-            <p className="small muted">
-              {d.focusId ? (
-                <button type="button" className="fx-link" onClick={() => model.reveal(d.focusId as string)}>
-                  {d.focusId}
-                </button>
-              ) : null}{' '}
-              {d.source ? <SourceLink path={d.source.path} line={d.source.line} /> : null}
-            </p>
-          </div>
+          <span className={`fx-dot is-${d.severity}`} aria-hidden="true" />
+          {d.focusId ? (
+            <button type="button" className="fx-link" onClick={() => model.reveal(d.focusId as string)}>
+              {d.message}
+            </button>
+          ) : (
+            <span>{d.message}</span>
+          )}
         </li>
       ))}
     </ul>
@@ -256,7 +222,6 @@ function Requirements({ model, node, disabled }: { model: FocusModel; node: Focu
   const { t } = useTranslation();
   const [pick, setPick] = useState('');
   const [group, setGroup] = useState('new');
-  const label = (id: string) => model.nodes.find((n) => n.id === id)?.label ?? id;
   const candidates = model.nodes.filter((n) => n.id !== node.id && !node.prerequisiteGroups.flat().includes(n.id));
   return (
     <fieldset className="fx-fieldset" disabled={disabled}>
@@ -265,11 +230,11 @@ function Requirements({ model, node, disabled }: { model: FocusModel; node: Focu
       <ul className="fx-groups">
         {node.prerequisiteGroups.map((members) => (
           <li key={members.join('|')}>
-            <p className="small muted">{members.length > 1 ? t('designLab.focus.anyOf') : t('designLab.focus.allOf')}</p>
+            {members.length > 1 ? <p className="small muted">{t('designLab.focus.anyOf')}</p> : null}
             <div className="chips">
               {members.map((id) => (
-                <Chip key={id} onRemove={() => model.unlink(node.id, id)} removeLabel={t('designLab.focus.removeRequirement', { name: label(id) })}>
-                  {label(id)}
+                <Chip key={id} onRemove={() => model.unlink(node.id, id)} removeLabel={t('designLab.focus.removeRequirement', { name: labelOf(model, id) })}>
+                  {labelOf(model, id)}
                 </Chip>
               ))}
             </div>
@@ -280,29 +245,30 @@ function Requirements({ model, node, disabled }: { model: FocusModel; node: Focu
         label={t('designLab.focus.addRequirement')}
         value={pick}
         onChange={setPick}
-        options={[{ value: '', label: t('designLab.focus.chooseFocus') }, ...candidates.map((n) => ({ value: n.id, label: `${n.label} (${n.id})` }))]}
+        options={[{ value: '', label: t('designLab.focus.chooseFocus') }, ...candidates.map((n) => ({ value: n.id, label: n.label }))]}
       />
-      {node.prerequisiteGroups.length > 0 ? (
+      {node.prerequisiteGroups.length > 0 && pick ? (
         <SelectField
           label={t('designLab.focus.asPartOf')}
           value={group}
           onChange={setGroup}
           options={[
             { value: 'new', label: t('designLab.focus.newGroup') },
-            ...node.prerequisiteGroups.map((g, index) => ({ value: String(index), label: t('designLab.focus.alternativeTo', { name: g.map(label).join(', ') }) })),
+            ...node.prerequisiteGroups.map((g, index) => ({ value: String(index), label: t('designLab.focus.alternativeTo', { name: g.map((id) => labelOf(model, id)).join(', ') }) })),
           ]}
         />
       ) : null}
-      <Button
-        size="sm"
-        disabled={!pick}
-        onClick={() => {
-          model.link(pick, node.id, group === 'new' ? undefined : Number(group));
-          setPick('');
-        }}
-      >
-        {t('designLab.focus.addRequirementButton')}
-      </Button>
+      {pick ? (
+        <Button
+          size="sm"
+          onClick={() => {
+            model.link(pick, node.id, group === 'new' ? undefined : Number(group));
+            setPick('');
+          }}
+        >
+          {t('designLab.focus.addRequirementButton')}
+        </Button>
+      ) : null}
     </fieldset>
   );
 }
@@ -331,39 +297,16 @@ function InspectorFor({ model, node }: { model: FocusModel; node: FocusNode }) {
     <div className="fx-inspector">
       <header className="fx-inspector-head">
         <h2>{node.label}</h2>
-        <p className="mono small muted">{node.id}</p>
-        {locked ? null : <SourceLink path={node.source.path} line={node.source.line} />}
+        {node.pending ? (
+          <p className="small muted">
+            {node.pending.change === 'changed' && before?.cost !== undefined
+              ? t('designLab.focus.pending.costChange', { before: before.cost, after: node.cost ?? 0 })
+              : t(`designLab.focus.pending.${node.pending.change}Title`)}
+          </p>
+        ) : null}
       </header>
 
-      {locked ? (
-        <Alert kind="info">
-          <p>
-            <strong>{t('designLab.focus.readOnly')}</strong> {node.notEditableReason}
-          </p>
-          <p>
-            <SourceLink path={node.source.path} line={node.source.line} />
-          </p>
-        </Alert>
-      ) : null}
-
-      {node.pending ? (
-        <div className="fx-pending-card">
-          <p>
-            <strong>{t(`designLab.focus.pending.${node.pending.change}Title`)}</strong>
-          </p>
-          {node.pending.change === 'changed' && before?.cost !== undefined ? (
-            <p className="small">{t('designLab.focus.pending.costChange', { before: before.cost, after: node.cost ?? 0 })}</p>
-          ) : null}
-          <div className="button-row">
-            <Button size="sm" variant="primary" onClick={() => model.apply(node.id)} disabled={model.refreshing}>
-              {t('designLab.focus.pending.apply')}
-            </Button>
-            <Button size="sm" onClick={() => model.discard(node.id)} disabled={model.refreshing}>
-              {t('designLab.focus.pending.discard')}
-            </Button>
-          </div>
-        </div>
-      ) : null}
+      {locked ? <p className="fx-note">{t('designLab.focus.lockedNote', { reason: node.notEditableReason })}</p> : null}
 
       <fieldset className="fx-fieldset" disabled={disabled}>
         <legend className="sr-only">{t('designLab.focus.fields.legend')}</legend>
@@ -378,34 +321,39 @@ function InspectorFor({ model, node }: { model: FocusModel; node: FocusNode }) {
 
       <Requirements model={model} node={node} disabled={disabled} />
 
-      <dl className="facts fx-facts">
-        <div className="fact">
-          <dt>{t('designLab.focus.fields.excludes')}</dt>
-          <dd>{node.mutuallyExclusive.length ? node.mutuallyExclusive.join(', ') : t('designLab.focus.none')}</dd>
-        </div>
-        <div className="fact">
-          <dt>{t('designLab.focus.fields.placed')}</dt>
-          <dd>{node.declared.mode === 'relative' ? t('designLab.focus.placedRelative', { to: node.declared.relativeTo }) : t(`designLab.focus.placed.${node.declared.mode}`)}</dd>
-        </div>
-        <div className="fact">
-          <dt>{t('designLab.focus.fields.icon')}</dt>
-          <dd>{node.icon ? <span className="mono">{node.icon.sprite}</span> : t('designLab.focus.none')} {node.icon && !node.icon.resolved ? <Badge tone="warning">{t('designLab.focus.iconMissing')}</Badge> : null}</dd>
-        </div>
-      </dl>
-
       {mine.length > 0 ? (
-        <div className="fx-node-diags">
-          <h3>{t('designLab.focus.problemsHere')}</h3>
-          <ul className="fx-diags">
-            {mine.map((d) => (
-              <li key={d.code}>
-                <Badge tone={SEVERITY_TONE[d.severity]}>{t(`designLab.focus.severity.${d.severity}`)}</Badge>
-                <p>{d.message}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <ul className="fx-diags" aria-label={t('designLab.focus.problemsHere')}>
+          {mine.map((d) => (
+            <li key={d.code}>
+              <span className={`fx-dot is-${d.severity}`} aria-hidden="true" />
+              <span>{d.message}</span>
+            </li>
+          ))}
+        </ul>
       ) : null}
+
+      <details className="fx-more">
+        <summary>{t('designLab.details')}</summary>
+        <dl className="facts fx-facts">
+          <div className="fact">
+            <dt>{t('designLab.focus.fields.id')}</dt>
+            <dd className="mono">{node.id}</dd>
+          </div>
+          <div className="fact">
+            <dt>{t('designLab.focus.fields.excludes')}</dt>
+            <dd>{node.mutuallyExclusive.length ? node.mutuallyExclusive.map((id) => labelOf(model, id)).join(', ') : t('designLab.focus.none')}</dd>
+          </div>
+          <div className="fact">
+            <dt>{t('designLab.focus.fields.placed')}</dt>
+            <dd>{node.declared.mode === 'relative' ? t('designLab.focus.placedRelative', { to: labelOf(model, node.declared.relativeTo ?? '') }) : t(`designLab.focus.placed.${node.declared.mode}`)}</dd>
+          </div>
+          <div className="fact">
+            <dt>{t('designLab.focus.fields.icon')}</dt>
+            <dd>{node.icon ? <span className="mono">{node.icon.sprite}</span> : t('designLab.focus.none')}</dd>
+          </div>
+        </dl>
+        <SourceLink path={node.source.path} line={node.source.line} />
+      </details>
     </div>
   );
 }

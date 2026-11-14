@@ -7,6 +7,7 @@
 // wait with the Redrawing state.
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Button } from '../../components/ui';
 import type { Diagnostic, FocusNode } from '../../focus/types';
 import baseMap from './render/game-base.json';
 import baseUrl from './render/game-base.webp';
@@ -212,7 +213,7 @@ export function GamePreview(props: GamePreviewProps) {
   };
 
   const onFramePointerDown = (event: PointerEvent<HTMLDivElement>) => {
-    if (event.button !== 0 || (event.target as HTMLElement).closest('.gp-hit, .gp-controls, .gp-divider, .gp-act')) return;
+    if (event.button !== 0 || (event.target as HTMLElement).closest('.gp-hit, .gp-controls, .gp-divider')) return;
     pan.current = { px: event.clientX, py: event.clientY, vx: view.x, vy: view.y };
     event.currentTarget.setPointerCapture(event.pointerId);
   };
@@ -275,8 +276,8 @@ export function GamePreview(props: GamePreviewProps) {
     if (event.type === 'pointerup' || event.type === 'pointercancel') dragPointer.current = false;
   };
 
+  const selectedNode = nodes.find((n) => n.id === selectedId);
   const dim = (node: FocusNode) => query !== '' && !matchesQuery(node, query);
-  const percent = Math.round(view.z * 100);
   const cut = compare ? compare.pos * geo.width : 0;
 
   return (
@@ -326,7 +327,7 @@ export function GamePreview(props: GamePreviewProps) {
                     type="button"
                     className={classes}
                     aria-pressed={selected}
-                    aria-label={t('designLab.focus.node.aria', { name: node.label, id: node.id, cost: node.cost ?? 0 })}
+                    aria-label={t(node.pending ? `designLab.focus.node.label_${node.pending.change}` : 'designLab.focus.node.label', { name: node.label, cost: node.cost ?? 0 })}
                     onClick={() => onSelect(node.id)}
                     onPointerDown={(event) => startDrag(event, node, box)}
                     onPointerMove={(event) => moveDrag(event, node)}
@@ -334,27 +335,14 @@ export function GamePreview(props: GamePreviewProps) {
                     onPointerCancel={() => endDrag(node)}
                     onKeyDown={(event) => onNodeKey(event, node)}
                   />
-                  {node.pending || (!node.editable && !readOnly) || state !== 'drawn' ? (
-                    <span className="gp-tags" aria-hidden="true">
-                      {node.pending ? <span className={`gp-tag gp-tag-${node.pending.change}`}>{t(`designLab.focus.node.${node.pending.change}`)}</span> : null}
-                      {!node.editable && !readOnly ? <span className="gp-tag gp-tag-locked">{t('designLab.focus.node.locked')}</span> : null}
-                      {state === 'moved' ? <span className="gp-tag gp-tag-stale">{t('designLab.focus.render.moved')}</span> : null}
-                      {state === 'undrawn' && !node.pending ? <span className="gp-tag gp-tag-stale">{t('designLab.focus.render.undrawn')}</span> : null}
+                  {node.pending ? (
+                    <span className={`gp-pin gp-pin-${node.pending.change}`} aria-hidden="true">
+                      {node.pending.change === 'added' ? '+' : '~'}
                     </span>
                   ) : null}
                   {info ? (
                     <span className={`gp-mark gp-mark-${info.severity}`} aria-hidden="true">
                       {info.severity === 'info' ? 'i' : '!'}
-                    </span>
-                  ) : null}
-                  {node.pending && !readOnly ? (
-                    <span className="gp-acts">
-                      <button type="button" className="gp-act gp-act-apply" disabled={redrawing} aria-label={t('designLab.focus.pending.applyOne', { name: node.label })} onClick={() => onApply?.(node.id)}>
-                        <span aria-hidden="true">&#10003;</span>
-                      </button>
-                      <button type="button" className="gp-act gp-act-discard" disabled={redrawing} aria-label={t('designLab.focus.pending.discardOne', { name: node.label })} onClick={() => onDiscard?.(node.id)}>
-                        <span aria-hidden="true">&#10005;</span>
-                      </button>
                     </span>
                   ) : null}
                 </div>
@@ -411,9 +399,6 @@ export function GamePreview(props: GamePreviewProps) {
           <button type="button" onClick={() => setFitted(true)}>
             {t('designLab.focus.view.fit')}
           </button>
-          <span className="gp-zoom" aria-live="off">
-            {percent}%
-          </span>
         </div>
         {compare ? (
           <>
@@ -427,7 +412,17 @@ export function GamePreview(props: GamePreviewProps) {
           </p>
         ) : null}
       </div>
-      <p className="gp-caption small muted">{t('designLab.focus.render.caption')}</p>
+      {selectedNode?.pending && !readOnly ? (
+        <div className="gp-selbar" role="group" aria-label={t('designLab.focus.pending.region')}>
+          <p>{t(`designLab.focus.pending.one_${selectedNode.pending.change}`, { name: selectedNode.label })}</p>
+          <Button size="sm" variant="primary" disabled={redrawing} onClick={() => onApply?.(selectedNode.id)}>
+            {t('designLab.focus.pending.apply')}
+          </Button>
+          <Button size="sm" disabled={redrawing} onClick={() => onDiscard?.(selectedNode.id)}>
+            {t('designLab.focus.pending.discard')}
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 }

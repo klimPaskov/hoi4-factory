@@ -1,15 +1,14 @@
-// The sections of the change card. The variants arrange the same sections differently: where
-// the verdicts sit, where the diff lives and where the actions are.
-import { useId, useMemo, useState } from 'react';
+// The parts of the change card. The variants arrange the same parts differently: where the render
+// sits, where the actions are and how the one Details toggle opens. The default view holds only
+// what a modder needs to decide: what changed, the render and the actions. Checks, counts and the
+// diff sit behind Details.
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Badge, Button, CheckboxField, SegmentedControl, type Tone } from '../../components/ui';
-import type { ChangeCard, CheckRow, SourceRef, Verdict } from '../../focus/types';
+import { Badge, Button, CheckboxField, SegmentedControl, type Tone } from '../../components/ui';
+import type { ChangeCard, CheckRow, LayoutVerdict } from '../../focus/types';
 import { GamePreview } from './GamePreview';
 import { makeCard, NODES, type CardScenario } from './fixtures';
-import { LayoutBadge } from './Panels';
 import './change.css';
-
-export const short = (hash: string | null): string => (hash ? hash.replace('sha256:', '').slice(0, 8) : '-');
 
 // ----- State of the card in the lab -------------------------------------------------------
 
@@ -46,212 +45,49 @@ export function useCard(scenario: CardScenario): CardControl {
   };
 }
 
-// ----- Header and verdicts ----------------------------------------------------------------
-
-const VERDICT_TONE: Record<Verdict, Tone> = { pass: 'success', incomplete: 'warning', fail: 'danger' };
 const CHECK_TONE: Record<CheckRow['result'], Tone> = { passed: 'success', failed: 'danger', unavailable: 'warning', skipped: 'neutral' };
+const labelOf = (id: string): string => NODES.find((n) => n.id === id)?.label ?? id;
+
+// ----- Header and summary -----------------------------------------------------------------
 
 export function CardHeader({ ctl }: { ctl: CardControl }) {
   const { t } = useTranslation();
-  const { card } = ctl;
-  const state = ctl.discarded ? 'discarded' : card.state;
   return (
     <header className="fc-head">
       <h1>{t('designLab.change.title')}</h1>
-      <p className="muted">
-        {t('designLab.change.by', { actor: card.actor.name, kind: t(`designLab.change.actor.${card.actor.kind}`) })}{' '}
-        <span className="mono">{card.operation}</span>{' '}
-        <span className="mono" title={card.proposalHash}>
-          {short(card.proposalHash)}
-        </span>
-      </p>
-      <Badge tone={state === 'committed' ? 'success' : state === 'stale' ? 'warning' : state === 'discarded' ? 'neutral' : 'accent'}>
-        {t(`designLab.change.state.${state}`)}
-      </Badge>
+      <p className="muted">{t('designLab.change.by', { who: t(`designLab.change.actor.${ctl.card.actor.kind}`) })}</p>
     </header>
   );
 }
 
-export function ClosureBadge({ closure }: { closure: ChangeCard['closure'] }) {
+/** What changed, in a few plain lines. The colors match the outlines on the render. */
+export function SummarySection({ card }: { card: ChangeCard }) {
   const { t } = useTranslation();
-  return <Badge tone={VERDICT_TONE[closure.verdict]}>{t(`designLab.change.closure.${closure.verdict}`)}</Badge>;
-}
-
-export function ClosureDetail({ closure }: { closure: ChangeCard['closure'] }) {
-  const { t } = useTranslation();
+  const { added, changed, removed } = card.summary;
   return (
-    <div className={`fc-closure is-${closure.verdict}`}>
-      <p>
-        <ClosureBadge closure={closure} />{' '}
-        {t('designLab.change.closure.counts', { resolved: closure.resolved, unresolved: closure.unresolved, unknown: closure.unknown })}
-      </p>
-      {closure.verdict === 'incomplete' ? (
-        <p className="fc-warn">
-          <strong>{t('designLab.change.closure.notAPass')}</strong> {t('designLab.change.closure.unknownMeaning', { count: closure.unknown })}
-        </p>
+    <ul className="fc-changes" aria-label={t('designLab.change.summary.label')}>
+      {added.length > 0 ? (
+        <li>
+          <span className="fc-swatch is-added" aria-hidden="true" />
+          {t('designLab.change.summary.added', { count: added.length, names: added.map(labelOf).join(', ') })}
+        </li>
       ) : null}
-    </div>
-  );
-}
-
-export function FindingDelta({ delta }: { delta: ChangeCard['findingDelta'] }) {
-  const { t } = useTranslation();
-  const keys = ['introduced', 'worsened', 'changed', 'improved', 'unchanged', 'resolved'] as const;
-  const bad = (key: (typeof keys)[number]) => (key === 'introduced' || key === 'worsened') && delta[key] > 0;
-  return (
-    <dl className="fc-delta">
-      {keys.map((key) => (
-        <div key={key} className={`fc-delta-item${bad(key) ? ' is-bad' : ''}${key === 'improved' || key === 'resolved' ? (delta[key] > 0 ? ' is-good' : '') : ''}`}>
-          <dt>{t(`designLab.change.delta.${key}`)}</dt>
-          <dd>{delta[key]}</dd>
-        </div>
+      {changed.map((change) => (
+        <li key={change.id}>
+          <span className="fc-swatch is-changed" aria-hidden="true" />
+          {t('designLab.change.summary.changed', {
+            name: labelOf(change.id),
+            what: change.fields.map((f) => t('designLab.change.summary.field', { name: f.name, before: f.before, after: f.after })).join(', '),
+          })}
+        </li>
       ))}
-    </dl>
-  );
-}
-
-export function VerdictStrip({ ctl }: { ctl: CardControl }) {
-  const { t } = useTranslation();
-  const { card } = ctl;
-  return (
-    <div className="fc-strip" role="group" aria-label={t('designLab.change.verdicts')}>
-      <ClosureBadge closure={card.closure} />
-      <LayoutBadge verdict={card.layoutVerdict} />
-      <Badge tone={card.findingDelta.introduced + card.findingDelta.worsened > 0 ? 'danger' : 'success'}>
-        {t('designLab.change.delta.short', { introduced: card.findingDelta.introduced, worsened: card.findingDelta.worsened })}
-      </Badge>
-    </div>
-  );
-}
-
-// ----- Summary ----------------------------------------------------------------------------
-
-export function jump(file: string, line: number, files: ChangeCard['files']): void {
-  const index = files.findIndex((f) => f.path === file);
-  document.getElementById(`diff-${index}-${line}`)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
-}
-
-export function SourceButton({ source, onJump, label }: { source: SourceRef; onJump: (source: SourceRef) => void; label?: string }) {
-  const { t } = useTranslation();
-  return (
-    <button type="button" className="fx-link mono" onClick={() => onJump(source)} aria-label={label ?? t('designLab.change.jump', { place: `${source.path}:${source.line}` })}>
-      {`${source.path.split('/').pop()}:${source.line}`}
-    </button>
-  );
-}
-
-export function SummarySection({ card, onJump }: { card: ChangeCard; onJump: (source: SourceRef) => void }) {
-  const { t } = useTranslation();
-  const link = (id: string) => card.sourceLinks.find((l) => l.focusId === id)?.source;
-  return (
-    <div className="fc-summary">
-      <section aria-labelledby="fc-added">
-        <h3 id="fc-added">{t('designLab.change.summary.added', { count: card.summary.added.length })}</h3>
-        <ul>
-          {card.summary.added.map((id) => {
-            const source = link(id);
-            return (
-              <li key={id}>
-                <Badge tone="success">{t('designLab.change.summary.plus')}</Badge> <span className="mono">{id}</span> {source ? <SourceButton source={source} onJump={onJump} /> : null}
-              </li>
-            );
-          })}
-        </ul>
-      </section>
-      <section aria-labelledby="fc-changed">
-        <h3 id="fc-changed">{t('designLab.change.summary.changed', { count: card.summary.changed.length })}</h3>
-        <ul>
-          {card.summary.changed.map((change) => {
-            const source = link(change.id);
-            return (
-              <li key={change.id}>
-                <span className="mono">{change.id}</span> {source ? <SourceButton source={source} onJump={onJump} /> : null}
-                <ul className="fc-fields">
-                  {change.fields.map((field) => (
-                    <li key={field.name}>
-                      <span className="muted">{field.name}</span> <del>{field.before}</del> <span aria-hidden="true">&rarr;</span>
-                      <span className="sr-only">{t('designLab.change.summary.to')}</span> <ins>{field.after}</ins>
-                    </li>
-                  ))}
-                </ul>
-              </li>
-            );
-          })}
-        </ul>
-      </section>
-      <section aria-labelledby="fc-removed">
-        <h3 id="fc-removed">{t('designLab.change.summary.removed', { count: card.summary.removed.length })}</h3>
-        {card.summary.removed.length === 0 ? (
-          <p className="muted">{t('designLab.change.summary.nothingRemoved')}</p>
-        ) : (
-          <ul>
-            {card.summary.removed.map((id) => (
-              <li key={id} className="mono">
-                {id}
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-    </div>
-  );
-}
-
-// ----- Diff -------------------------------------------------------------------------------
-
-interface DiffLine {
-  kind: 'add' | 'del' | 'hunk' | 'ctx' | 'meta';
-  text: string;
-  newLine?: number;
-}
-
-export function parseDiff(diff: string): DiffLine[] {
-  const out: DiffLine[] = [];
-  let next = 0;
-  for (const text of diff.split('\n')) {
-    if (text.startsWith('---') || text.startsWith('+++')) out.push({ kind: 'meta', text });
-    else if (text.startsWith('@@')) {
-      next = Number(/\+(\d+)/.exec(text)?.[1] ?? 0);
-      out.push({ kind: 'hunk', text });
-    } else if (text.startsWith('+')) out.push({ kind: 'add', text, newLine: next++ });
-    else if (text.startsWith('-')) out.push({ kind: 'del', text });
-    else out.push({ kind: 'ctx', text, newLine: next++ });
-  }
-  return out;
-}
-
-export function DiffSection({ card, open = true }: { card: ChangeCard; open?: boolean }) {
-  const { t } = useTranslation();
-  return (
-    <div className="fc-diff">
-      {card.files.map((file, index) => {
-        const lines = parseDiff(file.unifiedDiff);
-        const added = lines.filter((l) => l.kind === 'add').length;
-        const removed = lines.filter((l) => l.kind === 'del').length;
-        return (
-          <details key={file.path} open={open} className="fc-file">
-            <summary>
-              <span className="mono">{file.path}</span>
-              <span className="fc-file-meta">
-                <span className="fc-plus">+{added}</span> <span className="fc-minus">-{removed}</span>{' '}
-                <span className="muted mono" title={t('designLab.change.diff.hashes')}>
-                  {short(file.beforeSha256)} &rarr; {short(file.afterSha256)}
-                </span>
-              </span>
-            </summary>
-            <pre className="fc-pre">
-              <code>
-                {lines.map((line, i) => (
-                  <span key={i} id={line.newLine !== undefined ? `diff-${index}-${line.newLine}` : undefined} className={`fc-line fc-${line.kind}`}>
-                    {line.text || ' '}
-                  </span>
-                ))}
-              </code>
-            </pre>
-          </details>
-        );
-      })}
-    </div>
+      {removed.length > 0 ? (
+        <li>
+          <span className="fc-swatch is-removed" aria-hidden="true" />
+          {t('designLab.change.summary.removed', { count: removed.length, names: removed.map(labelOf).join(', ') })}
+        </li>
+      ) : null}
+    </ul>
   );
 }
 
@@ -264,50 +100,27 @@ const AFTER_NODES = NODES;
 // The before render does not draw the focuses the agent added.
 const BEFORE_NODES = NODES.filter((node) => node.pending?.change !== 'added');
 
-/** The before and after game renders of the proposal, the changed focuses outlined on both. */
-export function PreviewSection({ card, onJump, mode, className }: { card: ChangeCard; onJump: (source: SourceRef) => void; mode: PreviewMode; className?: string }) {
+/** The before and after game renders of the proposal. Only the selection ring and the small pins on changed focuses sit on them. */
+export function PreviewSection({ mode, className }: { mode: PreviewMode; className?: string }) {
   const { t } = useTranslation();
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [tick, setTick] = useState(0);
   const [which, setWhich] = useState('after');
   const [pos, setPos] = useState(0.5);
-  const changed = useMemo(() => NODES.filter((node) => node.pending), []);
-
-  const select = (id: string | null) => {
-    setSelectedId(id);
-    const source = card.sourceLinks.find((l) => l.focusId === id)?.source;
-    if (source) onJump(source);
-  };
-  const reveal = (id: string) => {
-    select(id);
-    setTick((n) => n + 1);
-  };
-  const common = { diagnostics: [], selectedId, onSelect: select, readOnly: true, revealTick: tick, revealId: selectedId };
+  const common = { diagnostics: [], selectedId, onSelect: setSelectedId, readOnly: true, revealId: selectedId };
 
   return (
     <div className={`fc-preview fc-preview-${mode}${className ? ` ${className}` : ''}`}>
-      <div className="fc-preview-bar">
-        {mode === 'toggle' ? (
-          <SegmentedControl
-            legend={t('designLab.change.preview.show')}
-            value={which}
-            onChange={setWhich}
-            options={[
-              { value: 'after', label: t('designLab.change.compare.after') },
-              { value: 'before', label: t('designLab.change.compare.before') },
-            ]}
-          />
-        ) : null}
-        <ul className="fc-chips" aria-label={t('designLab.change.preview.changedList')}>
-          {changed.map((node) => (
-            <li key={node.id}>
-              <button type="button" className={`fc-chip is-${node.pending?.change}${node.id === selectedId ? ' is-selected' : ''}`} aria-pressed={node.id === selectedId} onClick={() => reveal(node.id)}>
-                <span className="fc-chip-kind">{t(`designLab.focus.node.${node.pending?.change}`)}</span> {node.label}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
+      {mode === 'toggle' ? (
+        <SegmentedControl
+          legend={t('designLab.change.preview.show')}
+          value={which}
+          onChange={setWhich}
+          options={[
+            { value: 'after', label: t('designLab.change.compare.after') },
+            { value: 'before', label: t('designLab.change.compare.before') },
+          ]}
+        />
+      ) : null}
       {mode === 'side' ? (
         <div className="fc-sides">
           <figure>
@@ -329,22 +142,73 @@ export function PreviewSection({ card, onJump, mode, className }: { card: Change
         />
       ) : null}
       {mode === 'slider' ? <GamePreview {...common} image="proposed" nodes={AFTER_NODES} compare={{ pos, onChange: setPos }} label={t('designLab.change.preview.labelSlider')} /> : null}
-      <ul className="fc-legend small">
-        <li>
-          <span className="fc-swatch is-added" aria-hidden="true" /> {t('designLab.change.preview.legendAdded')}
-        </li>
-        <li>
-          <span className="fc-swatch is-changed" aria-hidden="true" /> {t('designLab.change.preview.legendChanged')}
-        </li>
-        <li className="muted">{t('designLab.change.preview.hint')}</li>
-      </ul>
     </div>
   );
 }
 
-// ----- Checks, limits, restore point ------------------------------------------------------
+// ----- Details: counts, checks, diff, limits ----------------------------------------------
 
-export function ChecksSection({ checks }: { checks: CheckRow[] }) {
+interface DiffLine {
+  kind: 'add' | 'del' | 'hunk' | 'ctx' | 'meta';
+  text: string;
+}
+
+export function parseDiff(diff: string): DiffLine[] {
+  return diff.split('\n').map((text) => {
+    if (text.startsWith('---') || text.startsWith('+++')) return { kind: 'meta', text };
+    if (text.startsWith('@@')) return { kind: 'hunk', text };
+    if (text.startsWith('+')) return { kind: 'add', text };
+    if (text.startsWith('-')) return { kind: 'del', text };
+    return { kind: 'ctx', text };
+  });
+}
+
+function DiffSection({ card }: { card: ChangeCard }) {
+  return (
+    <div className="fc-diff">
+      {card.files.map((file) => {
+        const lines = parseDiff(file.unifiedDiff);
+        const added = lines.filter((l) => l.kind === 'add').length;
+        const removed = lines.filter((l) => l.kind === 'del').length;
+        return (
+          <details key={file.path} className="fc-file">
+            <summary>
+              <span className="mono">{file.path}</span>
+              <span className="fc-file-meta">
+                <span className="fc-plus">+{added}</span> <span className="fc-minus">-{removed}</span>
+              </span>
+            </summary>
+            <pre className="fc-pre">
+              <code>
+                {lines.map((line, i) => (
+                  <span key={i} className={`fc-line fc-${line.kind}`}>
+                    {line.text || ' '}
+                  </span>
+                ))}
+              </code>
+            </pre>
+          </details>
+        );
+      })}
+    </div>
+  );
+}
+
+function Counts({ card }: { card: ChangeCard }) {
+  const { t } = useTranslation();
+  const { closure, findingDelta: delta } = card;
+  const keys = ['introduced', 'worsened', 'changed', 'improved', 'unchanged', 'resolved'] as const;
+  const layout: LayoutVerdict = card.layoutVerdict;
+  return (
+    <>
+      <p>{t('designLab.change.counts.closure', { resolved: closure.resolved, unresolved: closure.unresolved, unknown: closure.unknown })}</p>
+      <p>{keys.map((key) => t(`designLab.change.delta.${key}`, { count: delta[key] })).join(', ')}.</p>
+      <p>{t(`designLab.shared.layout.${layout}`)}</p>
+    </>
+  );
+}
+
+function ChecksSection({ checks }: { checks: CheckRow[] }) {
   const { t } = useTranslation();
   return (
     <ul className="fc-checks">
@@ -361,97 +225,86 @@ export function ChecksSection({ checks }: { checks: CheckRow[] }) {
   );
 }
 
-export function LimitsSection({ limits }: { limits: string[] }) {
+/** Everything a modder does not need to decide. One toggle, closed by default. */
+export function DetailsBody({ card }: { card: ChangeCard }) {
+  const { t } = useTranslation();
   return (
-    <ul className="fc-limits">
-      {limits.map((limit) => (
-        <li key={limit}>{limit}</li>
-      ))}
-    </ul>
+    <div className="fc-details-body">
+      <section aria-labelledby="fc-d-files">
+        <h3 id="fc-d-files">{t('designLab.change.sections.diff')}</h3>
+        <DiffSection card={card} />
+      </section>
+      <section aria-labelledby="fc-d-checks">
+        <h3 id="fc-d-checks">{t('designLab.change.sections.checks')}</h3>
+        <ChecksSection checks={card.checks} />
+        <Counts card={card} />
+      </section>
+      <section aria-labelledby="fc-d-limits">
+        <h3 id="fc-d-limits">{t('designLab.change.sections.limits')}</h3>
+        <ul className="fc-limits">
+          {card.limits.map((limit) => (
+            <li key={limit}>{limit}</li>
+          ))}
+        </ul>
+        <p>
+          {card.restorePoint ? (
+            <>
+              {t('designLab.change.restore.label')} <span className="mono">{card.restorePoint.ref}</span>
+            </>
+          ) : (
+            t('designLab.change.restore.none')
+          )}
+        </p>
+      </section>
+    </div>
   );
 }
 
-export function RestorePoint({ card }: { card: ChangeCard }) {
+export function ReviewDetails({ card }: { card: ChangeCard }) {
   const { t } = useTranslation();
-  if (!card.restorePoint) return <p className="muted">{t('designLab.change.restore.none')}</p>;
   return (
-    <p>
-      {t('designLab.change.restore.label')} <span className="mono">{card.restorePoint.ref}</span> <span className="mono muted">{card.restorePoint.oid.slice(0, 10)}</span>
-    </p>
+    <details className="fc-details">
+      <summary>{t('designLab.details')}</summary>
+      <DetailsBody card={card} />
+    </details>
   );
 }
 
 // ----- Actions ----------------------------------------------------------------------------
 
-const REASON: Record<'stale' | 'failed' | 'done', string> = {
+const REASON: Record<'stale' | 'failed', string> = {
   stale: 'designLab.change.actions.staleReason',
   failed: 'designLab.change.actions.failedReason',
-  done: 'designLab.change.actions.doneReason',
 };
 
-export function Acknowledge({ ctl }: { ctl: CardControl }) {
+/**
+ * One main action and one secondary action. A button that cannot be used is not drawn. A blocker is
+ * one short sentence. When a check was incomplete, a checkbox with one line sits next to Approve.
+ */
+export function Actions({ ctl }: { ctl: CardControl }) {
   const { t } = useTranslation();
-  if (!ctl.needsAck || ctl.blocked) return null;
-  return (
-    <CheckboxField
-      label={t('designLab.change.actions.acknowledge', { count: ctl.card.closure.unknown })}
-      checked={ctl.ack}
-      onChange={ctl.setAck}
-    />
-  );
-}
-
-export function Actions({ ctl, showAck = true }: { ctl: CardControl; showAck?: boolean }) {
-  const { t } = useTranslation();
-  const noteId = useId();
   const { card } = ctl;
-  const reason = ctl.blocked ? t(REASON[ctl.blocked]) : null;
-  const done = card.state === 'committed' || ctl.discarded;
+  if (card.state === 'committed') return <p className="fc-result">{t('designLab.change.actions.committed')}</p>;
+  if (ctl.discarded) return <p className="fc-result">{t('designLab.change.actions.discarded')}</p>;
+  const blocker = ctl.blocked === 'stale' || ctl.blocked === 'failed' ? ctl.blocked : null;
   return (
     <div className="fc-actions">
-      {showAck ? <Acknowledge ctl={ctl} /> : null}
-      <div className="button-row">
-        <Button variant="primary" disabled={!ctl.canApprove} onClick={ctl.approve} aria-describedby={reason ? noteId : undefined}>
-          {t('designLab.change.actions.approve')}
-        </Button>
-        <Button disabled={done} onClick={ctl.discard}>
-          {t('designLab.change.actions.discard')}
-        </Button>
-        <Button disabled aria-describedby={`${noteId}-push`}>
-          {t('designLab.change.actions.push')}
-        </Button>
+      {blocker ? <p className="fc-blocker">{t(REASON[blocker])}</p> : null}
+      <div className="fc-action-row">
+        {ctl.needsAck && !blocker ? (
+          <CheckboxField
+            label={card.closure.unknown > 0 ? t('designLab.change.actions.acknowledge', { count: card.closure.unknown }) : t('designLab.change.actions.acknowledgeChecks')}
+            checked={ctl.ack}
+            onChange={ctl.setAck}
+          />
+        ) : null}
+        {blocker ? null : (
+          <Button variant="primary" disabled={!ctl.canApprove} onClick={ctl.approve}>
+            {t('designLab.change.actions.approve')}
+          </Button>
+        )}
+        <Button onClick={ctl.discard}>{t('designLab.change.actions.discard')}</Button>
       </div>
-      {reason && !done ? (
-        <p id={noteId} className="small muted">
-          {reason}
-        </p>
-      ) : null}
-      {card.state === 'committed' ? (
-        <Alert kind="success">
-          <p>{t('designLab.change.actions.committed')}</p>
-        </Alert>
-      ) : null}
-      {ctl.discarded ? (
-        <Alert kind="info">
-          <p>{t('designLab.change.actions.discarded')}</p>
-        </Alert>
-      ) : null}
-      <p id={`${noteId}-push`} className="small muted">
-        {card.publication.canPush ? t('designLab.change.actions.pushReady') : (card.publication.reason ?? t('designLab.change.actions.pushNoGrant'))}
-      </p>
     </div>
   );
 }
-
-export function StaleBanner({ ctl }: { ctl: CardControl }) {
-  const { t } = useTranslation();
-  if (ctl.card.state !== 'stale') return null;
-  return (
-    <Alert kind="warning">
-      <p>
-        <strong>{t('designLab.change.stale.title')}</strong> {t('designLab.change.stale.body')}
-      </p>
-    </Alert>
-  );
-}
-

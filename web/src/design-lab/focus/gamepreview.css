@@ -83,8 +83,7 @@
   box-shadow: 0 0 0 6px #2d58cc;
 }
 .gp-hit.is-selected {
-  box-shadow: 0 0 0 3px #ffffff, 0 0 0 7px #2d58cc, 0 0 18px 8px rgb(45 88 204 / 0.55);
-  background: rgb(132 162 255 / 0.12);
+  box-shadow: 0 0 0 3px #ffffff, 0 0 0 6px #2d58cc;
 }
 .gp-hit.is-dim {
   background: rgb(8 9 12 / 0.72);
@@ -108,9 +107,6 @@
 .gp-hit.is-dragging {
   opacity: 0.35;
 }
-.gp-hit.is-locked:not(.is-selected):not(.is-pending) {
-  box-shadow: inset 0 0 0 2px rgb(255 255 255 / 0.28);
-}
 .gp-ghost {
   position: absolute;
   border: 3px dashed #84a2ff;
@@ -132,39 +128,32 @@
   white-space: nowrap;
 }
 
-/* Badges and markers keep close to their screen size at every zoom. The apply and discard buttons show for the selected, hovered or focused focus. */
-.gp-tags {
+/* Markers keep close to their screen size at every zoom. A new or changed focus gets a small pin, a
+   problem gets a small dot. Nothing on the picture is a button, so nothing covers a neighbour. */
+.gp-pin {
   position: absolute;
   left: 0;
   top: 0;
-  display: flex;
-  gap: 4px;
-  transform: translateY(-100%) scale(var(--gp-inv));
-  transform-origin: left bottom;
-  padding-bottom: 3px;
-  pointer-events: none;
-  white-space: nowrap;
-}
-.gp-tag {
-  padding: 1px 7px;
-  border-radius: 5px;
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1.4;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  font-weight: 800;
+  font-size: 13px;
+  line-height: 1;
   color: #101114;
-  background: #e8eaee;
+  transform: translate(-35%, -35%) scale(var(--gp-inv));
+  transform-origin: center;
+  pointer-events: none;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.6);
 }
-.gp-tag-added {
+.gp-pin-added {
   background: #3ddc84;
 }
-.gp-tag-changed {
+.gp-pin-changed {
   background: #ffb020;
-}
-.gp-tag-locked {
-  background: #c9ced8;
-}
-.gp-tag-stale {
-  background: #ffffff;
 }
 .gp-mark {
   position: absolute;
@@ -172,12 +161,12 @@
   top: 0;
   display: grid;
   place-items: center;
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   border: 2px solid #ffffff;
   font-weight: 800;
-  font-size: 14px;
+  font-size: 12px;
   line-height: 1;
   transform: translate(35%, -35%) scale(var(--gp-inv));
   transform-origin: center;
@@ -196,58 +185,16 @@
   background: #6cb4ff;
   color: #101114;
 }
-.gp-acts {
-  position: absolute;
-  left: 50%;
-  top: 100%;
+.gp-selbar {
   display: flex;
-  gap: 8px;
-  padding-top: 4px;
-  transform: translateX(-50%) scale(var(--gp-inv));
-  transform-origin: top center;
-  pointer-events: none;
-  opacity: 0;
-  z-index: 3;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding-top: var(--space-1);
 }
-.gp-slot:hover .gp-acts,
-.gp-slot:focus-within .gp-acts,
-.gp-hit.is-selected ~ .gp-acts {
-  opacity: 1;
-}
-.gp-act {
-  width: 32px;
-  height: 32px;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border-radius: 50%;
-  border: 2px solid #ffffff;
-  font-size: 16px;
-  font-weight: 800;
-  cursor: pointer;
-  pointer-events: none;
-  color: #101114;
-  box-shadow: 0 1px 4px rgb(0 0 0 / 0.6);
-}
-.gp-act-apply {
-  background: #3ddc84;
-}
-.gp-act-discard {
-  background: #ff8a8a;
-}
-.gp-slot:hover .gp-act,
-.gp-slot:focus-within .gp-act,
-.gp-hit.is-selected ~ .gp-acts .gp-act {
-  pointer-events: auto;
-}
-.gp-act:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-.gp-act:focus-visible {
-  outline: 3px solid #ffffff;
-  outline-offset: 2px;
-  box-shadow: 0 0 0 6px #2d58cc;
+.gp-selbar p {
+  margin: 0;
+  margin-inline-end: auto;
 }
 
 /* Before and after divider */
@@ -348,14 +295,6 @@
   outline: 2px solid var(--focus);
   outline-offset: -2px;
 }
-.gp-zoom {
-  display: grid;
-  place-items: center;
-  padding: 0 var(--space-3);
-  font-family: var(--mono);
-  font-size: var(--text-xs);
-  color: var(--muted);
-}
 .gp-note {
   position: absolute;
   left: 50%;
@@ -372,15 +311,7 @@
   font-size: var(--text-sm);
   max-width: calc(100% - 2 * var(--space-3));
 }
-.gp-caption {
-  margin: 0;
-}
-
 @media (max-width: 48rem), (pointer: coarse) {
-  .gp-act {
-    width: 40px;
-    height: 40px;
-  }
   .gp-side-before {
     left: var(--space-2);
     top: 3.5rem;
