@@ -44,6 +44,7 @@ hoi4-agent-tools (the MCP server) and the shared Rust HOI4 engine inside it: eng
 | S04-2 (tool parts) | 2026-11-06 | The hoi4.skill tool (M-1), tool-doc drift check (M-5) and private plugin (M-14) finish during S04 and do not gate its start. | [expansion record](../08-expansion-research/00-decision-record.md) |
 | M-15 | 2026-11-01 | No licensing action is needed for HOI4-MCP because nothing of it is used. | [expansion record](../08-expansion-research/00-decision-record.md) |
 | M-16 | 2026-11-01 | One release owner owns versions, CHANGELOG release sections and tags. Others write only under Unreleased. Rust builds share the main checkout's engine/target folder. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| D-68 | 2026-11-14 | Releases bundle the engine for four platforms: Windows x64, Linux x64, Linux ARM64 and Apple silicon. Intel Macs get no bundled engine for now, and a clear message with build steps. | [below](#decisions) |
 | FR-5 | 2026-11-01 | The read and render tools double as a visual editor through one operation layer. See factory. | [expansion record](../08-expansion-research/00-decision-record.md) |
 | D-36 | 2026-11-08 | Until about 2026-11-22 tools for other modders come first. Agent Tools gains more coverage: the R-5 modder features and the R-4 profiles. | [operations](operations.md#decisions) |
 | D-40 | 2026-11-08 | Feature releases at most about weekly, fixes any time. A promotion first releases the latest version and cleans the public text. | [operations](operations.md#decisions) |
@@ -51,7 +52,11 @@ hoi4-agent-tools (the MCP server) and the shared Rust HOI4 engine inside it: eng
 
 ## Decisions
 
-No new entries yet.
+New entries go here in full, oldest first.
+
+| ID | Date | Question | Decision |
+|---|---|---|---|
+| D-68 | 2026-11-14 | Should releases also build the engine for Intel Macs, now that the tools need it? | Not now. Releases keep bundling the engine for Windows x64, Linux x64, Linux ARM64 and Apple silicon. On an Intel Mac a tool call fails with a clear message that names the supported platforms and how to build the engine from source. The question can be reopened if modders ask for it. Maintainer decision |
 
 ## Replaced or expired
 
