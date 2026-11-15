@@ -15,10 +15,15 @@ HOI4 Mod Setup: its builds, install steps and image step. New decisions for this
 | D-36 | 2026-11-08 | Until about 2026-11-22 tools for other modders come first. A modder installs through Setup and has a working agent with every tool within minutes, proven by fresh-install tests on Windows and Linux. | [operations](operations.md#decisions) |
 | D-40 | 2026-11-08 | Feature releases at most about weekly, fixes any time. A promotion first releases the latest version and cleans the public text. | [operations](operations.md#decisions) |
 | D-43 | 2026-11-08 | The next promotion is the whole modder workflow: Setup, the kit and every tool it installs. | [operations](operations.md#decisions) |
+| D-73 | 2026-11-15 | The Setup session tags and publishes 0.9.5 by itself once the kit pin is in and the fresh-install test passes on Windows and Linux. Kit #127 merges after that. | [below](#decisions) |
 
 ## Decisions
 
-No new entries yet.
+New entries go here in full, oldest first.
+
+| ID | Date | Question | Decision |
+|---|---|---|---|
+| D-73 | 2026-11-15 | Who tags and publishes Setup 0.9.5? | The Setup session, without asking the maintainer again, once the kit has pinned the week's tool releases and the fresh-install test passes on Windows and on Linux. Kit pull request 127 merges after 0.9.5 is published. Maintainer decision |
 
 ## Replaced or expired
 
