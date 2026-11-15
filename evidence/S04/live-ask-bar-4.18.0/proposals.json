@@ -1,0 +1,347 @@
+{
+ "proposals": [
+  {
+   "actorAccountId": "0b24d900-219f-4439-bf76-e036af73ade0",
+   "actorKind": "person",
+   "after": {
+    "common/national_focus/exp_basic.focus-plan.json": "absent",
+    "common/national_focus/exp_basic.txt": "c930bd125d71212e0ef6c18807b16f19a97039e99cdc12c916d56bc3009a6bef"
+   },
+   "afterProjectionId": "7fa02d3e-1054-4576-8e12-c43916dc07ac",
+   "attemptId": null,
+   "baseProjectionHash": "9fbbf7c9e49365eb70ec7a4df7786a6bec9ed5ece9daf4b3788046dff81f1351",
+   "before": {
+    "common/national_focus/exp_basic.focus-plan.json": "absent",
+    "common/national_focus/exp_basic.txt": "68bd406d428bcc8add0a35b616904611bded565fe9e987d7bb0287fdfd15fcf9"
+   },
+   "changedIds": [
+    "exp_left"
+   ],
+   "changedPaths": [
+    "common/national_focus/exp_basic.txt"
+   ],
+   "createdAt": "2026-11-15T02:52:31.102854Z",
+   "diffs": [
+    {
+     "diff": "--- a/common/national_focus/exp_basic.txt\n+++ b/common/national_focus/exp_basic.txt\n@@ -28,7 +28,7 @@\n \t\tmutually_exclusive = { focus = exp_right }\n \t\tx = 2\n \t\ty = 1\n-\t\tcost = 5\n+\t\tcost = 9\n \t\tai_will_do = { factor = 2 }\n \t\tcompletion_reward = { add_stability = 0.05 }\n \t}\n",
+     "path": "common/national_focus/exp_basic.txt"
+    }
+   ],
+   "engineReport": {
+    "baseline_commit": "9513fbff96e96245263d9b193c70d6976d8a9aa7",
+    "baselined_findings": 0,
+    "blocking": [],
+    "elapsed_ms": 6785,
+    "engine_rev": "fb78624c7c76c993268c33fe1c50a62632547b98",
+    "engine_version": "0.1.0",
+    "game_version": "1.19.4.2",
+    "new_findings": 0,
+    "unknown": {
+     "commands_resolved": 5,
+     "commands_unknown": 0,
+     "commands_unresolved": 0,
+     "game_layer": true,
+     "references_resolved": 6,
+     "references_unknown": 0,
+     "references_unresolved": 0,
+     "unmodelled_script_files": 0,
+     "vocabulary_available": true
+    },
+    "verdict": "pass"
+   },
+   "findingDelta": {
+    "changed": 0,
+    "improved": 0,
+    "introduced": 0,
+    "resolved": 0,
+    "unchanged": 0,
+    "worsened": 0
+   },
+   "id": "42f50d3c-f4f5-4a5a-9951-1f344a369153",
+   "operations": [
+    {
+     "cost": 9.0,
+     "focus_id": "exp_left",
+     "op": "set_cost"
+    }
+   ],
+   "proposalHash": "2256d197f4e79998e31985f6d32001bc1ca2754febbf43dc0e5d60e3bdcd7179",
+   "requestSha256": "027eb5eb3b5139050f2c56b4127d9fe669b48d620c438d4f32b0b25f7081e01b",
+   "state": "committed",
+   "summary": {
+    "added": [],
+    "changed": [
+     {
+      "fields": [
+       {
+        "after": "9",
+        "before": "5",
+        "name": "cost"
+       }
+      ],
+      "id": "exp_left"
+     }
+    ],
+    "removed": []
+   },
+   "taskId": "1860729d-7394-42fa-8daa-a59bff2c76e1",
+   "toolOperation": "hoi4.focus_rewrite",
+   "toolVersion": "4.18.0",
+   "treeId": "exp_basic_tree",
+   "updatedAt": "2026-11-15T02:52:58.263599Z"
+  },
+  {
+   "actorAccountId": "0b24d900-219f-4439-bf76-e036af73ade0",
+   "actorKind": "person",
+   "after": {
+    "common/national_focus/exp_basic.focus-plan.json": "absent",
+    "common/national_focus/exp_basic.txt": "c930bd125d71212e0ef6c18807b16f19a97039e99cdc12c916d56bc3009a6bef",
+    "localisation/english/exp_basic_l_english.yml": "e42dedd3fd55f52f86b19b3f2c1ea9fba34cb4b0ae93ffe1bec90219c208d8a8"
+   },
+   "afterProjectionId": "588159fb-578c-4e07-b78e-9e4e0becd89f",
+   "attemptId": null,
+   "baseProjectionHash": "d9827214452f95b2e11d48625edd642e4e879982dd8152e94e2c09966f900144",
+   "before": {
+    "common/national_focus/exp_basic.focus-plan.json": "absent",
+    "common/national_focus/exp_basic.txt": "c930bd125d71212e0ef6c18807b16f19a97039e99cdc12c916d56bc3009a6bef",
+    "localisation/english/exp_basic_l_english.yml": "587f85bbac97ecf7a350d3f8e303597e9700c158bde29e810e2c97ffc06e3973"
+   },
+   "changedIds": [
+    "exp_left"
+   ],
+   "changedPaths": [
+    "localisation/english/exp_basic_l_english.yml"
+   ],
+   "createdAt": "2026-11-15T02:53:53.440268Z",
+   "diffs": [
+    {
+     "diff": "--- a/localisation/english/exp_basic_l_english.yml\n+++ b/localisation/english/exp_basic_l_english.yml\n@@ -1,7 +1,7 @@\n ﻿l_english:\n  exp_root:0 \"Root\"\n  exp_root_desc:0 \"The first focus.\"\n- exp_left:0 \"Left\"\n+ exp_left:0 \"Left wing\"\n  exp_left_desc:0 \"Go left.\"\n  exp_right:0 \"Right\"\n  exp_right_desc:0 \"Go right.\"\n",
+     "path": "localisation/english/exp_basic_l_english.yml"
+    }
+   ],
+   "engineReport": {
+    "baseline_commit": "7e7426de1ec61da4f7a6c1dd359ecce4d6ca0bb4",
+    "baselined_findings": 0,
+    "blocking": [],
+    "elapsed_ms": 5961,
+    "engine_rev": "fb78624c7c76c993268c33fe1c50a62632547b98",
+    "engine_version": "0.1.0",
+    "game_version": "1.19.4.2",
+    "new_findings": 0,
+    "unknown": {
+     "commands_resolved": 5,
+     "commands_unknown": 0,
+     "commands_unresolved": 0,
+     "game_layer": true,
+     "references_resolved": 6,
+     "references_unknown": 0,
+     "references_unresolved": 0,
+     "unmodelled_script_files": 0,
+     "vocabulary_available": true
+    },
+    "verdict": "pass"
+   },
+   "findingDelta": {
+    "changed": 0,
+    "improved": 0,
+    "introduced": 0,
+    "resolved": 0,
+    "unchanged": 0,
+    "worsened": 0
+   },
+   "id": "a6b6b501-bb4d-4eaa-9248-7f02eacb44a7",
+   "operations": [
+    {
+     "description": null,
+     "focus_id": "exp_left",
+     "op": "set_text",
+     "title": "Left wing"
+    }
+   ],
+   "proposalHash": "0f2811e9990fa561f6d6ccad7b9969ac465a47ec5de034a8e44d67ddb4d56d0f",
+   "requestSha256": "efa891f9b287ea6a51910de0b19f3dd921f9e432330d24074aa29bce528e90ae",
+   "state": "committed",
+   "summary": {
+    "added": [],
+    "changed": [
+     {
+      "fields": [
+       {
+        "after": "\"Left wing\"",
+        "before": "\"Left\"",
+        "name": "title"
+       }
+      ],
+      "id": "exp_left"
+     }
+    ],
+    "removed": []
+   },
+   "taskId": "1860729d-7394-42fa-8daa-a59bff2c76e1",
+   "toolOperation": "hoi4.focus_rewrite",
+   "toolVersion": "4.18.0",
+   "treeId": "exp_basic_tree",
+   "updatedAt": "2026-11-15T02:54:45.034266Z"
+  },
+  {
+   "actorAccountId": "0b24d900-219f-4439-bf76-e036af73ade0",
+   "actorKind": "person",
+   "after": {
+    "common/national_focus/exp_basic.focus-plan.json": "absent",
+    "common/national_focus/exp_basic.txt": "385a9696ec2bc5820594109385d2e4781e437275116eb069ca93d2bbe9ab3434"
+   },
+   "afterProjectionId": "f04fb2f7-c859-49d0-a6b2-5c1a7cd24673",
+   "attemptId": null,
+   "baseProjectionHash": "97d521bfe617239f8d23ec06ff25715b488e43c82ac7c462d9710db16f82666b",
+   "before": {
+    "common/national_focus/exp_basic.focus-plan.json": "absent",
+    "common/national_focus/exp_basic.txt": "c930bd125d71212e0ef6c18807b16f19a97039e99cdc12c916d56bc3009a6bef"
+   },
+   "changedIds": [
+    "exp_right"
+   ],
+   "changedPaths": [
+    "common/national_focus/exp_basic.txt"
+   ],
+   "createdAt": "2026-11-15T02:54:14.671575Z",
+   "diffs": [
+    {
+     "diff": "--- a/common/national_focus/exp_basic.txt\n+++ b/common/national_focus/exp_basic.txt\n@@ -38,7 +38,7 @@\n \t\ticon = GFX_exp_icon_right\n \t\tprerequisite = { focus = exp_root }\n \t\tmutually_exclusive = { focus = exp_left }\n-\t\tx = 6\n+\t\tx = 7\n \t\ty = 1\n \t\tcost = 5\n \t\tai_will_do = { factor = 1 }\n",
+     "path": "common/national_focus/exp_basic.txt"
+    }
+   ],
+   "engineReport": {
+    "baseline_commit": "7e7426de1ec61da4f7a6c1dd359ecce4d6ca0bb4",
+    "baselined_findings": 0,
+    "blocking": [],
+    "elapsed_ms": 5961,
+    "engine_rev": "fb78624c7c76c993268c33fe1c50a62632547b98",
+    "engine_version": "0.1.0",
+    "game_version": "1.19.4.2",
+    "new_findings": 0,
+    "unknown": {
+     "commands_resolved": 5,
+     "commands_unknown": 0,
+     "commands_unresolved": 0,
+     "game_layer": true,
+     "references_resolved": 6,
+     "references_unknown": 0,
+     "references_unresolved": 0,
+     "unmodelled_script_files": 0,
+     "vocabulary_available": true
+    },
+    "verdict": "pass"
+   },
+   "findingDelta": {
+    "changed": 0,
+    "improved": 0,
+    "introduced": 0,
+    "resolved": 0,
+    "unchanged": 0,
+    "worsened": 0
+   },
+   "id": "817a1bde-a0fd-45ae-b655-53e40d8bda46",
+   "operations": [
+    {
+     "focus_id": "exp_right",
+     "op": "move",
+     "x": 7,
+     "y": 1
+    }
+   ],
+   "proposalHash": "284c2b6383930b5ab5c381b8b9ee9ad6f00e49bb1b004f953402a2dbe1f2cb03",
+   "requestSha256": "7e7ece30daaa0b5ddf19211c3b792707d0da0e99ff05646e39059a2a044d2271",
+   "state": "committed",
+   "summary": {
+    "added": [],
+    "changed": [
+     {
+      "fields": [
+       {
+        "after": "7",
+        "before": "6",
+        "name": "x"
+       }
+      ],
+      "id": "exp_right"
+     }
+    ],
+    "removed": []
+   },
+   "taskId": "1860729d-7394-42fa-8daa-a59bff2c76e1",
+   "toolOperation": "hoi4.focus_rewrite",
+   "toolVersion": "4.18.0",
+   "treeId": "exp_basic_tree",
+   "updatedAt": "2026-11-15T02:54:45.034824Z"
+  },
+  {
+   "actorAccountId": null,
+   "actorKind": "native_agent",
+   "after": {
+    "common/national_focus/exp_basic.focus-plan.json": "absent",
+    "common/national_focus/exp_basic.txt": "f1e1220e44d4af427a3ad98b16fff9a204ccedb53a72be620d3a1de892318424",
+    "localisation/english/exp_basic_tree_l_english.yml": "79cf5e8ffcb4d627f300b81db4cf5aba88060cf6020208969019b281a59e4511"
+   },
+   "afterProjectionId": "261ff00d-aef0-4e49-a873-24d262aac7f7",
+   "attemptId": "4ed27899-a969-4053-ac02-b82a1257db21",
+   "baseProjectionHash": "053f2f511d734e13c24a6613be9feaa91f5aaab0111676df1e77b5564a1e2497",
+   "before": {
+    "common/national_focus/exp_basic.focus-plan.json": "absent",
+    "common/national_focus/exp_basic.txt": "385a9696ec2bc5820594109385d2e4781e437275116eb069ca93d2bbe9ab3434",
+    "localisation/english/exp_basic_tree_l_english.yml": "absent"
+   },
+   "changedIds": [
+    "exp_reform"
+   ],
+   "changedPaths": [
+    "common/national_focus/exp_basic.txt",
+    "localisation/english/exp_basic_tree_l_english.yml"
+   ],
+   "createdAt": "2026-11-15T02:55:34.700404Z",
+   "diffs": [
+    {
+     "diff": "--- a/common/national_focus/exp_basic.txt\n+++ b/common/national_focus/exp_basic.txt\n@@ -55,4 +55,15 @@\n \t\tai_will_do = { factor = 1 }\n \t\tcompletion_reward = { add_political_power = 50 }\n \t}\n+\n+\tfocus = {\n+\t\tid = exp_reform\n+\t\ticon = GFX_exp_icon_created\n+\t\tprerequisite = { focus = exp_join }\n+\t\tx = 4\n+\t\ty = 3\n+\t\tcost = 5\n+\t\tai_will_do = { factor = 1 }\n+\t\tcompletion_reward = { add_political_power = 50 }\n+\t}\n }\n",
+     "path": "common/national_focus/exp_basic.txt"
+    },
+    {
+     "diff": "--- /dev/null\n+++ b/localisation/english/exp_basic_tree_l_english.yml\n@@ -0,0 +1,3 @@\n+﻿l_english:\n+ exp_reform:0 \"Reform\"\n+ exp_reform_desc:0 \"Reform the party from within.\"\n",
+     "path": "localisation/english/exp_basic_tree_l_english.yml"
+    }
+   ],
+   "engineReport": null,
+   "findingDelta": null,
+   "id": "efe44b2c-534a-4ee5-856b-a385a83aac8d",
+   "operations": [
+    {
+     "cost": 5.0,
+     "description": "Reform the party from within.",
+     "focus_id": "exp_reform",
+     "icon": "GFX_exp_icon_created",
+     "op": "create",
+     "prerequisites": [
+      "exp_join"
+     ],
+     "reward": "add_political_power = 50",
+     "title": "Reform",
+     "x": 4,
+     "y": 3
+    }
+   ],
+   "proposalHash": "d3fbcc72568bf110a428420b7767a9062eeb8aa1876f6295c4f417f609fd200a",
+   "requestSha256": "7bc674aef9ad3259c114c3ab834846a55684d36a56f7eb8aee4fbb6a0d7c1a90",
+   "state": "applied",
+   "summary": {
+    "added": [
+     "exp_reform"
+    ],
+    "changed": [],
+    "removed": []
+   },
+   "taskId": "1860729d-7394-42fa-8daa-a59bff2c76e1",
+   "toolOperation": "hoi4.focus_rewrite",
+   "toolVersion": "4.18.0",
+   "treeId": "exp_basic_tree",
+   "updatedAt": "2026-11-15T02:55:34.700404Z"
+  }
+ ]
+}

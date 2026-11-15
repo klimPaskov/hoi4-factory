@@ -100,6 +100,22 @@ CLAUDE.md rule: wait until the replay server has counted the request before kill
 
 CLAUDE.md rule: format only your own new files with `rustfmt --edition 2024 <file>`. `cargo fmt -p factory-server` rewrote twelve untouched files.
 
+### A list of trees that laid out the whole game (2026-11-14)
+
+CLAUDE.md rule: scope each Agent Tools call to a file or a tree. The first list route for a mod's focus trees called `hoi4.focus_inspect` once with no scope. Tests passed in seconds, because the test workspace has no game folder. On a real stack with the game loaded as reference, the same call laid out every focus tree of the game and the page hung for minutes. The route now inspects each focus file of the mod on its own, and the first call takes about 11 seconds.
+
+### A summary page that showed the agent's whole report (2026-11-14)
+
+CLAUDE.md rule: text a model wrote is bounded before a page shows it. In the first live run of the ask bar the agent's summary was a long report with ids, file paths and tool names, and the editor showed all of it above Approve. The agent is now asked to open with one plain sentence and the pages show the first sentence only. On 2026-11-15 that sentence ended inside a quotation and the cut missed it, so the cut also accepts a closing quote or bracket.
+
+### A re-pin that listed only the core tools, and a count nobody ran (2026-11-15)
+
+CLAUDE.md rule: the host starts Agent Tools with `HOI4_AGENT_TOOLS_PROFILES=all`, and the whole `factory-hoi4-tools` crate runs against the real server after a profile or pin change. From 4.13.0 the stdio server lists only its core profile by default, so the first tool list for the 4.18.0 re-pin was far shorter than the pinned one. In the same re-pin the real-server test still expected nine tools for the model. The profile had offered ten since the game-view render was added, and only the server suites had been run against the real tools since then.
+
+### A test database killed halfway through a run (2026-11-15)
+
+CLAUDE.md rule: a test database on `--tmpfs` gets at least 3 GB for a full workspace run. The first workspace run on the 4.18.0 pin showed 78 failures. The PostgreSQL container had a 1 GB memory cap, its data lived in memory, and it was killed partway through. Every later database test failed with "failed to lookup address information". With 3 GB the same run had one failure, a real one.
+
 ## Verification and handoff
 
 ### Seven ZIN units in a trailer (2026-11-06)

@@ -1,0 +1,2 @@
+hf-s04ui-server:latest sha256:3a460977ad8dc5041fc80c557203622546c3c7e47bde64f394a93701f0ede2c6
+built from branch s04-finish at db01c97 on 2026-11-15, HOI4 Agent Tools 4.18.0
