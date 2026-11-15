@@ -285,7 +285,7 @@ function FocusCard({ session, node, frozen, onClose }: { session: FocusSession; 
       {!node.editable ? <p className="fx-card-note">{t('focus.card.cantDrag', { name: node.label })}</p> : null}
       <div className="field">
         <label htmlFor={`${ids}-title`}>{t('focus.card.title')}</label>
-        <input id={`${ids}-title`} type="text" dir="auto" maxLength={400} value={title} disabled={frozen || !canText} onChange={(event) => setTitle(event.target.value)} onBlur={saveText} />
+        <input id={`${ids}-title`} type="text" dir="auto" maxLength={400} value={title} disabled={frozen || !canText} onChange={(event) => setTitle(event.target.value)} onBlur={saveText} onKeyDown={(event) => { if (event.key === 'Enter') saveText(); }} />
       </div>
       {canText ? (
         <div className="field">

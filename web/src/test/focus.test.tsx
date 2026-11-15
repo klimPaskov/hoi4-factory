@@ -170,6 +170,21 @@ describe('the focus editor', () => {
     expect((api.requests.find((r) => r.path === `${TREE}/operations`)?.body as { operations: object[] }).operations[0]).not.toHaveProperty('description');
   });
 
+  it('saves a title on Enter, once', async () => {
+    const api = mockApi(
+      routes(() => [], {
+        [`POST ${TREE}/operations`]: { status: 201, json: { proposal: OWN_PROPOSAL, projection: PROJECTION } },
+      }),
+    );
+    renderApp(EDITOR);
+    await userEvent.click(await screen.findByRole('button', { name: 'Military Reform' }));
+    const title = within(screen.getByRole('complementary', { name: 'Military Reform' })).getByLabelText('Title');
+    await userEvent.clear(title);
+    await userEvent.type(title, 'Army Reform{Enter}');
+    await waitFor(() => expect(api.requests.some((r) => r.path === `${TREE}/operations`)).toBe(true));
+    expect(api.requests.filter((r) => r.path === `${TREE}/operations`)).toHaveLength(1);
+  });
+
   it('asks the agent for a change as a new attempt with the request', async () => {
     const api = mockApi(
       routes(() => [], {
@@ -387,6 +402,7 @@ describe('the one sentence about a change', () => {
     const report = 'Added the new focus `Reform` (exp_reform) directly below `Join`. What was added (common/national_focus/exp_basic.txt): - focus id exp_reform';
     expect(firstSentence(report)).toBe('Added the new focus Reform (exp_reform) directly below Join.');
     expect(firstSentence('One sentence only')).toBe('One sentence only');
+    expect(firstSentence('Reform now says "Reform the party from within." Details: - added')).toBe('Reform now says "Reform the party from within."');
     const long = firstSentence(`${'word '.repeat(80)}end.`);
     expect(long.length).toBeLessThanOrEqual(201);
     expect(long.endsWith('…')).toBe(true);

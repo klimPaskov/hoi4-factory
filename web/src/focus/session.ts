@@ -70,8 +70,9 @@ export function withPending(nodes: FocusNode[], open: Proposal[]): FocusNode[] {
  */
 export function firstSentence(text: string, limit = 200): string {
   const plain = text.replace(/[`*#]/g, '').replace(/\s+/g, ' ').trim();
-  const end = plain.search(/[.!?](\s|$)/);
-  const sentence = end >= 0 ? plain.slice(0, end + 1) : plain;
+  // A sentence can end inside a quotation, so closing quotes and brackets stay with it.
+  const end = /[.!?]["”’)\]]*(?=\s|$)/.exec(plain);
+  const sentence = end ? plain.slice(0, end.index + end[0].length) : plain;
   if (sentence.length <= limit) return sentence;
   const cut = sentence.slice(0, limit);
   return `${cut.slice(0, Math.max(cut.lastIndexOf(' '), limit - 40)).trimEnd()}…`;
