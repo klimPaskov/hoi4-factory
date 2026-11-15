@@ -661,7 +661,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d045de693cb712d0b22c6a64be5b953f67b3ce00ab5ad3dd5d8b441886ab8e1a"
 dependencies = [
  "quote",
- "syn 3.0.9",
+ "syn 2.0.119",
 ]
 
 [[package]]
@@ -1599,7 +1599,7 @@ dependencies = [
 [[package]]
 name = "hoi4-engine"
 version = "0.1.0"
-source = "git+https://github.com/klimPaskov/hoi4-agent-tools?rev=73a5d7199ab7d1e4e3aeca74598d946512e23f3d#73a5d7199ab7d1e4e3aeca74598d946512e23f3d"
+source = "git+https://github.com/klimPaskov/hoi4-agent-tools?rev=fb78624c7c76c993268c33fe1c50a62632547b98#fb78624c7c76c993268c33fe1c50a62632547b98"
 dependencies = [
  "hoi4-syntax",
  "memchr",
@@ -1665,7 +1665,7 @@ dependencies = [
 [[package]]
 name = "hoi4-syntax"
 version = "0.1.0"
-source = "git+https://github.com/klimPaskov/hoi4-agent-tools?rev=73a5d7199ab7d1e4e3aeca74598d946512e23f3d#73a5d7199ab7d1e4e3aeca74598d946512e23f3d"
+source = "git+https://github.com/klimPaskov/hoi4-agent-tools?rev=fb78624c7c76c993268c33fe1c50a62632547b98#fb78624c7c76c993268c33fe1c50a62632547b98"
 dependencies = [
  "serde",
 ]

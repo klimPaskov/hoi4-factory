@@ -178,6 +178,43 @@ fn append_localisation(root: &Path, rel: &str, lines: &[(String, String)]) -> Re
     std::fs::write(&path, text).map_err(|e| FocusError::Internal { message: e.to_string() })
 }
 
+/// How many focus files of one mod the list looks at.
+const MAX_FOCUS_FILES: usize = 60;
+
+/// The mod's focus files, relative to the mod and sorted: the `.txt` files directly under
+/// `common/national_focus`, where the game reads focus trees from.
+fn focus_files(root: &Path) -> Vec<String> {
+    let mut files: Vec<String> = std::fs::read_dir(root.join("common/national_focus"))
+        .into_iter()
+        .flatten()
+        .flatten()
+        .filter(|e| e.file_type().is_ok_and(|t| t.is_file()))
+        .filter_map(|e| e.file_name().into_string().ok())
+        .filter(|name| name.ends_with(".txt"))
+        .map(|name| format!("common/national_focus/{name}"))
+        .collect();
+    files.sort();
+    files.truncate(MAX_FOCUS_FILES);
+    files
+}
+
+/// The mod's own trees in an inspect result, sorted by id.
+fn trees_of_mod(structured: &Value) -> Vec<Value> {
+    // The tool puts its summary under "data".
+    let mut trees: Vec<Value> = structured["data"]["trees"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(|t| {
+            let id = t["id"].as_str()?;
+            let path = t["sourcePath"].as_str()?.strip_prefix("mod:")?;
+            Some(json!({ "treeId": id, "sourcePath": path, "focusCount": t["focusCount"].as_u64().unwrap_or(0) }))
+        })
+        .collect();
+    trees.sort_by(|a, b| a["treeId"].as_str().cmp(&b["treeId"].as_str()));
+    trees
+}
+
 /// The English localisation file under `localisation/` that defines `key`, if any.
 fn find_localisation(root: &Path, key: &str) -> Option<String> {
     fn walk(dir: &Path, rel: &str, depth: usize, out: &mut Vec<String>) {
@@ -371,6 +408,32 @@ impl FocusSession {
             BuildError::NotInMod(path) => FocusError::NotInMod { path },
             BuildError::Malformed(m) => FocusError::Internal { message: m.into() },
         })
+    }
+
+    /// The focus trees of the mod: each tree's id, its source file and how many focuses it has.
+    ///
+    /// Each focus file of the mod is inspected on its own. One inspect of the whole workspace
+    /// would also lay out every tree of the game when the game folder is loaded, which takes
+    /// minutes. A file the tool cannot read as a focus file is left out.
+    pub async fn list(&mut self) -> Result<Vec<Value>, FocusError> {
+        let mut trees = Vec::new();
+        for file in focus_files(&self.root) {
+            let deadline = Instant::now() + INSPECT_TIMEOUT;
+            let result = match self.session.call("agent_tools_focus_inspect", &json!({ "relativePath": file }), deadline).await {
+                Ok(r) => r,
+                Err(e) => match tool_error(e) {
+                    unavailable @ FocusError::ToolsUnavailable { .. } => return Err(unavailable),
+                    _ => continue,
+                },
+            };
+            if result.output.is_error {
+                continue;
+            }
+            trees.extend(trees_of_mod(&result.output.structured.clone().unwrap_or(Value::Null)));
+        }
+        trees.sort_by(|a, b| a["treeId"].as_str().cmp(&b["treeId"].as_str()));
+        trees.dedup_by(|a, b| a["treeId"] == b["treeId"]);
+        Ok(trees)
     }
 
     /// Draws the tree as the game draws it (`hoi4.focus_render`, view game).
@@ -576,6 +639,35 @@ fn tool_error(e: ToolError) -> FocusError {
 #[cfg(test)]
 mod text_tests {
     use super::*;
+
+    #[test]
+    fn the_focus_files_of_a_mod_are_its_text_files_in_the_focus_folder() {
+        let dir = tempfile::tempdir().unwrap();
+        let root = dir.path();
+        assert!(focus_files(root).is_empty(), "a mod without the folder has no focus file");
+        std::fs::create_dir_all(root.join("common/national_focus/old")).unwrap();
+        for name in ["b.txt", "a.txt", "notes.md", "old/c.txt"] {
+            std::fs::write(root.join("common/national_focus").join(name), "").unwrap();
+        }
+        assert_eq!(focus_files(root), vec!["common/national_focus/a.txt", "common/national_focus/b.txt"]);
+    }
+
+    #[test]
+    fn only_the_mods_own_trees_are_listed() {
+        let structured = json!({"data": {"trees": [
+            {"id": "zeta", "sourcePath": "mod:common/national_focus/z.txt", "focusCount": 3},
+            {"id": "generic_focus", "sourcePath": "game:common/national_focus/generic.txt", "focusCount": 60},
+            {"id": "alpha", "sourcePath": "mod:common/national_focus/a.txt", "focusCount": 12}
+        ]}});
+        assert_eq!(
+            trees_of_mod(&structured),
+            vec![
+                json!({"treeId": "alpha", "sourcePath": "common/national_focus/a.txt", "focusCount": 12}),
+                json!({"treeId": "zeta", "sourcePath": "common/national_focus/z.txt", "focusCount": 3}),
+            ]
+        );
+        assert!(trees_of_mod(&json!({})).is_empty());
+    }
 
     #[test]
     fn a_localisation_line_is_replaced_in_place_or_added() {

@@ -2,6 +2,13 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.48, 2026-11-15, scoped tool calls, bounded model text and the 4.18.0 re-pin
+
+- CLAUDE.md, Agent runtime rules: scope each Agent Tools call to a file or a tree, start the server with every profile on and run the whole `factory-hoi4-tools` crate against the real server after a profile or pin change, and bound text a model wrote before a page shows it.
+- CLAUDE.md, Windows: a test database on `--tmpfs` gets at least 3 GB for a full workspace run.
+- Reason and evidence: the S04 browser runs of 2026-11-14 and 2026-11-15 and the re-pin to Agent Tools 4.18.0. The stories are in the engineering lessons, and the results in `evidence/S04/checks.json`.
+- Authority: engineering guidance only. It widens no access, cost or scope.
+
 ## 0.2.47, 2026-11-14, Docker Desktop stays up and the client check has a WSL fallback
 
 - CLAUDE.md, Working environment: when Docker is down the client check runs in WSL from a copy of `web/`. On Windows, Docker Desktop is left running once it is up.

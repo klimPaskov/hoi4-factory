@@ -32,8 +32,8 @@ RUN npm run build
 # and the hoi4-engine git revision in Cargo.toml, and rerun the hoi4-tools integration tests.
 # ENGINE_BINARY=omit builds the T-ENG-01 test image without the engine binary.
 FROM node:22-bookworm-slim@sha256:de170b39439eb0e5a3444ad7d60b015614a381e10fecae2e30ec9e735122f38d AS agent-tools
-ARG AGENT_TOOLS_VERSION=4.12.0
-ARG AGENT_TOOLS_SHA256=6cf47af00a60ca49418410789690bb1edf69852b0d9b74110d545292a630dcb4
+ARG AGENT_TOOLS_VERSION=4.18.0
+ARG AGENT_TOOLS_SHA256=47e45204cfe7336cf36a06b1d2c03f112230b833ecf9980e7f49bccc1dd8c4e6
 ARG ENGINE_BINARY=include
 ARG TARGETARCH
 ADD --checksum=sha256:${AGENT_TOOLS_SHA256} \

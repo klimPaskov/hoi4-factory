@@ -2,6 +2,7 @@
 //!
 //! | Method and path | Role needed | Purpose |
 //! |---|---|---|
+//! | `GET /projects/{id}/tasks/{task}/focus/trees` | member | The mod's focus trees in the task's worktree: id, source file and focus count |
 //! | `GET /projects/{id}/tasks/{task}/focus/trees/{tree}` | member | The tree's projection from `hoi4.focus_inspect` in the task's worktree |
 //! | `GET .../focus/trees/{tree}/preview.png`, `.../preview.json` | member | The live preview as the game draws it (D-50) and its hover map |
 //! | `POST .../focus/trees/{tree}/operations` | `CreateTask`, edit task | Apply focus operations (move, cost, link, text, create) as one C-02 proposal, with the person as actor |
@@ -25,7 +26,7 @@ use serde_json::{Value, json};
 use crate::access::{active_project_for, project_for};
 use crate::agent_api::{ensure_worktree, load_task, runtime};
 use crate::api_error::Fail;
-use crate::focus::apply::{apply_operations, inspect_tree};
+use crate::focus::apply::{apply_operations, inspect_tree, list_trees};
 use crate::focus::ops::{FocusOp, MAX_OPS};
 use crate::focus::session::{FocusError, localisation_path};
 use crate::focus::store::{self, ActorKind, TaskKeys};
@@ -37,6 +38,7 @@ pub const LIMIT_FOCUS_OPERATION: &str = "focus_operation";
 pub fn router(state: &ServerState) -> Router {
     let accepted = accepted_origins(state);
     Router::new()
+        .route("/projects/{id}/tasks/{task}/focus/trees", get(trees))
         .route("/projects/{id}/tasks/{task}/focus/trees/{tree}", get(projection))
         .route("/projects/{id}/tasks/{task}/focus/trees/{tree}/operations", post(operations))
         .route("/projects/{id}/tasks/{task}/focus/trees/{tree}/preview.png", get(preview_png))
@@ -96,6 +98,15 @@ pub fn edit_allowed(task: &Task, relative_path: &str, tree_id: &str) -> Result<(
         }
     }
     Ok(())
+}
+
+async fn trees(principal: Principal, State(state): State<ServerState>, Path((id, task)): Path<(String, String)>) -> Result<Json<Value>, Fail> {
+    let rt = runtime(&state)?;
+    let project = project_for(&state, &principal, &id, Permission::ReadProject).await?;
+    let task = load_task(rt, &principal, &project, &task).await?;
+    let (root, _) = ensure_worktree(&state, &project, task.id).await?;
+    let found = list_trees(rt, &TaskKeys::of(&task, principal.account_id()), &root).await.map_err(focus_fail)?;
+    Ok(Json(json!({ "trees": found })))
 }
 
 async fn projection(

@@ -1,6 +1,10 @@
 // What the focus editor and the change card know about one tree of one task, and what they can
-// do to it. Every change goes to the server as a focus operation and comes back as a proposal:
-// nothing is kept only in the page. A person's gesture and the agent's edit share that path.
+// do to it. Every change goes to the server as a focus operation and comes back as a proposal.
+// A person's gesture and the agent's edit share that path.
+//
+// An edit is shown at once (D-66): the page draws the tree as it will be while the server's tool
+// writes and checks it, which takes about two seconds. When the answer arrives the page shows
+// what the server recorded. When the server refuses, the tree goes back and the page says why.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ApiError, isAbort } from '../api/client';
 import {
@@ -31,6 +35,20 @@ export function troubleOf(error: unknown): Trouble | null {
   return null;
 }
 
+/** The focuses as one operation will leave them, for showing an edit before the server answers. */
+export function applyLocally(nodes: FocusNode[], operations: FocusOp[]): FocusNode[] {
+  return nodes.map((node) => {
+    let next = node;
+    for (const op of operations) {
+      if (op.focus_id !== node.id) continue;
+      if (op.op === 'move') next = { ...next, x: op.x, y: op.y };
+      else if (op.op === 'set_cost') next = { ...next, cost: op.cost };
+      else if (op.op === 'set_text') next = { ...next, label: op.title ?? next.label, description: op.description ?? next.description };
+    }
+    return next;
+  });
+}
+
 /** Marks the focuses that open proposals added or changed, so the picture can outline them. */
 export function withPending(nodes: FocusNode[], open: Proposal[]): FocusNode[] {
   const marks = new Map<string, NonNullable<FocusNode['pending']>>();
@@ -46,13 +64,28 @@ export function withPending(nodes: FocusNode[], open: Proposal[]): FocusNode[] {
   return nodes.map((node) => ({ ...node, pending: marks.get(node.id) }));
 }
 
+/**
+ * The first sentence of a longer text, for the one line the pages show. A model can answer with a
+ * whole report. The rest stays on the task page, with the attempt.
+ */
+export function firstSentence(text: string, limit = 200): string {
+  const plain = text.replace(/[`*#]/g, '').replace(/\s+/g, ' ').trim();
+  // A sentence can end inside a quotation, so closing quotes and brackets stay with it.
+  const end = /[.!?]["”’)\]]*(?=\s|$)/.exec(plain);
+  const sentence = end ? plain.slice(0, end.index + end[0].length) : plain;
+  if (sentence.length <= limit) return sentence;
+  const cut = sentence.slice(0, limit);
+  return `${cut.slice(0, Math.max(cut.lastIndexOf(' '), limit - 40)).trimEnd()}…`;
+}
+
 /** The agent's own sentence about the open changes, when the agent made them and said one. */
 export function agentSentence(detail: TaskDetail | null, open: Proposal[]): string | null {
   const attempts = new Set(open.filter((p) => p.actorKind !== 'person').map((p) => p.attemptId));
   const said = (detail?.attempts ?? [])
     .filter((a) => attempts.has(a.id) && a.outcome?.summary)
     .sort((a, b) => b.attempt_no - a.attempt_no)[0];
-  return said?.outcome?.summary ?? null;
+  const summary = said?.outcome?.summary;
+  return summary ? firstSentence(summary) : null;
 }
 
 /** Loads the picture of the tree whenever its projection changes, and frees the old one. */
@@ -124,6 +157,13 @@ export interface FocusSession {
   working: boolean;
   /** A request of this page is on its way. */
   busy: boolean;
+  /** An edit is shown but the server has not confirmed it yet. */
+  checking: boolean;
+  /** The last edit the server refused. The tree is back as it was. */
+  refused: unknown;
+  /** Counts refusals, so a form that showed the refused value can start again from the tree. */
+  refusals: number;
+  dismissRefusal: () => void;
   /** The last thing that went wrong with an action, to show beside the buttons. */
   failure: unknown;
   trouble: Trouble | null;
@@ -148,6 +188,10 @@ export function useFocusSession(projectId: string, taskId: string, treeId: strin
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<unknown>(null);
   const [trouble, setTrouble] = useState<Trouble | null>(null);
+  // The focuses as the edit on its way will leave them, until the server answers.
+  const [shown, setShown] = useState<FocusNode[] | null>(null);
+  const [refused, setRefused] = useState<unknown>(null);
+  const [refusals, setRefusals] = useState(0);
 
   const read = useCallback(
     async (signal?: AbortSignal): Promise<Loaded> => {
@@ -194,7 +238,7 @@ export function useFocusSession(projectId: string, taskId: string, treeId: strin
   const hash = loaded?.projection.projectionHash ?? null;
   const pic = usePicture(projectId, taskId, treeId, hash);
   const open = useMemo(() => (loaded?.proposals ?? []).filter((p) => p.state === 'applied' && p.treeId === treeId), [loaded, treeId]);
-  const nodes = useMemo(() => withPending(loaded?.projection.nodes ?? [], open), [loaded, open]);
+  const nodes = useMemo(() => withPending(shown ?? loaded?.projection.nodes ?? [], open), [loaded, open, shown]);
 
   async function act(action: () => Promise<void>) {
     setBusy(true);
@@ -212,12 +256,23 @@ export function useFocusSession(projectId: string, taskId: string, treeId: strin
     setBusy(false);
   }
 
-  function operate(operations: FocusOp[]) {
-    if (!loaded) return;
-    void act(async () => {
+  /** Shows the edit at once, then confirms it with the server's answer or puts the tree back. */
+  async function operate(operations: FocusOp[]) {
+    if (!loaded || shown) return;
+    setShown(applyLocally(loaded.projection.nodes, operations));
+    setFailure(null);
+    setTrouble(null);
+    setRefused(null);
+    try {
       const done = await applyOperations(projectId, taskId, treeId, loaded.projection.projectionHash, operations);
       setLoaded((current) => (current ? { ...current, projection: done.projection, proposals: [...current.proposals, done.proposal] } : current));
-    });
+    } catch (cause) {
+      setRefused(cause);
+      setRefusals((n) => n + 1);
+      // The refusal may mean the page was out of date, so read the tree again.
+      await refresh();
+    }
+    setShown(null);
   }
 
   const task = loaded?.detail.task;
@@ -239,13 +294,17 @@ export function useFocusSession(projectId: string, taskId: string, treeId: strin
     fromAgent: open.some((p) => p.actorKind !== 'person'),
     agentSentence: agentSentence(loaded?.detail ?? null, open),
     working,
-    busy,
+    busy: busy || shown !== null,
+    checking: shown !== null,
+    refused,
+    refusals,
+    dismissRefusal: () => setRefused(null),
     failure,
     trouble,
     editable: task !== undefined && task.mode === 'edit' && task.state !== 'completed' && task.state !== 'cancelled',
-    move: (id, x, y) => operate([{ op: 'move', focus_id: id, x, y }]),
-    setCost: (id, cost) => operate([{ op: 'set_cost', focus_id: id, cost }]),
-    setText: (id, text) => operate([{ op: 'set_text', focus_id: id, ...text }]),
+    move: (id, x, y) => void operate([{ op: 'move', focus_id: id, x, y }]),
+    setCost: (id, cost) => void operate([{ op: 'set_cost', focus_id: id, cost }]),
+    setText: (id, text) => void operate([{ op: 'set_text', focus_id: id, ...text }]),
     approve: (message, anyway) =>
       void act(async () => {
         await commitProposals(

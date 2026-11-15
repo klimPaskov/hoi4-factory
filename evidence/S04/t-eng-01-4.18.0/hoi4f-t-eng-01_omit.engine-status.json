@@ -1,0 +1,2 @@
+{"agent_tools_installed":true,"agent_tools_version":"4.18.0","bundled_engine":{"message":"the bundled hoi4-engine for linux-x64 is missing","reason":"binary_not_found","state":"unavailable"},"linked_engine":{"rev":"fb78624c7c76c993268c33fe1c50a62632547b98","version":"0.1.0"}}
+exit=1

@@ -1,0 +1,111 @@
+{
+ "stage": "S04",
+ "scope": "Final gate review of the stage (validate-stage), 2026-11-15.",
+ "base_revision": "feea335",
+ "code_revision": "e5bcb5b on branch s04-finish. The Linux workspace run and the server image used db01c97 plus the test fix that e5bcb5b commits. The client check ran on e5bcb5b.",
+ "host": "Windows 11 Pro 10.0.26200, Git Bash, Docker Desktop on WSL2",
+ "tools": {
+  "rustc": "1.97.1, pinned by rust-toolchain.toml, in image hoi4-factory-test-runner:1",
+  "docker": "28.5.2 linux/amd64",
+  "postgres": "17.6-bookworm@sha256:f3bd19c6...",
+  "agent_tools": "4.18.0, release tarball sha256 47e45204cfe7336cf36a06b1d2c03f112230b833ecf9980e7f49bccc1dd8c4e6, hoi4-engine revision fb78624c7c76c993268c33fe1c50a62632547b98",
+  "client": "the pinned Node image of web/scripts/docker-npm.sh"
+ },
+ "checks": [
+  {
+   "id": "WORKSPACE-LINUX-4.18.0",
+   "gates": [2, 3, 4, 5, 6, 8, 9, 11],
+   "command": "the steps of scripts/linux-tests.sh with the Agent Tools install of the server image mounted and a 6 GB memory cap: cargo test --locked --workspace --no-fail-fast",
+   "evidence_kind": "test execution on Linux with real PostgreSQL and real HOI4 Agent Tools 4.18.0",
+   "exit_code": 101,
+   "result": "667 passed, 1 failed, 26 ignored in 77 test binaries. Server suites: agent 22, focus 10 (2 ignored: live spend and the timing run), http_api 12, publish 3, setup_gates 13 (5 ignored). The one failure was the stale tool count in factory-hoi4-tools real_agent_tools, fixed in e5bcb5b.",
+   "artifact": "log of 1189 lines, sha256 ba45773c63ba47336bde3c5ca55691c834cf893b3b5cc0aa1ddc94a939f3f2a0, kept outside the repository and deleted with the session's scratch files",
+   "limitation": "A first run was invalid: the test database was killed for memory under a 1 GB cap and 77 database tests failed on a lost connection. The cap was raised to 3 GB and the run repeated."
+  },
+  {
+   "id": "REAL-AGENT-TOOLS-4.18.0",
+   "gates": [11],
+   "command": "same runner: cargo test --locked -p factory-hoi4-tools --no-fail-fast",
+   "evidence_kind": "test execution against the real HOI4 Agent Tools 4.18.0 over stdio",
+   "exit_code": 0,
+   "result": "pass after the fix. 13 unit, 1 env_leak, 19 fake_server, 3 real_agent_tools.",
+   "limitation": "The focus editor profile offers the model ten tools, the nine read tools and the game-view render. The render's description says host only. It cannot write."
+  },
+  {
+   "id": "PIN-AGREEMENT",
+   "gates": [11],
+   "command": "the_linked_engine_matches_the_image_and_the_tool_profile and every_pinned_tool_is_exposed_or_withheld, inside WORKSPACE-LINUX-4.18.0",
+   "evidence_kind": "test execution",
+   "exit_code": 0,
+   "result": "pass. The Dockerfile, the tool profile, the engine check and Cargo.toml name the same release and engine revision. All 39 listed tools are in a profile or withheld with a reason."
+  },
+  {
+   "id": "T-ENG-01-4.18.0",
+   "gates": [8, 11],
+   "command": "scripts/t-eng-01.sh hf-s04ui-server:latest",
+   "evidence_kind": "tool execution in containers without network",
+   "exit_code": 0,
+   "result": "pass, eight checks. With the engine the rewrite applies. Without the binary the status is binary_not_found and the rewrite answers FOCUS_ENGINE_UNAVAILABLE with the source unchanged.",
+   "artifact": "evidence/S04/t-eng-01-4.18.0/"
+  },
+  {
+   "id": "CLIENT-CHECK",
+   "gates": [2, 4, 9],
+   "command": "web/scripts/docker-npm.sh run check",
+   "evidence_kind": "test execution (jsdom), lint, type check and production build",
+   "exit_code": 0,
+   "result": "pass. 106 tests in 8 files.",
+   "limitation": "Component tests answer from a stand-in API."
+  },
+  {
+   "id": "BROWSER-4.18.0",
+   "gates": [7, 9],
+   "command": "by hand in the built-in browser against a throwaway Compose stack on 127.0.0.1:18080",
+   "evidence_kind": "preview rendering and tool execution through the real server, timed by the browser. One live model call",
+   "exit_code": null,
+   "result": "An edit takes 8.9 to 9.8 s to check and 2.6 to 2.9 s to redraw. A save takes 7.4 s for one edit and 13.8 s for two. One ask-bar attempt succeeded in 43 s and its new focus appeared in the open editor without reload.",
+   "artifact": "evidence/S04/live-ask-bar-4.18.0/",
+   "limitation": "One sample per step on the four-focus fixture. Spend US$0.0060 on the maintainer's DeepSeek key."
+  },
+  {
+   "id": "T-BENCH-01-NIGHTLY",
+   "gates": [10],
+   "command": "hoi4-agent-tools scripts/bench/nightly.sh, real suite, run 2026-11-15T01-18-10Z (owned by the Agent Tools session)",
+   "evidence_kind": "tool execution on the real corpora, read from the benchmark's machine-local report",
+   "exit_code": null,
+   "result": "Not a pass for the pin. The run measured hoi4-agent-tools a6292e75, 29 commits after 4.18.0. Against the stored baseline: 47 improvements, 15 regressions that are all latency (p95), and one correctness case that newly fails, zin.validation.known-good-decisions with one false positive (SOURCE_STRING_TOO_LONG).",
+   "limitation": "No run exists on the exact pin fb78624. The ZIN corpus changed since the baseline (14 changed files). Whether the latency regressions are real or noise from a loaded machine is not established."
+  },
+  {
+   "id": "Q1-BASELINE-HASH",
+   "gates": [12],
+   "command": "sha256sum evidence/S04/q1-baseline/baseline-2026-11-06.json",
+   "evidence_kind": "recorded input hash rechecked",
+   "exit_code": 0,
+   "result": "1168af60ab60945a596417d7fbd4790216bacb2aea816215865f33bfbddd3731, as recorded."
+  },
+  {
+   "id": "GATE-1-ONBOARDING",
+   "gates": [1],
+   "command": "none",
+   "evidence_kind": "unavailable",
+   "exit_code": null,
+   "result": "unavailable. A new project and a GitHub import through onboarding in the browser need a real Setup analysis model key and the GitHub App on the test repository, which only the maintainer can provide. Uploads were used instead in every browser run."
+  }
+ ],
+ "gates": {
+  "1": "unavailable",
+  "2": "pass for the three server paths (test). In the browser the gesture and agent paths were walked, the coding client was not",
+  "3": "pass",
+  "4": "pass",
+  "5": "pass against the stand-in GitHub",
+  "6": "pass against the stand-in GitHub",
+  "7": "pass, measured and recorded on 4.18.0",
+  "8": "pass",
+  "9": "pass",
+  "10": "unresolved: the Hagane round trip is measured, T-BENCH-01 has no clean run on the pin and the nearest run shows regressions",
+  "11": "pass",
+  "12": "pass"
+ },
+ "disposition": "S04 is not complete. Gate 1 is unavailable and gate 10 is unresolved. Every other gate passes on the final revision. This record does not authorize S05."
+}

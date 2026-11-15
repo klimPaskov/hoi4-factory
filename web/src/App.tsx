@@ -9,6 +9,7 @@ import { usePageTitle } from './hooks';
 import { AccountPage } from './pages/Account';
 import { ChangeCardPage } from './pages/ChangeCard';
 import { FocusEditorPage } from './pages/FocusEditor';
+import { FocusTreesPage } from './pages/FocusTrees';
 import {
   ForgotPasswordPage,
   ResetPasswordPage,
@@ -94,6 +95,7 @@ export function AppRoutes() {
             <Route path="projects/:id" element={<ProjectPage />} />
             <Route path="projects/:id/tasks" element={<TasksPage />} />
             <Route path="projects/:id/tasks/:taskId" element={<TaskPage />} />
+            <Route path="projects/:id/tasks/:taskId/focus" element={<FocusTreesPage />} />
             <Route path="projects/:id/tasks/:taskId/focus/:treeId" element={<FocusEditorPage />} />
             <Route path="projects/:id/tasks/:taskId/changes/:proposalId" element={<ChangeCardPage />} />
             <Route path="account" element={<AccountPage />} />

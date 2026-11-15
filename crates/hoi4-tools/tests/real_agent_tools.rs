@@ -370,7 +370,9 @@ async fn real_focus_editor_profile_reads_artifacts_and_rewrites_for_the_host_onl
         !exposed.iter().any(|n| n.contains("rewrite")),
         "{exposed:?}"
     );
-    assert_eq!(exposed.len(), 9);
+    // The nine read tools and the game-view render, which is a derived job and not a write.
+    assert!(exposed.iter().any(|n| n == "agent_tools_focus_render"), "{exposed:?}");
+    assert_eq!(exposed.len(), 10);
 
     let deadline = || Instant::now() + Duration::from_secs(180);
     // An artifact no result linked is refused before the server sees it.

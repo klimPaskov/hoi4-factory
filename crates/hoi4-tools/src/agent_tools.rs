@@ -30,7 +30,7 @@ impl AgentToolsInstall {
 
 /// The only environment variable names `agent_tools_spec` ever sets (plus `SystemRoot` on
 /// Windows, which Node needs to start).
-pub const ENV_ALLOWLIST: [&str; 9] = [
+pub const ENV_ALLOWLIST: [&str; 10] = [
     "PATH",
     "HOME",
     "XDG_STATE_HOME",
@@ -39,6 +39,7 @@ pub const ENV_ALLOWLIST: [&str; 9] = [
     "XDG_CACHE_HOME",
     "HOI4_GAME_ROOT",
     "HOI4_AGENT_STDIO_IDLE_EXIT_MINUTES",
+    "HOI4_AGENT_TOOLS_PROFILES",
     "NODE_ENV",
 ];
 
@@ -82,6 +83,9 @@ pub fn agent_tools_spec(
         "HOI4_AGENT_STDIO_IDLE_EXIT_MINUTES".to_owned(),
         "10".to_owned(),
     ));
+    // Since Agent Tools 4.13.0 the server lists only its core profile by default. The host
+    // decides what the model sees from its own reviewed profile, so it asks for every tool.
+    env.push(("HOI4_AGENT_TOOLS_PROFILES".to_owned(), "all".to_owned()));
     env.push(("NODE_ENV".to_owned(), "production".to_owned()));
     #[cfg(windows)]
     env.push(("SystemRoot".to_owned(), "C:\\Windows".to_owned()));

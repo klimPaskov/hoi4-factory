@@ -11,6 +11,8 @@ export interface MockResponse {
   status?: number;
   json?: unknown;
   headers?: Record<string, string>;
+  /** The answer is held back until this settles, to look at the page while a request is on its way. */
+  wait?: Promise<unknown>;
 }
 
 export interface RecordedRequest {
@@ -60,6 +62,7 @@ export function mockApi(routes: Record<string, Handler>) {
         ? handler(recorded)
         : handler
       : { status: 404, json: envelope('not_found', 'Not found.') };
+    if (response.wait) await response.wait;
     const status = response.status ?? 200;
     return new Response(status === 204 ? null : JSON.stringify(response.json ?? {}), {
       status,

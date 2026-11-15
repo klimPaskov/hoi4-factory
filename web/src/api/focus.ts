@@ -107,6 +107,19 @@ export function newIdempotencyKey(prefix: string): string {
   return `${prefix}-${crypto.randomUUID()}`;
 }
 
+/** One focus tree of the mod, as the list route names it. */
+export interface TreeSummary {
+  treeId: string;
+  sourcePath: string;
+  focusCount: number;
+}
+
+/** The mod's focus trees in the task's worktree. */
+export async function listTrees(projectId: string, taskId: string, signal?: AbortSignal): Promise<TreeSummary[]> {
+  const data = await request<{ trees: TreeSummary[] }>(`${taskPath(projectId, taskId)}/focus/trees`, { signal });
+  return data.trees;
+}
+
 export function getProjection(projectId: string, taskId: string, treeId: string, signal?: AbortSignal): Promise<FocusProjection> {
   return request(`${taskPath(projectId, taskId)}/focus/trees/${encodeURIComponent(treeId)}`, { signal });
 }

@@ -1,0 +1,84 @@
+{
+ "attempts": [
+  {
+   "admitted_at": "2026-11-15T02:55:12.041701Z",
+   "attempt_no": 1,
+   "bundle": {
+    "id": "5b30a9c4-02aa-4102-bd5f-9ec82165cc59",
+    "manifest_sha256": "b240e17b4fcddf61999e239dc132c4e0dd5ec2263aa3b8283fdf1ad21b64f397"
+   },
+   "error_code": null,
+   "fencing_generation": 1,
+   "finished_at": "2026-11-15T02:55:55.451101Z",
+   "funding": "user_key",
+   "grant": {
+    "allowed_roots": [
+     "common/national_focus",
+     "localisation"
+    ],
+    "expires_at": "2026-11-15T04:55:12.041497Z",
+    "id": "3d6b946a-71df-4cce-9e5f-474eced2f479",
+    "max_cost_micros": 500000,
+    "operation_classes": [
+     "model_inference",
+     "read_source",
+     "run_read_only_tool",
+     "write_task_worktree"
+    ],
+    "provider_destinations": [
+     "openai_compatible:https://api.deepseek.com"
+    ],
+    "revocation_epoch": 1,
+    "revoked": false
+   },
+   "id": "4ed27899-a969-4053-ac02-b82a1257db21",
+   "outcome": {
+    "branch": "hoi4factory/1860729d-7394-42fa-8daa-a59bff2c76e1",
+    "changed_files": [
+     "common/national_focus/exp_basic.txt",
+     "localisation/english/exp_basic_tree_l_english.yml"
+    ],
+    "commit": null,
+    "open_questions": [
+     "The new English text lives in a second localisation file, exp_basic_tree_l_english.yml, instead of the existing exp_basic_l_english.yml. Should it be merged into the original file for tidiness?",
+     "Reform has no search-filter metadata, like Left wing, Right and Join; add one (e.g. FOCUS_FILTER_POLITICAL) if the tree should be search-filter complete?"
+    ],
+    "reported_changed_files": [
+     "common/national_focus/exp_basic.txt",
+     "localisation/english/exp_basic_tree_l_english.yml"
+    ],
+    "summary": "A new focus, \"Reform\", now sits directly below \"Join\", costs 5 and gives 50 political power, with the short description \"Reform the party from within.\"\n\nDetails:\n- The focus was added with the focus editor (exp_reform, grid 4/3, prerequisite: Join, cost 5, completion reward add_political_power = 50, icon GFX_exp_icon_created from the mod's existing placeholder sprites), so the rest of the tree file is byte-for-byte unchanged. Layout verdict for exp_basic_tree is \"pass\".\n- The English title and description were written by the editor into a new localisation file next to the existing one; it contains only the new focus's two keys, so no key is duplicated with the original exp_basic_l_english.yml.\n- The file validates cleanly by script check; the only diagnostics are the pre-existing ones shared with every other focus in this fixture (placeholder .dds texture absent, missing search-filter metadata).\n- Left \"Reform\" without search_filters or ai_will_do, matching the two one-line focuses around it (Left wing, Right, Join)."
+   },
+   "started_at": "2026-11-15T02:55:12.115373Z",
+   "state": "succeeded",
+   "version": 17
+  }
+ ],
+ "pending_effects": [],
+ "task": {
+  "allowed_paths": [
+   "common/national_focus",
+   "localisation"
+  ],
+  "budget_micros": 500000,
+  "created_at": "2026-11-15T02:51:23.546293Z",
+  "id": "1860729d-7394-42fa-8daa-a59bff2c76e1",
+  "last_seq": 56,
+  "max_turns": 20,
+  "mode": "edit",
+  "model": {
+   "funding": "user_key",
+   "key_id": "439e75ee-e641-4753-8268-129098725771",
+   "profile_id": "user:439e75ee-e641-4753-8268-129098725771"
+  },
+  "objective": "Edit the focus tree exp_basic_tree as asked in the editor.",
+  "pause_reason": null,
+  "paused": false,
+  "project_id": "8c652b45-7a06-42b0-a4fc-5cb16d02d9c2",
+  "spend_unknown": false,
+  "spent_micros": 6020,
+  "state": "in_review",
+  "updated_at": "2026-11-15T02:55:55.451101Z",
+  "version": 4
+ }
+}

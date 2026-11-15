@@ -134,6 +134,14 @@ async fn store_if_new(rt: &AgentRuntime, task: &TaskKeys, built: &Built) -> Resu
     Ok(id)
 }
 
+/// Lists the mod's focus trees in the task's worktree.
+pub async fn list_trees(rt: &AgentRuntime, task: &TaskKeys, root: &Path) -> Result<Vec<Value>, FocusError> {
+    let slot = rt.focus().slot(task.id);
+    let mut guard = slot.lock().await;
+    let session = open(rt, task, root, &mut guard).await?;
+    session.list().await
+}
+
 /// Inspects a tree in the task's worktree and records its projection.
 pub async fn inspect_tree(rt: &AgentRuntime, task: &TaskKeys, root: &Path, tree_id: &str) -> Result<Value, FocusError> {
     let slot = rt.focus().slot(task.id);

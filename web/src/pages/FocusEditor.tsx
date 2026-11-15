@@ -7,6 +7,7 @@ import { Link, useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { ApiError } from '../api/client';
 import { Button, ErrorMessage, Loading, NotAvailableYet } from '../components/ui';
+import { describeError } from '../errors';
 import { GamePreview } from '../focus/GamePreview';
 import { useFocusSession, type FocusSession } from '../focus/session';
 import type { Diagnostic, FocusNode } from '../focus/types';
@@ -90,9 +91,10 @@ function Editor({ projectId, taskId, treeId }: { projectId: string; taskId: stri
             <Loading label={t('focus.drawing')} />
           </div>
         )}
-        {selected ? <FocusCard key={selected.id} session={session} node={selected} frozen={frozen} onClose={() => setSelectedId(null)} /> : null}
+        {selected ? <FocusCard key={`${selected.id}:${session.refusals}`} session={session} node={selected} frozen={frozen} onClose={() => setSelectedId(null)} /> : null}
         <div className="fx-dock">
           <Status session={session} />
+          <Refusal session={session} />
           {session.failure ? <ErrorMessage error={session.failure} /> : null}
           <Verdict session={session} />
           <Ask session={session} selected={selected} />
@@ -154,10 +156,27 @@ function Header({ session, selected, back }: { session: FocusSession; selected: 
   );
 }
 
+/** A refused edit: what the server said, and that the tree is back as it was. */
+function Refusal({ session }: { session: FocusSession }) {
+  const { t } = useTranslation();
+  if (!session.refused) return null;
+  const said = describeError(session.refused);
+  return (
+    <div className="fx-refused" role="alert">
+      <p>
+        <strong>{t('focus.refused.title')}</strong> <span dir="auto">{said.message}</span> {t('focus.refused.restored')}
+      </p>
+      <Button size="sm" variant="ghost" onClick={session.dismissRefusal}>
+        {t('focus.refused.dismiss')}
+      </Button>
+    </div>
+  );
+}
+
 /** One line that says what is happening, or nothing. */
 function Status({ session }: { session: FocusSession }) {
   const { t } = useTranslation();
-  const text = session.working ? t('focus.working') : session.busy ? t('focus.saving') : session.redrawing ? t('focus.redrawing') : '';
+  const text = session.working ? t('focus.working') : session.checking ? t('focus.checking') : session.busy ? t('focus.saving') : session.redrawing ? t('focus.redrawing') : '';
   return (
     <p className="fx-status" role="status">
       {text ? (
@@ -266,7 +285,7 @@ function FocusCard({ session, node, frozen, onClose }: { session: FocusSession; 
       {!node.editable ? <p className="fx-card-note">{t('focus.card.cantDrag', { name: node.label })}</p> : null}
       <div className="field">
         <label htmlFor={`${ids}-title`}>{t('focus.card.title')}</label>
-        <input id={`${ids}-title`} type="text" dir="auto" maxLength={400} value={title} disabled={frozen || !canText} onChange={(event) => setTitle(event.target.value)} onBlur={saveText} />
+        <input id={`${ids}-title`} type="text" dir="auto" maxLength={400} value={title} disabled={frozen || !canText} onChange={(event) => setTitle(event.target.value)} onBlur={saveText} onKeyDown={(event) => { if (event.key === 'Enter') saveText(); }} />
       </div>
       {canText ? (
         <div className="field">
