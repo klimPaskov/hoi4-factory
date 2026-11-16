@@ -29,10 +29,15 @@ hoi4-imagegen-mcp: the public image generation MCP for HOI4 graphical assets, it
 | D-11 (see factory) | 2026-10-31 | In hosted Factory the operator allowance may also pay for images. See factory. | [expansion record](../08-expansion-research/00-decision-record.md) |
 | D-36 | 2026-11-08 | Until about 2026-11-22 tools for other modders come first. hoi4-imagegen makes better images: family fixes, model routing, palette variety and the TFR style packs. | [operations](operations.md#decisions) |
 | D-40 | 2026-11-08 | Feature releases at most about weekly, fixes any time. A promotion first releases the latest version and cleans the public text. | [operations](operations.md#decisions) |
+| D-78 | 2026-11-16 | Focus icons return to their earlier lively, varied look: the frame and muted vanilla-look changes are undone, the no-national-symbols rule stays, and the fix ships as 0.4.1 after the maintainer approves a side-by-side sheet. | [below](#decisions) |
 
 ## Decisions
 
-No new entries yet.
+New entries go here in full, oldest first.
+
+| ID | Date | Question | Decision |
+|---|---|---|---|
+| D-78 | 2026-11-16 | The focus icons in the 0.4.0 gallery look too dull and too alike. What happens? | Focus icons go back to the look they had before the frame and vanilla-look changes, which the maintainer liked better: livelier and clearly different from one icon to the next. The frames, the muted vanilla treatment and the simplification are undone for focus icons. The previous gallery's focus icons are the reference. The rule from the Irish feedback stays: no flags or national emblems unless a focus is directly national. After the maintainer approves a side-by-side sheet (old, current, restored), the change ships at once as 0.4.1, as a fix to a wrong result. The gallery's focus families are regenerated and the kit is re-pinned. Maintainer decision |
 
 ## Replaced or expired
 
