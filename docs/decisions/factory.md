@@ -26,6 +26,7 @@ The HOI4 Factory product and its stages: architecture, accounts, GitHub, game re
 | D-64 | 2026-11-14 | The S04 server gains the two additions the chosen designs need: a follow-up instruction on a new attempt of an edit task, and a focus operation that changes a title or description. | [below](#decisions) |
 | D-66 | 2026-11-14 | The S04 server also gets a read-only route that lists a mod's focus trees. The focus editor shows an edit at once and confirms it when the tool's check finishes. | [below](#decisions) |
 | D-72 | 2026-11-15 | S04 closes without gate 1, which is marked unavailable with its reason. Gate 10's benchmark half closes on the first clean nightly with the fixed warm-up. | [below](#decisions) |
+| D-79 (see agent-tools) | 2026-11-17 | S04 gate 10's benchmark half closes on the clean hand run of 2026-11-16 08:53, not on a nightly. See agent-tools. | [agent-tools](agent-tools.md#decisions) |
 | D-52 | 2026-11-08 | The general gptimage tool may make HOI4 Factory web-page and UI mockups as often as design work needs, one request at a time and never while hoi4-imagegen is generating. Game assets still come only from hoi4-imagegen. | [below](#decisions) |
 | Stage plans | 2026-11-01 | Every stage plan shows the full path in the stage that uses it: Rust engine, two-way editors, Hagane harvest, Q-1 gate, agent-tools coverage. Planning only, no stage is authorized by it. | [maintainer record](../02-architecture/maintainer-decisions-2026-10-24.md) |
 | **Architecture (ADR-001 to ADR-010)** | | | |

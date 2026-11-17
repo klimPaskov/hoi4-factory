@@ -1,6 +1,6 @@
 # S04 stage handoff
 
-Status: **final for this round of work, stage not complete**. `validate-stage` was run on 2026-11-15 and its record is [checks.json](checks.json). Ten of twelve gates pass on the final revision. Gate 1 is unavailable and gate 10 is unresolved. Nothing here authorizes S05.
+Status: **complete on 2026-11-17 under maintainer decisions D-72 and D-79** (see the closing note at the end). The text below is the 2026-11-15 record. `validate-stage` was run on 2026-11-15 and its record is [checks.json](checks.json). Ten of twelve gates pass on the final revision. Gate 1 is unavailable and gate 10 is unresolved. Nothing here authorizes S05.
 
 ## Identity and authorized scope
 
@@ -87,3 +87,9 @@ Recorded in the knowledge changelog: 0.2.45 (cancel-safe worker writes), 0.2.46 
 - Still to do in S04: gate 1 when the maintainer can provide what it needs, and the T-BENCH-01 half of gate 10.
 - Read first: this file, [checks.json](checks.json), the three session records above and [the checks of the pages](browser-pages-2026-11-14.md).
 - Pending operations needing reconciliation: none.
+
+## Closing note, 2026-11-17
+
+- Gate 1 is accepted as unavailable by maintainer decision D-72. It needs a real model key for Setup's analysis step and the GitHub App on the test repository, and it runs in a later stage once those exist.
+- The benchmark half of gate 10 (T-BENCH-01) closes on the clean hand run of the full nightly suite on 2026-11-16 at 08:53, by maintainer decision D-79. The run used the same command and engine as the scheduled task on Agent Tools main `4c4e77cb`, not the 4.18.0 pin. Every case passed, and it was accepted as the benchmark baseline. The two nightly runs of 2026-11-16 and 2026-11-17 were 15 to 30 times slower on the same cases with every result correct, and the load log of 2026-11-17 showed no other work, so the slowness belongs to the scheduled task's context. Since D-79 the benchmark runs on demand and the nightly task is off.
+- With both, S04 is complete. This does not authorize S05, which needs the maintainer's authorization.
