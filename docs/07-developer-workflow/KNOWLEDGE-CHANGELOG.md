@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.51, 2026-11-18, lessons go into the workflow for weaker models
+
+- CLAUDE.md, Keeping this guidance current: each lesson goes into the shared workflow as a step, rule or check that a small model can follow, and workflow changes are tested with a small model when possible.
+- Reason and evidence: D-90, stated by the maintainer on the night the 3D route was first tested end to end with a small model.
+- Authority: a maintainer decision about how agents work. It widens no access, cost or scope.
+
 ## 0.2.50, 2026-11-18, detailed work and no simplifying without consent
 
 - CLAUDE.md, Verification and handoff: work stays detailed, nothing is simplified without the maintainer's consent, and a pass is checked against the input it used before it is relayed.
