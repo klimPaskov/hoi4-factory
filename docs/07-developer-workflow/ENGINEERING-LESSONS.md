@@ -116,6 +116,10 @@ CLAUDE.md rule: the host starts Agent Tools with `HOI4_AGENT_TOOLS_PROFILES=all`
 
 CLAUDE.md rule: a test database on `--tmpfs` gets at least 3 GB for a full workspace run. The first workspace run on the 4.18.0 pin showed 78 failures. The PostgreSQL container had a 1 GB memory cap, its data lived in memory, and it was killed partway through. Every later database test failed with "failed to lookup address information". With 3 GB the same run had one failure, a real one.
 
+### A Linux VM that held 6 GB of file cache (2026-11-18)
+
+CLAUDE.md rule: after a heavy WSL job, drop the VM's file cache so Windows gets the memory back. On 2026-11-18 two ZIN game captures were stopped by the memory guard before the game started, and then every Blender step of the 3D lane waited at its memory gate, although no game and no Blender was running. Commit stood at 48.0 GB and free RAM at 2.8 GB. Inside the VM only 1.2 GB was in use and 6.6 GB was file cache, left from hashing the game copy during the capture's sync. Dropping the cache and compacting memory as root took commit to 41.4 GB and free RAM to 9.8 GB within a minute, and `vmmemWSL` fell from 7.8 GB to 2.0 GB. Nothing is lost, because the cache only mirrors files on disk.
+
 ## Verification and handoff
 
 ### Seven ZIN units in a trailer (2026-11-06)

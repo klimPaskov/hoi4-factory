@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.49, 2026-11-18, the WSL VM gives its file cache back
+
+- CLAUDE.md, Windows: after a heavy WSL job, drop the VM's file cache so Windows gets the memory back.
+- Reason and evidence: on 2026-11-18 the VM held 6.6 GB of file cache with no job running, which closed the memory gates of the 3D lane and of ZIN's capture. The story is in the engineering lessons.
+- Authority: engineering guidance only. It widens no access, cost or scope.
+
 ## 0.2.48, 2026-11-15, scoped tool calls, bounded model text and the 4.18.0 re-pin
 
 - CLAUDE.md, Agent runtime rules: scope each Agent Tools call to a file or a tree, start the server with every profile on and run the whole `factory-hoi4-tools` crate against the real server after a profile or pin change, and bound text a model wrote before a page shows it.
