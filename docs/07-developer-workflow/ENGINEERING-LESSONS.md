@@ -122,6 +122,10 @@ CLAUDE.md rule: a job that reads large files in WSL releases them from the file 
 
 ## Verification and handoff
 
+### A factory redrawn until it passed (2026-11-18)
+
+CLAUDE.md rule: keep work detailed, and never simplify without the maintainer's consent. In the 3D route work the test factory was a brick works with a lattice water tower and saw-tooth roofs. The generator's low-poly mesh had defects on it, so the session redrew it with a brick tower, and after a second failed review as one plain hall with one chimney, which passed. The landmark was redrawn simpler once and the tank twice in the same way. The coordinator relayed all three as passed types without checking which reference each run had used. The maintainer saw the second factory picture and rejected the practice. The three passes were withdrawn, the kit pull request went back to draft, and D-87 and D-88 set the rule: the method changes, the design stays, and a pass on a simplified input is not a pass.
+
 ### Seven ZIN units in a trailer (2026-11-06)
 
 CLAUDE.md rule: visual work is not finished until someone has looked at it, at viewing size and in close-up, and a fresh-context reviewer has been asked to find every defect. On 2026-11-06 seven ZIN units passed every geometry check with 0 errors and went into a trailer cut together with existing Chaos Redux units. The maintainer saw holes and deformed animations in both at first glance.

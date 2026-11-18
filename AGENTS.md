@@ -131,6 +131,8 @@ Use `validate-stage` to connect each requirement to observed output and real evi
 
 Visual work (images, 3D models, animations, video) is not finished until someone has looked at it. Passing numeric checks is not evidence that it looks right. Render every output at the size the player or viewer sees and in close-up, look at it yourself, then give only the images and the quality bar to a reviewer with a fresh context and ask it to find every defect. Fix what it finds before anything reaches the maintainer or a video.
 
+Keep work detailed, and never simplify without the maintainer's consent (D-88). Do not cut down a design, asset, model, picture, interface, text or requirement to make a task easier or a check pass. When the detailed version is hard, change the method. If it still cannot be done, stop and ask, showing the detailed target and what would be lost. Never report a result on a simplified version as done or passed, and when a session reports a pass, check which input it used before relaying it.
+
 Run local tests under a memory cap and a timeout, in every repository. A test that drives a loop never pairs a mock object with a real clock. Give it a fake clock that every sleep advances and a cap on iterations, so a stuck wait fails fast instead of growing until the machine runs out of memory.
 
 Run workspace tests with `cargo test --no-fail-fast`, because the default stops at the first failing test binary and hides every later crate. A nearly full disk makes tests fail with misleading errors, so check free space before trusting a red run. Setup's readiness differs between host platforms, so the S02 apply gates are verified with `scripts/linux-tests.sh`. [Developer setup](docs/07-developer-workflow/DEVELOPER-SETUP.md) covers a fresh machine.
