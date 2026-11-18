@@ -4,7 +4,7 @@ This is the versioned index of accepted engineering guidance changes. Detailed c
 
 ## 0.2.49, 2026-11-18, the WSL VM gives its file cache back
 
-- CLAUDE.md, Windows: after a heavy WSL job, drop the VM's file cache so Windows gets the memory back.
+- CLAUDE.md, Windows: a job that reads large files in WSL releases them from the file cache as the ordinary user when it ends. Dropping the whole cache as root needs the maintainer's yes.
 - Reason and evidence: on 2026-11-18 the VM held 6.6 GB of file cache with no job running, which closed the memory gates of the 3D lane and of ZIN's capture. The story is in the engineering lessons.
 - Authority: engineering guidance only. It widens no access, cost or scope.
 

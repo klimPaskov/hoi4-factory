@@ -60,7 +60,7 @@ On both machines:
 
 On Windows only:
 
-- The WSL VM keeps its file cache after a large copy, sync or game run, and Windows counts it as used memory (`vmmemWSL` at 7 GB or more with nothing running in it). When no job runs in WSL, give it back with `wsl -u root -e sh -c 'sync && echo 3 > /proc/sys/vm/drop_caches && echo 1 > /proc/sys/vm/compact_memory'`. It deletes nothing, and Windows shows the freed memory within a minute. Do this after every heavy WSL job before the next heavy job starts.
+- The WSL VM keeps its file cache after a large copy, sync or game run, and Windows counts it as used memory (`vmmemWSL` at 7 GB or more with nothing running in it). A job that reads large files in WSL releases them from the cache as the ordinary user when it ends, for example `dd if=<file> iflag=nocache count=0 status=none` per file, and checks that `vmmemWSL` is small again before the next heavy job starts. Dropping the whole cache needs root in the distro, which agents use only with the maintainer's yes.
 - Leave Docker Desktop running once it is up. Stop your own containers and nothing else. A `docker desktop stop` can leave a socket file under `%LOCALAPPDATA%\Docker\run` that Windows refuses to delete, and then the next start crashes.
 - The locale encoding is cp1252, and Python text-mode writes produce CRLF. Write files in binary mode or with `newline="\n"`.
 - Git over HTTP stalls after a `401` from the server even with prompts disabled, until the caller's timeout. Tests that only need a failed Git request make the fake GitHub answer `500` (`git_error_after`). Keep `401` for the cases that test revocation itself.
