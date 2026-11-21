@@ -2,6 +2,13 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.52, 2026-11-21, one root command in WSL and the coordinator's model
+
+- CLAUDE.md, Windows only: agents may drop the WSL file cache as root when memory blocks a heavy job and nothing runs in WSL, and they log it. Every other use of root still needs the maintainer's yes.
+- CLAUDE.md, Delegation and parallel work: no worker session or subagent runs on Fable, and only the coordinator session may.
+- Reason and evidence: D-96 and D-95, answered by the maintainer when a new coordinator session started.
+- Authority: maintainer decisions. D-96 widens agent access by exactly one command, on the maintainer's word.
+
 ## 0.2.51, 2026-11-18, lessons go into the workflow for weaker models
 
 - CLAUDE.md, Keeping this guidance current: each lesson goes into the shared workflow as a step, rule or check that a small model can follow, and workflow changes are tested with a small model when possible.

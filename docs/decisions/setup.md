@@ -16,6 +16,7 @@ HOI4 Mod Setup: its builds, install steps and image step. New decisions for this
 | D-40 | 2026-11-08 | Feature releases at most about weekly, fixes any time. A promotion first releases the latest version and cleans the public text. | [operations](operations.md#decisions) |
 | D-43 | 2026-11-08 | The next promotion is the whole modder workflow: Setup, the kit and every tool it installs. | [operations](operations.md#decisions) |
 | D-73 | 2026-11-15 | The Setup session tags and publishes 0.9.5 by itself once the kit pin is in and the fresh-install test passes on Windows and Linux. Kit #127 merges after that. | [below](#decisions) |
+| D-97 | 2026-11-21 | Setup's audit check may pass only advisories on a short reviewed list in its repository, as Agent Tools does (D-80). The list starts with the dev-only picomatch advisory that has no fix. | [below](#decisions) |
 
 ## Decisions
 
@@ -24,6 +25,7 @@ New entries go here in full, oldest first.
 | ID | Date | Question | Decision |
 |---|---|---|---|
 | D-73 | 2026-11-15 | Who tags and publishes Setup 0.9.5? | The Setup session, without asking the maintainer again, once the kit has pinned the week's tool releases and the fresh-install test passes on Windows and on Linux. Kit pull request 127 merges after 0.9.5 is published. Maintainer decision |
+| D-97 | 2026-11-21 | Setup pull request 204 fails on the picomatch advisory GHSA-fc5q-39xc-vjpf, which has no fixed version. Does Setup wait for upstream? | No. Setup gets the same reviewed exception list as Agent Tools under D-80. Each entry names the advisory, the package, the reason and a review date, and stops counting once a fixed version is published. The audit of what users install stays strict with no exceptions. The list starts with this one advisory, which is reached only through development tools. Maintainer decision |
 
 ## Replaced or expired
 

@@ -52,6 +52,7 @@ hoi4-agent-tools (the MCP server) and the shared Rust HOI4 engine inside it: eng
 | D-36 | 2026-11-08 | Until about 2026-11-22 tools for other modders come first. Agent Tools gains more coverage: the R-5 modder features and the R-4 profiles. | [operations](operations.md#decisions) |
 | D-40 | 2026-11-08 | Feature releases at most about weekly, fixes any time. A promotion first releases the latest version and cleans the public text. | [operations](operations.md#decisions) |
 | D-41 | 2026-11-08 | A fresh read-only scan of HOI4 AI and modding tools feeds Agent Tools priorities and the Q-1 comparison set. | [operations](operations.md#decisions) |
+| D-98 | 2026-11-21 | The under-one-second edit plus inspect target (issue 137) is reached by letting the inspect reuse the index the rewrite just built. Writes stay durable. | [below](#decisions) |
 
 ## Decisions
 
@@ -63,6 +64,7 @@ New entries go here in full, oldest first.
 | D-71 | 2026-11-15 | Which tool-side changes go after the 1 s focus edit target (issue 137)? | Both. A manifest of the game build lets a call skip walking the game files. A focus edit answers as soon as its safe write is done, and the result of the check after the edit follows separately, so a failing check can still undo or flag the edit. Maintainer decision |
 | D-79 | 2026-11-17 | Why does the benchmark run nightly, and should it? | It ran nightly because the PC used to be quiet at night. Agents now work through the night, and two nightly runs were 15 to 30 times slower than the same suite run by hand, which was clean. So the benchmark runs on demand: the release owner runs it by hand in a quiet slot, with the heavy-job slot from the coordinator, before every Agent Tools release and on pull requests that touch speed. The nightly scheduled task is turned off. The benchmark half of S04 gate 10 closes on the clean hand run of 2026-11-16 08:53 on main `4c4e77cb`, which replaces the nightly condition in D-72. Maintainer decision |
 | D-80 | 2026-11-17 | Every Agent Tools check fails on an advisory with no fixed version (GHSA-fc5q-39xc-vjpf in picomatch, reached only through build and test tools). How does the audit gate handle that? | The audit of the installed package (`npm audit --omit=dev --audit-level=high`) stays strict, with no exceptions. The full audit still fails on any high or critical advisory, except those on a short reviewed list kept in the repository, where each entry names the advisory, the package, the reason and a review date. The list starts with this one advisory, which is dev-only, and the entry stops counting once a fixed picomatch is published. Waiting for an upstream fix with no merges and no release was the alternative and is not chosen. Maintainer decision |
+| D-98 | 2026-11-21 | Issue 137 offers two ways to get an edit plus inspect under one second: weaken the durable write, or let the inspect reuse the index the rewrite built. Which one? | The inspect reuses the index. The durable write is not weakened, so a crash or power loss still cannot lose a finished write. Maintainer decision |
 
 ## Replaced or expired
 
