@@ -58,6 +58,10 @@ CLAUDE.md rule: run long work as separate sessions, not as background subagents 
 
 CLAUDE.md rule: start a new Claude Code session on Sonnet at medium or high effort, and use Opus at medium effort for harder tasks. This is a maintainer preference of 2026-11-02, and a new session does not inherit the starting session's model and effort.
 
+### Two heavy jobs at once (2026-11-21)
+
+CLAUDE.md rule: take the heavy-job slot only through `scripts/heavy-slot.sh`. The slot had two signals, a hold file written by hand and the `blender.lock` folder taken by the 3D lane's Blender gate. On 2026-11-21 the 3D gate took the lock at 19:19:37 and a ZIN worker wrote its hold 23 seconds later, because it checked only the hold file. A 40-minute build started beside a Blender run with 10 GB of RAM free, and the build had to be killed. Earlier the same day a release benchmark rerun also ran while the lock existed. One script that checks both signals and takes the slot atomically replaces the by-hand protocol.
+
 ### Parallel crate packets (S03)
 
 CLAUDE.md rule: commit empty crate skeletons and their workspace members on main before parallel crate packets, and give each brief the public API. In S03 four Sonnet packets built this way merged without conflicts and needed only small adapter changes.

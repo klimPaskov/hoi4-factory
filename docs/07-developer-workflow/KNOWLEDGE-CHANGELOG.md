@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.53, 2026-11-21, one script for the heavy-job slot
+
+- CLAUDE.md, Delegation and parallel work: every session takes and gives back the heavy-job slot with `scripts/heavy-slot.sh`, which checks the hold file and the Blender lock together, checks the memory and disk lines and takes the slot atomically.
+- Reason and evidence: two collisions on 2026-11-21, a benchmark rerun and a ZIN build each started while a Blender run held the lock. The story is in the engineering lessons.
+- Authority: a technical default under D-18 and D-90. It widens no access, cost or scope.
+
 ## 0.2.52, 2026-11-21, one root command in WSL and the coordinator's model
 
 - CLAUDE.md, Windows only: agents may drop the WSL file cache as root when memory blocks a heavy job and nothing runs in WSL, and they log it. Every other use of root still needs the maintainer's yes.
