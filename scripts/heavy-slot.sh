@@ -19,7 +19,14 @@ dir="$root/.work/tripo-round4"
 hold="$dir/hold"
 legacy="$dir/blender.lock"
 slots="$dir/slots"
-n=${HEAVY_SLOTS:-4}
+# The pool size is read again on every loop: HEAVY_SLOTS if set, else the number in .work/tripo-round4/pool-size, else 4.
+# A take that waits keeps up with a change of size this way.
+pool_n() {
+  if [ -n "${HEAVY_SLOTS:-}" ]; then echo "$HEAVY_SLOTS"
+  elif [ -f "$dir/pool-size" ]; then tr -cd '0-9' < "$dir/pool-size"
+  else echo 4; fi
+}
+n=$(pool_n)
 
 machine_ok() {
   free_kb=$(df -k "$dir" | tail -1 | awk '{print $4}')
@@ -77,6 +84,7 @@ case "$cmd" in
     mkdir -p "$slots"
     mine=""
     while :; do
+      n=$(pool_n)
       if [ "$excl" -eq 1 ]; then
         if [ -z "$mine" ]; then
           if [ -f "$hold" ]; then reason="exclusive hold: $(head -1 "$hold" 2>/dev/null)"
