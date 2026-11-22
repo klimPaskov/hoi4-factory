@@ -28,6 +28,28 @@ pool_n() {
 }
 n=$(pool_n)
 
+# Rust reserve: a take whose text contains "rust" or "cargo" (any case) is a Rust take. While a Rust take is waiting,
+# the other takes leave R slots free for it. R comes from HEAVY_RUST_RESERVE, else .work/tripo-round4/rust-reserve, else 0.
+# A waiting Rust take touches a ticket in .work/tripo-round4/rust-wait every loop, and a ticket older than 2 minutes is ignored,
+# so the reserved slots go back to everyone as soon as no Rust take waits.
+rust_r() {
+  if [ -n "${HEAVY_RUST_RESERVE:-}" ]; then echo "$HEAVY_RUST_RESERVE"
+  elif [ -f "$dir/rust-reserve" ]; then tr -cd '0-9' < "$dir/rust-reserve"
+  else echo 0; fi
+}
+is_rust() { printf '%s' "$1" | grep -Eqi 'rust|cargo'; }
+used_other() {
+  count=0
+  [ -d "$legacy" ] && count=$((count + 1))
+  i=1
+  while [ "$i" -le "$n" ]; do
+    if [ -d "$slots/s$i" ] && ! grep -Eqi 'rust|cargo' "$slots/s$i/owner" 2>/dev/null; then count=$((count + 1)); fi
+    i=$((i + 1))
+  done
+  echo "$count"
+}
+rust_waiting() { [ -d "$dir/rust-wait" ] && [ -n "$(find "$dir/rust-wait" -type f -mmin -2 2>/dev/null | head -1)" ]; }
+
 machine_ok() {
   free_kb=$(df -k "$dir" | tail -1 | awk '{print $4}')
   if [ "$free_kb" -lt 31457280 ]; then echo "disk: under 30 GB free"; return 1; fi
@@ -73,7 +95,13 @@ case "$cmd" in
     if [ -f "$hold" ]; then echo "BUSY exclusive, $u of $n slots used"; list; exit 0; fi
     if [ "$u" -ge "$n" ]; then echo "BUSY $u of $n slots used"; list; exit 0; fi
     if r=$(machine_ok); then echo "FREE $u of $n slots used"; else echo "FREE $u of $n slots used, but WAIT $r"; fi
-    list; exit 0 ;;
+    list
+    rr=$(rust_r)
+    if [ "${rr:-0}" -gt 0 ]; then
+      if rust_waiting; then echo "Rust reserve: $rr slot(s), a Rust take is waiting, so other takes stop at $((n - rr)) slots"
+      else echo "Rust reserve: $rr slot(s), no Rust take waiting, so every slot is open"; fi
+    fi
+    exit 0 ;;
   take)
     shift
     excl=0
@@ -83,8 +111,14 @@ case "$cmd" in
     max=${2:-3600}; waited=0
     mkdir -p "$slots"
     mine=""
+    ticket=""
+    if [ "$excl" -eq 0 ] && is_rust "$what"; then
+      mkdir -p "$dir/rust-wait"; ticket="$dir/rust-wait/$$"
+      trap 'rm -f "$ticket"' EXIT
+    fi
     while :; do
       n=$(pool_n)
+      [ -n "$ticket" ] && touch "$ticket"
       if [ "$excl" -eq 1 ]; then
         if [ -z "$mine" ]; then
           if [ -f "$hold" ]; then reason="exclusive hold: $(head -1 "$hold" 2>/dev/null)"
@@ -99,6 +133,8 @@ case "$cmd" in
       else
         if [ -f "$hold" ]; then reason="exclusive hold: $(head -1 "$hold" 2>/dev/null)"
         elif [ "$(used)" -ge "$n" ]; then reason="all $n slots used"
+        elif [ -z "$ticket" ] && rust_waiting && [ "$(used_other)" -ge $((n - $(rust_r))) ]; then
+          reason="the last $(rust_r) slot(s) are kept for a waiting Rust take"
         elif ! reason=$(machine_ok); then :
         else
           i=1; got=""
