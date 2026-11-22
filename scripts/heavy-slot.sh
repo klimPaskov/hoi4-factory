@@ -11,7 +11,7 @@
 #   scripts/heavy-slot.sh release "<same text or a unique part of it>"
 # Take only when the job is ready to start, check the exit code directly (never through a pipe), and release in a trap on EXIT.
 # Pool size: HEAVY_SLOTS, default 2. Every start also needs the machine lines: on Windows free RAM at least 6 GB and commit under
-# 44 GB, on every machine at least 30 GB free disk. An exclusive take first writes the hold (so nothing new starts), then waits until
+# 50 GB, on every machine at least 30 GB free disk. An exclusive take first writes the hold (so nothing new starts), then waits until
 # every slot is free. A take prints TAKEN and exits 0. Exit codes: 0 done, 2 usage, 3 timed out waiting, 4 release refused.
 set -u
 root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
@@ -28,8 +28,8 @@ machine_ok() {
     MINGW*|MSYS*|CYGWIN*)
       line=$(powershell -NoProfile -Command '$os = Get-CimInstance Win32_OperatingSystem; $pf = Get-CimInstance Win32_PerfFormattedData_PerfOS_Memory; "{0:N1} {1:N1}" -f ($os.FreePhysicalMemory/1MB), ($pf.CommittedBytes/1GB)' | tr -d '\r' | tr ',' '.')
       free=${line% *}; commit=${line#* }
-      if awk -v f="$free" -v c="$commit" 'BEGIN { exit !((f + 0) < 6 || (c + 0) >= 44) }'; then
-        echo "memory: free RAM $free GB, commit $commit GB (need 6 GB free and commit under 44 GB)"; return 1
+      if awk -v f="$free" -v c="$commit" 'BEGIN { exit !((f + 0) < 6 || (c + 0) >= 50) }'; then
+        echo "memory: free RAM $free GB, commit $commit GB (need 6 GB free and commit under 50 GB)"; return 1
       fi ;;
   esac
   return 0
