@@ -29,6 +29,7 @@ The Agentic HOI4 Modding kit: its skills, canonical instructions, wiki snapshot,
 | R3 | 2026-10-31 | No hidden startup-event overlays to modify vanilla characters and leaders. Use direct edits or shadow files, audited by P3. | [expansion record](../08-expansion-research/00-decision-record.md) |
 | R4 | 2026-10-31 | Hagane's field reference is not used as the HOI4 reference because it has contradicted claims. | [expansion record](../08-expansion-research/00-decision-record.md) |
 | **Agents, art and other projects** | | | |
+| D-118 | 2026-11-22 | Ideology, route, cosmetic-tag and formable variants of flags, emblems, portraits and icons are complete reimaginings true to the culture, never the same design with colours or marks added. A new variant method gets a pilot first. | [below](#decisions) |
 | D-23 (kit part) | 2026-11-06 | The kit's general modding rules for users stay as they are, even though agents themselves merge and push freely. | [expansion record](../08-expansion-research/00-decision-record.md) |
 | D3 | 2026-10-31 | Agents may call a ComfyUI endpoint the maintainer configured, for any asset including portraits of real people. This changes the kit's rule that agents never operate RunPod. See imagegen. | [expansion record](../08-expansion-research/00-decision-record.md) |
 | W5-2 (kit part) | 2026-11-01 | The old gptimage paths are removed from the kit once hoi4-imagegen replaces them. See imagegen. | [expansion record](../08-expansion-research/00-decision-record.md) |
@@ -39,7 +40,9 @@ The Agentic HOI4 Modding kit: its skills, canonical instructions, wiki snapshot,
 
 ## Decisions
 
-No new entries yet.
+| ID | Date | Question | Decision |
+|---|---|---|---|
+| D-118 | 2026-11-22 | ZIN's flag lane made a realm's ideology flags as the same arms with an added border, band, crown or dye. Is that a valid variant? | No. A variant of a country's flag, emblem, portrait or icon (for an ideology, a route, a cosmetic tag or a formable) is a complete reimagining of that country under that government or path, still true to its culture, its crown and its history. It is never the same design with colours, a border, a band, a crown or any other mark added. The maintainer said this goes for everything in the Agentic HOI4 Modding workflow, so it applies to every mod, not only ZIN. A new variant method gets a small pilot accepted before production. Maintainer decision, relayed by the ZIN lead from the maintainer's own words |
 
 ## Replaced or expired
 
