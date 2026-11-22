@@ -10,7 +10,7 @@
 #   scripts/heavy-slot.sh take --exclusive "<what runs, which session>" [max_wait_seconds]  every slot (a Windows game launch, a quiet benchmark)
 #   scripts/heavy-slot.sh release "<same text or a unique part of it>"
 # Take only when the job is ready to start, check the exit code directly (never through a pipe), and release in a trap on EXIT.
-# Pool size: HEAVY_SLOTS, default 2. Every start also needs the machine lines: on Windows free RAM at least 6 GB and commit under
+# Pool size: HEAVY_SLOTS, default 4. Every start also needs the machine lines: on Windows free RAM at least 6 GB and commit under
 # 50 GB, on every machine at least 30 GB free disk. An exclusive take first writes the hold (so nothing new starts), then waits until
 # every slot is free. A take prints TAKEN and exits 0. Exit codes: 0 done, 2 usage, 3 timed out waiting, 4 release refused.
 set -u
@@ -19,7 +19,7 @@ dir="$root/.work/tripo-round4"
 hold="$dir/hold"
 legacy="$dir/blender.lock"
 slots="$dir/slots"
-n=${HEAVY_SLOTS:-2}
+n=${HEAVY_SLOTS:-4}
 
 machine_ok() {
   free_kb=$(df -k "$dir" | tail -1 | awk '{print $4}')
