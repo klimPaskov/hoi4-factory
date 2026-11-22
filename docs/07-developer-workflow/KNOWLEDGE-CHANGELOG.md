@@ -2,6 +2,10 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.56, 2026-11-22, green means checks for the head commit
+
+- CLAUDE.md, External services: a pull request is green only when `gh pr checks` lists every required check as passed for its current head commit. "No checks reported" or a run without jobs is not green. Incident in the engineering lessons.
+
 ## 0.2.55, 2026-11-22, a pool of heavy-job slots
 
 - CLAUDE.md, Delegation and parallel work: heavy jobs run in a pool of two slots (`scripts/heavy-slot.sh`, D-113), with `take --exclusive` for Windows game launches and quiet benchmarks. A 3D run takes no slot itself, because each `gated.sh` step takes one. Take only when the job is ready, check the take's exit code directly, release in a trap, and kill a stopped waiter's whole process tree.
