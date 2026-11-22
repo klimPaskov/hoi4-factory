@@ -34,7 +34,7 @@ How the work is run across the HOI4 projects: approvals and autonomy, game launc
 | D-34 | 2026-11-08 | Sessions are not capped, D-31 stands. The coordinator archives finished sessions and runs one heavy job at a time. | [below](#decisions) |
 | D-35 | 2026-11-08 | Decisions are recorded per project under docs/decisions/, each file with an in-force list. IDs continue as one global D- sequence. The two old records become history. | [below](#decisions) |
 | D-48 | 2026-11-08 | The coordinator's check-in runs hourly while sessions are live, every three hours when all are idle or waiting. | [below](#decisions) |
-| D-39 | 2026-11-08 | No new work session starts above about 80% of the weekly usage limit, keeping the rest for the maintainer. | [below](#decisions) |
+| D-125 | 2026-11-22 | Usage is no limit on the work: sessions keep their pace and may use the weekly limit until it runs out. Replaces D-39's stop at 80%. | [below](#decisions) |
 | D-53 | 2026-11-08 | No session or worker runs above high effort, and each gets the model its work needs: Sonnet for structured or mechanical work, Opus at medium only for design-heavy work. | [below](#decisions) |
 | D-82 | 2026-11-18 | Sessions and workers do not run on Fable, except the coordinator session (D-95). Work continues under the normal rules: D-53's models and effort, and D-39's hold at about 80% of the weekly limit. | [below](#decisions) |
 | D-88 | 2026-11-18 | Work is always detailed. Nothing is simplified without the maintainer's consent: no design, asset, model, picture, interface, text or requirement is cut down to make a task easier or a check pass. | [below](#decisions) |
@@ -89,11 +89,13 @@ New entries go here in full, oldest first. A decision that spans projects is wri
 | D-112 | 2026-11-22 | Must agents ask before downloading files their work needs? | No. The maintainer gave agents full permission to download what their work needs, such as reference photos, documents, data and release files, without asking first. Each download goes into its own new folder in the git-ignored work area or the session scratchpad, records its source, and is deleted once its evidence is kept. A downloaded file is only read, never run, and licences are respected: references for 3D pictures come from public-domain or openly licensed sources. Spending money, signing in, posting and the other limits are unchanged. Maintainer decision |
 | D-113 | 2026-11-22 | The single heavy-job slot is the main limit on the 3D push. May more heavy jobs run at once? | Yes. The maintainer allowed more jobs at the same time. The slot becomes a pool, two slots on the Windows machine to start with, and the coordinator may raise the count when memory allows. Every start still needs the memory and disk lines (on Windows at least 6 GB of free RAM and a commit under 50 GB (raised from 44 GB on 2026-11-22, the commit limit is 58.6 GB), and 30 GB of free disk on every machine). A Windows game launch under D-33 and a timing-sensitive benchmark take every slot through an exclusive mode. The game still runs one instance at a time, and the WSL copy keeps its own lock. Technical form chosen by the coordinator under D-18. Maintainer decision |
 | D-116 | 2026-11-22 | Must the 3D models trailer wait for D-92's round releases of the other tools? | No. The 3D models trailer is independent of the other tools and comes when the 3D route and its models are ready. Only the all-in-one trailer waits for every round release that D-92 names, Agent Tools 5.0.0 included. This amends D-92 and D-74. Maintainer decision |
+| D-125 | 2026-11-22 | The weekly usage limit reached 67% with 4.4 days to its reset, and D-39 stops new sessions at about 80%. Does the work slow down? | No. The maintainer does not want usage to limit the work: sessions keep their pace, new sessions may start above 80%, and the work may use the weekly limit until it runs out. The coordinator still reads usage at each check-in and reports it, but no longer stops at a line. This replaces D-39. Maintainer decision |
 
 ## Replaced or expired
 
 | ID | Status | By or until |
 |---|---|---|
+| D-39 | Replaced | D-125, 2026-11-22: usage no longer stops new sessions |
 | D-81 | Replaced | D-82, on 2026-11-18 when the Fable limit was reached |
 | D-13a (move to the Mac) | Replaced | D-25 |
 | D-19 | Expired | Night of 2026-11-01 to 2026-11-02 |
