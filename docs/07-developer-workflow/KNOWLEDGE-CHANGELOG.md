@@ -2,6 +2,17 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.55, 2026-11-22, a pool of heavy-job slots
+
+- CLAUDE.md, Delegation and parallel work: heavy jobs run in a pool of two slots (`scripts/heavy-slot.sh`, D-113), with `take --exclusive` for Windows game launches and quiet benchmarks. A 3D run takes no slot itself, because each `gated.sh` step takes one. Take only when the job is ready, check the take's exit code directly, release in a trap, and kill a stopped waiter's whole process tree.
+- Reason and evidence: the single slot stalled the work of 2026-11-22 (a benchmark ran unheld, two holds sat idle, one lane lost every race). The story is in the engineering lessons.
+- Authority: the maintainer allowed more heavy jobs at once (D-113). The pool's form is a technical default under D-18.
+
+## 0.2.54, 2026-11-22, downloads need no approval
+
+- CLAUDE.md, External services: agents download what their work needs without asking (D-112), into their own folder, read only, never run.
+- Authority: maintainer decision D-112.
+
 ## 0.2.53, 2026-11-21, one script for the heavy-job slot
 
 - CLAUDE.md, Delegation and parallel work: every session takes and gives back the heavy-job slot with `scripts/heavy-slot.sh`, which checks the hold file and the Blender lock together, checks the memory and disk lines and takes the slot atomically.

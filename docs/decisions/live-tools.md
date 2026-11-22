@@ -14,11 +14,14 @@ HOI4 Live Tools: the MCP that runs real in-game tests, its launch preparation an
 | C4 (see factory) | 2026-10-31 | The local companion shows Live Tools test cards. See factory. | [expansion record](../08-expansion-research/00-decision-record.md) |
 | D-17 (see operations) | 2026-11-08 | Agents never start the game outside D-33's standing rule. See operations. | [expansion record](../08-expansion-research/00-decision-record.md) |
 | D-36 | 2026-11-08 | Until about 2026-11-22 tools for other modders come first. In-game testing through Live Tools comes after the three first goals of D-36. | [operations](operations.md#decisions) |
+| D-117 | 2026-11-22 | The five old handoff files move to `docs/archive`, and AGENTS.md points at one status file. | [below](#decisions) |
 | D-40 | 2026-11-08 | Feature releases at most about weekly, fixes any time. A promotion first releases the latest version and cleans the public text. | [operations](operations.md#decisions) |
 
 ## Decisions
 
-No new entries yet.
+| ID | Date | Question | Decision |
+|---|---|---|---|
+| D-117 | 2026-11-22 | Live Tools keeps five old handoff files that its AGENTS.md tells agents to start from. Do they stay for 2.0.0? | No. The five files move to `docs/archive`, and AGENTS.md points agents at one current status file instead, in the same change, so the public docs are clean for Live Tools 2.0.0. Maintainer decision |
 
 ## Replaced or expired
 
