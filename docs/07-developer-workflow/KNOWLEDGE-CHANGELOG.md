@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.60, 2026-11-23, a handover word keeps the game windows
+
+- `coordinate-sessions`, Stop and error paths: when the maintainer asks the coordinator to pass a handover word such as "PC is yours" for him, it passes the word only within D-33. The Windows game waits until he has stopped using the PC, and the isolated WSL copy may run at any time on a virtual display.
+- Reason and evidence: on 2026-11-23 at 18:45 a coordinator passed "PC is yours" to the Live Tools port worker as if it opened the Windows game at once. The maintainer corrected it five minutes later. The Windows game runs only once he is no longer at the PC. No game had started.
+- Authority: D-33 restated. It widens no access, cost or scope.
+
 ## 0.2.59, 2026-11-23, reserved slots per group
 
 - CLAUDE.md, Delegation and parallel work: a group keeps slots in the heavy-job pool while one of its takes waits (`.work/tripo-round4/reserves`). Rust keeps 2 for take texts containing `rust` or `cargo`, and ZIN keeps 1 for take texts starting `zin-lane:`.
