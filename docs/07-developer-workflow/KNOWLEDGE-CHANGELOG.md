@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.59, 2026-11-23, reserved slots per group
+
+- CLAUDE.md, Delegation and parallel work: a group keeps slots in the heavy-job pool while one of its takes waits (`.work/tripo-round4/reserves`). Rust keeps 2 for take texts containing `rust` or `cargo`, and ZIN keeps 1 for take texts starting `zin-lane:`.
+- Reason and evidence: on 2026-11-22 the Rust packets waited behind six 3D steps with nothing compiled, and on 2026-11-23 four ZIN jobs, among them the maintainer's top priority of the day, waited the same way. A group's unfilled slots open to everyone as soon as none of its takes waits.
+- Authority: a technical default under D-18 and D-113. It widens no access, cost or scope.
+
 ## 0.2.58, 2026-11-23, archive only your own family's sessions
 
 - CLAUDE.md, Delegation and parallel work: archive only sessions your own family started, after reading the last report. A merged pull request does not mean a session is finished. Ask another family's lead to archive its own.

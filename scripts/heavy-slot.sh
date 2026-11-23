@@ -28,27 +28,62 @@ pool_n() {
 }
 n=$(pool_n)
 
-# Rust reserve: a take whose text contains "rust" or "cargo" (any case) is a Rust take. While a Rust take is waiting,
-# the other takes leave R slots free for it. R comes from HEAVY_RUST_RESERVE, else .work/tripo-round4/rust-reserve, else 0.
-# A waiting Rust take touches a ticket in .work/tripo-round4/rust-wait every loop, and a ticket older than 2 minutes is ignored,
-# so the reserved slots go back to everyone as soon as no Rust take waits.
-rust_r() {
-  if [ -n "${HEAVY_RUST_RESERVE:-}" ]; then echo "$HEAVY_RUST_RESERVE"
-  elif [ -f "$dir/rust-reserve" ]; then tr -cd '0-9' < "$dir/rust-reserve"
-  else echo 0; fi
+# Reserves: a group of takes keeps slots for itself while one of its takes waits. Each line of .work/tripo-round4/reserves
+# is "<name> <count> <pattern>", and a take belongs to the first group whose pattern (grep -Ei) matches its text, so list
+# the narrow patterns first. Without that file, HEAVY_RUST_RESERVE or rust-reserve gives the old Rust group ("rust" or
+# "cargo"). A waiting take touches a ticket in .work/tripo-round4/<name>-wait every loop. A ticket older than 2 minutes is
+# ignored, so a group's unfilled slots go back to everyone as soon as none of its takes waits.
+reserves() {
+  if [ -f "$dir/reserves" ]; then grep -Ev '^[[:space:]]*(#|$)' "$dir/reserves"
+  else
+    r=0
+    if [ -n "${HEAVY_RUST_RESERVE:-}" ]; then r=$HEAVY_RUST_RESERVE
+    elif [ -f "$dir/rust-reserve" ]; then r=$(tr -cd '0-9' < "$dir/rust-reserve"); fi
+    [ "${r:-0}" -gt 0 ] && echo "rust $r rust|cargo"
+  fi
+  return 0
 }
-is_rust() { printf '%s' "$1" | grep -Eqi 'rust|cargo'; }
-used_other() {
-  count=0
-  [ -d "$legacy" ] && count=$((count + 1))
-  i=1
-  while [ "$i" -le "$n" ]; do
-    if [ -d "$slots/s$i" ] && ! grep -Eqi 'rust|cargo' "$slots/s$i/owner" 2>/dev/null; then count=$((count + 1)); fi
-    i=$((i + 1))
+group_of() {
+  reserves | while read -r gname gcount gpat; do
+    if printf '%s' "$1" | grep -Eqi -- "$gpat"; then echo "$gname"; break; fi
   done
-  echo "$count"
 }
-rust_waiting() { [ -d "$dir/rust-wait" ] && [ -n "$(find "$dir/rust-wait" -type f -mmin -2 2>/dev/null | head -1)" ]; }
+group_waiting() { [ -d "$dir/$1-wait" ] && [ -n "$(find "$dir/$1-wait" -type f -mmin -2 2>/dev/null | head -1)" ]; }
+used_by() {
+  ucount=0; ui=1
+  while [ "$ui" -le "$n" ]; do
+    if [ -f "$slots/s$ui/owner" ]; then
+      uwhat=$(sed -e 's/^[0-9-]* [0-9:]* //' -e 's/ (pid [0-9]*)$//' "$slots/s$ui/owner")
+      [ "$(group_of "$uwhat")" = "$1" ] && ucount=$((ucount + 1))
+    fi
+    ui=$((ui + 1))
+  done
+  echo "$ucount"
+}
+# Prints "<slots> <names>": the unfilled reserved slots of waiting groups other than group $1.
+kept_for_others() {
+  own=$1; ktotal=0; knames=""
+  ktmp="$dir/.reserves.$$"
+  reserves > "$ktmp"
+  while read -r gname gcount gpat; do
+    [ "$gname" = "$own" ] && continue
+    group_waiting "$gname" || continue
+    kleft=$((gcount - $(used_by "$gname")))
+    [ "$kleft" -gt 0 ] || continue
+    ktotal=$((ktotal + kleft)); knames="$knames $gname"
+  done < "$ktmp"
+  rm -f "$ktmp"
+  echo "$ktotal$knames"
+}
+show_reserves() {
+  stmp="$dir/.reserves.s$$"
+  reserves > "$stmp"
+  while read -r gname gcount gpat; do
+    if group_waiting "$gname"; then w="a take is waiting"; else w="none waiting, so its slots are open"; fi
+    echo "Reserve $gname: $gcount slot(s) for takes matching '$gpat', $(used_by "$gname") in use, $w"
+  done < "$stmp"
+  rm -f "$stmp"
+}
 
 machine_ok() {
   free_kb=$(df -k "$dir" | tail -1 | awk '{print $4}')
@@ -92,15 +127,11 @@ cmd=${1:-}
 case "$cmd" in
   status)
     u=$(used)
-    if [ -f "$hold" ]; then echo "BUSY exclusive, $u of $n slots used"; list; exit 0; fi
-    if [ "$u" -ge "$n" ]; then echo "BUSY $u of $n slots used"; list; exit 0; fi
+    if [ -f "$hold" ]; then echo "BUSY exclusive, $u of $n slots used"; list; show_reserves; exit 0; fi
+    if [ "$u" -ge "$n" ]; then echo "BUSY $u of $n slots used"; list; show_reserves; exit 0; fi
     if r=$(machine_ok); then echo "FREE $u of $n slots used"; else echo "FREE $u of $n slots used, but WAIT $r"; fi
     list
-    rr=$(rust_r)
-    if [ "${rr:-0}" -gt 0 ]; then
-      if rust_waiting; then echo "Rust reserve: $rr slot(s), a Rust take is waiting, so other takes stop at $((n - rr)) slots"
-      else echo "Rust reserve: $rr slot(s), no Rust take waiting, so every slot is open"; fi
-    fi
+    show_reserves
     exit 0 ;;
   take)
     shift
@@ -111,10 +142,13 @@ case "$cmd" in
     max=${2:-3600}; waited=0
     mkdir -p "$slots"
     mine=""
-    ticket=""
-    if [ "$excl" -eq 0 ] && is_rust "$what"; then
-      mkdir -p "$dir/rust-wait"; ticket="$dir/rust-wait/$$"
-      trap 'rm -f "$ticket"' EXIT
+    ticket=""; grp=""
+    if [ "$excl" -eq 0 ]; then
+      grp=$(group_of "$what")
+      if [ -n "$grp" ]; then
+        mkdir -p "$dir/$grp-wait"; ticket="$dir/$grp-wait/$$"
+        trap 'rm -f "$ticket"' EXIT
+      fi
     fi
     while :; do
       n=$(pool_n)
@@ -133,8 +167,8 @@ case "$cmd" in
       else
         if [ -f "$hold" ]; then reason="exclusive hold: $(head -1 "$hold" 2>/dev/null)"
         elif [ "$(used)" -ge "$n" ]; then reason="all $n slots used"
-        elif [ -z "$ticket" ] && rust_waiting && [ "$(used_other)" -ge $((n - $(rust_r))) ]; then
-          reason="the last $(rust_r) slot(s) are kept for a waiting Rust take"
+        elif kept=$(kept_for_others "$grp") && [ $(( $(used) + ${kept%% *} )) -ge "$n" ]; then
+          reason="${kept%% *} slot(s) are kept for waiting group(s):${kept#* }"
         elif ! reason=$(machine_ok); then :
         else
           i=1; got=""
