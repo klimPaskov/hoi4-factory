@@ -38,7 +38,7 @@ Done when the fresh-install test passes on Windows and Linux, and the macOS resu
 1. Family fixes (agency and doctrine colours), model routing under W5-10 with a probe of what the sign-in route returns, palette variety across every family, and the TFR style packs.
 2. Keep the `model_reference` family general and lean, and put specific review points into how agents review their results.
 3. Land the open docs pull request. Close the macOS release-blocker issue if macOS CI passes on main, since a release already shipped after it.
-4. Respect the sign-in concurrency rule (W5-8) and any temporary one-at-a-time period after a revocation.
+4. Respect the sign-in concurrency rule (D-141, which replaced W5-8): 10 at once by default, more only with the user's confirmation, and one step down for each repeated sign-out.
 
 ### HOI4 Live Tools: after the three goals
 
