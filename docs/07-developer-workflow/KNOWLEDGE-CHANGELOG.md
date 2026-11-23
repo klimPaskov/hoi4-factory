@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.63, 2026-11-23, gated steps start first come, first served
+
+- CLAUDE.md, Delegation and parallel work: the 3D lanes' gated steps start in the order they began waiting. `heavy-slot.sh kept` finds the gated step that asks, ranks it by its process start time among the waiting steps (cached for 15 s), and keeps it waiting while older steps fit the free slots.
+- Reason and evidence: on 2026-11-23 about 25 gated steps waited at once with memory near the line. Every waiter took a slot in turn and ran its own PowerShell memory check every 15 s, so newer steps often started before ones that had waited since 18:00, and the checks themselves cost memory and CPU.
+- Authority: a technical default under D-18 and D-113. It widens no access, cost or scope.
+
 ## 0.2.62, 2026-11-23, no obvious fault reaches the maintainer
 
 - CLAUDE.md, Verification and handoff: before showing or relaying anything, check it against the accepted references and the anatomy of every figure, fix each obvious fault or send it back, and never show a known fault with a caption. A renderer's limit counts as a fault.

@@ -88,6 +88,47 @@ show_reserves() {
   rm -f "$stmp"
 }
 
+# First come, first served among the 3D lanes' gated steps (.work/tripo-round4/gated.sh). Before it claims a slot, gated.sh
+# asks `kept`. When the asking step is not among the oldest waiting steps that fit in the free slots, `kept` answers with the
+# free slots, so the step keeps waiting and runs no memory check of its own. Without this, every waiting step raced for each
+# slot that opened and started its own PowerShell check every 15 s, and a step could wait for hours behind newer ones
+# (2026-11-23). Order is the gated.sh process start time. The list of waiting steps is cached for 15 s in
+# .work/tripo-round4/queue.cache, so the waiters do not each scan the processes. Only where /proc exists (Git Bash, Linux).
+gated_caller() {
+  gp=$PPID; gk=0
+  while [ "$gk" -lt 6 ] && [ -n "$gp" ] && [ "$gp" != 1 ]; do
+    gc=""; { IFS= read -r gc < "/proc/$gp/cmdline"; } 2>/dev/null
+    case "$gc" in sh*/tripo-round4/gated.sh*) echo "$gp"; return 0 ;; esac
+    gq=""; { IFS= read -r gq < "/proc/$gp/ppid"; } 2>/dev/null
+    gp=$gq; gk=$((gk + 1))
+  done
+  return 1
+}
+queue_build() {
+  ps 2>/dev/null | awk '$NF ~ /\/sh$/ { print $1 }' | while read -r qp; do
+    qc=""; { IFS= read -r qc < "/proc/$qp/cmdline"; } 2>/dev/null
+    case "$qc" in sh*/tripo-round4/gated.sh*) ;; *) continue ;; esac
+    grep -qs "(pid $qp)" "$slots"/s*/owner && continue
+    qs=""; { IFS= read -r qs < "/proc/$qp/stat"; } 2>/dev/null
+    set -- $qs
+    [ "$#" -ge 22 ] || continue
+    eval "qst=\${22}"
+    echo "$qst $qp"
+  done | sort -n
+}
+queue_list() {
+  qcache="$dir/queue.cache"; qnow=$(date +%s); qt=0
+  [ -f "$qcache" ] && { IFS= read -r qt < "$qcache"; } 2>/dev/null
+  case "$qt" in ''|*[!0-9]*) qt=0 ;; esac
+  [ -d "$dir/.queue.lock" ] && [ -n "$(find "$dir/.queue.lock" -mmin +2 2>/dev/null)" ] && rmdir "$dir/.queue.lock" 2>/dev/null
+  if [ $((qnow - qt)) -ge 15 ] && mkdir "$dir/.queue.lock" 2>/dev/null; then
+    { echo "$qnow"; queue_build; } > "$qcache.$$" && mv -f "$qcache.$$" "$qcache"
+    rmdir "$dir/.queue.lock" 2>/dev/null
+  fi
+  [ -f "$qcache" ] && tail -n +2 "$qcache"
+  return 0
+}
+
 machine_ok() {
   free_kb=$(df -k "$dir" | tail -1 | awk '{print $4}')
   if [ "$free_kb" -lt 31457280 ]; then echo "disk: under 30 GB free"; return 1; fi
@@ -139,8 +180,22 @@ case "$cmd" in
   kept)
     # Prints "<slots> <groups>": the slots other takers must leave free for waiting groups. gated.sh asks this before it
     # claims a slot. With a take text, that text's own group is left out.
+    # With no take text and a gated.sh step as the caller, the first-come queue applies too (see gated_caller).
     kgrp=""; [ -n "${2:-}" ] && kgrp=$(group_of "$2")
-    kept_for_others "$kgrp"; exit 0 ;;
+    kout=$(kept_for_others "$kgrp")
+    if [ -z "${2:-}" ] && [ -r "/proc/$$/cmdline" ] && me=$(gated_caller); then
+      free=$(( n - $(used) - ${kout%% *} ))
+      if [ "$free" -gt 0 ]; then
+        qall=$(queue_list)
+        rank=$(printf '%s\n' "$qall" | awk -v me="$me" '$2 == me { print NR - 1; f = 1; exit } END { if (!f) print -1 }')
+        total=$(printf '%s\n' "$qall" | grep -c .)
+        if [ "$rank" -lt 0 ] || [ "$rank" -ge "$free" ]; then
+          if [ "$rank" -lt 0 ]; then place="not yet listed"; else place="place $((rank + 1)) of $total"; fi
+          echo "$free first-come-queue($place)"; exit 0
+        fi
+      fi
+    fi
+    echo "$kout"; exit 0 ;;
   take)
     shift
     excl=0
