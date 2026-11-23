@@ -136,6 +136,11 @@ case "$cmd" in
     list
     show_reserves
     exit 0 ;;
+  kept)
+    # Prints "<slots> <groups>": the slots other takers must leave free for waiting groups. gated.sh asks this before it
+    # claims a slot. With a take text, that text's own group is left out.
+    kgrp=""; [ -n "${2:-}" ] && kgrp=$(group_of "$2")
+    kept_for_others "$kgrp"; exit 0 ;;
   take)
     shift
     excl=0
