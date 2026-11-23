@@ -129,6 +129,20 @@ queue_list() {
   return 0
 }
 
+# Memory lines on Windows: free RAM at least 6 GB and commit under 62 GB. The maintainer may approve looser lines for a set time:
+# .work/tripo-round4/mem-lines holds "<free GB> <commit GB> <until, epoch seconds>" and is ignored once that time has passed.
+mem_lines() {
+  mlf=6; mlc=62
+  if [ -f "$dir/mem-lines" ]; then
+    mo=""; { IFS= read -r mo < "$dir/mem-lines"; } 2>/dev/null
+    set -- $mo
+    if [ "$#" -ge 3 ]; then
+      case "$1$2$3" in *[!0-9.]*) ;; *) [ "$(date +%s)" -lt "$3" ] && { mlf=$1; mlc=$2; } ;; esac
+    fi
+  fi
+  echo "$mlf $mlc"
+}
+
 machine_ok() {
   free_kb=$(df -k "$dir" | tail -1 | awk '{print $4}')
   if [ "$free_kb" -lt 31457280 ]; then echo "disk: under 30 GB free"; return 1; fi
@@ -136,8 +150,9 @@ machine_ok() {
     MINGW*|MSYS*|CYGWIN*)
       line=$(powershell -NoProfile -Command '$os = Get-CimInstance Win32_OperatingSystem; $pf = Get-CimInstance Win32_PerfFormattedData_PerfOS_Memory; "{0:N1} {1:N1}" -f ($os.FreePhysicalMemory/1MB), ($pf.CommittedBytes/1GB)' | tr -d '\r' | tr ',' '.')
       free=${line% *}; commit=${line#* }
-      if awk -v f="$free" -v c="$commit" 'BEGIN { exit !((f + 0) < 6 || (c + 0) >= 62) }'; then
-        echo "memory: free RAM $free GB, commit $commit GB (need 6 GB free and commit under 62 GB)"; return 1
+      ml=$(mem_lines); lf=${ml% *}; lc=${ml#* }
+      if awk -v f="$free" -v c="$commit" -v lf="$lf" -v lc="$lc" 'BEGIN { exit !((f + 0) < (lf + 0) || (c + 0) >= (lc + 0)) }'; then
+        echo "memory: free RAM $free GB, commit $commit GB (need $lf GB free and commit under $lc GB)"; return 1
       fi ;;
   esac
   return 0
