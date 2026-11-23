@@ -130,6 +130,10 @@ CLAUDE.md rule: a job that reads large files in WSL releases them from the file 
 
 ## Verification and handoff
 
+### Obvious faults shown for review (2026-11-23)
+
+CLAUDE.md rule: fix every obvious fault before the maintainer sees the work, and never show a known fault with an explanatory caption (D-144). On 2026-11-23 pictures reached the maintainer for review still carrying faults that the agents could have seen themselves: an interface renderer's base-game titles and placeholder numbers, mismatched frames, an event picture that did not fill its frame, off-centre buttons, a figure with three arms, creatures off the project's accepted look, and characters off canon. A coordinator also relayed a ship picture as fine without a full-size look of its own. The rule now covers everything an agent shows or relays, and the modding kit carries it too.
+
 ### A factory redrawn until it passed (2026-11-18)
 
 CLAUDE.md rule: keep work detailed, and never simplify without the maintainer's consent. In the 3D route work the test factory was a brick works with a lattice water tower and saw-tooth roofs. The generator's low-poly mesh had defects on it, so the session redrew it with a brick tower, and after a second failed review as one plain hall with one chimney, which passed. The landmark was redrawn simpler once and the tank twice in the same way. The coordinator relayed all three as passed types without checking which reference each run had used. The maintainer saw the second factory picture and rejected the practice. The three passes were withdrawn, the kit pull request went back to draft, and D-87 and D-88 set the rule: the method changes, the design stays, and a pass on a simplified input is not a pass.

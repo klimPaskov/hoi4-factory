@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.62, 2026-11-23, no obvious fault reaches the maintainer
+
+- CLAUDE.md, Verification and handoff: before showing or relaying anything, check it against the accepted references and the anatomy of every figure, fix each obvious fault or send it back, and never show a known fault with a caption. A renderer's limit counts as a fault.
+- Reason and evidence: the engineering lessons, "Obvious faults shown for review (2026-11-23)".
+- Authority: maintainer decision D-144.
+
 ## 0.2.61, 2026-11-23, one game depot through Steam's console
 
 - CLAUDE.md, On Windows only: the depot IDs of HOI4 per platform, and that the current Steam client opens its Console tab only when started with `-console`. `steam://open/console` does nothing.
