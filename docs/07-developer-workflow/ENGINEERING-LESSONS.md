@@ -58,6 +58,10 @@ CLAUDE.md rule: run long work as separate sessions, not as background subagents 
 
 CLAUDE.md rule: start a new Claude Code session on Sonnet at medium or high effort, and use Opus at medium effort for harder tasks. This is a maintainer preference of 2026-11-02, and a new session does not inherit the starting session's model and effort.
 
+### Archiving one session archived eight (2026-11-23)
+
+CLAUDE.md rule: archiving one session also archives every idle session that shares its folder and has no open pull request, so list the folder's sessions before and after. On 2026-11-23 the coordinator archived a stale scheduled cleanup session that worked in the main hoi4-factory checkout. The app also archived seven idle 3D workers in the same folder whose pull requests had merged, and the Agent Tools integrator. All of them still had work. The coordinator saw it only when its resume messages bounced, unarchived all eight, and found their worktrees intact.
+
 ### Two heavy jobs at once (2026-11-21)
 
 CLAUDE.md rule: take the heavy-job slot only through `scripts/heavy-slot.sh`. The slot had two signals, a hold file written by hand and the `blender.lock` folder taken by the 3D lane's Blender gate. On 2026-11-21 the 3D gate took the lock at 19:19:37 and a ZIN worker wrote its hold 23 seconds later, because it checked only the hold file. A 40-minute build started beside a Blender run with 10 GB of RAM free, and the build had to be killed. Earlier the same day a release benchmark rerun also ran while the lock existed. One script that checks both signals and takes the slot atomically replaces the by-hand protocol.

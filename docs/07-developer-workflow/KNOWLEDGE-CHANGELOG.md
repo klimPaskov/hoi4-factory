@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.58, 2026-11-23, archiving cascades to idle sessions in the same folder
+
+- CLAUDE.md, Delegation and parallel work: archiving one session also archives every idle session that shares its folder and has no open pull request. List the folder's sessions before archiving, and afterwards unarchive any that still have work.
+- Reason and evidence: one archive took eight working sessions with it on 2026-11-23. The story is in the engineering lessons.
+- Authority: a technical default under D-18 and D-90. It widens no access, cost or scope.
+
 ## 0.2.57, 2026-11-22, root fixes in every lane
 
 - CLAUDE.md, Keeping this guidance current: the D-90 rule holds in every lane and whatever a task first aimed at. A problem met while making production content is still fixed at its root in the shared kit or tool, so it cannot recur for the maintainer's mods or for public users.
