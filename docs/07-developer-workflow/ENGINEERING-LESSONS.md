@@ -58,9 +58,9 @@ CLAUDE.md rule: run long work as separate sessions, not as background subagents 
 
 CLAUDE.md rule: start a new Claude Code session on Sonnet at medium or high effort, and use Opus at medium effort for harder tasks. This is a maintainer preference of 2026-11-02, and a new session does not inherit the starting session's model and effort.
 
-### Archiving one session archived eight (2026-11-23)
+### Another family's lead archived eight working sessions (2026-11-23)
 
-CLAUDE.md rule: archiving one session also archives every idle session that shares its folder and has no open pull request, so list the folder's sessions before and after. On 2026-11-23 the coordinator archived a stale scheduled cleanup session that worked in the main hoi4-factory checkout. The app also archived seven idle 3D workers in the same folder whose pull requests had merged, and the Agent Tools integrator. All of them still had work. The coordinator saw it only when its resume messages bounced, unarchived all eight, and found their worktrees intact.
+CLAUDE.md rule: archive only sessions your own family started, and only after reading the last report. A merged pull request does not mean a session is finished. On 2026-11-23 the maintainer asked two coordinators to clean old and stale chats. The ZIN lead archived eight of the HOI4 coordinator's sessions because each had a merged pull request: seven 3D workers and the Agent Tools integrator. All of them still had work, and the coordinator had just sent them resume messages. The coordinator first blamed its own archive of an unrelated session, wrote a wrong rule about a cascade, and corrected it once the ZIN lead's report arrived. It unarchived all eight, and their worktrees were intact.
 
 ### Two heavy jobs at once (2026-11-21)
 
