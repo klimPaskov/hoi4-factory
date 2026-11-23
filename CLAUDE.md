@@ -71,6 +71,7 @@ On Windows only:
 - Shell heredocs passed into Python can alter backslash escapes, and a Python heredoc that edits files containing backslashes or `'''` can fail silently or abort the command. Make such edits with the Edit tool, and check that an edit applied.
 - Git Bash corrupts non-ASCII text passed on a command line, for example `curl -d` with accents or emoji. Write such payloads to a UTF-8 file and send them with `--data-binary @file`.
 - Scripts that pass host paths to `docker run` convert them with `cygpath -m` when it exists and set `MSYS_NO_PATHCONV=1`, as `scripts/linux-tests.sh` does. Both are no-ops on macOS.
+- To fetch one platform's HOI4 files for the WSL copy, the maintainer types `download_depot 394360 <depot>` in Steam's Console tab (394361 shared data, 394362 Windows, 394363 Linux, 394364 macOS). The current Steam client ignores `steam://open/console`, so start Steam with `steam.exe -console` (after `steam.exe -shutdown` if it runs). The files land in `steamapps\content\app_394360\depot_<id>`. Check each manifest against `https://api.steamcmd.net/v1/info/394360`.
 - The session scratchpad path is long, so cloning a deep repository there (the Agentic kit's skill assets) fails with "Filename too long". Mount the checkout read-only into a Linux container and clone it inside, which also gives a fresh-checkout Linux run.
 
 On macOS only:

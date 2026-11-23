@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.61, 2026-11-23, one game depot through Steam's console
+
+- CLAUDE.md, On Windows only: the depot IDs of HOI4 per platform, and that the current Steam client opens its Console tab only when started with `-console`. `steam://open/console` does nothing.
+- Reason and evidence: on 2026-11-23 the WSL copy moved to 1.20.0.0. The Linux and macOS binaries came from `download_depot`, which worked only after Steam was restarted with `-console`. Both manifests matched the public build.
+- Authority: a technical note under D-18 and D-90. It widens no access, cost or scope.
+
 ## 0.2.60, 2026-11-23, a handover word keeps the game windows
 
 - `coordinate-sessions`, Stop and error paths: when the maintainer asks the coordinator to pass a handover word such as "PC is yours" for him, it passes the word only within D-33. The Windows game waits until he has stopped using the PC, and the isolated WSL copy may run at any time on a virtual display.
