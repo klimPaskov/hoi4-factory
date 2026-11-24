@@ -94,20 +94,31 @@ show_reserves() {
 # slot that opened and started its own PowerShell check every 15 s, and a step could wait for hours behind newer ones
 # (2026-11-23). Order is the gated.sh process start time. The list of waiting steps is cached for 15 s in
 # .work/tripo-round4/queue.cache, so the waiters do not each scan the processes. Only where /proc exists (Git Bash, Linux).
+# gated.sh asks `kept` from a command substitution, so the nearest matching ancestor is a forked subshell with the same command
+# line. Take the topmost of the matching ancestors, which is the gated.sh process itself (2026-11-24: taking the fork made every
+# waiter "not yet listed" and blocked the queue for hours).
+is_gated() {
+  gc=""; { IFS= read -r gc < "/proc/$1/cmdline"; } 2>/dev/null
+  case "$gc" in sh*/tripo-round4/gated.sh*) return 0 ;; esac
+  return 1
+}
 gated_caller() {
-  gp=$PPID; gk=0
-  while [ "$gk" -lt 6 ] && [ -n "$gp" ] && [ "$gp" != 1 ]; do
-    gc=""; { IFS= read -r gc < "/proc/$gp/cmdline"; } 2>/dev/null
-    case "$gc" in sh*/tripo-round4/gated.sh*) echo "$gp"; return 0 ;; esac
+  gp=$PPID; gk=0; gfound=""
+  while [ "$gk" -lt 8 ] && [ -n "$gp" ] && [ "$gp" != 1 ]; do
+    if is_gated "$gp"; then gfound=$gp
+    elif [ -n "$gfound" ]; then break
+    fi
     gq=""; { IFS= read -r gq < "/proc/$gp/ppid"; } 2>/dev/null
     gp=$gq; gk=$((gk + 1))
   done
+  [ -n "$gfound" ] && { echo "$gfound"; return 0; }
   return 1
 }
 queue_build() {
   ps 2>/dev/null | awk '$NF ~ /\/sh$/ { print $1 }' | while read -r qp; do
-    qc=""; { IFS= read -r qc < "/proc/$qp/cmdline"; } 2>/dev/null
-    case "$qc" in sh*/tripo-round4/gated.sh*) ;; *) continue ;; esac
+    is_gated "$qp" || continue
+    qpp=""; { IFS= read -r qpp < "/proc/$qp/ppid"; } 2>/dev/null
+    [ -n "$qpp" ] && is_gated "$qpp" && continue
     grep -qs "(pid $qp)" "$slots"/s*/owner && continue
     qs=""; { IFS= read -r qs < "/proc/$qp/stat"; } 2>/dev/null
     set -- $qs

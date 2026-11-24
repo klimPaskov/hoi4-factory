@@ -130,6 +130,10 @@ CLAUDE.md rule: a job that reads large files in WSL releases them from the file 
 
 ## Verification and handoff
 
+### A queue that blocked its own waiters (2026-11-24)
+
+CLAUDE.md rule: the 3D lanes' gated steps start first come, first served. The first version of the queue in `heavy-slot.sh kept` looked for the nearest ancestor whose command line was `gated.sh`. But gated.sh asks from a command substitution, and that forked subshell has the same command line. So the code found the fork, which is never in the waiting list, and told every waiter "not yet listed, keep waiting". From about 22:40 on 2026-11-23 to 04:48 the next morning, almost no 3D step started, while the pool showed free slots and the memory lines passed. The test had used a stand-in with the same fork structure, and its "not yet listed" answer was misread as expected. The fix takes the topmost matching ancestor and leaves forks out of the list. Lesson: when a test's answer says "not found", check that it found the right process before accepting it, and watch the pool for a few minutes after changing it.
+
 ### Obvious faults shown for review (2026-11-23)
 
 CLAUDE.md rule: fix every obvious fault before the maintainer sees the work, and never show a known fault with an explanatory caption (D-144). On 2026-11-23 pictures reached the maintainer for review still carrying faults that the agents could have seen themselves: an interface renderer's base-game titles and placeholder numbers, mismatched frames, an event picture that did not fill its frame, off-centre buttons, a figure with three arms, creatures off the project's accepted look, and characters off canon. A coordinator also relayed a ship picture as fine without a full-size look of its own. The rule now covers everything an agent shows or relays, and the modding kit carries it too.
