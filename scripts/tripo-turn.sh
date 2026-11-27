@@ -10,7 +10,7 @@
 # Take the turn only when your Tripo steps are ready, check the exit code directly, and release as soon as the browser is free.
 # A waiting take touches its ticket every 15 s. A ticket untouched for 2 minutes belongs to a take that died, and is removed,
 # so a killed waiter never blocks the queue. Exit codes: 0 done, 2 usage, 3 timed out waiting, 4 release refused.
-# On Windows the take also waits until free RAM is at least TRIPO_MIN_FREE_GB (default 3). A Tripo page opened with about
+# On Windows the take also waits until free RAM is at least TRIPO_MIN_FREE_GB (default 8). A Tripo page opened with about
 # 1 GB free froze Chrome, and a frozen Tripo tab hangs every later Tripo tab, because Chrome renders one site in one process.
 set -u
 root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
@@ -24,7 +24,7 @@ mem_ok() {
     MINGW*|MSYS*|CYGWIN*) ;;
     *) return 0 ;;
   esac
-  need=${TRIPO_MIN_FREE_GB:-3}
+  need=${TRIPO_MIN_FREE_GB:-8}
   free=$(powershell -NoProfile -Command '"{0:N1}" -f ((Get-CimInstance Win32_OperatingSystem).FreePhysicalMemory/1MB)' 2>/dev/null | tr -d '\r' | tr ',' '.')
   case "$free" in ''|*[!0-9.]*) return 0 ;; esac
   if awk -v f="$free" -v n="$need" 'BEGIN { exit !((f + 0) < (n + 0)) }'; then

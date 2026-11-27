@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.66, 2026-11-27, the Tripo turn waits for 8 GB free
+
+- CLAUDE.md, External services, Tripo browser: `scripts/tripo-turn.sh take` now waits for 8 GB of free RAM (was 3).
+- Reason and evidence: after a full PC restart on 2026-11-27, Tripo's Animate and Generate pages still froze Chrome, both times at about 3.6 GB free while other lanes ran. A fresh browser and GPU process did not help, so the free-memory floor was too low.
+- Authority: a technical default under D-18 and D-114. It widens no access, cost or scope.
+
 ## 0.2.65, 2026-11-27, the tutorial path goes first in the pool
 
 - CLAUDE.md, Delegation and parallel work: the pool keeps 1 slot for take texts starting `tutorial-path:`, checked before the Rust and ZIN reserves.
