@@ -76,6 +76,10 @@ CLAUDE.md rule: commit empty crate skeletons and their workspace members on main
 
 CLAUDE.md rule: make every HOI4 image with hoi4-imagegen, never the general `gptimage` MCP. hoi4-imagegen paces its ChatGPT sign-in requests across all its processes on the machine, while `gptimage` uses the same Codex sign-in outside that limit. On 2026-11-08 both ran at once and OpenAI revoked the sign-in at 15:29 UTC.
 
+### A game run cut into a build between its steps (2026-11-27)
+
+CLAUDE.md rule: a job of several steps keeps one take across all of them. On 2026-11-27 ZIN's playtest build released its slot between a failed gate and its retry, and the Live Tools port worker's exclusive take for the Windows game landed in that gap at 23:39. The build then waited behind the hold, and the port worker had to give the night's batch up so the playtest could still start. zin-build fixed it by wrapping build, plan and apply in one take.
+
 ### A frozen Tripo tab blocked every later Tripo page (2026-11-27)
 
 CLAUDE.md rule: `tripo-turn.sh take` waits until 3 GB of RAM is free (`TRIPO_MIN_FREE_GB`). Kror's export page froze Chrome with about 1 GB free. On 2026-11-27 the goblin's Animate page froze at 1.1 GB free, and Chrome would not close it. Later Tripo pages opened with 5.7 GB free froze within seconds too, because Chrome renders one site in one process, so the first frozen tab hung them all. No press was made and no credits were spent. Agents can close only the tabs in their own Chrome tab group, so a stuck tab in another session's group needs the maintainer.

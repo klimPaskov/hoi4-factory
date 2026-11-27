@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.67, 2026-11-27, one take for a job of several steps
+
+- CLAUDE.md, Delegation and parallel work: a job of several steps that a game run must not split keeps one take across all its steps.
+- Reason and evidence: the engineering lessons, "A game run cut into a build between its steps (2026-11-27)".
+- Authority: a technical default under D-18 and D-113. It widens no access, cost or scope.
+
 ## 0.2.66, 2026-11-27, the Tripo turn waits for 8 GB free
 
 - CLAUDE.md, External services, Tripo browser: `scripts/tripo-turn.sh take` now waits for 8 GB of free RAM (was 3).
