@@ -14,7 +14,7 @@
 # pattern: on 2026-11-23 a pattern kill ended eight other lanes' waiting takes. Record the PID when your script starts, send
 # TERM to the script first so its EXIT trap releases what it holds, then end its children, then check `status` for your text.
 # Pool size: HEAVY_SLOTS, default 4. Every start also needs the machine lines: on Windows free RAM at least 6 GB and commit under
-# 62 GB, on every machine at least 30 GB free disk. An exclusive take first writes the hold (so nothing new starts), then waits until
+# 70 GB (D-156), on every machine at least 30 GB free disk. An exclusive take first writes the hold (so nothing new starts), then waits until
 # every slot is free. A take prints TAKEN and exits 0. Exit codes: 0 done, 2 usage, 3 timed out waiting, 4 release refused.
 set -u
 root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
@@ -140,10 +140,10 @@ queue_list() {
   return 0
 }
 
-# Memory lines on Windows: free RAM at least 6 GB and commit under 62 GB. The maintainer may approve looser lines for a set time:
+# Memory lines on Windows: free RAM at least 6 GB and commit under 70 GB (D-156). The maintainer may approve looser lines for a set time:
 # .work/tripo-round4/mem-lines holds "<free GB> <commit GB> <until, epoch seconds>" and is ignored once that time has passed.
 mem_lines() {
-  mlf=6; mlc=62
+  mlf=6; mlc=70
   if [ -f "$dir/mem-lines" ]; then
     mo=""; { IFS= read -r mo < "$dir/mem-lines"; } 2>/dev/null
     set -- $mo
