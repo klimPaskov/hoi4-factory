@@ -7,6 +7,7 @@ HOI4 Live Tools: the MCP that runs real in-game tests, its launch preparation an
 | ID | Since | In short | Full entry |
 |---|---|---|---|
 | D-15 | 2026-11-01 | Real in-game testing belongs to Live Tools. When it is not set up or the user is on the web version, a human runs the test. Agent Tools gets no game-launch runner. | [expansion record](../08-expansion-research/00-decision-record.md) |
+| D-154 | 2026-11-27 | In-game testing through Live Tools is a normal step of the kit's workflow. The agent asks the user once whether to run it, how and when, and records the answer. Public users need no backup-and-restore step. The maintainer's PC keeps D-33. | [below](#decisions) |
 | D-33 | 2026-11-08 | Standing launch rule: the Windows game runs any night 00:00 to 06:00 local through one runner session using Live Tools, one instance at a time. See operations. | [operations](operations.md#decisions) |
 | D-30 | 2026-11-08 | Until 2026-11-09. One named runner may start the Windows game from 2026-11-08 18:00 for Live Tools release acceptance and, if time allows, the cancelled in-game checklist. It backs up and restores user-folder files, never loads ZIN on Windows and starts no launch after 06:00. | [expansion record](../08-expansion-research/00-decision-record.md) |
 | R-6 | 2026-11-06 | A prepare step may copy launcher-v2.sqlite and dlc_signature into the run's user folder with a backup and restore afterwards, so a launch works without Steam. | [expansion record](../08-expansion-research/00-decision-record.md) |
@@ -22,6 +23,7 @@ HOI4 Live Tools: the MCP that runs real in-game tests, its launch preparation an
 | ID | Date | Question | Decision |
 |---|---|---|---|
 | D-117 | 2026-11-22 | Live Tools keeps five old handoff files that its AGENTS.md tells agents to start from. Do they stay for 2.0.0? | No. The five files move to `docs/archive`, and AGENTS.md points agents at one current status file instead, in the same change, so the public docs are clean for Live Tools 2.0.0. Maintainer decision |
+| D-154 | 2026-11-27 | The kit tells agents never to start Hearts of Iron IV unless the user invokes live testing, so a user's mod is never checked in game. Should users be offered in-game testing, and with what safeguards? | Yes, as a normal step of the workflow. The agent asks the user once, as part of the consultation, whether to run in-game tests through Live Tools at all, how to run them and when (for example after each feature or at milestones), and records the answer so it is not asked again. No extra backup-and-restore step is required for public users. The maintainer's own PC keeps D-33's windows and launch rules. Maintainer decision |
 
 ## Replaced or expired
 

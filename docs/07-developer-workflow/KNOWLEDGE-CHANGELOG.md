@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.65, 2026-11-27, the tutorial path goes first in the pool
+
+- CLAUDE.md, Delegation and parallel work: the pool keeps 1 slot for take texts starting `tutorial-path:`, checked before the Rust and ZIN reserves.
+- Reason and evidence: memory left the pool few free slots on 2026-11-27, and the maintainer chose the order: the tutorial path, then Rust, then 3D and ZIN.
+- Authority: maintainer decision D-153.
+
 ## 0.2.64, 2026-11-27, the Tripo turn waits for free memory
 
 - CLAUDE.md, External services, Tripo browser: `scripts/tripo-turn.sh take` waits until 3 GB of RAM is free (`TRIPO_MIN_FREE_GB`) before it hands out the turn, and sessions close their own Tripo tabs before they release.
