@@ -76,6 +76,10 @@ CLAUDE.md rule: commit empty crate skeletons and their workspace members on main
 
 CLAUDE.md rule: make every HOI4 image with hoi4-imagegen, never the general `gptimage` MCP. hoi4-imagegen paces its ChatGPT sign-in requests across all its processes on the machine, while `gptimage` uses the same Codex sign-in outside that limit. On 2026-11-08 both ran at once and OpenAI revoked the sign-in at 15:29 UTC.
 
+### A frozen Tripo tab blocked every later Tripo page (2026-11-27)
+
+CLAUDE.md rule: `tripo-turn.sh take` waits until 3 GB of RAM is free (`TRIPO_MIN_FREE_GB`). Kror's export page froze Chrome with about 1 GB free. On 2026-11-27 the goblin's Animate page froze at 1.1 GB free, and Chrome would not close it. Later Tripo pages opened with 5.7 GB free froze within seconds too, because Chrome renders one site in one process, so the first frozen tab hung them all. No press was made and no credits were spent. Agents can close only the tabs in their own Chrome tab group, so a stuck tab in another session's group needs the maintainer.
+
 ### A pull request opened on the upstream of a fork (2026-11-09)
 
 CLAUDE.md rule: pass `--repo` and `--base` to `gh pr create` in a forked repository. In hoi4-imagegen-mcp, a fork, `gh pr create` without them opened the colour PR on the upstream parent project. The session closed it within a minute and reopened it on our repository, but the closed PR stays visible there.

@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.64, 2026-11-27, the Tripo turn waits for free memory
+
+- CLAUDE.md, External services, Tripo browser: `scripts/tripo-turn.sh take` waits until 3 GB of RAM is free (`TRIPO_MIN_FREE_GB`) before it hands out the turn, and sessions close their own Tripo tabs before they release.
+- Reason and evidence: the engineering lessons, "A frozen Tripo tab blocked every later Tripo page (2026-11-27)".
+- Authority: a technical default under D-18, D-114 and D-151. It widens no access, cost or scope.
+
 ## 0.2.63, 2026-11-23, gated steps start first come, first served
 
 - CLAUDE.md, Delegation and parallel work: the 3D lanes' gated steps start in the order they began waiting. `heavy-slot.sh kept` finds the gated step that asks, ranks it by its process start time among the waiting steps (cached for 15 s), and keeps it waiting while older steps fit the free slots.
