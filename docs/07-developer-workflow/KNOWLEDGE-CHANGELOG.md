@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.68, 2026-11-28, TaskStop leaves a waiting take alive
+
+- CLAUDE.md, Delegation and parallel work: stopping a background task does not end its waiting take's child, so kill the tree by PID or let the job run or time out.
+- Reason and evidence: on 2026-11-28 a Rust packet stopped two queued jobs with TaskStop. The orphaned takes took two slots at 03:25 and 03:29 with no job behind them, and blocked half the pool until 06:10.
+- Authority: a technical default under D-18 and D-113. It widens no access, cost or scope.
+
 ## 0.2.67, 2026-11-27, one take for a job of several steps
 
 - CLAUDE.md, Delegation and parallel work: a job of several steps that a game run must not split keeps one take across all its steps.
