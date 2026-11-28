@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.70, 2026-11-28, check ownership before moving a .work folder
+
+- CLAUDE.md, Working environment, cleanup: before moving or deleting a `.work` folder, check that `.work/INDEX.md` names you as its owner and that no script, RESUME or STATUS file under `.work/` names its path.
+- Reason and evidence: the engineering lessons, "A cleanup moved a live lane's inputs (2026-11-28)".
+- Authority: a technical default under D-18. It widens no access, cost or scope.
+
 ## 0.2.69, 2026-11-28, slot pool priority and dead-slot clearing
 
 - CLAUDE.md, Delegation and parallel work: reserve conflicts go by priority (tutorial, Rust, then 3D and ZIN, oldest waiting take first), a plain take's slot is cleared once its recorded pid is gone for 5 minutes, and `scripts/test_heavy_slot.sh` covers both.
