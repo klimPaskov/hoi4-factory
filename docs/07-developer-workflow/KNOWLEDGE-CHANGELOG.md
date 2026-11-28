@@ -2,6 +2,12 @@
 
 This is the versioned index of accepted engineering guidance changes. Detailed candidates retain evidence and review records. It is separate from product runtime memory and game design canon. Follow [the policy](REUSABLE-KNOWLEDGE-POLICY.md).
 
+## 0.2.69, 2026-11-28, slot pool priority and dead-slot clearing
+
+- CLAUDE.md, Delegation and parallel work: reserve conflicts go by priority (tutorial, Rust, then 3D and ZIN, oldest waiting take first), a plain take's slot is cleared once its recorded pid is gone for 5 minutes, and `scripts/test_heavy_slot.sh` covers both.
+- Reason and evidence: the engineering lessons, "The slot pool deadlocked and kept dead slots (2026-11-28)".
+- Authority: a technical default under D-18, D-113 and D-153. It widens no access, cost or scope.
+
 ## 0.2.68, 2026-11-28, TaskStop leaves a waiting take alive
 
 - CLAUDE.md, Delegation and parallel work: stopping a background task does not end its waiting take's child, so kill the tree by PID or let the job run or time out.

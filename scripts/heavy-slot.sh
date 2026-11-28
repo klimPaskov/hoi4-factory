@@ -13,12 +13,17 @@
 # To stop a waiting take, kill only your own take's recorded PID and its children, never a process matched by a command-line
 # pattern: on 2026-11-23 a pattern kill ended eight other lanes' waiting takes. Record the PID when your script starts, send
 # TERM to the script first so its EXIT trap releases what it holds, then end its children, then check `status` for your text.
+# Tests: HEAVY_STATE_DIR moves the whole pool to another folder, HEAVY_MACHINE_FAKE, HEAVY_POLL_SECONDS and HEAVY_SETTLE_SECONDS fake
+# the machine lines and the clocks (scripts/test_heavy_slot.sh).
 # Pool size: HEAVY_SLOTS, default 4. Every start also needs the machine lines: on Windows free RAM at least 6 GB and commit under
 # 70 GB (D-156), on every machine at least 30 GB free disk. An exclusive take first writes the hold (so nothing new starts), then waits until
 # every slot is free. A take prints TAKEN and exits 0. Exit codes: 0 done, 2 usage, 3 timed out waiting, 4 release refused.
 set -u
 root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-dir="$root/.work/tripo-round4"
+dir="${HEAVY_STATE_DIR:-$root/.work/tripo-round4}"
+poll_s=${HEAVY_POLL_SECONDS:-15}
+settle_s=${HEAVY_SETTLE_SECONDS:-2}
+dead_min=${HEAVY_DEAD_AFTER_MIN:-5}
 hold="$dir/hold"
 legacy="$dir/blender.lock"
 slots="$dir/slots"
@@ -52,6 +57,28 @@ group_of() {
   done
 }
 group_waiting() { [ -d "$dir/$1-wait" ] && [ -n "$(find "$dir/$1-wait" -type f -mmin -2 2>/dev/null | head -1)" ]; }
+# Priority of a group when the free slots are fewer than the slots kept for waiting groups (D-153): a lower number goes first.
+# The order is separate from the pattern order above. .work/tripo-round4/reserve-priority holds lines "<name> <number>"; a group
+# not listed there gets tutorial 1, rust 2, anything else (3D, ZIN) 3. Groups of one level go by the oldest waiting take.
+group_prio() {
+  gpv=""
+  [ -f "$dir/reserve-priority" ] && gpv=$(awk -v g="$1" '$1 == g && $2 ~ /^[0-9]+$/ { print $2; exit }' "$dir/reserve-priority")
+  if [ -z "$gpv" ]; then
+    case "$1" in tutorial) gpv=1 ;; rust) gpv=2 ;; *) gpv=3 ;; esac
+  fi
+  echo "$gpv"
+}
+# Start time (epoch seconds) of the oldest waiting take of a group. A ticket holds the time its take started. An empty ticket
+# (from an older script) counts as starting now.
+group_start() {
+  gsn=$(date +%s); gsb=$gsn
+  for gsf in $(find "$dir/$1-wait" -type f -mmin -2 2>/dev/null); do
+    gsv=""; { IFS= read -r gsv < "$gsf"; } 2>/dev/null
+    case "$gsv" in ''|*[!0-9]*) gsv=$gsn ;; esac
+    [ "$gsv" -lt "$gsb" ] && gsb=$gsv
+  done
+  echo "$gsb"
+}
 used_by() {
   ucount=0; ui=1
   while [ "$ui" -le "$n" ]; do
@@ -63,27 +90,40 @@ used_by() {
   done
   echo "$ucount"
 }
-# Prints "<slots> <names>": the unfilled reserved slots of waiting groups other than group $1.
-kept_for_others() {
-  own=$1; ktotal=0; knames=""
-  ktmp="$dir/.reserves.$$"
-  reserves > "$ktmp"
+# Prints "<prio> <start> <name> <unfilled>" for each waiting group with unfilled reserved slots, in priority order.
+waiting_order() {
+  wtmp="$dir/.reserves.w$$"
+  reserves > "$wtmp"
   while read -r gname gcount gpat; do
-    [ "$gname" = "$own" ] && continue
     group_waiting "$gname" || continue
-    kleft=$((gcount - $(used_by "$gname")))
-    [ "$kleft" -gt 0 ] || continue
-    ktotal=$((ktotal + kleft)); knames="$knames $gname"
-  done < "$ktmp"
-  rm -f "$ktmp"
-  echo "$ktotal$knames"
+    wleft=$((gcount - $(used_by "$gname")))
+    [ "$wleft" -gt 0 ] || continue
+    echo "$(group_prio "$gname") $(group_start "$gname") $gname $wleft"
+  done < "$wtmp" | sort -k1,1n -k2,2n -k3,3
+  rm -f "$wtmp"
+}
+# Prints "<slots> <names>": the unfilled reserved slots of waiting groups that go before group $1, so a taker of group $1 must
+# leave them free. Groups that go after it by priority do not hold it back, so two groups can never keep the last free slot
+# from each other (2026-11-28 01:45). A taker with no group, or whose group has filled its reserve, leaves every waiting group's
+# slots free.
+kept_for_others() {
+  own=$1
+  waiting_order | {
+    ktotal=0; knames=""
+    while read -r kp ks kn kl; do
+      [ -n "$kn" ] || continue
+      [ "$kn" = "$own" ] && break
+      ktotal=$((ktotal + kl)); knames="$knames $kn"
+    done
+    echo "$ktotal$knames"
+  }
 }
 show_reserves() {
   stmp="$dir/.reserves.s$$"
   reserves > "$stmp"
   while read -r gname gcount gpat; do
     if group_waiting "$gname"; then w="a take is waiting"; else w="none waiting, so its slots are open"; fi
-    echo "Reserve $gname: $gcount slot(s) for takes matching '$gpat', $(used_by "$gname") in use, $w"
+    echo "Reserve $gname: $gcount slot(s) for takes matching '$gpat', priority $(group_prio "$gname"), $(used_by "$gname") in use, $w"
   done < "$stmp"
   rm -f "$stmp"
 }
@@ -154,7 +194,12 @@ mem_lines() {
   echo "$mlf $mlc"
 }
 
+# Test hook: HEAVY_MACHINE_FAKE=ok passes the machine lines, any other text fails them with that text as the reason.
 machine_ok() {
+  if [ -n "${HEAVY_MACHINE_FAKE:-}" ]; then
+    [ "$HEAVY_MACHINE_FAKE" = ok ] && return 0
+    echo "$HEAVY_MACHINE_FAKE"; return 1
+  fi
   free_kb=$(df -k "$dir" | tail -1 | awk '{print $4}')
   if [ "$free_kb" -lt 31457280 ]; then echo "disk: under 30 GB free"; return 1; fi
   case "$(uname -s)" in
@@ -191,11 +236,49 @@ list() {
   return 0
 }
 
-stamp() { printf '%s %s (pid %s)\n' "$(date '+%Y-%m-%d %H:%M')" "$1" "$PPID"; }
+# The recorded pid is the shell that called take, so a take must be made by the script that runs the job (or by a long-lived
+# shell). A caller that cannot be that shell sets HEAVY_OWNER_PID to the pid of the process that lives as long as the job.
+stamp() { printf '%s %s (pid %s)\n' "$(date '+%Y-%m-%d %H:%M')" "$1" "${HEAVY_OWNER_PID:-$PPID}"; }
+
+# Plain takes have no heartbeat, so a job that dies without its EXIT trap would hold its slot forever (2026-11-28: two dead slots
+# for almost three hours). A slot is cleared when its owner file is older than HEAVY_DEAD_AFTER_MIN minutes (default 5) and the
+# pid it records is gone, or when its folder has had no owner file for that long. A slot with no pid in its owner text, or with
+# pid 1 or less, is never cleared this way. The pid is an MSYS pid under Git Bash, where kill -0 checks it. A native Windows
+# parent shows its Windows pid instead, so on Windows a pid that kill cannot see is also looked up with ps -W (a match there
+# keeps the slot). Each cleared slot is logged in .work/tripo-round4/cleared.log, and printed unless the caller is quiet.
+pid_alive() {
+  kill -0 "$1" 2>/dev/null && return 0
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*) ps -W 2>/dev/null | awk -v p="$1" '$1 == p || $4 == p { f = 1 } END { exit !f }' && return 0 ;;
+  esac
+  return 1
+}
+sweep_dead() {
+  si=1
+  while [ "$si" -le "$n" ]; do
+    sd="$slots/s$si"; si=$((si + 1))
+    [ -d "$sd" ] || continue
+    if [ -f "$sd/owner" ]; then sf="$sd/owner"; else sf="$sd"; fi
+    [ -n "$(find "$sf" -maxdepth 0 -mmin +"$dead_min" 2>/dev/null)" ] || continue
+    so=""; [ -f "$sd/owner" ] && so=$(head -1 "$sd/owner" 2>/dev/null)
+    sp=$(printf '%s' "$so" | sed -n 's/.*(pid \([0-9][0-9]*\))$/\1/p')
+    if [ -n "$so" ]; then
+      [ -n "$sp" ] && [ "$sp" -gt 1 ] || continue
+      pid_alive "$sp" && continue
+    fi
+    [ "$(head -1 "$sd/owner" 2>/dev/null)" = "$so" ] || continue
+    rm -rf "$sd"
+    sm="CLEARED dead slot ${sd##*/}: owner pid ${sp:-none} is gone, older than $dead_min min: ${so:-no owner file}"
+    printf '%s %s\n' "$(date '+%Y-%m-%d %H:%M')" "$sm" >> "$dir/cleared.log"
+    [ "${1:-}" = quiet ] || echo "$sm" >&2
+  done
+  return 0
+}
 
 cmd=${1:-}
 case "$cmd" in
   status)
+    sweep_dead
     u=$(used)
     if [ -f "$hold" ]; then echo "BUSY exclusive, $u of $n slots used"; list; show_reserves; exit 0; fi
     if [ "$u" -ge "$n" ]; then echo "BUSY $u of $n slots used"; list; show_reserves; exit 0; fi
@@ -207,6 +290,7 @@ case "$cmd" in
     # Prints "<slots> <groups>": the slots other takers must leave free for waiting groups. gated.sh asks this before it
     # claims a slot. With a take text, that text's own group is left out.
     # With no take text and a gated.sh step as the caller, the first-come queue applies too (see gated_caller).
+    sweep_dead quiet
     kgrp=""; [ -n "${2:-}" ] && kgrp=$(group_of "$2")
     kout=$(kept_for_others "$kgrp")
     if [ -z "${2:-}" ] && [ -r "/proc/$$/cmdline" ] && me=$(gated_caller); then
@@ -236,11 +320,13 @@ case "$cmd" in
       grp=$(group_of "$what")
       if [ -n "$grp" ]; then
         mkdir -p "$dir/$grp-wait"; ticket="$dir/$grp-wait/$$"
+        date +%s > "$ticket"
         trap 'rm -f "$ticket"' EXIT
       fi
     fi
     while :; do
       n=$(pool_n)
+      sweep_dead
       [ -n "$ticket" ] && touch "$ticket"
       if [ "$excl" -eq 1 ]; then
         if [ -z "$mine" ]; then
@@ -267,7 +353,7 @@ case "$cmd" in
           done
           if [ -n "$got" ]; then
             stamp "$what" > "$slots/s$got/owner"
-            sleep 2
+            sleep "$settle_s"
             if [ -f "$hold" ] || [ "$(used)" -gt "$n" ]; then
               rm -rf "$slots/s$got"; reason="an exclusive hold or another taker appeared at the same moment, backing off"
             else
@@ -281,7 +367,7 @@ case "$cmd" in
         echo "TIMEOUT after ${max}s: $reason"; exit 3
       fi
       [ $((waited % 300)) -eq 0 ] && echo "waiting: $reason"
-      sleep 15; waited=$((waited + 15))
+      sleep "$poll_s"; waited=$((waited + poll_s))
     done ;;
   release)
     what=${2:-}
